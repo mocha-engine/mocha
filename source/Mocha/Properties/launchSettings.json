@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Mocha": {
+      "commandName": "Project",
+      "workingDirectory": "F:\\Projects\\Mocha"
+    }
+  }
+}
