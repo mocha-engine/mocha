@@ -1,36 +1,44 @@
 <p align="center">
     <h1 align="center">
-        OpenTPW
+        Mocha
     </h1>
     <p align="center">
-        OpenTPW is an open-source re-implementation of <a href="https://en.wikipedia.org/wiki/Theme_Park_World">Sim Theme Park / Theme Park World</a>.
+        Yet Another Game Engine
         <br>
-        <a href="https://opentpw.gu3.me/formats/">Documentation</a> |
-        <a href="https://github.com/ThemeParkWorld/OpenTPW/issues">Issues</a> |
-        <a href="https://github.com/ThemeParkWorld/OpenTPW/pulls">Pull Requests</a>
+        <a href="https://github.com/xezno/mocha/issues">Issues</a> |
+        <a href="https://github.com/xezno/mocha/pulls">Pull Requests</a>
     </p>
     <p align="center">
-        <img src="https://img.shields.io/github/repo-size/ThemeParkWorld/OpenTPW?style=flat-square" alt="Repo Size">
-        <img src="https://img.shields.io/github/contributors/ThemeParkWorld/OpenTPW?style=flat-square" alt="Contributors">
-        <img src="https://img.shields.io/github/stars/ThemeParkWorld/OpenTPW?style=flat-square" alt="Stars"> 
-        <img src="https://img.shields.io/github/forks/ThemeParkWorld/OpenTPW?style=flat-square" alt="Forks">
-        <img src="https://img.shields.io/github/license/ThemeParkWorld/OpenTPW?style=flat-square" alt="License">
-        <img src="https://img.shields.io/github/issues/ThemeParkWorld/OpenTPW?style=flat-square" alt="Issues">
+        <img src="https://img.shields.io/github/repo-size/xezno/mocha?style=flat-square" alt="Repo Size">
+        <img src="https://img.shields.io/github/contributors/xezno/mocha?style=flat-square" alt="Contributors">
+        <img src="https://img.shields.io/github/stars/xezno/mocha?style=flat-square" alt="Stars"> 
+        <img src="https://img.shields.io/github/forks/xezno/mocha?style=flat-square" alt="Forks">
+        <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
+        <img src="https://img.shields.io/github/issues/xezno/mocha?style=flat-square" alt="Issues">
     </p>
 </p>
 
-## About
+## Building
 
-OpenTPW is a re-implementation of [Sim Theme Park / Theme Park World](https://en.wikipedia.org/wiki/Theme_Park_World), requiring an installation the original game and its assets in order to run. OpenTPW aims to re-create the same experience as the original game. While OpenTPW was initially created as it is quite difficult to get Sim Theme Park to run on modern hardware and on a modern operating system, it also aims to somewhat re-introduce the original online aspect of the game - the servers of which have since been shut down.
+### Prerequisites
 
-## Prerequisites
+#### Requirements
 
-- A copy of the original game (either Theme Park World or Sim Theme Park)
+- .NET 6.0
+- Visual Studio 2022
+- Windows
+
+#### Recommendations
+
+- Windows 10 / 11
 - A decent graphics card & processor
 
-## Documentation
+### Instructions
 
-File format information is available within this repo's [wiki](https://github.com/xezno/OpenTPW/wiki).  Keep in mind that this information is a work-in-progress, and therefore might not be of incredible detail - however, upon completion, it still aims to be as useful, detailed, and as in-depth as possible.
+#### Building with the example project
+
+1. First, clone the repository recursively with `git clone --recursive https://github.com/xezno/mocha`
+2. Once complete, open `Source/Mocha.sln` and build the solution. This will fetch / build any NuGet dependencies automatically, and then build the engine.
 
 ## Contributing
 
@@ -40,9 +48,17 @@ Contributions to this project are greatly appreciated; please follow these steps
 2. Create a branch under the name `YourName/FeatureName`
 3. Once you've made all the changes you need to make, go ahead and submit a Pull Request.
 
+## Code Conventions
+
+Throughout this project, the standard [C# coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions) should be observed and used within any pull requests / any other direct contributions.
+
+## Support
+
+Feel free to [open an issue](https://github.com/xezno/mocha/issues/new) if you encounter any bugs or problems, have any feature requests, or have any questions.
+
 ## License
 
-This project is licensed under the MPL-2.0 license; a copy of this license is available at [LICENSE.md](https://github.com/ThemeParkWorld/OpenTPW/blob/main/LICENSE.md).
+This project is licensed under the MPL-2.0 license; a copy of this license is available at [Docs/LICENSE.md](https://github.com/xezno/mocha/blob/main/Docs/LICENSE.md).
 
 ## Acknowledgements
 * [Badges](https://shields.io)
