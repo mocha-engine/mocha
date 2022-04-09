@@ -15,19 +15,19 @@ public class World
 	public World()
 	{
 		Current = this;
+		Event.Register( this );
+		Event.RegisterStatics();
+		Event.Run( Event.Game.LoadAttribute.Name );
 
 		SetupEntities();
 		SetupHud();
-
-		Event.Register( this );
-		Event.Run( Event.Game.LoadAttribute.Name );
 	}
 
 	private void SetupEntities()
 	{
 		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
-		_ = new TestObject();
+		_ = new GenericModelObject( "content/models/sponza/sponza.obj" );
 	}
 
 	private void SetupHud()
