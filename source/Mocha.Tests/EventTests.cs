@@ -32,7 +32,7 @@ public class EventTests
 	[TestMethod]
 	public void RegisterAndRunStaticEvent()
 	{
-		Event.Register( this );
+		Event.RegisterStatics();
 		Event.Run( "Event.Test.TestEvent" );
 
 		Assert.IsTrue( staticEventHasRun );
@@ -41,7 +41,7 @@ public class EventTests
 	[TestMethod]
 	public void RegisterAndRunStaticEventWithParams()
 	{
-		Event.Register( this );
+		Event.RegisterStatics();
 		Event.Run( "Event.Test.TestEventWithParams", "Test" );
 
 		Assert.IsTrue( staticEventWithParamsHasRun );

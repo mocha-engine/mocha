@@ -29,6 +29,16 @@ public static partial class Event
 		events.AddRange( attributes );
 	}
 
+	public static void RegisterStatics()
+	{
+		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes() )
+		{
+			var attributes = type.GetMethods()
+				.Where( m => m.GetCustomAttribute<EventAttribute>() != null && m.IsStatic )
+				.Select( m => new EventRef( m.GetCustomAttribute<EventAttribute>().EventName, m, null ) );
+		}
+	}
+
 	public static void Run( string name, params object[] parameters )
 	{
 		events.ForEach( e =>
