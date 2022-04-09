@@ -6,12 +6,12 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<ApplicationIcon>icon.ico</ApplicationIcon>
+		<ApplicationIcon>mocha.ico</ApplicationIcon>
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Content Include="icon.ico" />
+		<Content Include="mocha.ico" />
 	</ItemGroup>
 
 	<ItemGroup>
