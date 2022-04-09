@@ -1,4 +1,6 @@
 ﻿using StbImageSharp;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Veldrid;
 
@@ -71,6 +73,13 @@ public partial class TextureBuilder
 		};
 	}
 
+	public TextureBuilder WithType( string type = "texture_diffuse" )
+	{
+		this.type = type;
+
+		return this;
+	}
+
 	public TextureBuilder GenerateMips( bool generateMips = true )
 	{
 		if ( !generateMips )
@@ -128,6 +137,32 @@ public partial class TextureBuilder
 		this.width = (uint)image.Width;
 		this.height = (uint)image.Height;
 		this.path = $"Stream {stream.GetHashCode()}";
+
+		return this;
+	}
+
+	public TextureBuilder WithName( string name )
+	{
+		this.path = name;
+
+		return this;
+	}
+
+	public TextureBuilder FromColor( Vector4 vector4 )
+	{
+		var data = new byte[4];
+
+		data[0] = (byte)(vector4.X * 255).FloorToInt();
+		data[1] = (byte)(vector4.Y * 255).FloorToInt();
+		data[2] = (byte)(vector4.Z * 255).FloorToInt();
+		data[3] = (byte)(vector4.W * 255).FloorToInt();
+
+		return FromData( data, 1, 1 );
+	}
+
+	public TextureBuilder FromInternal( string name )
+	{
+		this.path = name;
 
 		return this;
 	}

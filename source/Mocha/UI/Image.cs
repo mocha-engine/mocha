@@ -14,13 +14,14 @@ public partial class Image : Panel
 
 	public Image( Texture texture )
 	{
-		var material = new Material(
-			texture,
-			ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )
+		var material = new Material
+		{
+			DiffuseTexture = texture,
+			Shader = ShaderBuilder.Default.WithVertex( "content/shaders/test.vert" )
 						  .WithFragment( "content/shaders/test.frag" )
 						  .Build(),
-			typeof( ObjectUniformBuffer )
-		);
+			UniformBufferType = typeof( ObjectUniformBuffer )
+		};
 
 		model = Primitives.Plane.GenerateModel( material );
 	}

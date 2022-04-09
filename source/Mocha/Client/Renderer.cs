@@ -110,7 +110,7 @@ internal class Renderer
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 
-		var windowTitle = $"Mocha | {Device.BackendType}";
+		var windowTitle = $"Mocha Renderer ({Device.BackendType})";
 		Window.Current.SdlWindow.Title = windowTitle;
 	}
 

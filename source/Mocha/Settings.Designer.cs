@@ -49,7 +49,7 @@ namespace Mocha {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("Vulkan")]
+        [global::System.Configuration.DefaultSettingValueAttribute("Direct3D11")]
         public string PreferredBackend {
             get {
                 return ((string)(this["PreferredBackend"]));
