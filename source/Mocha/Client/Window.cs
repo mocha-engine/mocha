@@ -24,8 +24,8 @@ internal class Window
 			WindowWidth = Settings.Default.GameWindowSize.X,
 			WindowHeight = Settings.Default.GameWindowSize.Y,
 			WindowTitle = "Mocha",
-			X = 32,
-			Y = 32
+			X = 128,
+			Y = 128
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
