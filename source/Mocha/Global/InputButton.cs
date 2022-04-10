@@ -4,5 +4,6 @@ public enum InputButton
 {
 	ConsoleToggle,
 	RotateLeft,
-	RotateRight
+	RotateRight,
+	Jump
 }

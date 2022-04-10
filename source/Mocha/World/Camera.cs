@@ -14,24 +14,22 @@ public class Camera : Entity
 	private Vector3 velocity = new();
 	private Vector3 wishVelocity = new();
 
-	private float wishYaw = 0f;
-	private float yaw = 0f;
-	private float wishHeight = 8f;
 	private float cameraSpeed = 100f;
 
 	private void CalcViewProjMatrix()
 	{
-		var lookAt = new Vector3( position.X, position.Y + 4, 0 );
+		var cameraPos = position;
 
-		var cameraPos = lookAt + new Vector3(
-			MathF.Cos( yaw.DegreesToRadians() ) * position.Z,
-			MathF.Sin( yaw.DegreesToRadians() ) * position.Z,
-			position.Z
+		var direction = new Vector3(
+			MathF.Cos( rotation.Y.DegreesToRadians() ) * MathF.Cos( rotation.X.DegreesToRadians() ),
+			MathF.Sin( rotation.Y.DegreesToRadians() ) * MathF.Cos( rotation.X.DegreesToRadians() ),
+			MathF.Sin( rotation.X.DegreesToRadians() )
 		);
+		var cameraFront = direction;
 
 		var cameraUp = new Vector3( 0, 0, 1 );
 
-		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, lookAt, cameraUp );
+		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, cameraPos + cameraFront, cameraUp );
 		ProjMatrix = Matrix4x4.CreatePerspectiveFieldOfView(
 			90.0f.DegreesToRadians(),
 			Screen.Aspect,
@@ -51,32 +49,31 @@ public class Camera : Entity
 		// Get user input
 		//
 
-		var wishDir = new Vector3( Input.Forward, Input.Right, 0 ).Normal;
+		var wishDir = new Vector3( Input.Forward, Input.Left, 0 ).Normal;
 
-		if ( Input.Mouse.Right && !wasPressed )
+		if ( Input.MouseRight && !wasPressed )
 		{
-			mouseAnchor = Input.Mouse.Position;
+			mouseAnchor = Input.MousePosition;
 		}
 
-		if ( Input.Mouse.Right )
+		if ( Input.MouseRight )
 		{
-			var delta = mouseAnchor - Input.Mouse.Position;
+			var delta = mouseAnchor - (Vector2)Input.MousePosition;
 			wishDir = new Vector3( delta.Y, -delta.X, 0 ) / 512f;
 		}
 
-		wasPressed = Input.Mouse.Right;
+		wasPressed = Input.MouseRight;
 
 		wishVelocity = Forward * wishDir.X * Time.Delta * cameraSpeed;
 		wishVelocity += Right * wishDir.Y * Time.Delta * cameraSpeed;
-		wishVelocity.Z = 0;
 
-		wishHeight += -Input.Mouse.Wheel;
-		wishHeight = wishHeight.Clamp( 1, 10 );
+		if ( Input.Down( InputButton.Jump ) )
+			wishVelocity.Z += cameraSpeed * Time.Delta;
 
-		if ( Input.Pressed( InputButton.RotateLeft ) )
-			wishYaw -= 90;
-		if ( Input.Pressed( InputButton.RotateRight ) )
-			wishYaw += 90;
+		rotation.Y -= Input.MouseDelta.X * 20f * Time.Delta;
+		rotation.X -= Input.MouseDelta.Y * 20f * Time.Delta;
+
+		rotation.X = rotation.X.Clamp( -89, 89 );
 
 		//
 		// Apply everything
@@ -88,12 +85,8 @@ public class Camera : Entity
 		// Apply drag
 		velocity *= 1 - Time.Delta * 10f;
 
-		// Rotate camera
-		yaw = yaw.LerpTo( wishYaw, 10f * Time.Delta );
-
 		// Move camera
 		position += velocity * Time.Delta;
-		position.Z = position.Z.LerpTo( wishHeight, 10f * Time.Delta );
 
 		// Run view/proj matrix calculations
 		CalcViewProjMatrix();

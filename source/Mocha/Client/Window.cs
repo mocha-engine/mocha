@@ -31,13 +31,5 @@ internal class Window
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
 
 		Screen.UpdateFrom( Size );
-
-		SdlWindow.Resized += SdlWindow_Resized;
-	}
-
-	private void SdlWindow_Resized()
-	{
-		Screen.UpdateFrom( Size );
-		Event.Run( Event.Window.ResizedAttribute.Name, Size );
 	}
 }

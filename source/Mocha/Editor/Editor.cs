@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Veldrid;
+using Veldrid.Sdl2;
 
 namespace Mocha;
 internal partial class Editor
@@ -124,6 +125,8 @@ internal partial class Editor
 			ImGui.Text( $"{total} total" );
 		}
 
+		ImGui.Text( $"Running for {Time.Now:0}s" );
+
 		ImGui.End();
 	}
 
@@ -164,12 +167,15 @@ internal partial class Editor
 		ImGui.EndMainMenuBar();
 	}
 
-	public void UpdateFrom( InputSnapshot inputSnapshot )
+	public void UpdateFrom( MochaInputSnapshot snapshot )
 	{
-		ImGuiRenderer.Update( Time.Delta, inputSnapshot );
+		ImGuiRenderer.Update( Time.Delta, snapshot );
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
+		{
+			Log.Trace( "Editor toggled..." );
 			shouldRender = !shouldRender;
+		}
 
 		DrawPerfOverlay();
 
