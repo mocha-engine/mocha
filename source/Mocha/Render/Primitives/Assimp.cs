@@ -28,6 +28,7 @@ partial class Primitives
 				| PostProcessSteps.OptimizeGraph
 				| PostProcessSteps.ValidateDataStructure
 				| PostProcessSteps.GenerateNormals
+				| PostProcessSteps.FlipWindingOrder
 				| PostProcessSteps.FlipUVs );
 
 			ProcessNode( ref models, scene.RootNode, scene, directory );
