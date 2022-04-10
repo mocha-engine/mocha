@@ -27,7 +27,9 @@ public class World
 	{
 		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
-		_ = new GenericModelObject( "content/models/sponza/sponza.obj" );
+		var model = new GenericModelObject( "content/models/sponza/sponza.obj" );
+		model.rotation = new Vector3( 90, 0, 0 );
+		model.scale = new Vector3( 0.025f );
 	}
 
 	private void SetupHud()
