@@ -65,6 +65,7 @@ internal class Renderer
 	private void PostRender()
 	{
 		commandList.End();
+		Device.SyncToVerticalBlank = true;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
 	}
@@ -80,13 +81,11 @@ internal class Renderer
 		float deltaTime = (float)(DateTime.Now - lastFrame).TotalSeconds;
 		lastFrame = DateTime.Now;
 
-		InputSnapshot inputSnapshot = window.SdlWindow.PumpEvents();
-
 		Time.UpdateFrom( deltaTime );
-		Input.UpdateFrom( inputSnapshot );
+		Input.Update();
 
 		world.Update();
-		editor?.UpdateFrom( inputSnapshot );
+		editor?.UpdateFrom( Input.InputSnapshot );
 	}
 
 	private void CreateGraphicsDevice()
@@ -110,7 +109,7 @@ internal class Renderer
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 
-		var windowTitle = $"Mocha Renderer ({Device.BackendType})";
+		var windowTitle = $"Mocha | {Device.BackendType}";
 		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
