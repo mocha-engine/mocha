@@ -89,19 +89,13 @@ public partial class TextureBuilder
 		return this;
 	}
 
-	public TextureBuilder FromPath( string path, bool flipY = true )
+	public TextureBuilder FromPath( string path, bool flipY = false )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
-		// shit-tier hack
-		if ( flipY )
-			StbImage.stbi_set_flip_vertically_on_load( 1 );
-
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		StbImage.stbi_set_flip_vertically_on_load( 0 );
 
 		this.data = image.Data;
 		this.width = (uint)image.Width;
