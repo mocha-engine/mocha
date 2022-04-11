@@ -14,7 +14,7 @@ internal partial class Editor
 
 	private List<BaseTab> tabs = new();
 
-	private bool shouldRender;
+	public bool ShouldRender { get; set; }
 
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
@@ -127,6 +127,15 @@ internal partial class Editor
 
 		ImGui.Text( $"Running for {Time.Now:0}s" );
 
+		ImGui.Separator();
+
+		ImGui.Text( $"Mouse pos: {Input.InputSnapshot.MousePosition}" );
+
+		foreach ( var veldridMouseEvent in Input.InputSnapshot.MouseEvents )
+		{
+			ImGui.Text( $"{veldridMouseEvent.MouseButton}: {veldridMouseEvent.Down}" );
+		}
+
 		ImGui.End();
 	}
 
@@ -172,14 +181,11 @@ internal partial class Editor
 		ImGuiRenderer.Update( Time.Delta, snapshot );
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
-		{
-			Log.Trace( "Editor toggled..." );
-			shouldRender = !shouldRender;
-		}
+			ShouldRender = !ShouldRender;
 
 		DrawPerfOverlay();
 
-		if ( !shouldRender )
+		if ( !ShouldRender )
 			return;
 
 		DrawMenuBar();
