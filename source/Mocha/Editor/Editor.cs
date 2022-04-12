@@ -129,9 +129,9 @@ internal partial class Editor
 
 		ImGui.Separator();
 
-		ImGui.Text( $"Mouse pos: {Input.InputSnapshot.MousePosition}" );
+		ImGui.Text( $"Mouse pos: {Input.Snapshot.MousePosition}" );
 
-		foreach ( var veldridMouseEvent in Input.InputSnapshot.MouseEvents )
+		foreach ( var veldridMouseEvent in Input.Snapshot.MouseEvents )
 		{
 			ImGui.Text( $"{veldridMouseEvent.MouseButton}: {veldridMouseEvent.Down}" );
 		}

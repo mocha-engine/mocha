@@ -6,17 +6,17 @@ namespace Mocha;
 
 public static partial class Input
 {
-	public static MochaInputSnapshot InputSnapshot { get; private set; }
+	public static MochaInputSnapshot Snapshot { get; private set; }
 
-	public static System.Numerics.Vector2 MouseDelta => InputSnapshot.MouseDelta;
-	public static System.Numerics.Vector2 MousePosition => InputSnapshot.MousePosition;
+	public static System.Numerics.Vector2 MouseDelta => Snapshot.MouseDelta;
+	public static System.Numerics.Vector2 MousePosition => Snapshot.MousePosition;
 
-	public static float Forward => InputSnapshot.Forward;
-	public static float Left => InputSnapshot.Left;
-	public static float Up => InputSnapshot.Up;
+	public static float Forward => Snapshot.Forward;
+	public static float Left => Snapshot.Left;
+	public static float Up => Snapshot.Up;
 
-	public static bool MouseLeft => InputSnapshot.MouseLeft;
-	public static bool MouseRight => InputSnapshot.MouseRight;
+	public static bool MouseLeft => Snapshot.MouseLeft;
+	public static bool MouseRight => Snapshot.MouseRight;
 
 	public static unsafe void Update()
 	{
@@ -25,13 +25,13 @@ public static partial class Input
 		if ( Sdl2Native.SDL_SetRelativeMouseMode( !Editor.Instance.ShouldRender ) != 0 )
 			throw new Exception();
 
-		var lastKeysDown = InputSnapshot?.KeysDown.ToList() ?? new();
-		var lastKeyEvents = InputSnapshot?.KeyEvents.ToList() ?? new();
-		var lastMouseEvents = InputSnapshot?.MouseEvents.ToList() ?? new();
-		InputSnapshot ??= new();
-		InputSnapshot.KeysDown = lastKeysDown.ToList();
-		InputSnapshot.LastKeysDown = lastKeysDown;
-		InputSnapshot.MouseDelta = Vector2.Zero;
+		var lastKeysDown = Snapshot?.KeysDown.ToList() ?? new();
+		var lastKeyEvents = Snapshot?.KeyEvents.ToList() ?? new();
+		var lastMouseEvents = Snapshot?.MouseEvents.ToList() ?? new();
+		Snapshot ??= new();
+		Snapshot.KeysDown = lastKeysDown.ToList();
+		Snapshot.LastKeysDown = lastKeysDown;
+		Snapshot.MouseDelta = Vector2.Zero;
 
 		Sdl2Native.SDL_PumpEvents();
 
@@ -46,8 +46,8 @@ public static partial class Input
 			{
 				case SDL_EventType.MouseMotion:
 					SDL_MouseMotionEvent mme = Unsafe.Read<SDL_MouseMotionEvent>( &e );
-					InputSnapshot.MouseDelta = new( mme.xrel, mme.yrel );
-					InputSnapshot.MousePosition = new( mme.x, mme.y );
+					Snapshot.MouseDelta = new( mme.xrel, mme.yrel );
+					Snapshot.MousePosition = new( mme.x, mme.y );
 
 					break;
 				case SDL_EventType.MouseButtonDown:
@@ -60,11 +60,11 @@ public static partial class Input
 					{
 						case SDL_MouseButton.Left:
 							veldridButton = Veldrid.MouseButton.Left;
-							InputSnapshot.MouseLeft = isButtonDown;
+							Snapshot.MouseLeft = isButtonDown;
 							break;
 						case SDL_MouseButton.Right:
 							veldridButton = Veldrid.MouseButton.Right;
-							InputSnapshot.MouseRight = isButtonDown;
+							Snapshot.MouseRight = isButtonDown;
 							break;
 						default:
 							break;
@@ -83,12 +83,12 @@ public static partial class Input
 
 					if ( isKeyDown )
 					{
-						if ( !InputSnapshot.KeysDown.Any( x => x.sym == kbe.keysym.sym ) )
-							InputSnapshot.KeysDown.Add( kbe.keysym );
+						if ( !Snapshot.KeysDown.Any( x => x.sym == kbe.keysym.sym ) )
+							Snapshot.KeysDown.Add( kbe.keysym );
 					}
 					else
 					{
-						InputSnapshot.KeysDown.RemoveAll( x => x.sym == kbe.keysym.sym );
+						Snapshot.KeysDown.RemoveAll( x => x.sym == kbe.keysym.sym );
 					}
 
 					var veldridModifiers = Veldrid.ModifierKeys.None;
@@ -117,35 +117,35 @@ public static partial class Input
 			}
 		}
 
-		InputSnapshot.Forward = 0;
-		InputSnapshot.Left = 0;
-		InputSnapshot.Up = 0;
+		Snapshot.Forward = 0;
+		Snapshot.Left = 0;
+		Snapshot.Up = 0;
 
 		if ( IsKeyPressed( SDL_Keycode.SDLK_a ) )
-			InputSnapshot.Left -= 1;
+			Snapshot.Left -= 1;
 		if ( IsKeyPressed( SDL_Keycode.SDLK_d ) )
-			InputSnapshot.Left += 1;
+			Snapshot.Left += 1;
 		if ( IsKeyPressed( SDL_Keycode.SDLK_w ) )
-			InputSnapshot.Forward += 1;
+			Snapshot.Forward += 1;
 		if ( IsKeyPressed( SDL_Keycode.SDLK_s ) )
-			InputSnapshot.Forward -= 1;
+			Snapshot.Forward -= 1;
 
-		InputSnapshot.KeyEvents = veldridKeyEvents;
-		InputSnapshot.MouseEvents = veldridMouseEvents;
-		InputSnapshot.KeyCharPresses = keyCharPresses;
+		Snapshot.KeyEvents = veldridKeyEvents;
+		Snapshot.MouseEvents = veldridMouseEvents;
+		Snapshot.KeyCharPresses = keyCharPresses;
 
 		if ( Editor.Instance.ShouldRender )
 		{
-			InputSnapshot.MouseDelta = Vector2.Zero;
-			InputSnapshot.MouseLeft = false;
-			InputSnapshot.MouseRight = false;
+			Snapshot.MouseDelta = Vector2.Zero;
+			Snapshot.MouseLeft = false;
+			Snapshot.MouseRight = false;
 		}
 	}
 
-	private static bool IsKeyPressed( SDL_Keycode k ) => InputSnapshot.KeysDown.Select( x => x.sym ).Contains( k );
+	private static bool IsKeyPressed( SDL_Keycode k ) => Snapshot.KeysDown.Select( x => x.sym ).Contains( k );
 	private static bool IsKeyPressed( InputButton b ) => IsKeyPressed( ButtonToKeycode( b ) );
 
-	private static bool WasKeyPressed( SDL_Keycode k ) => InputSnapshot.LastKeysDown.Select( x => x.sym ).Contains( k );
+	private static bool WasKeyPressed( SDL_Keycode k ) => Snapshot.LastKeysDown.Select( x => x.sym ).Contains( k );
 	private static bool WasKeyPressed( InputButton b ) => WasKeyPressed( ButtonToKeycode( b ) );
 
 	/*
@@ -164,6 +164,7 @@ public static partial class Input
 		InputButton.RotateLeft => SDL_Keycode.SDLK_LEFT,
 		InputButton.RotateRight => SDL_Keycode.SDLK_RIGHT,
 		InputButton.Jump => SDL_Keycode.SDLK_SPACE,
+		InputButton.Sprint => SDL_Keycode.SDLK_LSHIFT,
 
 		_ => SDL_Keycode.SDLK_UNKNOWN
 	};

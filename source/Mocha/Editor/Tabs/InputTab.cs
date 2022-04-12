@@ -12,10 +12,10 @@ internal class InputTab : BaseTab
 		ImGui.Text( $"Time: {Time.Now}" );
 
 		ImGui.Text( $"Last keys down:" );
-		Input.InputSnapshot.LastKeysDown.ForEach( key => ImGui.Text( $"\t{key}" ) );
+		Input.Snapshot.LastKeysDown.ForEach( key => ImGui.Text( $"\t{key}" ) );
 
 		ImGui.Text( $"\n\nKeys down:" );
-		Input.InputSnapshot.KeysDown.ForEach( key => ImGui.Text( $"\t{key}" ) );
+		Input.Snapshot.KeysDown.ForEach( key => ImGui.Text( $"\t{key}" ) );
 
 		foreach ( var prop in typeof( Input ).GetProperties() )
 		{
