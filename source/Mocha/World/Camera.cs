@@ -38,7 +38,6 @@ public class Camera : Entity
 		);
 	}
 
-	private Vector2 mouseAnchor;
 	private bool wasPressed = false;
 
 	public override void Update()
@@ -51,17 +50,6 @@ public class Camera : Entity
 
 		var wishDir = new Vector3( Input.Forward, Input.Left, 0 ).Normal;
 
-		if ( Input.MouseRight && !wasPressed )
-		{
-			mouseAnchor = Input.MousePosition;
-		}
-
-		if ( Input.MouseRight )
-		{
-			var delta = mouseAnchor - (Vector2)Input.MousePosition;
-			wishDir = new Vector3( delta.Y, -delta.X, 0 ) / 512f;
-		}
-
 		wasPressed = Input.MouseRight;
 
 		wishVelocity = Forward * wishDir.X * Time.Delta * cameraSpeed;
@@ -69,6 +57,9 @@ public class Camera : Entity
 
 		if ( Input.Down( InputButton.Jump ) )
 			wishVelocity.Z += cameraSpeed * Time.Delta;
+
+		if ( Input.Down( InputButton.Sprint ) )
+			wishVelocity *= 4.0f;
 
 		rotation.Y -= Input.MouseDelta.X * 20f * Time.Delta;
 		rotation.X -= Input.MouseDelta.Y * 20f * Time.Delta;
