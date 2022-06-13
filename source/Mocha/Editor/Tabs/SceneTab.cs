@@ -38,7 +38,7 @@ internal class SceneTab : BaseTab
 		{
 			var sysVec3 = vec3.GetSystemVector3();
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputFloat3( $"##thing_{thing.Name}", ref sysVec3 );
+			ImGui.DragFloat3( $"##thing_{thing.Name}", ref sysVec3 );
 			thing.SetValue?.Invoke( new Vector3( sysVec3 ) );
 		}
 		else if ( thing.Value is Matrix4x4 mat4 )
