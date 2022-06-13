@@ -28,6 +28,6 @@ internal static class EditorHelpers
 		var texPtr = Editor.Instance.ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
 
 		ImGui.Image( texPtr, size,
-			new System.Numerics.Vector2( 0, 1 ), new System.Numerics.Vector2( 1, 0 ) );
+			new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ) );
 	}
 }
