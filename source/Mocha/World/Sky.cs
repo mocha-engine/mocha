@@ -51,7 +51,6 @@ public class Sky : Entity
 
 	public override void Render( CommandList commandList )
 	{
-		position = World.Current.Camera.position;
 		var uniformBuffer = new SkyUniformBuffer
 		{
 			g_mModel = ModelMatrix,
