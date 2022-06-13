@@ -62,8 +62,10 @@ void main() {
     vs_out.vNormal = normal;
     vs_out.vPosition = position;
 
+    mat4 rotView = mat4( mat3( g_oUbo.g_mView ) ); // Stamp out position
     vec4 pos = g_oUbo.g_mModel * vec4( position, 1.0 );
-    gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
+    vec4 clipPos = g_oUbo.g_mProj * rotView * pos;
+    gl_Position = clipPos.xyww; // Depth trick, requires LessEqual depth test
 }
 
 #endif
