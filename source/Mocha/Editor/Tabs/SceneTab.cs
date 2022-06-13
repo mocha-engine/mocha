@@ -13,17 +13,22 @@ internal class SceneTab : BaseTab
 	{
 		public string Name { get; set; }
 		public object? Value { get; set; }
+		public Action<object> SetValue { get; set; }
 
 		public ReflectedThing( object o, FieldInfo fieldInfo )
 		{
 			Name = fieldInfo.Name;
 			Value = fieldInfo.GetValue( o );
+			SetValue = ( v ) => fieldInfo.SetValue( o, v );
 		}
 
 		public ReflectedThing( object o, PropertyInfo propertyInfo )
 		{
 			Name = propertyInfo.Name;
 			Value = propertyInfo.GetValue( o );
+
+			if ( propertyInfo.SetMethod != null )
+				SetValue = ( v ) => propertyInfo.SetValue( o, v );
 		}
 	}
 
@@ -33,7 +38,8 @@ internal class SceneTab : BaseTab
 		{
 			var sysVec3 = vec3.GetSystemVector3();
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputFloat3( $"##thing_{thing.GetHashCode()}", ref sysVec3 );
+			ImGui.InputFloat3( $"##thing_{thing.Name}", ref sysVec3 );
+			thing.SetValue?.Invoke( new Vector3( sysVec3 ) );
 		}
 		else if ( thing.Value is Matrix4x4 mat4 )
 		{
@@ -49,12 +55,14 @@ internal class SceneTab : BaseTab
 		else if ( thing.Value is string str )
 		{
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputText( $"##thing_{thing.GetHashCode()}", ref str, 256 );
+			ImGui.InputText( $"##thing_{thing.Name}", ref str, 256 );
+			thing.SetValue?.Invoke( str );
 		}
 		else if ( thing.Value is float f )
 		{
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.SliderFloat( $"##thing_{thing.GetHashCode()}", ref f, 0.0f, 1.0f );
+			ImGui.DragFloat( $"##thing_{thing.Name}", ref f );
+			thing.SetValue?.Invoke( f );
 		}
 		else
 		{
