@@ -30,13 +30,15 @@ public class Sky : Entity
 		public System.Numerics.Vector3 g_vCameraPos; // 12
 		public float g_flPlanetRadius; // 4
 
+		public System.Numerics.Vector3 g_vSunPos; // 12
 		public float g_flAtmosphereRadius; // 4
+
 		public float _padding0; // 4
 	}
 
 	public float SunIntensity { get; set; } = 32.0f;
 	public float PlanetRadius { get; set; } = 6371000;
-	public float AtmosphereRadius { get; set; } = 6471000;
+	public float AtmosphereRadius { get; set; } = 6381000;
 
 	public Sky()
 	{
@@ -64,6 +66,7 @@ public class Sky : Entity
 			g_flPlanetRadius = PlanetRadius,
 			g_flAtmosphereRadius = AtmosphereRadius,
 			g_flSunIntensity = SunIntensity,
+			g_vSunPos = World.Current.Sun.rotation,
 
 			_padding0 = 0
 		};

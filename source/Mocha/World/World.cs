@@ -28,13 +28,23 @@ public class World
 	private void SetupEntities()
 	{
 		Camera = new Camera();
-		Sun = new Sun() { position = new( 0, 10, 10 ) };
-		Sky = new Sky();
-		Sky.scale = Vector3.One * -100f;
 
-		var model = new GenericModelObject( "content/models/rainier/scene.gltf" );
-		model.rotation = new Vector3( 90, 0, 0 );
-		model.scale = new Vector3( 0.025f );
+		Sun = new Sun()
+		{
+			position = new( 0, 10, 10 ),
+			rotation = new( -1, -1, 0 )
+		};
+
+		Sky = new Sky
+		{
+			scale = Vector3.One * -100f
+		};
+
+		_ = new GenericModelObject( "content/models/rainier/scene.gltf" )
+		{
+			rotation = new Vector3( 90, 0, 0 ),
+			scale = new Vector3( 0.025f )
+		};
 	}
 
 	private void SetupHud()
