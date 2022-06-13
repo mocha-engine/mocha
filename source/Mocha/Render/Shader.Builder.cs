@@ -11,6 +11,8 @@ namespace Mocha
 
 		public static ShaderBuilder Default => new ShaderBuilder();
 
+		public string Path { get; set; }
+
 		internal ShaderBuilder()
 		{
 
@@ -26,6 +28,7 @@ namespace Mocha
 
 		public ShaderBuilder FromMoyaiShader( string mshdrPath )
 		{
+			Path = mshdrPath;
 			var shaderText = File.ReadAllText( mshdrPath );
 
 			var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
@@ -42,30 +45,33 @@ namespace Mocha
 
 		public ShaderBuilder WithFragment( string fragPath )
 		{
+			Path += $"{fragPath};";
 			FragmentShaderDescription = CreateShaderDescription( fragPath, ShaderStages.Fragment );
 			return this;
 		}
 
 		public ShaderBuilder WithVertex( string vertPath )
 		{
+			Path += $"{vertPath};";
 			VertexShaderDescription = CreateShaderDescription( vertPath, ShaderStages.Vertex );
 			return this;
 		}
 
 		public Shader Build()
 		{
+			Log.Trace( $"Compiling shader {Path}" );
 			try
 			{
 				var fragCompilation = SpirvCompilation.CompileGlslToSpirv(
 					Encoding.UTF8.GetString( FragmentShaderDescription.ShaderBytes ),
-					"FS",
+					Path + "_FS",
 					ShaderStages.Fragment,
 					new GlslCompileOptions( debug: true ) );
 				FragmentShaderDescription.ShaderBytes = fragCompilation.SpirvBytes;
 
 				var vertCompilation = SpirvCompilation.CompileGlslToSpirv(
 					Encoding.UTF8.GetString( VertexShaderDescription.ShaderBytes ),
-					"VS",
+					Path + "_VS",
 					ShaderStages.Vertex,
 					new GlslCompileOptions( debug: true ) );
 				VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
