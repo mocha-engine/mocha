@@ -81,8 +81,36 @@ public class Model
 				},
 				new ResourceLayoutElementDescription()
 				{
+					Kind = ResourceKind.TextureReadOnly,
+					Name = "g_tSpecular",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.TextureReadOnly,
+					Name = "g_tNormal",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.TextureReadOnly,
+					Name = "g_tEmissive",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
+					Kind = ResourceKind.TextureReadOnly,
+					Name = "g_tORM",
+					Options = ResourceLayoutElementOptions.None,
+					Stages = ShaderStages.Fragment
+				},
+				new ResourceLayoutElementDescription()
+				{
 					Kind = ResourceKind.Sampler,
-					Name = "g_sDiffuse",
+					Name = "g_sSampler",
 					Options = ResourceLayoutElementOptions.None,
 					Stages = ShaderStages.Fragment
 				},
@@ -127,7 +155,16 @@ public class Model
 			new BufferDescription( uboSizeInBytes,
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 
-		var resourceSetDescription = new ResourceSetDescription( rsrcLayout, material.DiffuseTexture.VeldridTexture, Device.Aniso4xSampler, uniformBuffer );
+		var resourceSetDescription = new ResourceSetDescription(
+			rsrcLayout,
+			material.DiffuseTexture.VeldridTexture,
+			material.SpecularTexture.VeldridTexture,
+			material.NormalTexture.VeldridTexture,
+			material.EmissiveTexture.VeldridTexture,
+			material.ORMTexture.VeldridTexture,
+			Device.PointSampler,
+			uniformBuffer );
+
 		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
 	}
 

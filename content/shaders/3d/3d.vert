@@ -10,7 +10,7 @@ layout( location = 2 ) in vec2 texCoords;
 //
 // Uniforms
 //
-layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
+layout( set = 0, binding = 6 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mView;
     mat4 g_mProj;
