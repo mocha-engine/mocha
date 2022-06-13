@@ -21,7 +21,7 @@ public partial class GenericModelObject : Entity
 			g_mView = World.Current.Camera.ViewMatrix,
 			g_mProj = World.Current.Camera.ProjMatrix,
 			g_vLightPos = World.Current.Sun.position,
-			g_fTime = Time.Now,
+			g_flTime = Time.Now,
 			g_vLightColor = World.Current.Sun.Color,
 			g_vCameraPos = World.Current.Camera.position,
 
