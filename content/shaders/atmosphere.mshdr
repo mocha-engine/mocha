@@ -32,6 +32,7 @@ layout( set = 0, binding = 6 ) uniform ObjectUniformBuffer {
     float g_flSunIntensity;
     vec3 g_vCameraPos;
     float g_flPlanetRadius;
+    vec3 g_vSunPos;
     float g_flAtmosphereRadius;
 } g_oUbo;
 
@@ -91,8 +92,8 @@ layout( location = 0 ) in struct VS_OUT {
 //
 layout( location = 0 ) out vec4 fragColor;
 
-#define iSteps 32
-#define jSteps 16
+#define iSteps 16
+#define jSteps 8
 
 vec2 RaySphereIntersect(vec3 radius, vec3 rd, float sr)
 {
@@ -222,12 +223,12 @@ void main()
     vec3 color = atmosphere(
         dir,                            // ray dir
         vec3(0,-6371000,0),             // ray origin
-        vec3(1, -time, 0),              // position of the sun
+        g_oUbo.g_vSunPos,                      // position of the sun
         g_oUbo.g_flSunIntensity,
         g_oUbo.g_flPlanetRadius,
         g_oUbo.g_flAtmosphereRadius,
-        8000,                         // Rayleigh scale height
-        1200                          // Mie scale height
+        8000,                           // Rayleigh scale height
+        1200                            // Mie scale height
     );
 
     
