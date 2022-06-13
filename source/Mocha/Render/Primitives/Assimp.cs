@@ -58,8 +58,7 @@ partial class Primitives
 			var material = new Material
 			{
 				Shader = ShaderBuilder.Default
-									  .WithVertex( "content/shaders/3d/3d.vert" )
-									  .WithFragment( "content/shaders/3d/3d.frag" )
+									  .FromMoyaiShader( "content/shaders/pbr.mshdr" )
 									  .Build(),
 				UniformBufferType = typeof( GenericModelUniformBuffer )
 			};
@@ -84,8 +83,8 @@ partial class Primitives
 
 				if ( mesh.HasTangentBasis )
 				{
-					// vertex.Tangent = new Vector3( mesh.Tangents[i].X, mesh.Tangents[i].Y, mesh.Tangents[i].Z );
-					// vertex.BiTangent = new Vector3( mesh.BiTangents[i].X, mesh.BiTangents[i].Y, mesh.BiTangents[i].Z );
+					vertex.Tangent = new Vector3( mesh.Tangents[i].X, mesh.Tangents[i].Y, mesh.Tangents[i].Z );
+					vertex.Bitangent = new Vector3( mesh.BiTangents[i].X, mesh.BiTangents[i].Y, mesh.BiTangents[i].Z );
 				}
 
 				vertices.Add( vertex );
