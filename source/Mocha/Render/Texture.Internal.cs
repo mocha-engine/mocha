@@ -26,14 +26,33 @@ public partial class TextureBuilder
 		{
 			var missingTextureData = new byte[]
 			{
-				0, 255, 0, 255,
-				255, 0, 255, 255,
-				0, 255, 0, 255,
-				255, 0, 255, 255,
+				//
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+								
+				//
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
+								
+				//
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+								
+				//
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
+				255, 0, 255, 255,	// P
+				0, 0, 0, 255,		// B
 			};
 
 			missingTexture = Texture.Builder
-				.FromData( missingTextureData, 2, 2 )
+				.FromData( missingTextureData, 4, 4 )
 				.WithType( "internal" )
 				.WithName( "internal:missing" )
 				.Build();
