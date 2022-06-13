@@ -12,11 +12,27 @@ public struct Material
 	public Texture? EmissiveTexture { get; set; }
 	public Texture? ORMTexture { get; set; }
 
-	public bool IsDirty => DiffuseTexture?.IsDirty ?? false;
+	public bool IsDirty => (DiffuseTexture?.IsDirty ?? false)
+		|| (SpecularTexture?.IsDirty ?? false)
+		|| (NormalTexture?.IsDirty ?? false)
+		|| (EmissiveTexture?.IsDirty ?? false)
+		|| (ORMTexture?.IsDirty ?? false);
 
 	public void GenerateMipmaps( CommandList commandList )
 	{
 		if ( DiffuseTexture?.IsDirty ?? false )
 			DiffuseTexture.GenerateMipmaps( commandList );
+
+		if ( SpecularTexture?.IsDirty ?? false )
+			SpecularTexture.GenerateMipmaps( commandList );
+
+		if ( NormalTexture?.IsDirty ?? false )
+			NormalTexture.GenerateMipmaps( commandList );
+
+		if ( EmissiveTexture?.IsDirty ?? false )
+			EmissiveTexture.GenerateMipmaps( commandList );
+
+		if ( ORMTexture?.IsDirty ?? false )
+			ORMTexture.GenerateMipmaps( commandList );
 	}
 }

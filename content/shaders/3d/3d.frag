@@ -18,8 +18,12 @@ layout( location = 0 ) out vec4 fragColor;
 // Uniforms
 //
 layout( set = 0, binding = 0 ) uniform texture2D g_tDiffuse;
-layout( set = 0, binding = 1 ) uniform sampler g_sDiffuse;
-layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
+layout( set = 0, binding = 1 ) uniform texture2D g_tSpecular;
+layout( set = 0, binding = 2 ) uniform texture2D g_tNormal;
+layout( set = 0, binding = 3 ) uniform texture2D g_tEmissive;
+layout( set = 0, binding = 4 ) uniform texture2D g_tORM;
+layout( set = 0, binding = 5 ) uniform sampler g_sSampler;
+layout( set = 0, binding = 6 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mView;
     mat4 g_mProj;
@@ -55,7 +59,7 @@ void main()
     vec3 vCameraDir = normalize( g_oUbo.g_vCameraPos - vs_out.vPosition );
     vec3 vSpecular = specular( vLightDir, vs_out.vNormal, vCameraDir, 32.0 );
 
-    vec4 vColor = texture( sampler2D( g_tDiffuse, g_sDiffuse ), vs_out.vTexCoords );
+    vec4 vColor = texture( sampler2D( g_tNormal, g_sSampler ), vs_out.vTexCoords );
 
-    fragColor = vec4( vLambert + vAmbient + vSpecular, 1.0 ) * vColor;
+    fragColor = vColor;//vec4( vLambert + vAmbient + vSpecular, 1.0 ) * vColor;
 }
