@@ -38,8 +38,6 @@ public class Camera : Entity
 		);
 	}
 
-	private bool wasPressed = false;
-
 	public override void Update()
 	{
 		base.Update();
@@ -47,10 +45,7 @@ public class Camera : Entity
 		//
 		// Get user input
 		//
-
 		var wishDir = new Vector3( Input.Forward, Input.Left, 0 ).Normal;
-
-		wasPressed = Input.MouseRight;
 
 		wishVelocity = Forward * wishDir.X * Time.Delta * cameraSpeed;
 		wishVelocity += Right * wishDir.Y * Time.Delta * cameraSpeed;
