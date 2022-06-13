@@ -12,6 +12,8 @@ public class World
 
 	public Sun Sun { get; set; }
 
+	public Sky Sky { get; set; }
+
 	public World()
 	{
 		Current = this;
@@ -27,6 +29,9 @@ public class World
 	{
 		Camera = new Camera();
 		Sun = new Sun() { position = new( 0, 10, 10 ) };
+		Sky = new Sky();
+		Sky.scale = Vector3.One * -100f;
+
 		var model = new GenericModelObject( "content/models/rainier/scene.gltf" );
 		model.rotation = new Vector3( 90, 0, 0 );
 		model.scale = new Vector3( 0.025f );

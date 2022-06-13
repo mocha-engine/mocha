@@ -29,7 +29,7 @@ namespace Mocha
 			var shaderText = File.ReadAllText( mshdrPath );
 
 			var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
-			var fragmentShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
+			var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";
 
 			var vertexShaderBytes = Encoding.Default.GetBytes( vertexShaderText );
 			var fragmentShaderBytes = Encoding.Default.GetBytes( fragmentShaderText );

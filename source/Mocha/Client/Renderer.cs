@@ -94,7 +94,8 @@ internal class Renderer
 		{
 			PreferStandardClipSpaceYDirection = true,
 			PreferDepthRangeZeroToOne = true,
-			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt
+			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
+			SwapchainSrgbFormat = false,
 		};
 
 		var preferredBackend = GraphicsBackend.Direct3D11;

@@ -2,19 +2,25 @@
 
 namespace Mocha;
 
-public partial class GenericModelObject : Entity
+public class Sky : Entity
 {
-	private List<Model> models;
+	private Model Model { get; set; }
+	private Material Material { get; set; }
 
-	public GenericModelObject( string modelPath )
+	public Sky()
 	{
-		models = Primitives.Assimp.GenerateModels( modelPath );
+		Material = new()
+		{
+			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/atmosphere.mshdr" ).Build(),
+			UniformBufferType = typeof( GenericModelUniformBuffer )
+		};
+
+		Model = Primitives.Cube.GenerateModel( Material );
 	}
 
 	public override void Render( CommandList commandList )
 	{
-		base.Render( commandList );
-
+		position = World.Current.Camera.position;
 		var uniformBuffer = new GenericModelUniformBuffer
 		{
 			g_mModel = ModelMatrix,
@@ -29,6 +35,6 @@ public partial class GenericModelObject : Entity
 			_padding2 = 0
 		};
 
-		models.ForEach( x => x.Draw( uniformBuffer, commandList ) );
+		Model.Draw( uniformBuffer, commandList );
 	}
 }

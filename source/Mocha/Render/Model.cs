@@ -157,11 +157,11 @@ public class Model
 
 		var resourceSetDescription = new ResourceSetDescription(
 			rsrcLayout,
-			material.DiffuseTexture.VeldridTexture,
-			material.SpecularTexture.VeldridTexture,
-			material.NormalTexture.VeldridTexture,
-			material.EmissiveTexture.VeldridTexture,
-			material.ORMTexture.VeldridTexture,
+			material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
+			material.SpecularTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
+			material.NormalTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
+			material.EmissiveTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
+			material.ORMTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
 			Device.PointSampler,
 			uniformBuffer );
 
