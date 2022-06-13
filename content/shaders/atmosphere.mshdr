@@ -10,6 +10,7 @@
 //
 // Common
 //
+#define PI 3.14159
 
 //
 // Uniforms
@@ -90,7 +91,6 @@ layout( location = 0 ) in struct VS_OUT {
 //
 layout( location = 0 ) out vec4 fragColor;
 
-#define PI 3.141592
 #define iSteps 32
 #define jSteps 16
 
