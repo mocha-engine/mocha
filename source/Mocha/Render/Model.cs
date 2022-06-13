@@ -162,7 +162,7 @@ public class Model
 			material.NormalTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
 			material.EmissiveTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
 			material.ORMTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			Device.PointSampler,
+			Device.Aniso4xSampler,
 			uniformBuffer );
 
 		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
