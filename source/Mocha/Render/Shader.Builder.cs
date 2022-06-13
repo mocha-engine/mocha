@@ -59,6 +59,12 @@ namespace Mocha
 
 		public Shader Build()
 		{
+			if ( Shader.All.Any( x => x.Path == Path ) )
+			{
+				Log.Trace( $"Using cached shader {Path}" );
+				return Shader.All.First( x => x.Path == Path );
+			}
+
 			Log.Trace( $"Compiling shader {Path}" );
 			try
 			{
@@ -77,7 +83,7 @@ namespace Mocha
 				VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 				var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
-				return new Shader( shaderProgram );
+				return new Shader( Path, shaderProgram );
 			}
 			catch ( Exception ex )
 			{

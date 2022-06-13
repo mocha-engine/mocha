@@ -1,72 +1,16 @@
-﻿using System.Numerics;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 public class Shader
 {
+	public static List<Shader> All = new();
 	public Veldrid.Shader[] ShaderProgram { get; }
+	public string Path { get; set; }
 
-	internal Shader( Veldrid.Shader[] shaderProgram )
+	internal Shader( string path, Veldrid.Shader[] shaderProgram )
 	{
 		ShaderProgram = shaderProgram;
-	}
+		Path = path;
 
-	public void Use()
-	{
-	}
-
-	public void SetFloat( string name, float value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	public void SetInt( string name, int value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	public unsafe void SetMatrix( string name, Matrix4x4 value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	public void SetVector2( string name, Vector2 value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	public void SetVector3( string name, Vector3 value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	internal void SetBool( string name, bool value )
-	{
-		if ( TryGetUniformLocation( name, out int loc ) )
-		{
-		}
-	}
-
-	private bool TryGetUniformLocation( string name, out int loc )
-	{
-		loc = -1;
-
-		if ( loc < 0 )
-		{
-			Log.Warning( $"No variable {name}" );
-			return false;
-		}
-
-		return true;
+		All.Add( this );
 	}
 }
