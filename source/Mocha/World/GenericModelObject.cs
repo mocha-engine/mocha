@@ -8,11 +8,6 @@ public partial class GenericModelObject : Entity
 
 	public GenericModelObject( string modelPath )
 	{
-		var material = new Material
-		{
-			DiffuseTexture = TextureBuilder.WorldTexture.FromPath( "content/textures/test.png" ).Build(),
-		};
-
 		models = Primitives.Assimp.GenerateModels( modelPath );
 	}
 
