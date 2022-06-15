@@ -72,14 +72,14 @@ namespace Mocha
 					Encoding.UTF8.GetString( FragmentShaderDescription.ShaderBytes ),
 					Path + "_FS",
 					ShaderStages.Fragment,
-					new GlslCompileOptions( debug: true ) );
+					new GlslCompileOptions( debug: false ) );
 				FragmentShaderDescription.ShaderBytes = fragCompilation.SpirvBytes;
 
 				var vertCompilation = SpirvCompilation.CompileGlslToSpirv(
 					Encoding.UTF8.GetString( VertexShaderDescription.ShaderBytes ),
 					Path + "_VS",
 					ShaderStages.Vertex,
-					new GlslCompileOptions( debug: true ) );
+					new GlslCompileOptions( debug: false ) );
 				VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 				var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
