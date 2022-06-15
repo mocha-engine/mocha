@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Veldrid;
-using Veldrid.Sdl2;
 
 namespace Mocha;
+
 internal partial class Editor
 {
 	public static Editor Instance { get; private set; }
@@ -184,6 +184,8 @@ internal partial class Editor
 			ShouldRender = !ShouldRender;
 
 		DrawPerfOverlay();
+
+		Gizmos.Draw();
 
 		if ( !ShouldRender )
 			return;
