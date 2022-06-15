@@ -1,6 +1,6 @@
 ﻿namespace Mocha;
 
-public struct Vertex
+public struct VertexInfo
 {
 	public System.Numerics.Vector3 Position { get; set; }
 	public System.Numerics.Vector3 Normal { get; set; }

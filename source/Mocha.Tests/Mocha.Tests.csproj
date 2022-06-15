@@ -15,6 +15,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Mocha.Serializer\Mocha.Common.csproj" />
 		<ProjectReference Include="..\Mocha\Mocha.csproj" />
 	</ItemGroup>
 

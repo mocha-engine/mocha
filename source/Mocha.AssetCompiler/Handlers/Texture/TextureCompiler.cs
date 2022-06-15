@@ -1,6 +1,7 @@
 ﻿using StbImageSharp;
 using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
+using System.Security.Cryptography;
 
 namespace Mocha.AssetCompiler;
 
@@ -22,39 +23,39 @@ public class TextureCompiler
 
 	public static string CompileFile( string path )
 	{
+		Console.WriteLine( $"[TEXTURE]\t{path}" );
+
 		var destFileName = Path.ChangeExtension( path, "mtex" );
-		Console.WriteLine( $"Compiling {path}" );
+		var textureFormat = new TextureInfo();
 
-		using var fileStream = new FileStream( destFileName, FileMode.Create );
-		using var binaryWriter = new BinaryWriter( fileStream );
-
-		binaryWriter.Write( new char[] { 'M', 'T', 'E', 'X' } ); // Magic number
-
-		//
-		// File header
-		//
-		binaryWriter.Write( 1 ); // Version major
-		binaryWriter.Write( 2 ); // Version minor
-
+		// Load image
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
 
-		var width = (uint)image.Width;
-		var height = (uint)image.Height;
+		textureFormat.Width = (uint)image.Width;
+		textureFormat.Height = (uint)image.Height;
 
-		binaryWriter.Write( width ); // Image width
-		binaryWriter.Write( height ); // Image height
+		// Compress data using BC
+		textureFormat.Data = BlockCompression( image.Data, image.Width, image.Height );
+		textureFormat.DataLength = textureFormat.Data.Length;
 
-		binaryWriter.Write( new char[] { 'D', 'A', 'T', 'A' } );
+		// Wrapper for file
+		var mochaFile = new MochaFile<TextureInfo>()
+		{
+			MajorVersion = 3,
+			MinorVersion = 0,
+			Data = textureFormat
+		};
 
-		var data = image.Data;
-		data = BlockCompression( data, (int)width, (int)height );
+		// Calculate original asset hash
+		using ( var md5 = MD5.Create() )
+			mochaFile.AssetHash = md5.ComputeHash( fileData );
 
-		var compressedData = Compressor.Compress( data );
+		// Write result
+		using var fileStream = new FileStream( destFileName, FileMode.Create );
+		using var binaryWriter = new BinaryWriter( fileStream );
 
-		binaryWriter.Write( compressedData.Length );
-		binaryWriter.Write( compressedData ); // Image data
-
+		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
 		return destFileName;
 	}
 }

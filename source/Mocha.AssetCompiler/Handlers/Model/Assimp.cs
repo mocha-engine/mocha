@@ -1,5 +1,4 @@
 ﻿using Assimp;
-using System.Numerics;
 
 namespace Mocha;
 
@@ -7,11 +6,6 @@ partial class Primitives
 {
 	public static class Assimp
 	{
-		private static Vector4 AssimpColorToVec4( Color4D col )
-		{
-			return new Vector4( col.R, col.G, col.B, col.A );
-		}
-
 		public static List<Model> GenerateModels( string path )
 		{
 			var models = new List<Model>();
@@ -52,14 +46,14 @@ partial class Primitives
 
 		private static Model ProcessMesh( global::Assimp.Mesh mesh, global::Assimp.Scene scene, global::Assimp.Matrix4x4 transform, string? directory )
 		{
-			List<Vertex> vertices = new List<Vertex>();
+			List<VertexInfo> vertices = new List<VertexInfo>();
 			List<uint> indices = new List<uint>();
 
 			var material = new Material();
 
 			for ( int i = 0; i < mesh.VertexCount; ++i )
 			{
-				var vertex = new Vertex()
+				var vertex = new VertexInfo()
 				{
 					Position = new Vector3( mesh.Vertices[i].X, mesh.Vertices[i].Y, mesh.Vertices[i].Z ),
 					Normal = new Vector3( mesh.Normals[i].X, mesh.Normals[i].Y, mesh.Normals[i].Z )

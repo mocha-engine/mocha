@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Json;
 using Veldrid;
 
 namespace Mocha;
@@ -100,25 +101,12 @@ public partial class TextureBuilder
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
-		using var fileStream = File.OpenRead( path );
-		using var binaryReader = new BinaryReader( fileStream );
+		var fileBytes = File.ReadAllBytes( path );
 
-		binaryReader.ReadChars( 4 ); // MTEX
-
-		var versionMajor = binaryReader.ReadInt32();
-		var versionMinor = binaryReader.ReadInt32();
-
-		Log.Trace( $"Mocha texture v{versionMajor}.{versionMinor}" );
-
-		this.width = binaryReader.ReadUInt32();
-		this.height = binaryReader.ReadUInt32();
-
-		binaryReader.ReadChars( 4 );
-
-		var dataCount = binaryReader.ReadInt32();
-		var compressedData = binaryReader.ReadBytes( dataCount );
-
-		this.data = Compressor.Decompress( compressedData );
+		var textureFormat = Serializer.Deserialize<TextureInfo>( fileBytes );
+		this.width = textureFormat.Data.Width;
+		this.height = textureFormat.Data.Height;
+		this.data = textureFormat.Data.Data;
 		this.path = path;
 
 		this.isCompressed = true;

@@ -109,7 +109,10 @@ partial class Primitives
 			path = path.Replace( "BaseColor", typeName );
 
 			if ( !File.Exists( path ) )
+			{
+				Log.Warning( $"No texture '{path}'" );
 				return TextureBuilder.MissingTexture;
+			}
 
 			using var _ = new Stopwatch( $"{typeName}: {path} texture load" );
 			return Texture.Builder
