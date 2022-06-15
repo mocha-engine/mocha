@@ -77,9 +77,8 @@ public static class Program
 		}
 		else
 		{
-			Console.WriteLine( $"Skipping unrecognised extension '{fileExtension}' for path '{fileName}'..." );
+			Console.WriteLine( $"[SKIP]\t'{fileExtension}' for path '{fileName}'..." );
 		}
-
 	}
 
 	private static void CompileFile( string fileName )
@@ -88,13 +87,14 @@ public static class Program
 
 		if ( fileExtension == ".fbx" )
 		{
-			//var destFile = ModelCompiler.CompileFile( fileName );
-			//Console.WriteLine( $"Compiled model to {destFile}" );
+			// Check if we have an original asset & if it needs recompiling
+			var destFile = ModelCompiler.CompileFile( fileName );
+			Console.WriteLine( $"[MODEL OK]\t{destFile}" );
 		}
 		else if ( fileExtension == ".png" )
 		{
 			var destFile = TextureCompiler.CompileFile( fileName );
-			Console.WriteLine( $"Compiled texture to {destFile}" );
+			Console.WriteLine( $"[TEXTURE OK]\t{destFile}" );
 		}
 	}
 }

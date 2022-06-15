@@ -5,7 +5,7 @@ public class ModelCompiler
 	public static string CompileFile( string path )
 	{
 		var destFileName = Path.ChangeExtension( path, "mmdl" );
-		Console.WriteLine( $"Compiling {path}" );
+		Console.WriteLine( $"[MODEL]\t{path}" );
 
 		using var fileStream = new FileStream( destFileName, FileMode.Create );
 		using var binaryWriter = new BinaryWriter( fileStream );
