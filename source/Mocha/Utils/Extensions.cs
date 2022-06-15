@@ -58,6 +58,7 @@ public static class MathExtensions
 	}
 
 	public static float LerpTo( this float a, float b, float t ) => a * (1 - t) + b * t;
+	public static float LerpInverse( this float t, float a, float b ) => ((t - a) / (b - a));
 
 	public static Vector3 Normalize( this Vector3 vector ) => vector / vector.Length;
 
