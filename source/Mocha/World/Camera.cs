@@ -16,6 +16,9 @@ public class Camera : Entity
 
 	private float cameraSpeed = 100f;
 
+	private float fov = 90f;
+	private float wishFov = 90f;
+
 	private void CalcViewProjMatrix()
 	{
 		var cameraPos = position;
@@ -31,7 +34,7 @@ public class Camera : Entity
 
 		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, cameraPos + cameraFront, cameraUp );
 		ProjMatrix = Matrix4x4.CreatePerspectiveFieldOfView(
-			90.0f.DegreesToRadians(),
+			fov.DegreesToRadians(),
 			Screen.Aspect,
 			0.1f,
 			1000.0f
@@ -61,6 +64,9 @@ public class Camera : Entity
 
 		rotation.X = rotation.X.Clamp( -89, 89 );
 
+		float t = velocity.WithZ( 0 ).Length.LerpInverse( 0, 50 );
+		wishFov = 60f.LerpTo( 90f, t );
+
 		//
 		// Apply everything
 		//
@@ -73,6 +79,9 @@ public class Camera : Entity
 
 		// Move camera
 		position += velocity * Time.Delta;
+
+		// Apply fov
+		fov = fov.LerpTo( wishFov, 5f * Time.Delta );
 
 		// Run view/proj matrix calculations
 		CalcViewProjMatrix();
