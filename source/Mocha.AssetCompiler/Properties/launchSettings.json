@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "Mocha.AssetCompiler": {
+      "commandName": "Project",
+      "commandLineArgs": "content/models/sponza",
+      "workingDirectory": "F:\\Projects\\Mocha\\"
+    }
+  }
+}

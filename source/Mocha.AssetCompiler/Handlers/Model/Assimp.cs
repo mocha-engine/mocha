@@ -14,11 +14,9 @@ partial class Primitives
 
 		public static List<Model> GenerateModels( string path )
 		{
-			using var _ = new Stopwatch( "Assimp model generation" );
-
 			var models = new List<Model>();
 			var context = new AssimpContext();
-			var logStream = new LogStream( ( msg, _ ) => Log.Trace( msg ) );
+			var logStream = new LogStream( ( msg, _ ) => Console.WriteLine( msg ) );
 			var directory = Path.GetDirectoryName( path );
 
 			var scene = context.ImportFile( path,
@@ -57,13 +55,7 @@ partial class Primitives
 			List<Vertex> vertices = new List<Vertex>();
 			List<uint> indices = new List<uint>();
 
-			var material = new Material
-			{
-				Shader = ShaderBuilder.Default
-									  .FromMoyaiShader( "content/shaders/pbr.mshdr" )
-									  .Build(),
-				UniformBufferType = typeof( GenericModelUniformBuffer )
-			};
+			var material = new Material();
 
 			for ( int i = 0; i < mesh.VertexCount; ++i )
 			{
@@ -105,30 +97,25 @@ partial class Primitives
 			{
 				var assimpMaterial = scene.Materials[mesh.MaterialIndex];
 
-				material.DiffuseTexture = LoadMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
-				material.SpecularTexture = LoadMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
-				material.NormalTexture = LoadMaterialTexture( assimpMaterial, TextureType.Normals, "texture_normal", directory );
-				material.EmissiveTexture = LoadMaterialTexture( assimpMaterial, TextureType.Emissive, "texture_emissive", directory );
-				material.ORMTexture = LoadMaterialTexture( assimpMaterial, TextureType.Unknown, "texture_unknown", directory );
+				material.DiffuseTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
+				material.SpecularTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
+				material.NormalTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Normals, "texture_normal", directory );
+				material.EmissiveTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Emissive, "texture_emissive", directory );
+				material.ORMTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Unknown, "texture_unknown", directory );
 			}
 
 			return new Model( vertices.ToArray(), indices.ToArray(), material );
 		}
 
-		private static Texture LoadMaterialTexture( global::Assimp.Material material, global::Assimp.TextureType textureType, string typeName, string? directory )
+		private static string GetMaterialTexture( global::Assimp.Material material, global::Assimp.TextureType textureType, string typeName, string? directory )
 		{
 			if ( material.GetMaterialTexture( textureType, 0, out var textureSlot ) )
 			{
-				using var _ = new Stopwatch( $"{material.Name}: {textureSlot.FilePath} texture load" );
-
-				return Texture.Builder
-					.FromPath( Path.Join( directory, textureSlot.FilePath ) )
-					.WithType( typeName )
-					.Build();
+				return Path.Join( directory, textureSlot.FilePath );
 			}
 			else
 			{
-				return TextureBuilder.MissingTexture;
+				return "internal:missing";
 			}
 		}
 	}

@@ -8,7 +8,7 @@ public partial class GenericModelObject : Entity
 
 	public GenericModelObject( string modelPath )
 	{
-		models = Primitives.Assimp.GenerateModels( modelPath );
+		models = Primitives.MochaModel.GenerateModels( modelPath );
 	}
 
 	public override void Render( CommandList commandList )
