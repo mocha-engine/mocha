@@ -9,6 +9,7 @@ public class Model
 	private Pipeline pipeline;
 	private ResourceSet resourceSet;
 
+	public DeviceBuffer TBNBuffer { get; private set; }
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
 
@@ -26,6 +27,8 @@ public class Model
 
 		SetupMesh( vertices, indices );
 		SetupResources( material );
+
+		material.Shader.OnRecompile += () => SetupResources( material );
 	}
 
 	public Model( Vertex[] vertices, Material material )
@@ -35,6 +38,8 @@ public class Model
 
 		SetupMesh( vertices );
 		SetupResources( material );
+
+		material.Shader.OnRecompile += () => SetupResources( material );
 	}
 
 	private void SetupMesh( Vertex[] vertices )
