@@ -10,7 +10,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha", "Mocha\Mocha.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Tests", "Mocha.Tests\Mocha.Tests.csproj", "{96BBB7AC-AC1F-4430-8039-21D03E4903AD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.HangDetector", "Mocha.HangDetector\Mocha.HangDetector.csproj", "{3C746AF5-7408-40CA-B7D8-12BA41582F26}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.HangDetector", "Mocha.HangDetector\Mocha.HangDetector.csproj", "{3C746AF5-7408-40CA-B7D8-12BA41582F26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.AssetCompiler", "Mocha.AssetCompiler\Mocha.AssetCompiler.csproj", "{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -30,6 +32,10 @@ Global
 		{3C746AF5-7408-40CA-B7D8-12BA41582F26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3C746AF5-7408-40CA-B7D8-12BA41582F26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3C746AF5-7408-40CA-B7D8-12BA41582F26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

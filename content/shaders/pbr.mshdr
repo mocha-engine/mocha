@@ -177,9 +177,9 @@ void main()
     vec4 albedoSrc = texture( sampler2D( g_tDiffuse, g_sSampler ), vs_out.vTexCoords );
     vec3 albedo = albedoSrc.xyz;
 
-    float ao = texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).x;
-    float roughness = texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).y;
-    float metallic = texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).z;
+    float ao = 1.0;//texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).x;
+    float roughness = 0.0; //texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).y;
+    float metallic = 0.0;// texture(sampler2D( g_tORM, g_sSampler ), vs_out.vTexCoords).z;
 
     //
     // TODO: Handle missing normal maps
@@ -230,10 +230,11 @@ void main()
 
     vec3 diffuse = albedo;
 
-    vec3 specular = vec3( 0.0 );
+    vec3 specular = vec3( 0.38, 0.59, 0.77 ) * F;//(F * envBrdf.x + envBrdf.y);
     vec3 ambient = (kD * diffuse + specular) * ao;
     vec3 color = Lo + ambient;
 
+    // color = albedo;                   
     fragColor = vec4( color, 1.0 );
 }
 #endif

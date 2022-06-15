@@ -1,4 +1,5 @@
 ﻿using StbImageSharp;
+using System.IO.Compression;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -17,6 +18,7 @@ public partial class TextureBuilder
 	private string path;
 
 	private bool shouldGenerateMips = false;
+	private bool isCompressed = false;
 
 	public TextureBuilder()
 	{
@@ -46,16 +48,20 @@ public partial class TextureBuilder
 			return existingTexture;
 
 		uint mipLevels = 1;
+
+		if ( isCompressed )
+			shouldGenerateMips = false;
+
 		if ( shouldGenerateMips )
-			mipLevels = 5;
+			mipLevels = 3;
 
 		var textureDescription = TextureDescription.Texture2D(
 			width,
 			height,
 			mipLevels,
 			1,
-			PixelFormat.R8_G8_B8_A8_UNorm,
-			TextureUsage.Sampled | TextureUsage.GenerateMipmaps
+			isCompressed ? PixelFormat.BC3_UNorm : PixelFormat.R8_G8_B8_A8_UNorm,
+			TextureUsage.Sampled //| TextureUsage.GenerateMipmaps
 		);
 
 		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
@@ -86,6 +92,37 @@ public partial class TextureBuilder
 			return this;
 
 		this.shouldGenerateMips = true;
+		return this;
+	}
+
+	public TextureBuilder FromMochaTexture( string path )
+	{
+		if ( TryGetExistingTexture( path, out _ ) )
+			return new TextureBuilder() { path = path };
+
+		using var fileStream = File.OpenRead( path );
+		using var binaryReader = new BinaryReader( fileStream );
+
+		binaryReader.ReadChars( 4 ); // MTEX
+
+		var versionMajor = binaryReader.ReadInt32();
+		var versionMinor = binaryReader.ReadInt32();
+
+		Log.Trace( $"Mocha texture v{versionMajor}.{versionMinor}" );
+
+		this.width = binaryReader.ReadUInt32();
+		this.height = binaryReader.ReadUInt32();
+
+		binaryReader.ReadChars( 4 );
+
+		var dataCount = binaryReader.ReadInt32();
+		var compressedData = binaryReader.ReadBytes( dataCount );
+
+		this.data = Compressor.Decompress( compressedData );
+		this.path = path;
+
+		this.isCompressed = true;
+
 		return this;
 	}
 

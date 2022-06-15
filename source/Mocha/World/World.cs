@@ -40,9 +40,9 @@ public class World
 			scale = Vector3.One * -100f
 		};
 
-		_ = new GenericModelObject( "content/models/rainier/scene.gltf" )
+		_ = new GenericModelObject( "content/models/sponza/sponza.mmdl" )
 		{
-			rotation = new Vector3( 90, 0, 0 ),
+			//rotation = new Vector3( 90, 0, 0 ),
 			scale = new Vector3( 0.025f )
 		};
 	}
