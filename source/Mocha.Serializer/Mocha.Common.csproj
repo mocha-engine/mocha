@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Veldrid" Version="4.8.0" />
+  </ItemGroup>
+
 </Project>

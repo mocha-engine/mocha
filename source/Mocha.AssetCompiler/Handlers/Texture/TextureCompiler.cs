@@ -7,13 +7,13 @@ namespace Mocha.AssetCompiler;
 
 public class TextureCompiler
 {
-	private static byte[] BlockCompression( byte[] data, int width, int height )
+	private static byte[] BlockCompression( byte[] data, int width, int height, CompressionFormat compressionFormat )
 	{
 		using var stream = new MemoryStream();
 
 		BcEncoder encoder = new BcEncoder();
 
-		encoder.OutputOptions.GenerateMipMaps = false;
+		encoder.OutputOptions.GenerateMipMaps = true;
 		encoder.OutputOptions.Quality = CompressionQuality.Fast;
 		encoder.OutputOptions.Format = CompressionFormat.Bc3;
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
@@ -28,22 +28,35 @@ public class TextureCompiler
 		var destFileName = Path.ChangeExtension( path, "mtex" );
 		var textureFormat = new TextureInfo();
 
+
 		// Load image
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
 
 		textureFormat.Width = (uint)image.Width;
 		textureFormat.Height = (uint)image.Height;
+		textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
 
-		// Compress data using BC
-		textureFormat.Data = BlockCompression( image.Data, image.Width, image.Height );
+		// Change compression format based on normal map
+		if ( path.Contains( "Normal" ) )
+		{
+			// Do not compress
+			textureFormat.CompressionFormat = Veldrid.PixelFormat.R8_G8_B8_A8_UNorm;
+			textureFormat.Data = image.Data;
+		}
+		else
+		{
+			// Compress data using BC
+			textureFormat.Data = BlockCompression( image.Data, image.Width, image.Height, CompressionFormat.Bc3 );
+		}
+
 		textureFormat.DataLength = textureFormat.Data.Length;
 
 		// Wrapper for file
 		var mochaFile = new MochaFile<TextureInfo>()
 		{
 			MajorVersion = 3,
-			MinorVersion = 0,
+			MinorVersion = 1,
 			Data = textureFormat
 		};
 

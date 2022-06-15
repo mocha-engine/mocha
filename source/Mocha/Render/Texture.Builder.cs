@@ -21,6 +21,8 @@ public partial class TextureBuilder
 	private bool shouldGenerateMips = false;
 	private bool isCompressed = false;
 
+	private PixelFormat compressionFormat;
+
 	public TextureBuilder()
 	{
 		path = GetHashCode().ToString();
@@ -61,7 +63,7 @@ public partial class TextureBuilder
 			height,
 			mipLevels,
 			1,
-			isCompressed ? PixelFormat.BC3_UNorm : PixelFormat.R8_G8_B8_A8_UNorm,
+			isCompressed ? compressionFormat : PixelFormat.R8_G8_B8_A8_UNorm,
 			TextureUsage.Sampled //| TextureUsage.GenerateMipmaps
 		);
 
@@ -107,6 +109,7 @@ public partial class TextureBuilder
 		this.width = textureFormat.Data.Width;
 		this.height = textureFormat.Data.Height;
 		this.data = textureFormat.Data.Data;
+		this.compressionFormat = textureFormat.Data.CompressionFormat;
 		this.path = path;
 
 		this.isCompressed = true;
