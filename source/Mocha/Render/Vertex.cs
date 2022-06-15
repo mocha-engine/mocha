@@ -14,10 +14,10 @@ public struct Vertex
 
 	public static VertexElementDescription[] VertexElementDescriptions = new[]
 	{
-		new VertexElementDescription( "vPosition", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
-		new VertexElementDescription( "vNormal", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
-		new VertexElementDescription( "vTexCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
-		new VertexElementDescription( "vTangent", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
-		new VertexElementDescription( "vBitangent", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+		new VertexElementDescription( "position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+		new VertexElementDescription( "normal", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+		new VertexElementDescription( "texCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
+		new VertexElementDescription( "tangent", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+		new VertexElementDescription( "bitangent", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
 	};
 }
