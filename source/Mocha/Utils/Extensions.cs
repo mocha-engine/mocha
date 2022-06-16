@@ -45,8 +45,8 @@ public static class MathExtensions
 	public static int NearestPowerOf2( this int x ) => NearestPowerOf2( (uint)x );
 	public static int NearestPowerOf2( this uint x ) => 1 << (sizeof( uint ) * 8 - BitOperations.LeadingZeroCount( x - 1 ));
 
-	public static float DegreesToRadians( this float degrees ) => degrees * (MathF.PI / 180f);
-	public static float RadiansToDegrees( this float radians ) => radians * (180f / MathF.PI);
+	public static float DegreesToRadians( this float degrees ) => degrees * 0.0174533f;
+	public static float RadiansToDegrees( this float radians ) => radians * 57.2958f;
 
 	public static float Clamp( this float v, float min, float max )
 	{

@@ -18,6 +18,7 @@ partial class Primitives
 				| PostProcessSteps.PreTransformVertices
 				| PostProcessSteps.RemoveRedundantMaterials
 				| PostProcessSteps.CalculateTangentSpace
+				| PostProcessSteps.GenerateSmoothNormals
 				| PostProcessSteps.OptimizeMeshes
 				| PostProcessSteps.OptimizeGraph
 				| PostProcessSteps.ValidateDataStructure

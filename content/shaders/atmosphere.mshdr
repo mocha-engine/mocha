@@ -15,13 +15,7 @@
 //
 // Uniforms
 //
-layout( set = 0, binding = 0 ) uniform texture2D g_tDiffuse;
-layout( set = 0, binding = 1 ) uniform texture2D g_tSpecular;
-layout( set = 0, binding = 2 ) uniform texture2D g_tNormal;
-layout( set = 0, binding = 3 ) uniform texture2D g_tEmissive;
-layout( set = 0, binding = 4 ) uniform texture2D g_tORM;
-layout( set = 0, binding = 5 ) uniform sampler g_sSampler;
-layout( set = 0, binding = 6 ) uniform ObjectUniformBuffer {
+layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mView;
     mat4 g_mProj;

@@ -19,10 +19,7 @@ public class Entity
 	/// </summary>
 	public Vector3 position;
 
-	/// <summary>
-	/// Pitch, Yaw, Roll (PYR)
-	/// </summary>
-	public Vector3 rotation;
+	public Rotation rotation;
 	public Vector3 scale = Vector3.One;
 
 	public string Name { get; set; }
@@ -33,6 +30,7 @@ public class Entity
 		{
 			var matrix = Matrix4x4.CreateScale( scale );
 			matrix *= Matrix4x4.CreateTranslation( position );
+			matrix *= Matrix4x4.CreateFromQuaternion( rotation.GetSystemQuaternion() );
 			matrix *= Matrix4x4.CreateFromYawPitchRoll(
 				rotation.Y.DegreesToRadians(),
 				rotation.X.DegreesToRadians(),

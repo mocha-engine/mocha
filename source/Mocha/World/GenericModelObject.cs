@@ -20,13 +20,16 @@ public partial class GenericModelObject : Entity
 			g_mModel = ModelMatrix,
 			g_mView = World.Current.Camera.ViewMatrix,
 			g_mProj = World.Current.Camera.ProjMatrix,
-			g_vLightPos = World.Current.Sun.position,
 			g_flTime = Time.Now,
-			g_vLightColor = World.Current.Sun.Color,
+
+			g_vSunLightDir = World.Current.Sun.rotation.Forward,
+			g_vSunLightColor = World.Current.Sun.Color,
+			g_vSunLightIntensity = World.Current.Sun.Intensity,
 			g_vCameraPos = World.Current.Camera.position,
 
 			_padding1 = 0,
-			_padding2 = 0
+			_padding2 = 0,
+			_padding3 = 0
 		};
 
 		models.ForEach( x => x.Draw( uniformBuffer, commandList ) );

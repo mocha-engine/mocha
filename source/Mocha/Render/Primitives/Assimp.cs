@@ -106,9 +106,8 @@ partial class Primitives
 				var assimpMaterial = scene.Materials[mesh.MaterialIndex];
 
 				material.DiffuseTexture = LoadMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
-				material.SpecularTexture = LoadMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
+				material.AlphaTexture = LoadMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
 				material.NormalTexture = LoadMaterialTexture( assimpMaterial, TextureType.Normals, "texture_normal", directory );
-				material.EmissiveTexture = LoadMaterialTexture( assimpMaterial, TextureType.Emissive, "texture_emissive", directory );
 				material.ORMTexture = LoadMaterialTexture( assimpMaterial, TextureType.Unknown, "texture_unknown", directory );
 			}
 
@@ -128,7 +127,7 @@ partial class Primitives
 			}
 			else
 			{
-				return TextureBuilder.MissingTexture;
+				return null;
 			}
 		}
 	}

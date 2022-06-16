@@ -16,20 +16,37 @@
 // Uniforms
 //
 layout( set = 0, binding = 0 ) uniform texture2D g_tDiffuse;
-layout( set = 0, binding = 1 ) uniform texture2D g_tSpecular;
+layout( set = 0, binding = 1 ) uniform texture2D g_tAlpha;
 layout( set = 0, binding = 2 ) uniform texture2D g_tNormal;
-layout( set = 0, binding = 3 ) uniform texture2D g_tEmissive;
-layout( set = 0, binding = 4 ) uniform texture2D g_tORM;
-layout( set = 0, binding = 5 ) uniform sampler g_sSampler;
-layout( set = 0, binding = 6 ) uniform ObjectUniformBuffer {
+layout( set = 0, binding = 3 ) uniform texture2D g_tORM;
+layout( set = 0, binding = 4 ) uniform sampler g_sSampler;
+layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mView;
     mat4 g_mProj;
 
+    vec3 g_vSunLightDir;
+    vec3 g_vSunLightColor;
+    float g_vSunLightIntensity;
+
     vec3 g_vLightPos;
+    float g_flTime;
     vec3 g_vLightColor;
     vec3 g_vCameraPos;
 } g_oUbo;
+
+struct VS_OUT {
+    vec2 vTexCoords;
+    vec3 vNormal;
+    vec3 vTangent;
+    vec3 vPositionWS;
+
+    mat3 TBN;
+
+    vec3 vLightPosTS;
+    vec3 vCameraPosTS;
+    vec3 vPositionTS;
+};
 
 // ==========================================================================================================================
 
@@ -50,24 +67,12 @@ layout( location = 4 ) in vec3 bitangent;
 //
 // Out
 //
-layout( location = 0 ) out struct VS_OUT {
-    vec2 vTexCoords;
-    vec3 vNormal;
-    vec3 vTangent;
-    vec3 vPositionWS;
-
-    vec3 vLightPosTS;
-    vec3 vCameraPosTS;
-    vec3 vPositionTS;
-} vs_out;
+layout( location = 0 ) out VS_OUT vs_out;
 
 void main() {
-    mat3 modelNormalMatrix = transpose( inverse( mat3( g_oUbo.g_mModel ) ) );
-    vec3 T = normalize( modelNormalMatrix * tangent );
-    vec3 N = normalize( modelNormalMatrix * normal );
-    T = normalize( T - dot( T, N ) * N );
-    vec3 B = cross( N, T );
-
+    vec3 T = normalize( vec3( g_oUbo.g_mModel * vec4( tangent, 1.0 ) ) );
+    vec3 B = normalize( vec3( g_oUbo.g_mModel * vec4( bitangent, 1.0 ) ) );
+    vec3 N = normalize( vec3( g_oUbo.g_mModel * vec4( normal, 1.0 ) ) );
     mat3 TBN = mat3( T, B, N );
 
     vs_out.vPositionWS = vec3( g_oUbo.g_mModel * vec4( position, 1.0 ) );
@@ -78,6 +83,8 @@ void main() {
     vs_out.vLightPosTS = TBN * g_oUbo.g_vLightPos;
     vs_out.vCameraPosTS = TBN * g_oUbo.g_vCameraPos;
     vs_out.vPositionTS = TBN * vs_out.vPositionWS;
+
+    vs_out.TBN = TBN;
    
     vec4 pos = g_oUbo.g_mModel * vec4( position, 1.0 );
     gl_Position = g_oUbo.g_mProj * g_oUbo.g_mView * pos;
@@ -95,62 +102,55 @@ void main() {
 //
 // In
 //
-layout( location = 0 ) in struct VS_OUT {
-    vec2 vTexCoords;
-    vec3 vNormal;
-    vec3 vTangent;
-    vec3 vPositionWS;
-
-    vec3 vLightPosTS;
-    vec3 vCameraPosTS;
-    vec3 vPositionTS;
-} vs_out;
+layout( location = 0 ) in VS_OUT fs_in;
 
 //
 // Out
 //
 layout( location = 0 ) out vec4 fragColor;
 
-float GetAmbient()
+vec3 GetTextureSample( texture2D tex )
 {
-    return 0.0;
-}
-
-float GetDiffuse( vec3 norm )
-{
-    vec3 lightDir = normalize( vs_out.vLightPosTS - vs_out.vPositionTS );
-
-    float diffuse = max( dot( norm, lightDir ), 0.0 );
-    return diffuse;
-}
-
-float GetSpecular( vec3 norm )
-{
-    float strength = 1.0;
-    vec3 viewDir = normalize( vs_out.vCameraPosTS - vs_out.vPositionTS );
-    vec3 lightDir = normalize( vs_out.vLightPosTS - vs_out.vPositionTS );
-    vec3 reflectDir = reflect( -lightDir, norm );
-    vec3 halfwayDir = normalize( lightDir + viewDir );
-
-    float spec = pow( max( dot( norm, halfwayDir ), 0.0 ), 32 );
-    return spec * strength;
+    return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords ).xyz;
 }
 
 void main() 
 {
-    vec3 normal = texture( sampler2D( g_tNormal, g_sSampler ), vs_out.vTexCoords ).xyz;
+    // Obtain normal from normal map in range [0,1]
+    vec3 normal = GetTextureSample( g_tNormal );
 
-    // calculate blue/Z channel
-    vec2 normalXY = normal.xy;
-    normalXY = normalize( normalXY * 2.0 - 1.0 ); // transform normal vector to range [-1, 1]
-    float normalZ = sqrt( clamp( 1.0 - dot( normalXY, normalXY ), 0.0, 1.0 ) );
+    // Transform normal vector to range [-1, 1]
+    normal = normal * 2.0 - 1.0;
+    normal.y = -normal.y;
 
-    normal = vec3( normalXY.x, normalXY.y, normalZ );
+    // Transform normal vector into tangent space
+    normal = normalize( fs_in.TBN * normal );
+
+    // Get diffuse color
+    vec3 color = pow( GetTextureSample( g_tDiffuse ), vec3( 2.2 ) );
     
-    vec3 albedo = texture( sampler2D( g_tDiffuse, g_sSampler ), vs_out.vTexCoords ).xyz;
-    vec3 color = ( GetAmbient() + GetDiffuse( normal ) + GetSpecular( normal ) ) * albedo;
+    // Ambient
+    vec3 ambient = 0.05 * color;
 
-    fragColor = vec4( color, 1.0 );
+    // Diffuse
+    vec3 lightDir = normalize( g_oUbo.g_vSunLightDir );
+    float diff = max( dot( lightDir, normal ), 0.0 );
+    vec3 diffuse = diff * color;
+
+    // Specular
+    vec3 viewDir = normalize( g_oUbo.g_vCameraPos - fs_in.vPositionWS );
+    vec3 reflectDir = reflect( -lightDir, normal );
+    vec3 halfwayDir = normalize( lightDir + viewDir );
+    float spec = pow( max( dot( normal, halfwayDir ), 0.0 ), 8.0 );
+
+    vec3 specular = vec3( 0.1 ) * spec;
+
+    // Mix lighting
+    vec3 lighting = diffuse + specular;
+    fragColor = vec4( ambient + lighting, 1.0 );
+
+    // Gamma correction
+    fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
 }
 #endif
 // ==========================================================================================================================
