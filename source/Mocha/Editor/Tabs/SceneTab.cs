@@ -1,6 +1,7 @@
 ﻿using ImGuiNET;
 using System.Numerics;
 using System.Reflection;
+using Veldrid;
 
 namespace Mocha;
 
@@ -70,6 +71,13 @@ internal class SceneTab : BaseTab
 			ImGui.SetNextItemWidth( -1 );
 			if ( ImGui.DragFloat3( $"##thing_{thing.Name}", ref eulerAngles ) )
 				thing.SetValue?.Invoke( Rotation.From( eulerAngles.X, eulerAngles.Y, eulerAngles.Z ) );
+		}
+		else if ( thing.Value is RgbaFloat col )
+		{
+			var sysVec4 = col.ToVector4();
+			ImGui.SetNextItemWidth( -1 );
+			if ( ImGui.ColorEdit4( $"##thing_{thing.Name}", ref sysVec4 ) )
+				thing.SetValue?.Invoke( new RgbaFloat( sysVec4 ) );
 		}
 		else
 		{
