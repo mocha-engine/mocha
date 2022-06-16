@@ -10,9 +10,9 @@ public class Program
 {
 	public static void Main( string[] args )
 	{
-		if ( Veldrid.RenderDoc.Load( out var rd ) )
+		//if ( Veldrid.RenderDoc.Load( out var rd ) )
 		{
-			Log.Trace( $"Attached to renderdoc" );
+			//Log.Trace( $"Attached to renderdoc" );
 		}
 
 		var game = new Game();

@@ -87,7 +87,7 @@ public class Model
 				new ResourceLayoutElementDescription()
 				{
 					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tSpecular",
+					Name = "g_tAlpha",
 					Options = ResourceLayoutElementOptions.None,
 					Stages = ShaderStages.Fragment
 				},
@@ -95,13 +95,6 @@ public class Model
 				{
 					Kind = ResourceKind.TextureReadOnly,
 					Name = "g_tNormal",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tEmissive",
 					Options = ResourceLayoutElementOptions.None,
 					Stages = ShaderStages.Fragment
 				},
@@ -133,7 +126,7 @@ public class Model
 
 		var pipelineDescription = new GraphicsPipelineDescription()
 		{
-			BlendState = BlendStateDescription.SingleOverrideBlend,
+			BlendState = BlendStateDescription.SingleAlphaBlend,
 
 			DepthStencilState = new DepthStencilStateDescription(
 				true,
@@ -162,11 +155,10 @@ public class Model
 
 		var resourceSetDescription = new ResourceSetDescription(
 			rsrcLayout,
-			material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			material.SpecularTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			material.NormalTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			material.EmissiveTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			material.ORMTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
+			material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
+			material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
+			material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
+			material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
 			Device.Aniso4xSampler,
 			uniformBuffer );
 
@@ -180,9 +172,6 @@ public class Model
 			throw new Exception( $"Tried to set unmatching uniform buffer object" +
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
-
-		if ( Material.IsDirty )
-			Material.GenerateMipmaps( commandList );
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.SetPipeline( pipeline );

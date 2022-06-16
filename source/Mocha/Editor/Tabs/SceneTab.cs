@@ -38,8 +38,8 @@ internal class SceneTab : BaseTab
 		{
 			var sysVec3 = vec3.GetSystemVector3();
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.DragFloat3( $"##thing_{thing.Name}", ref sysVec3 );
-			thing.SetValue?.Invoke( new Vector3( sysVec3 ) );
+			if ( ImGui.DragFloat3( $"##thing_{thing.Name}", ref sysVec3 ) )
+				thing.SetValue?.Invoke( new Vector3( sysVec3 ) );
 		}
 		else if ( thing.Value is Matrix4x4 mat4 )
 		{
@@ -55,14 +55,21 @@ internal class SceneTab : BaseTab
 		else if ( thing.Value is string str )
 		{
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputText( $"##thing_{thing.Name}", ref str, 256 );
-			thing.SetValue?.Invoke( str );
+			if ( ImGui.InputText( $"##thing_{thing.Name}", ref str, 256 ) )
+				thing.SetValue?.Invoke( str );
 		}
 		else if ( thing.Value is float f )
 		{
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.DragFloat( $"##thing_{thing.Name}", ref f );
-			thing.SetValue?.Invoke( f );
+			if ( ImGui.DragFloat( $"##thing_{thing.Name}", ref f ) )
+				thing.SetValue?.Invoke( f );
+		}
+		else if ( thing.Value is Rotation r )
+		{
+			var eulerAngles = r.ToEulerAngles().GetSystemVector3();
+			ImGui.SetNextItemWidth( -1 );
+			if ( ImGui.DragFloat3( $"##thing_{thing.Name}", ref eulerAngles ) )
+				thing.SetValue?.Invoke( Rotation.From( eulerAngles.X, eulerAngles.Y, eulerAngles.Z ) );
 		}
 		else
 		{

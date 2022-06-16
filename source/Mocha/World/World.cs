@@ -32,7 +32,7 @@ public class World
 		Sun = new Sun()
 		{
 			position = new( 0, 10, 10 ),
-			rotation = new( -1, -1, 0 )
+			rotation = Rotation.From( 0, 0, 0 )
 		};
 
 		Sky = new Sky

@@ -45,9 +45,8 @@ partial class Primitives
 				binaryReader.ReadString();
 
 				material.DiffuseTexture = LoadMaterialTexture( "BaseColor", baseTexture );
-				material.SpecularTexture = LoadMaterialTexture( "Roughness", baseTexture );
+				material.AlphaTexture = LoadMaterialTexture( "Mask", baseTexture );
 				material.NormalTexture = LoadMaterialTexture( "Normal", baseTexture );
-				material.EmissiveTexture = TextureBuilder.MissingTexture;// LoadMaterialTexture( "BaseColor", baseTexture );
 				material.ORMTexture = LoadMaterialTexture( "Metalness", baseTexture );
 
 				binaryReader.ReadChars( 4 ); // VRTX
@@ -96,7 +95,8 @@ partial class Primitives
 					indices.Add( binaryReader.ReadUInt32() );
 				}
 
-				models.Add( new Model( vertices.ToArray(), indices.ToArray(), material ) );
+				if ( material.AlphaTexture == null ) // TODO: Alpha support
+					models.Add( new Model( vertices.ToArray(), indices.ToArray(), material ) );
 			}
 
 			return models;
@@ -104,14 +104,16 @@ partial class Primitives
 		private static Texture LoadMaterialTexture( string typeName, string path )
 		{
 			if ( !path.StartsWith( "internal:" ) )
-				path = Path.ChangeExtension( path, "mtex" );
-
-			path = path.Replace( "BaseColor", typeName );
+			{
+				path = path.Replace( "_BaseColor", "" );
+				path = path.Remove( path.LastIndexOf( "." ) );
+				path = path + $"_{typeName}.mtex";
+			}
 
 			if ( !File.Exists( path ) )
 			{
 				Log.Warning( $"No texture '{path}'" );
-				return TextureBuilder.MissingTexture;
+				return null;
 			}
 
 			using var _ = new Stopwatch( $"{typeName}: {path} texture load" );

@@ -66,7 +66,7 @@ public class Sky : Entity
 			g_flPlanetRadius = PlanetRadius,
 			g_flAtmosphereRadius = AtmosphereRadius,
 			g_flSunIntensity = SunIntensity,
-			g_vSunPos = World.Current.Sun.rotation,
+			g_vSunPos = World.Current.Sun.rotation.Backward,
 
 			_padding0 = 0
 		};

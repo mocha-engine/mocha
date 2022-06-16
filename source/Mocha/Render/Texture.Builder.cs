@@ -1,9 +1,8 @@
-﻿using StbImageSharp;
-using System.IO.Compression;
+﻿using Microsoft.Win32;
+using StbImageSharp;
+using System;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Json;
 using Veldrid;
 
 namespace Mocha;
@@ -12,15 +11,13 @@ public partial class TextureBuilder
 {
 	private string type = "texture_diffuse";
 
-	private byte[] data;
+	private byte[][] data;
 	private uint width;
 	private uint height;
 
 	private string path;
 
-	private bool shouldGenerateMips = false;
-	private bool isCompressed = false;
-
+	private int mipCount = 1;
 	private PixelFormat compressionFormat;
 
 	public TextureBuilder()
@@ -29,7 +26,7 @@ public partial class TextureBuilder
 	}
 
 	public static TextureBuilder Default => new TextureBuilder();
-	public static TextureBuilder WorldTexture => new TextureBuilder().GenerateMips();
+	public static TextureBuilder WorldTexture => new TextureBuilder();
 	public static TextureBuilder UITexture => new TextureBuilder();
 
 	private static bool TryGetExistingTexture( string path, out Texture texture )
@@ -50,51 +47,48 @@ public partial class TextureBuilder
 		if ( TryGetExistingTexture( path, out var existingTexture ) )
 			return existingTexture;
 
-		uint mipLevels = 1;
-
-		if ( isCompressed )
-			shouldGenerateMips = false;
-
-		if ( shouldGenerateMips )
-			mipLevels = 3;
-
 		var textureDescription = TextureDescription.Texture2D(
 			width,
 			height,
-			mipLevels,
+			(uint)mipCount,
 			1,
-			isCompressed ? compressionFormat : PixelFormat.R8_G8_B8_A8_UNorm,
-			TextureUsage.Sampled //| TextureUsage.GenerateMipmaps
+			compressionFormat,
+			TextureUsage.Sampled
 		);
 
 		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
 
-		var textureDataPtr = Marshal.AllocHGlobal( data.Length );
-		Marshal.Copy( data, 0, textureDataPtr, data.Length );
-		Device.UpdateTexture( texture, textureDataPtr, (uint)data.Length, 0, 0, 0, width, height, 1, 0, 0 );
-		Marshal.FreeHGlobal( textureDataPtr );
+		for ( int i = 0; i < mipCount; i++ )
+		{
+			var mipData = data[i];
+			var mipDataPtr = Marshal.AllocHGlobal( mipData.Length );
+
+			int mipWidth = Mips.CalcSize( (int)width, i );
+			int mipHeight = Mips.CalcSize( (int)height, i );
+
+			Marshal.Copy( mipData, 0, mipDataPtr, mipData.Length );
+			Device.UpdateTexture( texture,
+						mipDataPtr,
+						(uint)mipData.Length,
+						0,
+						0,
+						0,
+						(uint)mipWidth,
+						(uint)mipHeight,
+						1,
+						(uint)i,
+						0 );
+			Marshal.FreeHGlobal( mipDataPtr );
+		}
 
 		var textureView = Device.ResourceFactory.CreateTextureView( texture );
-
-		return new Texture( path, texture, textureView, type, (int)width, (int)height )
-		{
-			IsDirty = shouldGenerateMips
-		};
+		return new Texture( path, texture, textureView, type, (int)width, (int)height );
 	}
 
 	public TextureBuilder WithType( string type = "texture_diffuse" )
 	{
 		this.type = type;
 
-		return this;
-	}
-
-	public TextureBuilder GenerateMips( bool generateMips = true )
-	{
-		if ( !generateMips )
-			return this;
-
-		this.shouldGenerateMips = true;
 		return this;
 	}
 
@@ -108,11 +102,10 @@ public partial class TextureBuilder
 		var textureFormat = Serializer.Deserialize<TextureInfo>( fileBytes );
 		this.width = textureFormat.Data.Width;
 		this.height = textureFormat.Data.Height;
-		this.data = textureFormat.Data.Data;
+		this.data = textureFormat.Data.MipData;
 		this.compressionFormat = textureFormat.Data.CompressionFormat;
+		this.mipCount = textureFormat.Data.MipCount;
 		this.path = path;
-
-		this.isCompressed = true;
 
 		return this;
 	}
@@ -125,7 +118,7 @@ public partial class TextureBuilder
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
 
-		this.data = image.Data;
+		this.data = new[] { image.Data };
 		this.width = (uint)image.Width;
 		this.height = (uint)image.Height;
 		this.path = path;
@@ -135,7 +128,7 @@ public partial class TextureBuilder
 
 	public TextureBuilder FromData( byte[] data, uint width, uint height )
 	{
-		this.data = data;
+		this.data = new[] { data };
 		this.width = width;
 		this.height = height;
 
@@ -155,7 +148,7 @@ public partial class TextureBuilder
 
 		StbImage.stbi_set_flip_vertically_on_load( 0 );
 
-		this.data = image.Data;
+		this.data = new[] { image.Data };
 		this.width = (uint)image.Width;
 		this.height = (uint)image.Height;
 		this.path = $"Stream {stream.GetHashCode()}";

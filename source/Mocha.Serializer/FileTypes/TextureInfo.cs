@@ -7,6 +7,7 @@ public struct TextureInfo
 
 	public Veldrid.PixelFormat CompressionFormat { get; set; }
 
-	public int DataLength { get; set; }
-	public byte[] Data { get; set; }
+	public int MipCount { get; set; }
+	public int[] MipDataLength { get; set; }
+	public byte[][] MipData { get; set; }
 }

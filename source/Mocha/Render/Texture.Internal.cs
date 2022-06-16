@@ -5,6 +5,30 @@
  */
 public partial class TextureBuilder
 {
+	private static Texture? zero;
+	public static Texture Zero
+	{
+		get
+		{
+			if ( zero == null )
+				CreateZeroTexture();
+
+			return zero;
+		}
+	}
+	private static Texture? one;
+	public static Texture One
+	{
+		get
+		{
+			if ( one == null )
+				CreateOneTexture();
+
+			return one;
+		}
+	}
+
+
 	private static Texture? missingTexture;
 	public static Texture MissingTexture
 	{
@@ -14,6 +38,41 @@ public partial class TextureBuilder
 				CreateMissingTexture();
 
 			return missingTexture;
+		}
+	}
+
+	[Event.Game.Load]
+	public static void CreateOneTexture()
+	{
+		{
+			var missingTextureData = new byte[]
+			{
+				255, 255, 255, 255,
+			};
+
+			one = Texture.Builder
+				.FromData( missingTextureData, 1, 1 )
+				.WithType( "internal" )
+				.WithName( "internal:one" )
+				.Build();
+		}
+	}
+
+
+	[Event.Game.Load]
+	public static void CreateZeroTexture()
+	{
+		{
+			var missingTextureData = new byte[]
+			{
+				0, 0, 0, 255,
+			};
+
+			zero = Texture.Builder
+				.FromData( missingTextureData, 1, 1 )
+				.WithType( "internal" )
+				.WithName( "internal:zero" )
+				.Build();
 		}
 	}
 

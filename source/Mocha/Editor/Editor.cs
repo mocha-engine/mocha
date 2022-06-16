@@ -185,10 +185,10 @@ internal partial class Editor
 
 		DrawPerfOverlay();
 
-		Gizmos.Draw();
-
 		if ( !ShouldRender )
 			return;
+
+		Gizmos.Draw();
 
 		DrawMenuBar();
 
