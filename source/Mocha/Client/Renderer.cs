@@ -96,6 +96,7 @@ internal class Renderer
 			PreferDepthRangeZeroToOne = true,
 			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
 			SwapchainSrgbFormat = false,
+			SyncToVerticalBlank = false
 		};
 
 		var preferredBackend = GraphicsBackend.Direct3D11;

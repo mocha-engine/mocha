@@ -26,13 +26,18 @@ layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
     mat4 g_mProj;
 
     vec3 g_vSunLightDir;
-    vec3 g_vSunLightColor;
-    float g_vSunLightIntensity;
+    float g_flTime;
 
     vec3 g_vLightPos;
-    float g_flTime;
-    vec3 g_vLightColor;
+    float g_vSunLightIntensity;
+
     vec3 g_vCameraPos;
+    // float pad
+
+    vec3 g_vLightColor;
+    // float pad
+
+    vec4 g_vSunLightColor;
 } g_oUbo;
 
 struct VS_OUT {
@@ -114,6 +119,18 @@ vec3 GetTextureSample( texture2D tex )
     return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords ).xyz;
 }
 
+float Luminance(vec3 v)
+{
+    return dot(v, vec3(0.2126, 0.7152, 0.0722));
+}
+
+vec3 ReinhardJodie(vec3 v)
+{
+    float l = Luminance(v);
+    vec3 tv = v / (1.0 + v);
+    return mix(v / (1.0 + l), tv, tv);
+}
+
 void main() 
 {
     // Obtain normal from normal map in range [0,1]
@@ -130,7 +147,7 @@ void main()
     vec3 color = pow( GetTextureSample( g_tDiffuse ), vec3( 2.2 ) );
     
     // Ambient
-    vec3 ambient = 0.05 * color;
+    vec3 ambient = 0.1 * color;
 
     // Diffuse
     vec3 lightDir = normalize( g_oUbo.g_vSunLightDir );
@@ -146,11 +163,16 @@ void main()
     vec3 specular = vec3( 0.1 ) * spec;
 
     // Mix lighting
-    vec3 lighting = diffuse + specular;
+    vec3 lighting = (diffuse + specular) * g_oUbo.g_vSunLightColor.xyz;
     fragColor = vec4( ambient + lighting, 1.0 );
+    
+    // Reinhard-Jodie tone mapping
+    fragColor.xyz = ReinhardJodie( fragColor.xyz );
+    fragColor.xyz *= pow( 2, 0.5 );
 
     // Gamma correction
     fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
+    fragColor.xyz = 1.0 - exp( -4.0 * fragColor.xyz );
 }
 #endif
 // ==========================================================================================================================

@@ -23,13 +23,12 @@ public partial class GenericModelObject : Entity
 			g_flTime = Time.Now,
 
 			g_vSunLightDir = World.Current.Sun.rotation.Forward,
-			g_vSunLightColor = World.Current.Sun.Color,
+			g_vSunLightColor = World.Current.Sun.Color.ToVector4(),
 			g_vSunLightIntensity = World.Current.Sun.Intensity,
 			g_vCameraPos = World.Current.Camera.position,
 
 			_padding1 = 0,
-			_padding2 = 0,
-			_padding3 = 0
+			_padding2 = 0
 		};
 
 		models.ForEach( x => x.Draw( uniformBuffer, commandList ) );

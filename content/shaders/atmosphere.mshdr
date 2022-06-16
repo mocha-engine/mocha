@@ -22,12 +22,16 @@ layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
 
     vec3 g_vLightPos;
     float g_flTime;
-    vec3 g_vLightColor;
-    float g_flSunIntensity;
+
+    vec4 g_vLightColor;
+
     vec3 g_vCameraPos;
     float g_flPlanetRadius;
+    
     vec3 g_vSunPos;
     float g_flAtmosphereRadius;
+
+    float g_flSunIntensity;
 } g_oUbo;
 
 // ==========================================================================================================================
