@@ -1,4 +1,4 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Common;
 
 public struct MochaFile<T>
 {

@@ -5,7 +5,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using Veldrid;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 public partial class TextureBuilder
 {

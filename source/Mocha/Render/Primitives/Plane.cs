@@ -1,4 +1,4 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Renderer;
 
 partial class Primitives
 {
