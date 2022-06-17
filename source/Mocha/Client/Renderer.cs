@@ -85,7 +85,7 @@ internal class Renderer
 		Input.Update();
 
 		world.Update();
-		editor?.UpdateFrom( Input.Snapshot );
+		editor?.Update();
 	}
 
 	private void CreateGraphicsDevice()
