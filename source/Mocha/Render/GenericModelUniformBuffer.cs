@@ -1,10 +1,10 @@
 ﻿using System.Numerics;
 using System.Runtime.InteropServices;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 [StructLayout( LayoutKind.Sequential )]
-struct GenericModelUniformBuffer
+public struct GenericModelUniformBuffer
 {
 	/*
 	 * These fields are padded so that they're

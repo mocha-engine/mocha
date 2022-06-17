@@ -1,6 +1,6 @@
 ﻿using Veldrid;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 public class Texture : Asset
 {

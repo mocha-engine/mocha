@@ -1,6 +1,4 @@
-﻿using Assimp;
-
-namespace Mocha.AssetCompiler;
+﻿namespace Mocha.AssetCompiler;
 
 public class ModelCompiler
 {

@@ -1,8 +1,8 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Renderer;
 
 partial class Primitives
 {
-	internal static class Cube
+	public static class Cube
 	{
 		private static float[] cubeVertices = new[] {
             // Top

@@ -1,4 +1,4 @@
-﻿global using System.Numerics;
+﻿global using Mocha.Common;
 
 namespace Mocha.AssetCompiler;
 

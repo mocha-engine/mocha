@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha", "Mocha\Mocha.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Renderer", "Mocha\Mocha.Renderer.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
 	ProjectSection(ProjectDependencies) = postProject
 		{3C746AF5-7408-40CA-B7D8-12BA41582F26} = {3C746AF5-7408-40CA-B7D8-12BA41582F26}
 	EndProjectSection
@@ -12,9 +12,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Tests", "Mocha.Tests\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.HangDetector", "Mocha.HangDetector\Mocha.HangDetector.csproj", "{3C746AF5-7408-40CA-B7D8-12BA41582F26}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.AssetCompiler", "Mocha.AssetCompiler\Mocha.AssetCompiler.csproj", "{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.AssetCompiler", "Mocha.AssetCompiler\Mocha.AssetCompiler.csproj", "{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.Common", "Mocha.Serializer\Mocha.Common.csproj", "{05117E76-6DE2-4B04-BF23-93621AF84576}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Common", "Mocha.Serializer\Mocha.Common.csproj", "{05117E76-6DE2-4B04-BF23-93621AF84576}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.Engine", "Mocha.Engine\Mocha.Engine.csproj", "{86D9A27F-6F46-4F60-BD58-94DF366704EB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,10 @@ Global
 		{05117E76-6DE2-4B04-BF23-93621AF84576}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{05117E76-6DE2-4B04-BF23-93621AF84576}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{05117E76-6DE2-4B04-BF23-93621AF84576}.Release|Any CPU.Build.0 = Release|Any CPU
+		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

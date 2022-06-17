@@ -1,6 +1,6 @@
 ﻿using Assimp;
 
-namespace Mocha;
+namespace Mocha.AssetCompiler;
 
 partial class Primitives
 {

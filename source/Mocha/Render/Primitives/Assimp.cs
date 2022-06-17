@@ -1,7 +1,6 @@
 ﻿using Assimp;
-using System.Numerics;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 partial class Primitives
 {
@@ -105,10 +104,10 @@ partial class Primitives
 			{
 				var assimpMaterial = scene.Materials[mesh.MaterialIndex];
 
-				material.DiffuseTexture = LoadMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
-				material.AlphaTexture = LoadMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
-				material.NormalTexture = LoadMaterialTexture( assimpMaterial, TextureType.Normals, "texture_normal", directory );
-				material.ORMTexture = LoadMaterialTexture( assimpMaterial, TextureType.Unknown, "texture_unknown", directory );
+				material.DiffuseTexture = LoadMaterialTexture( assimpMaterial, global::Assimp.TextureType.Diffuse, "texture_diffuse", directory );
+				material.AlphaTexture = LoadMaterialTexture( assimpMaterial, global::Assimp.TextureType.Specular, "texture_specular", directory );
+				material.NormalTexture = LoadMaterialTexture( assimpMaterial, global::Assimp.TextureType.Normals, "texture_normal", directory );
+				material.ORMTexture = LoadMaterialTexture( assimpMaterial, global::Assimp.TextureType.Unknown, "texture_unknown", directory );
 			}
 
 			return new Model( vertices.ToArray(), indices.ToArray(), material );

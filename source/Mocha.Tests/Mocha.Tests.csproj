@@ -15,8 +15,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Mocha.AssetCompiler\Mocha.AssetCompiler.csproj" />
+		<ProjectReference Include="..\Mocha.Engine\Mocha.Engine.csproj" />
 		<ProjectReference Include="..\Mocha.Serializer\Mocha.Common.csproj" />
-		<ProjectReference Include="..\Mocha\Mocha.csproj" />
+		<ProjectReference Include="..\Mocha\Mocha.Renderer.csproj" />
 	</ItemGroup>
 
 </Project>

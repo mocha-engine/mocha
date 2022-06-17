@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Veldrid;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 [StructLayout( LayoutKind.Sequential )]
 public struct Vertex

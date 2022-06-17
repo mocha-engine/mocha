@@ -2,7 +2,7 @@
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 public class Shader
 {

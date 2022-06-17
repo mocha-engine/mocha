@@ -1,4 +1,4 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Renderer;
 
 /*
  * Generators for internal textures (missing texture etc.)
@@ -41,7 +41,6 @@ public partial class TextureBuilder
 		}
 	}
 
-	[Event.Game.Load]
 	public static void CreateOneTexture()
 	{
 		{
@@ -59,7 +58,6 @@ public partial class TextureBuilder
 	}
 
 
-	[Event.Game.Load]
 	public static void CreateZeroTexture()
 	{
 		{
@@ -76,7 +74,6 @@ public partial class TextureBuilder
 		}
 	}
 
-	[Event.Game.Load]
 	public static void CreateMissingTexture()
 	{
 		//

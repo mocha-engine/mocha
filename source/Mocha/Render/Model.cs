@@ -1,7 +1,7 @@
 ﻿using System.Runtime.InteropServices;
 using Veldrid;
 
-namespace Mocha;
+namespace Mocha.Renderer;
 
 public class Model
 {
@@ -165,7 +165,7 @@ public class Model
 		resourceSet = Device.ResourceFactory.CreateResourceSet( resourceSetDescription );
 	}
 
-	internal void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : struct
+	public void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : struct
 	{
 		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
 		{

@@ -1,7 +1,7 @@
 ﻿using System.IO.Compression;
 using System.Text.Json;
 
-namespace Mocha;
+namespace Mocha.Common;
 
 public static class Serializer
 {
