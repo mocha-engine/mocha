@@ -176,9 +176,9 @@ internal partial class Editor
 		ImGui.EndMainMenuBar();
 	}
 
-	public void UpdateFrom( MochaInputSnapshot snapshot )
+	public void Update()
 	{
-		ImGuiRenderer.Update( Time.Delta, snapshot );
+		ImGuiRenderer.Update( Time.Delta, Input.Snapshot );
 
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			ShouldRender = !ShouldRender;
