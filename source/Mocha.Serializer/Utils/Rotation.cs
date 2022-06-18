@@ -29,12 +29,12 @@ public partial struct Rotation : IEquatable<Rotation>
 	}
 
 	public Rotation Normal => Normalize( this );
-	public Vector3 Forward => this * Vector3.Forward;
-	public Vector3 Backward => this * Vector3.Backward;
-	public Vector3 Left => this * Vector3.Left;
-	public Vector3 Right => this * Vector3.Right;
-	public Vector3 Up => this * Vector3.Up;
-	public Vector3 Down => this * Vector3.Down;
+	public Vector3 Forward => (this * Vector3.Forward).Normal;
+	public Vector3 Backward => (this * Vector3.Backward).Normal;
+	public Vector3 Left => (this * Vector3.Left).Normal;
+	public Vector3 Right => (this * Vector3.Right).Normal;
+	public Vector3 Up => (this * Vector3.Up).Normal;
+	public Vector3 Down => (this * Vector3.Down).Normal;
 
 	public Rotation( float x, float y, float z, float w )
 	{
