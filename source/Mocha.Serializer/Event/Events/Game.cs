@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine;
+﻿namespace Mocha.Common;
 
 partial class Event
 {

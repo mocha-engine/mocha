@@ -17,8 +17,9 @@ public class RendererInstance
 
 	public RendererInstance()
 	{
-		Init();
+		Event.Register( this );
 
+		Init();
 		lastFrame = DateTime.Now;
 	}
 
@@ -93,6 +94,7 @@ public class RendererInstance
 		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
+	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );

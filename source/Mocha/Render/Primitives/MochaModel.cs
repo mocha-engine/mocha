@@ -101,6 +101,7 @@ public partial class Primitives
 
 			return models;
 		}
+
 		private static Texture LoadMaterialTexture( string typeName, string path )
 		{
 			if ( !path.StartsWith( "internal:" ) )
