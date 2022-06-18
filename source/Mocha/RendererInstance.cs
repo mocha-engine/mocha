@@ -12,12 +12,14 @@ public class RendererInstance
 
 	private CommandList commandList;
 
+	public Action OnUpdate;
+	public Action OnRender;
+
 	public RendererInstance()
 	{
 		Init();
 
 		lastFrame = DateTime.Now;
-		MainLoop();
 	}
 
 	private void Init()
@@ -30,7 +32,7 @@ public class RendererInstance
 		world = new();
 	}
 
-	private void MainLoop()
+	public void Run()
 	{
 		while ( window.SdlWindow.Exists )
 		{
@@ -69,9 +71,8 @@ public class RendererInstance
 		lastFrame = DateTime.Now;
 
 		Time.UpdateFrom( deltaTime );
-		Input.Update();
-
-		world.Update();
+		Input.Update(); // TODO: Decouple this
+		OnUpdate?.Invoke();
 	}
 
 	private void CreateGraphicsDevice()
