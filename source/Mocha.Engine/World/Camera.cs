@@ -2,42 +2,27 @@
 
 public class Camera : Entity
 {
-	public Matrix4x4 ViewMatrix { get; set; }
-	public Matrix4x4 ProjMatrix { get; set; }
-
-	public Vector3 Forward => ViewMatrix.Forward();
-	public Vector3 Right => ViewMatrix.Right();
-	public Vector3 Up => ViewMatrix.Up();
+	public SceneCamera SceneCamera { get; set; }
 
 	private Vector3 velocity = new();
 	private Vector3 wishVelocity = new();
 
 	private float cameraSpeed = 100f;
 
-	private float fov = 90f;
+	private float FieldOfView
+	{
+		get => SceneCamera.FieldOfView;
+		set => SceneCamera.FieldOfView = value;
+	}
+
 	private float wishFov = 90f;
 
-	private void CalcViewProjMatrix()
+	public Matrix4x4 ProjMatrix => SceneCamera.ProjMatrix;
+	public Matrix4x4 ViewMatrix => SceneCamera.ViewMatrix;
+
+	public Camera()
 	{
-		var cameraPos = Position;
-
-		// TODO: Do this proper
-		var direction = new Vector3(
-			MathF.Cos( Rotation.Y.DegreesToRadians() ) * MathF.Cos( Rotation.X.DegreesToRadians() ),
-			MathF.Sin( Rotation.Y.DegreesToRadians() ) * MathF.Cos( Rotation.X.DegreesToRadians() ),
-			MathF.Sin( Rotation.X.DegreesToRadians() )
-		);
-		var cameraFront = direction;
-
-		var cameraUp = new Vector3( 0, 0, 1 );
-
-		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, cameraPos + cameraFront, cameraUp );
-		ProjMatrix = Matrix4x4.CreatePerspectiveFieldOfView(
-			fov.DegreesToRadians(),
-			Screen.Aspect,
-			0.1f,
-			1000.0f
-		);
+		SceneCamera = new( this );
 	}
 
 	public override void Update()
@@ -49,8 +34,8 @@ public class Camera : Entity
 		//
 		var wishDir = new Vector3( Input.Forward, Input.Left, 0 ).Normal;
 
-		wishVelocity = Forward * wishDir.X * Time.Delta * cameraSpeed;
-		wishVelocity += Right * wishDir.Y * Time.Delta * cameraSpeed;
+		wishVelocity = Rotation.Forward * wishDir.X * Time.Delta * cameraSpeed;
+		wishVelocity += Rotation.Right * wishDir.Y * Time.Delta * cameraSpeed;
 
 		if ( Input.Down( InputButton.Jump ) )
 			wishVelocity.Z += cameraSpeed * Time.Delta;
@@ -82,9 +67,9 @@ public class Camera : Entity
 		Position += velocity * Time.Delta;
 
 		// Apply fov
-		fov = fov.LerpTo( wishFov, 5f * Time.Delta );
+		FieldOfView = FieldOfView.LerpTo( wishFov, 5f * Time.Delta );
 
 		// Run view/proj matrix calculations
-		CalcViewProjMatrix();
+		SceneCamera.CalcViewProjMatrix();
 	}
 }

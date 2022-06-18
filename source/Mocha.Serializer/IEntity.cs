@@ -3,4 +3,6 @@
 public interface IEntity
 {
 	public Transform Transform { get; set; }
+
+	void Delete();
 }

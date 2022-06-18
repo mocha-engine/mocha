@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using Veldrid;
 
 namespace Mocha.Engine;
 
@@ -8,7 +7,6 @@ public class Entity : IEntity
 {
 	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
 
-	public SceneObject SceneObject { get; set; }
 	private Transform transform;
 
 	Transform IEntity.Transform
@@ -39,14 +37,11 @@ public class Entity : IEntity
 
 	public Entity()
 	{
-		SceneObject = new( this );
 		All.Add( this );
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
 
-	public virtual void Render( CommandList commandList ) { }
 	public virtual void Update() { }
-
 	public virtual void Delete() { }
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();

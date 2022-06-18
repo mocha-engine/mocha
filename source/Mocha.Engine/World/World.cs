@@ -35,7 +35,7 @@ public class World
 			Scale = Vector3.One * -100f
 		};
 
-		_ = new GenericModelObject( "content/models/sponza/sponza.mmdl" )
+		_ = new ModelEntity( "content/models/sponza/sponza.mmdl" )
 		{
 			//rotation = new Vector3( 90, 0, 0 ),
 			Scale = new Vector3( 0.025f )
@@ -45,10 +45,5 @@ public class World
 	public void Update()
 	{
 		Entity.All.ForEach( entity => entity.Update() );
-	}
-
-	public void Render( CommandList commandList )
-	{
-		Entity.All.ForEach( entity => entity.Render( commandList ) );
 	}
 }

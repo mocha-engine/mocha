@@ -2,15 +2,18 @@
 
 public class SceneWorld
 {
-	internal void Render( CommandList commandList )
+	public static SceneWorld Current { get; private set; }
+
+	public SceneCamera Camera => SceneObject.All.OfType<SceneCamera>().FirstOrDefault();
+	public SceneLight Sun => SceneObject.All.OfType<SceneLight>().FirstOrDefault();
+
+	public SceneWorld()
 	{
-		return;
-		throw new NotImplementedException();
+		Current = this;
 	}
 
-	internal void Update()
+	public void Render( CommandList commandList )
 	{
-		return;
-		throw new NotImplementedException();
+		SceneObject.All.ForEach( obj => obj.Render( commandList ) );
 	}
 }

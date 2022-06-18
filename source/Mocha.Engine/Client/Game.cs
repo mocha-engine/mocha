@@ -12,5 +12,9 @@ internal class Game
 	{
 		Log.Trace( "Initializing game" );
 		renderer = new();
+		var world = new World();
+		renderer.OnUpdate += world.Update;
+
+		renderer.Run();
 	}
 }
