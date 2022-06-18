@@ -4,43 +4,42 @@ using Veldrid;
 
 namespace Mocha.Engine;
 
-public class Entity
+public class Entity : IEntity
 {
 	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
 
-	//
-	// Transform
-	// These aren't properties because we want to be able to add to them
-	//
+	public SceneObject SceneObject { get; set; }
+	private Transform transform;
 
-	/// <summary>
-	/// Right, Up, Forward (FLU)
-	/// </summary>
-	public Vector3 position;
+	Transform IEntity.Transform
+	{
+		get => transform;
+		set => transform = value;
+	}
 
-	public Rotation rotation;
-	public Vector3 scale = Vector3.One;
+	public Vector3 Scale
+	{
+		get => transform.Scale;
+		set => transform.Scale = value;
+	}
+
+	public Vector3 Position
+	{
+		get => transform.Position;
+		set => transform.Position = value;
+	}
+
+	public Rotation Rotation
+	{
+		get => transform.Rotation;
+		set => transform.Rotation = value;
+	}
 
 	public string Name { get; set; }
 
-	public Matrix4x4 ModelMatrix
-	{
-		get
-		{
-			var matrix = Matrix4x4.CreateScale( scale );
-			matrix *= Matrix4x4.CreateTranslation( position );
-			matrix *= Matrix4x4.CreateFromQuaternion( rotation.GetSystemQuaternion() );
-			matrix *= Matrix4x4.CreateFromYawPitchRoll(
-				rotation.Y.DegreesToRadians(),
-				rotation.X.DegreesToRadians(),
-				rotation.Z.DegreesToRadians() );
-
-			return matrix;
-		}
-	}
-
 	public Entity()
 	{
+		SceneObject = new( this );
 		All.Add( this );
 		Name = $"{this.GetType().Name} {All.Count}";
 	}

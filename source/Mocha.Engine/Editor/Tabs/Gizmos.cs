@@ -26,7 +26,7 @@ public class Gizmos
 			foreach ( var ent in Entity.All )
 			{
 				var vp = World.Current.Camera.ViewMatrix * World.Current.Camera.ProjMatrix;
-				System.Numerics.Vector4 worldPos = new( ent.position, 1.0f );
+				Vector4 worldPos = new( ent.Position, 1.0f );
 				var clipPos = System.Numerics.Vector4.Transform( worldPos, vp );
 				var ndcPos = new Vector3( clipPos.X, clipPos.Y, clipPos.Z ) / clipPos.W;
 
@@ -39,7 +39,7 @@ public class Gizmos
 
 				if ( ent is Sun )
 				{
-					float distance = Vector3.DistanceBetween( World.Current.Camera.position, ent.position ) / 16;
+					float distance = Vector3.DistanceBetween( World.Current.Camera.Position, ent.Position ) / 16;
 					distance = distance.Clamp( 0.0f, 0.1f );
 					distance = 1.0f - distance;
 					Vector2 size = new Vector2( 64, 64 ) * distance;

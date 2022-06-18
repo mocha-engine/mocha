@@ -19,12 +19,13 @@ public class Camera : Entity
 
 	private void CalcViewProjMatrix()
 	{
-		var cameraPos = position;
+		var cameraPos = Position;
 
+		// TODO: Do this proper
 		var direction = new Vector3(
-			MathF.Cos( rotation.Y.DegreesToRadians() ) * MathF.Cos( rotation.X.DegreesToRadians() ),
-			MathF.Sin( rotation.Y.DegreesToRadians() ) * MathF.Cos( rotation.X.DegreesToRadians() ),
-			MathF.Sin( rotation.X.DegreesToRadians() )
+			MathF.Cos( Rotation.Y.DegreesToRadians() ) * MathF.Cos( Rotation.X.DegreesToRadians() ),
+			MathF.Sin( Rotation.Y.DegreesToRadians() ) * MathF.Cos( Rotation.X.DegreesToRadians() ),
+			MathF.Sin( Rotation.X.DegreesToRadians() )
 		);
 		var cameraFront = direction;
 
@@ -57,10 +58,12 @@ public class Camera : Entity
 		if ( Input.Down( InputButton.Sprint ) )
 			wishVelocity *= 4.0f;
 
-		rotation.Y -= Input.MouseDelta.X * 20f * Time.Delta;
-		rotation.X -= Input.MouseDelta.Y * 20f * Time.Delta;
+		var targetRot = Rotation;
+		targetRot.Y -= Input.MouseDelta.X * 20f * Time.Delta;
+		targetRot.X -= Input.MouseDelta.Y * 20f * Time.Delta;
 
-		rotation.X = rotation.X.Clamp( -89, 89 );
+		targetRot.X = Rotation.X.Clamp( -89, 89 );
+		Rotation = targetRot;
 
 		float t = velocity.WithZ( 0 ).Length.LerpInverse( 0, 50 );
 		wishFov = 60f.LerpTo( 90f, t );
@@ -76,7 +79,7 @@ public class Camera : Entity
 		velocity *= 1 - Time.Delta * 10f;
 
 		// Move camera
-		position += velocity * Time.Delta;
+		Position += velocity * Time.Delta;
 
 		// Apply fov
 		fov = fov.LerpTo( wishFov, 5f * Time.Delta );

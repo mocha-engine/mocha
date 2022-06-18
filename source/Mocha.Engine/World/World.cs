@@ -26,19 +26,19 @@ public class World
 
 		Sun = new Sun()
 		{
-			position = new( 0, 10, 10 ),
-			rotation = Rotation.From( 0, 0, 0 )
+			Position = new( 0, 10, 10 ),
+			Rotation = Rotation.From( 0, 0, 0 )
 		};
 
 		Sky = new Sky
 		{
-			scale = Vector3.One * -100f
+			Scale = Vector3.One * -100f
 		};
 
 		_ = new GenericModelObject( "content/models/sponza/sponza.mmdl" )
 		{
 			//rotation = new Vector3( 90, 0, 0 ),
-			scale = new Vector3( 0.025f )
+			Scale = new Vector3( 0.025f )
 		};
 	}
 
