@@ -6,9 +6,7 @@ namespace Mocha.Renderer;
 public class Window
 {
 	public static Window Current { get; set; }
-
 	public Sdl2Window SdlWindow { get; private set; }
-
 	public Point2 Size => new Point2( SdlWindow.Width, SdlWindow.Height );
 
 	public Window()

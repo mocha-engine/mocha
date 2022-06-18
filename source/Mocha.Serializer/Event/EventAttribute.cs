@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine;
+﻿namespace Mocha.Common;
 
 [AttributeUsage( AttributeTargets.Method, AllowMultiple = true )]
 public class EventAttribute : Attribute

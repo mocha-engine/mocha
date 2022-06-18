@@ -104,8 +104,8 @@ public static partial class Input
 						case SDL_WindowEventID.Resized:
 						case SDL_WindowEventID.SizeChanged:
 							var newSize = new Point2( we.data1, we.data2 );
-							Screen.UpdateFrom( newSize ); // TODO: Can we hook this up to Event.Window.Resized?
-														  // Event.Run( Event.Window.ResizedAttribute.Name, newSize );
+							Screen.UpdateFrom( newSize );
+							Event.Run( Event.Window.ResizedAttribute.Name, newSize );
 							break;
 						default:
 							break;
