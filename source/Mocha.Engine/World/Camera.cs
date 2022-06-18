@@ -43,12 +43,12 @@ public class Camera : Entity
 		if ( Input.Down( InputButton.Sprint ) )
 			wishVelocity *= 4.0f;
 
-		var targetRot = Rotation;
-		targetRot.Y -= Input.MouseDelta.X * 20f * Time.Delta;
-		targetRot.X -= Input.MouseDelta.Y * 20f * Time.Delta;
+		var targetEuler = Rotation.ToEulerAngles();
+		targetEuler.X += Input.MouseDelta.Y * 20f * Time.Delta;
+		targetEuler.Y -= Input.MouseDelta.X * 20f * Time.Delta;
 
-		targetRot.X = Rotation.X.Clamp( -89, 89 );
-		Rotation = targetRot;
+		targetEuler.X = targetEuler.X.Clamp( -89, 89 );
+		Rotation = Rotation.From( targetEuler.X, targetEuler.Y, targetEuler.Z );
 
 		float t = velocity.WithZ( 0 ).Length.LerpInverse( 0, 50 );
 		wishFov = 60f.LerpTo( 90f, t );
