@@ -54,18 +54,18 @@ public class Sky : Entity
 	{
 		var uniformBuffer = new SkyUniformBuffer
 		{
-			g_mModel = ModelMatrix,
+			g_mModel = SceneObject.ModelMatrix,
 			g_mView = World.Current.Camera.ViewMatrix,
 			g_mProj = World.Current.Camera.ProjMatrix,
-			g_vLightPos = World.Current.Sun.position,
+			g_vLightPos = World.Current.Sun.Position,
 			g_flTime = Time.Now,
 			g_vLightColor = World.Current.Sun.Color.ToVector4(),
-			g_vCameraPos = World.Current.Camera.position,
+			g_vCameraPos = World.Current.Camera.Position,
 
 			g_flPlanetRadius = PlanetRadius,
 			g_flAtmosphereRadius = AtmosphereRadius,
 			g_flSunIntensity = SunIntensity,
-			g_vSunPos = World.Current.Sun.rotation.Backward
+			g_vSunPos = World.Current.Sun.Rotation.Backward
 		};
 
 		Model.Draw( uniformBuffer, commandList );

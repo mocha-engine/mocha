@@ -17,15 +17,15 @@ public partial class GenericModelObject : Entity
 
 		var uniformBuffer = new GenericModelUniformBuffer
 		{
-			g_mModel = ModelMatrix,
+			g_mModel = SceneObject.ModelMatrix,
 			g_mView = World.Current.Camera.ViewMatrix,
 			g_mProj = World.Current.Camera.ProjMatrix,
 			g_flTime = Time.Now,
 
-			g_vSunLightDir = World.Current.Sun.rotation.Forward,
+			g_vSunLightDir = World.Current.Sun.Rotation.Forward,
 			g_vSunLightColor = World.Current.Sun.Color.ToVector4(),
 			g_vSunLightIntensity = World.Current.Sun.Intensity,
-			g_vCameraPos = World.Current.Camera.position,
+			g_vCameraPos = World.Current.Camera.Position,
 
 			_padding1 = 0,
 			_padding2 = 0
