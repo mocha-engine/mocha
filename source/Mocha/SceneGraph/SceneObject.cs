@@ -5,10 +5,9 @@ namespace Mocha.Renderer;
 
 public class SceneObject
 {
-	public static List<SceneObject> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<SceneObject>().ToList();
-
 	public IEntity Entity { get; set; }
 	public Transform Transform => Entity.Transform;
+	public static List<SceneObject> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<SceneObject>().ToList();
 
 	public SceneObject( IEntity entity )
 	{

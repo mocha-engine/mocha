@@ -37,7 +37,7 @@ internal class Game
 						break;
 				}
 
-				vconsole.Log( $"{str}", color );
+				vconsole.Log( str, color );
 			};
 
 			var editorFontTexture = Editor.GenerateFontTexture();

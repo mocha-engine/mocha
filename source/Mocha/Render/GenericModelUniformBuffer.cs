@@ -19,7 +19,7 @@ public struct GenericModelUniformBuffer
 	public float g_flTime; // 4
 
 	public System.Numerics.Vector3 g_vLightPos; // 12
-	public float g_vSunLightIntensity; // 4
+	public float g_flSunLightIntensity; // 4
 
 	public System.Numerics.Vector3 g_vLightColor; // 12
 	public float _padding1; // 4
