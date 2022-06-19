@@ -1,0 +1,15 @@
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\bin\Debug\net6.0\VConsoleLib.exe
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\bin\Debug\net6.0\VConsoleLib.deps.json
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\bin\Debug\net6.0\VConsoleLib.runtimeconfig.json
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\bin\Debug\net6.0\VConsoleLib.dll
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\bin\Debug\net6.0\VConsoleLib.pdb
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.csproj.AssemblyReference.cache
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.GeneratedMSBuildEditorConfig.editorconfig
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.AssemblyInfoInputs.cache
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.AssemblyInfo.cs
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.csproj.CoreCompileInputs.cache
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.dll
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\refint\VConsoleLib.dll
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.pdb
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\VConsoleLib.genruntimeconfig.cache
+F:\Projects\Mocha\thirdparty\VConsoleLib\VConsoleLib\obj\Debug\net6.0\ref\VConsoleLib.dll
