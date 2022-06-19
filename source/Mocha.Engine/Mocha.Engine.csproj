@@ -26,6 +26,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\..\thirdparty\VConsoleLib\VConsoleLib\VConsoleLib.csproj" />
 		<ProjectReference Include="..\Mocha.Serializer\Mocha.Common.csproj" />
 		<ProjectReference Include="..\Mocha\Mocha.Renderer.csproj" />
 	</ItemGroup>
