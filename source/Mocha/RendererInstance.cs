@@ -11,8 +11,11 @@ public class RendererInstance
 	private DateTime lastFrame;
 
 	private CommandList commandList;
+	private ImGuiRenderer imguiRenderer;
 
+	public Action PreUpdate;
 	public Action OnUpdate;
+	public Action PostUpdate;
 	public Action OnRender;
 
 	public RendererInstance()
@@ -29,6 +32,11 @@ public class RendererInstance
 
 		CreateGraphicsDevice();
 		commandList = Device.ResourceFactory.CreateCommandList();
+
+		imguiRenderer = new( Device,
+			  Device.SwapchainFramebuffer.OutputDescription,
+			  window.SdlWindow.Width,
+			  window.SdlWindow.Height );
 
 		world = new();
 	}
@@ -64,6 +72,7 @@ public class RendererInstance
 	private void Render()
 	{
 		world.Render( commandList );
+		imguiRenderer?.Render( Device, commandList );
 	}
 
 	private void Update()
@@ -72,8 +81,11 @@ public class RendererInstance
 		lastFrame = DateTime.Now;
 
 		Time.UpdateFrom( deltaTime );
-		Input.Update(); // TODO: Decouple this
+
+		PreUpdate?.Invoke();
 		OnUpdate?.Invoke();
+		imguiRenderer.Update( Time.Delta, Input.Snapshot );
+		PostUpdate?.Invoke();
 	}
 
 	private void CreateGraphicsDevice()
@@ -94,9 +106,15 @@ public class RendererInstance
 		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
+	public IntPtr GetImGuiBinding( Texture texture )
+	{
+		return imguiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
+	}
+
 	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
+		imguiRenderer.WindowResized( newSize.X, newSize.Y );
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
 	}
 }

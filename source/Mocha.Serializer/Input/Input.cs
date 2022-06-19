@@ -6,6 +6,14 @@ namespace Mocha.Common;
 // TODO: Decouple from SDL
 public static partial class Input
 {
+	public enum MouseModes
+	{
+		Locked,
+		Unlocked
+	}
+
+	public static MouseModes MouseMode { get; set; }
+
 	public static MochaInputSnapshot Snapshot { get; private set; }
 
 	public static System.Numerics.Vector2 MouseDelta => Snapshot.MouseDelta;
@@ -20,7 +28,7 @@ public static partial class Input
 
 	public static unsafe void Update()
 	{
-		if ( Sdl2Native.SDL_SetRelativeMouseMode( true ) != 0 )
+		if ( Sdl2Native.SDL_SetRelativeMouseMode( MouseMode == MouseModes.Locked ) != 0 )
 			throw new Exception();
 
 		var lastKeysDown = Snapshot?.KeysDown.ToList() ?? new();
@@ -131,6 +139,13 @@ public static partial class Input
 		Snapshot.KeyEvents = veldridKeyEvents;
 		Snapshot.MouseEvents = veldridMouseEvents;
 		Snapshot.KeyCharPresses = keyCharPresses;
+
+		if ( MouseMode == MouseModes.Unlocked )
+		{
+			Snapshot.MouseDelta = Vector2.Zero;
+			Snapshot.MouseLeft = false;
+			Snapshot.MouseRight = false;
+		}
 	}
 
 	private static bool IsKeyPressed( SDL_Keycode k ) => Snapshot.KeysDown.Select( x => x.sym ).Contains( k );
