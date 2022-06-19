@@ -9,6 +9,14 @@
 		<ApplicationIcon>mocha.ico</ApplicationIcon>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);RENDERDOC</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants);RENDERDOC</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<None Remove="mocha.ico" />
 	</ItemGroup>

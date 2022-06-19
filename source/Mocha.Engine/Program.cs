@@ -11,10 +11,12 @@ public class Program
 {
 	public static void Main( string[] args )
 	{
-		if ( Veldrid.RenderDoc.Load( out var rd ) )
+#if RENDERDOC
+		if ( !Veldrid.RenderDoc.Load( out var rd ) )
 		{
-			Log.Trace( $"Attached to renderdoc" );
+			throw new Exception();
 		}
+#endif
 
 		var game = new Game();
 	}

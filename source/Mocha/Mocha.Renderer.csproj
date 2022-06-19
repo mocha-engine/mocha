@@ -9,6 +9,14 @@
 		<LangVersion>preview</LangVersion>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <DefineConstants>$(DefineConstants)</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
 		<PackageReference Include="ImGui.NET" Version="1.87.2" />

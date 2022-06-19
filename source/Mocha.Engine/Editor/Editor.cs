@@ -8,24 +8,19 @@ namespace Mocha.Engine;
 internal partial class Editor
 {
 	public static Editor Instance { get; private set; }
+	public bool ShouldRender { get; set; }
+	public static ImFontPtr MonospaceFont { get; private set; }
+	public static ImFontPtr SansSerifFont { get; private set; }
 
-	public ImGuiRenderer ImGuiRenderer { get; private set; }
 	private Mocha.Renderer.Texture defaultFontTexture;
 
 	private List<BaseTab> tabs = new();
 
-	public bool ShouldRender { get; set; }
-
-	public static ImFontPtr MonospaceFont { get; private set; }
-	public static ImFontPtr SansSerifFont { get; private set; }
-
-	public Editor( ImGuiRenderer imGuiController )
+	public Editor( IntPtr imguiBinding )
 	{
 		Instance ??= this;
 
-		ImGuiRenderer = imGuiController;
-
-		InitIO();
+		Init( imguiBinding );
 		SetTheme();
 
 		tabs.AddRange( new BaseTab[] {
@@ -37,8 +32,26 @@ internal partial class Editor
 			new SceneTab(),
 			new ThemerTab()
 		} );
+	}
 
-		tabs.ForEach( x => x.ImGuiRenderer = ImGuiRenderer );
+	public static Mocha.Renderer.Texture GenerateFontTexture()
+	{
+		var io = ImGui.GetIO();
+
+		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
+
+		io.Fonts.Clear();
+
+		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
+		MonospaceFont = io.Fonts.AddFontDefault();
+
+		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
+
+		int size = width * height * bpp;
+		byte[] data = new byte[size];
+		Marshal.Copy( pixels, data, 0, size );
+
+		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
 	}
 
 	private static void SetKeyMappings( ImGuiIOPtr io )
@@ -64,27 +77,12 @@ internal partial class Editor
 		io.KeyMap[(int)ImGuiKey.Z] = (int)Key.Z;
 	}
 
-	private void InitIO()
+	public void Init( IntPtr imguiBinding )
 	{
 		var io = ImGui.GetIO();
 
-		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
-
-		io.Fonts.Clear();
-
-		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
-		MonospaceFont = io.Fonts.AddFontDefault();
-
-		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
-
-		int size = width * height * bpp;
-		byte[] data = new byte[size];
-		Marshal.Copy( pixels, data, 0, size );
-		defaultFontTexture = TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
-
-		//var texPtr = ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, defaultFontTexture.VeldridTextureView );
-		//io.Fonts.SetTexID( texPtr );
-		//io.Fonts.ClearTexData();
+		io.Fonts.SetTexID( imguiBinding );
+		io.Fonts.ClearTexData();
 
 		SetKeyMappings( io );
 	}
@@ -178,12 +176,16 @@ internal partial class Editor
 
 	public void Update()
 	{
-		ImGuiRenderer.Update( Time.Delta, Input.Snapshot );
-
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			ShouldRender = !ShouldRender;
 
 		DrawPerfOverlay();
+
+		Input.MouseMode = ShouldRender switch
+		{
+			true => Input.MouseModes.Unlocked,
+			false => Input.MouseModes.Locked
+		};
 
 		if ( !ShouldRender )
 			return;
