@@ -135,23 +135,14 @@ public partial class TextureBuilder
 		return this;
 	}
 
-	public TextureBuilder FromStream( Stream stream, bool flipY = true )
+	public TextureBuilder FromEmpty( uint width, uint height )
 	{
-		// shit-tier hack
-		if ( flipY )
-			StbImage.stbi_set_flip_vertically_on_load( 1 );
+		var dataLength = (int)(width * height * 4);
 
-		var fileData = new byte[stream.Length];
-		stream.Read( fileData, 0, fileData.Length );
-
-		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		StbImage.stbi_set_flip_vertically_on_load( 0 );
-
-		this.data = new[] { image.Data };
-		this.width = (uint)image.Width;
-		this.height = (uint)image.Height;
-		this.path = $"Stream {stream.GetHashCode()}";
+		this.data = new[] { Enumerable.Repeat( (byte)0, dataLength ).ToArray() };
+		this.width = width;
+		this.height = height;
+		this.path = $"{GetHashCode()}";
 
 		return this;
 	}

@@ -11,6 +11,8 @@ internal partial class Editor
 	public bool ShouldRender { get; set; }
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
+	public static ImFontPtr HeadingFont { get; private set; }
+	public static ImFontPtr SubheadingFont { get; private set; }
 
 	private Renderer.Texture defaultFontTexture;
 	private List<BaseTab> tabs = new();
@@ -42,7 +44,11 @@ internal partial class Editor
 
 		io.Fonts.Clear();
 
-		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Roboto-Regular.ttf", 14f );
+		var sansSerifFontFile = "content/fonts/Inter-Regular.ttf";
+
+		SansSerifFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 14f );
+		HeadingFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 24f );
+		SubheadingFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 20f );
 		MonospaceFont = io.Fonts.AddFontDefault();
 
 		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
@@ -114,29 +120,24 @@ internal partial class Editor
 		windowPivot.Y = 0.0f;
 
 		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
-
 		ImGui.SetNextWindowBgAlpha( 0.5f );
+		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 150, 0 ) );
 
 		if ( ImGui.Begin( $"##overlay", window_flags ) )
 		{
 			string total = GC.GetTotalMemory( false ).ToSize( MathExtensions.SizeUnits.MB );
 
+			ImGui.PushFont( HeadingFont );
 			ImGui.Text( $"{io.Framerate.CeilToInt()}fps" );
-			ImGui.Separator();
+			ImGui.PopFont();
+
+			ImGui.PushFont( SubheadingFont );
 			ImGui.Text( $"{total} total" );
+			ImGui.PopFont();
 		}
 
 		ImGui.Text( $"Running for {Time.Now:0}s" );
-
-		ImGui.Separator();
-
-		ImGui.Text( $"Mouse pos: {Input.Snapshot.MousePosition}" );
-
-		foreach ( var veldridMouseEvent in Input.Snapshot.MouseEvents )
-		{
-			ImGui.Text( $"{veldridMouseEvent.MouseButton}: {veldridMouseEvent.Down}" );
-		}
-
+		ImGui.Text( $"Frame time {Time.Delta:0.0000}s" );
 		ImGui.End();
 	}
 
@@ -189,6 +190,8 @@ internal partial class Editor
 			true => Input.MouseModes.Unlocked,
 			false => Input.MouseModes.Locked
 		};
+
+		Notify.Draw();
 
 		if ( !ShouldRender )
 			return;
