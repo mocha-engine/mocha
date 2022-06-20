@@ -1,6 +1,4 @@
-﻿using VConsoleLib;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 /// <summary>
 /// Handles the creation of various game systems.
@@ -25,34 +23,6 @@ internal class Game
 					str,
 					stackTrace.GetFrame( 2 ).GetMethod().DeclaringType.Name,
 					stackTrace.GetFrames().Select( x => x.ToString() ).ToArray() );
-			};
-
-			var vconsole = new VConsoleServer();
-			Logger.OnLog += ( level, str, _ ) =>
-			{
-				uint color = 0xFFFFFFFF;
-				switch ( level )
-				{
-					case Logger.Level.Trace:
-						color = 0xFFAAAAAA;
-						break;
-					case Logger.Level.Info:
-						color = 0xFFFFFFFF;
-						break;
-					case Logger.Level.Warning:
-						color = 0xAAAAAAFF;
-						break;
-					case Logger.Level.Error:
-						color = 0xFF0000FF;
-						break;
-				}
-
-				vconsole.Log( str, color );
-			};
-
-			vconsole.OnCommand += ( command ) =>
-			{
-				Log.Error( $"Unknown command '{command}'" );
 			};
 
 			var editorFontTexture = Editor.GenerateFontTexture();
