@@ -12,8 +12,7 @@ internal partial class Editor
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
 
-	private Mocha.Renderer.Texture defaultFontTexture;
-
+	private Renderer.Texture defaultFontTexture;
 	private List<BaseTab> tabs = new();
 
 	public Editor( IntPtr imguiBinding )
@@ -23,16 +22,12 @@ internal partial class Editor
 		Init( imguiBinding );
 		SetTheme();
 
-		tabs.AddRange( new BaseTab[] {
-			new TexturesTab(),
-			new ConsoleTab(),
-			new InputTab(),
-			new FileBrowserTab(),
-			new DemoWindow(),
-			new SceneTab(),
-			new ThemerTab(),
-			new RenderDocTab()
-		} );
+		tabs.AddRange( Assembly.GetExecutingAssembly()
+			.GetTypes()
+			.Where( x => typeof( BaseTab ).IsAssignableFrom( x ) )
+			.Select( x => Activator.CreateInstance( x ) )
+			.OfType<BaseTab>()
+		);
 	}
 
 	public static Mocha.Renderer.Texture GenerateFontTexture()
