@@ -57,8 +57,15 @@ public static class MathExtensions
 		return v > max ? max : v;
 	}
 
-	public static float LerpTo( this float a, float b, float t ) => a * (1 - t) + b * t;
-	public static float LerpInverse( this float t, float a, float b ) => ((t - a) / (b - a));
+	public static float LerpTo( this float a, float b, float t )
+	{
+		return a * (1 - t) + b * t.Clamp( 0, 1 );
+	}
+
+	public static float LerpInverse( this float t, float a, float b )
+	{
+		return ((t - a) / (b - a)).Clamp( 0, 1 );
+	}
 
 	public static Vector3 Normalize( this Vector3 vector ) => vector / vector.Length;
 
