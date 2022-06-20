@@ -18,9 +18,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Common", "Mocha.Seria
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Engine", "Mocha.Engine\Mocha.Engine.csproj", "{86D9A27F-6F46-4F60-BD58-94DF366704EB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VConsoleLib", "..\thirdparty\VConsoleLib\VConsoleLib\VConsoleLib.csproj", "{93AF8750-7756-4CBE-BDF1-816A174F36C9}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mocha.Console", "Mocha.Console\Mocha.Console.csproj", "{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Console", "Mocha.Console\Mocha.Console.csproj", "{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -52,10 +50,6 @@ Global
 		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86D9A27F-6F46-4F60-BD58-94DF366704EB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{93AF8750-7756-4CBE-BDF1-816A174F36C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{93AF8750-7756-4CBE-BDF1-816A174F36C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{93AF8750-7756-4CBE-BDF1-816A174F36C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{93AF8750-7756-4CBE-BDF1-816A174F36C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}.Release|Any CPU.ActiveCfg = Release|Any CPU
