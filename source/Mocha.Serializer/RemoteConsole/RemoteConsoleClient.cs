@@ -1,13 +1,11 @@
-﻿using Mocha.Common;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 
-namespace Mocha.Console;
+namespace Mocha.Common;
 
-public class RemoteConsoleClient
+public class RemoteConsoleClient : RemoteConsoleConnection
 {
 	private TcpClient tcpClient;
-	private NetworkStream stream;
 
 	public Action<ConsoleMessage> OnLog;
 
@@ -40,7 +38,7 @@ public class RemoteConsoleClient
 		}
 	}
 
-	private void ListenThread()
+	protected override void ListenThread()
 	{
 		while ( tcpClient.Connected )
 		{
@@ -56,5 +54,11 @@ public class RemoteConsoleClient
 			}
 			catch { }
 		}
+	}
+
+	public override void MessageReceived( byte[] data )
+	{
+		var obj = Serializer.Deserialize<ConsolePacket<ConsoleMessage>>( data );
+		OnLog?.Invoke( obj.Data );
 	}
 }

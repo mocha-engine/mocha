@@ -20,7 +20,11 @@ internal class Game
 			var remoteConsole = new RemoteConsoleServer();
 			Logger.OnLog += ( level, str, stackTrace ) =>
 			{
-				remoteConsole.Write( level, str, stackTrace );
+				remoteConsole.Write(
+					level,
+					str,
+					stackTrace.GetFrame( 2 ).GetMethod().DeclaringType.Name,
+					stackTrace.GetFrames().Select( x => x.ToString() ).ToArray() );
 			};
 
 			var vconsole = new VConsoleServer();
