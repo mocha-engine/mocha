@@ -8,7 +8,6 @@ public class Gizmos
 
 	public static void Draw()
 	{
-		var io = ImGui.GetIO();
 		var window_flags = ImGuiWindowFlags.NoDecoration |
 			ImGuiWindowFlags.AlwaysAutoResize |
 			ImGuiWindowFlags.NoSavedSettings |
@@ -34,8 +33,8 @@ public class Gizmos
 					continue;
 
 				var screenPos = new Point2(
-					(int)(((ndcPos.X + 1.0) / 2.0) * Screen.Size.X),
-					(int)(((-ndcPos.Y + 1.0) / 2.0) * Screen.Size.Y) );
+					(int)((ndcPos.X + 1.0) / 2.0 * Screen.Size.X),
+					(int)((-ndcPos.Y + 1.0) / 2.0 * Screen.Size.Y) );
 
 				if ( ent is Sun )
 				{
