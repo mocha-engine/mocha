@@ -46,15 +46,28 @@ public class RendererInstance
 		while ( window.SdlWindow.Exists )
 		{
 			Update();
-
 			PreRender();
-			Render();
+
+			Render( Device.SwapchainFramebuffer );
+
+			foreach ( var shadowBuffer in SceneObject.All.OfType<SkySceneObject>().Select( x => x.ShadowBuffer ) )
+			{
+				Render( shadowBuffer );
+			}
+
 			PostRender();
 		}
 	}
 
 	private void PreRender()
 	{
+		// TODO: Make this nicer
+		// Check each shader, if it's dirty then recompile it
+		foreach ( var shader in Shader.All.Where( x => x.IsDirty ) )
+		{
+			shader.Recompile();
+		}
+
 		commandList.Begin();
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
 		commandList.ClearColorTarget( 0, RgbaFloat.Black );
@@ -63,16 +76,23 @@ public class RendererInstance
 
 	private void PostRender()
 	{
+		imguiRenderer?.Render( Device, commandList );
 		commandList.End();
-		Device.SyncToVerticalBlank = true;
+		Device.SyncToVerticalBlank = false;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
 	}
 
-	private void Render()
+	private void Render( Framebuffer framebuffer )
 	{
+		commandList.SetFramebuffer( framebuffer );
+
+		for ( uint i = 0; i < framebuffer.ColorTargets.Count; ++i )
+			commandList.ClearColorTarget( i, RgbaFloat.Black );
+
+		commandList.ClearDepthStencil( 1 );
+
 		world.Render( commandList );
-		imguiRenderer?.Render( Device, commandList );
 	}
 
 	private void Update()

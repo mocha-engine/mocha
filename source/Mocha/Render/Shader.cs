@@ -13,6 +13,8 @@ public class Shader
 
 	public FileSystemWatcher Watcher;
 
+	public bool IsDirty { get; private set; }
+
 	internal Shader( string path, Veldrid.Shader[] shaderProgram )
 	{
 		All.Add( this );
@@ -41,14 +43,7 @@ public class Shader
 
 	private void OnWatcherChanged( object sender, FileSystemEventArgs e )
 	{
-		using var _ = new Stopwatch( $"Recompile shader {Path}" );
-		while ( !IsFileReady( Path ) ) ;
-
-		Log.Trace( $"File {Path} ready" );
-		Recompile();
-
-		Log.Trace( $"Firing OnRecompile ({OnRecompile})" );
-		OnRecompile?.Invoke();
+		IsDirty = true;
 	}
 
 	public static bool IsFileReady( string path )
@@ -64,8 +59,11 @@ public class Shader
 		}
 	}
 
-	private void Recompile()
+	public void Recompile()
 	{
+		if ( !IsFileReady( Path ) )
+			return;
+
 		var shaderText = File.ReadAllText( Path );
 
 		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
@@ -94,10 +92,16 @@ public class Shader
 			vertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			ShaderProgram = Device.ResourceFactory.CreateFromSpirv( vertexShaderDescription, fragmentShaderDescription );
+
+			Notify.AddNotification( "Shader Compilation Success!", $"Compiled shader {Path}" );
 		}
 		catch ( Exception ex )
 		{
-			Log.Warning( $"Compile failed:\n{ex}" );
+			Log.Warning( $"Compile failed:\n{ex.Message}" );
+			Notify.AddNotification( "Shader Compilation Fail", $"{ex.Message}" );
 		}
+
+		IsDirty = false;
+		OnRecompile?.Invoke();
 	}
 }

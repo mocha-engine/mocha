@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-public class Gizmos
+public static class Gizmos
 {
 	private static Texture LightTexture => Texture.Builder.FromPath( "content/icons/lightbulb.png" ).Build();
 
