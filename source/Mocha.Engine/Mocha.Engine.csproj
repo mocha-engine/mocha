@@ -7,14 +7,15 @@
 		<OutputType>WinExe</OutputType>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<ApplicationIcon>mocha.ico</ApplicationIcon>
+		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);RENDERDOC</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DefineConstants>$(DefineConstants);RENDERDOC</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>

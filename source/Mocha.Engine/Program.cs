@@ -11,13 +11,6 @@ public class Program
 {
 	public static void Main( string[] args )
 	{
-#if RENDERDOC
-		if ( !Veldrid.RenderDoc.Load( out var rd ) )
-		{
-			throw new Exception();
-		}
-#endif
-
 		var game = new Game();
 	}
 }

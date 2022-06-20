@@ -30,7 +30,8 @@ internal partial class Editor
 			new FileBrowserTab(),
 			new DemoWindow(),
 			new SceneTab(),
-			new ThemerTab()
+			new ThemerTab(),
+			new RenderDocTab()
 		} );
 	}
 
