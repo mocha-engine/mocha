@@ -5,8 +5,19 @@ using Mocha.Console;
 
 public class ConsoleWindow
 {
-	DateTime lastUpdate = DateTime.Now;
-	List<ConsoleInstance> instances = new List<ConsoleInstance> { new ConsoleInstance() };
+	private DateTime lastUpdate = DateTime.Now;
+	private List<ConsoleInstance> instances = new();
+
+	public ConsoleWindow()
+	{
+		// Create initial instance
+		CreateInstance();
+	}
+
+	private void CreateInstance()
+	{
+		instances.Add( new() );
+	}
 
 	private void DrawMenuBar()
 	{
@@ -21,15 +32,63 @@ public class ConsoleWindow
 
 		if ( ImGui.BeginMenu( "File" ) )
 		{
-			if ( ImGui.MenuItem( "Connect" ) )
+			if ( ImGui.MenuItem( "New Instance" ) )
 			{
-				instances.Add( new() );
+				CreateInstance();
+			}
+
+			ImGui.Separator();
+
+			if ( ImGui.MenuItem( "Exit" ) )
+			{
+				Environment.Exit( 0 );
 			}
 
 			ImGui.EndMenu();
 		}
 
 		ImGui.EndMainMenuBar();
+	}
+
+	private void DrawMain()
+	{
+		var viewport = ImGui.GetMainViewport();
+		ImGui.SetNextWindowSize( viewport.WorkSize );
+		ImGui.SetNextWindowPos( viewport.WorkPos );
+		ImGui.SetNextWindowViewport( viewport.ID );
+		ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
+
+		if ( ImGui.Begin( "Console", ImGuiWindowFlags.NoDecoration ) )
+		{
+			if ( ImGui.BeginTabBar( "consoleTabs" ) )
+			{
+				foreach ( ConsoleInstance instance in instances.ToArray() )
+				{
+					bool isOpen = true;
+
+					if ( ImGui.BeginTabItem( $"{instance.Title}##{instance.GetHashCode()}", ref isOpen ) )
+					{
+						instance.Render();
+						ImGui.EndTabItem();
+					}
+
+					if ( !isOpen )
+					{
+						instances.Remove( instance );
+					}
+				}
+
+				if ( ImGui.TabItemButton( "+" ) )
+				{
+					CreateInstance();
+				}
+
+				ImGui.EndTabBar();
+			}
+		}
+
+		ImGui.PopStyleVar();
+		ImGui.End();
 	}
 
 	public void Run()
@@ -73,39 +132,7 @@ public class ConsoleWindow
 			lastUpdate = DateTime.Now;
 
 			DrawMenuBar();
-
-			var viewport = ImGui.GetMainViewport();
-			ImGui.SetNextWindowSize( viewport.WorkSize );
-			ImGui.SetNextWindowPos( viewport.WorkPos );
-			ImGui.SetNextWindowViewport( viewport.ID );
-			ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
-
-			if ( ImGui.Begin( "Console", ImGuiWindowFlags.NoDecoration ) )
-			{
-				if ( ImGui.BeginTabBar( "consoleTabs", ImGuiTabBarFlags.Reorderable ) )
-				{
-					foreach ( ConsoleInstance instance in instances.ToArray() )
-					{
-						bool isOpen = true;
-
-						if ( ImGui.BeginTabItem( $"{instance.Title}##{instance.GetHashCode()}", ref isOpen ) )
-						{
-							instance.Render();
-							ImGui.EndTabItem();
-						}
-
-						if ( !isOpen )
-						{
-							instances.Remove( instance );
-						}
-					}
-
-					ImGui.EndTabBar();
-				}
-			}
-
-			ImGui.PopStyleVar();
-			ImGui.End();
+			DrawMain();
 
 			cl.Begin();
 			cl.SetFramebuffer( graphicsDevice.MainSwapchain.Framebuffer );

@@ -25,7 +25,7 @@ public class ConsoleInstance
 
 	public void Render()
 	{
-		if ( ImGui.BeginChild( "##logs_container", new System.Numerics.Vector2( 0, -48 ) ) )
+		if ( ImGui.BeginChild( "##logs_container", new System.Numerics.Vector2( 0, -72 ) ) )
 		{
 			if ( ImGui.BeginTable( $"##logs", 2, ImGuiTableFlags.RowBg | ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp, new System.Numerics.Vector2( 0, 0 ) ) )
 			{
@@ -54,6 +54,19 @@ public class ConsoleInstance
 					ImGui.TextWrapped( message );
 
 					ImGui.PopStyleColor();
+
+					if ( ImGui.IsItemHovered() )
+					{
+						ImGui.BeginTooltip();
+
+						ImGui.Text( "Stack Trace:" );
+						foreach ( var line in item.StackTrace.Skip( 2 ) )
+						{
+							ImGui.Text( $"\t{line}" );
+						}
+
+						ImGui.EndTooltip();
+					}
 				}
 
 				ImGui.EndTable();
@@ -65,14 +78,18 @@ public class ConsoleInstance
 			ImGui.EndChild();
 		}
 
+		ImGui.Dummy( new Vector2( 0, 4 ) );
+		ImGui.Separator();
+		ImGui.Dummy( new Vector2( 0, 4 ) );
+
 		ImGui.SetNextItemWidth( item_width: 256 );
-		ImGui.Text( "Filter" );
+		ImGui.Text( "Filter".PadRight( 8 ) );
 		ImGui.SameLine();
 		ImGui.SetNextItemWidth( -1 );
 		ImGui.InputText( "##console_filter", ref consoleFilter, 512 );
 
 		ImGui.SetNextItemWidth( item_width: 256 );
-		ImGui.Text( "Command" );
+		ImGui.Text( "Command".PadRight( 8 ) );
 		ImGui.SameLine();
 		ImGui.SetNextItemWidth( -64 );
 		ImGui.InputText( "##console_input", ref consoleInput, 512 );
