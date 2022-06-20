@@ -25,8 +25,7 @@ internal class Game
 					stackTrace.GetFrames().Select( x => x.ToString() ).ToArray() );
 			};
 
-			var editorFontTexture = Editor.GenerateFontTexture();
-			editor = new( renderer.GetImGuiBinding( editorFontTexture ) );
+			editor = new( renderer );
 
 			var world = new World();
 

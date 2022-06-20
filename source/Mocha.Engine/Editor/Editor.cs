@@ -15,11 +15,15 @@ internal partial class Editor
 	private Renderer.Texture defaultFontTexture;
 	private List<BaseTab> tabs = new();
 
-	public Editor( IntPtr imguiBinding )
+	// TODO: I don't like this
+	internal RendererInstance Renderer { get; }
+
+	public Editor( RendererInstance renderer )
 	{
 		Instance ??= this;
+		Renderer = renderer;
 
-		Init( imguiBinding );
+		Init();
 		SetTheme();
 
 		tabs.AddRange( Assembly.GetExecutingAssembly()
@@ -73,9 +77,12 @@ internal partial class Editor
 		io.KeyMap[(int)ImGuiKey.Z] = (int)Key.Z;
 	}
 
-	public void Init( IntPtr imguiBinding )
+	public void Init()
 	{
 		var io = ImGui.GetIO();
+
+		var editorFontTexture = GenerateFontTexture();
+		var imguiBinding = Renderer.GetImGuiBinding( editorFontTexture );
 
 		io.Fonts.SetTexID( imguiBinding );
 		io.Fonts.ClearTexData();

@@ -25,11 +25,9 @@ internal static class EditorHelpers
 
 	public static void Image( Texture texture, Vector2 size )
 	{
-		return;
+		var texPtr = Editor.Instance.Renderer.GetImGuiBinding( texture );
 
-		//var texPtr = Editor.Instance.ImGuiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
-
-		//ImGui.Image( texPtr, size,
-		//	new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ) );
+		ImGui.Image( texPtr, size,
+			new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ) );
 	}
 }
