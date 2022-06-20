@@ -17,8 +17,14 @@ internal class Game
 			Log.Trace( "Game init" );
 			renderer = new();
 
+			var remoteConsole = new RemoteConsoleServer();
+			Logger.OnLog += ( level, str, stackTrace ) =>
+			{
+				remoteConsole.Write( level, str, stackTrace );
+			};
+
 			var vconsole = new VConsoleServer();
-			Logger.OnLog += ( level, str ) =>
+			Logger.OnLog += ( level, str, _ ) =>
 			{
 				uint color = 0xFFFFFFFF;
 				switch ( level )
@@ -38,6 +44,11 @@ internal class Game
 				}
 
 				vconsole.Log( str, color );
+			};
+
+			vconsole.OnCommand += ( command ) =>
+			{
+				Log.Error( $"Unknown command '{command}'" );
 			};
 
 			var editorFontTexture = Editor.GenerateFontTexture();

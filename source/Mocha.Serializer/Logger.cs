@@ -1,4 +1,6 @@
-﻿namespace Mocha.Common;
+﻿using System.Diagnostics;
+
+namespace Mocha.Common;
 
 /// <summary>
 /// Handles all debug logging functionality.
@@ -18,8 +20,7 @@ public class Logger
 	public void Warning( object obj ) => Log( obj?.ToString(), Level.Warning );
 	public void Error( object obj ) => Log( obj?.ToString(), Level.Error );
 
-	public delegate void LogDelegate( Level severity, string logText );
-	public static LogDelegate? OnLog;
+	public static Action<Level, string, StackTrace> OnLog;
 
 	private static void Log( string? str, Level severity = Level.Trace )
 	{
@@ -34,7 +35,8 @@ public class Logger
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
 		Console.WriteLine( $"[{DateTime.Now.ToLongTimeString()}] {str}" );
 
-		OnLog?.Invoke( severity, str );
+		var stackTrace = new System.Diagnostics.StackTrace();
+		OnLog?.Invoke( severity, str, stackTrace );
 	}
 
 	private static ConsoleColor SeverityToConsoleColor( Level severity )

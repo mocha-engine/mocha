@@ -99,7 +99,7 @@ public partial class TextureBuilder
 
 		var fileBytes = File.ReadAllBytes( path );
 
-		var textureFormat = Serializer.Deserialize<TextureInfo>( fileBytes );
+		var textureFormat = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes );
 		this.width = textureFormat.Data.Width;
 		this.height = textureFormat.Data.Height;
 		this.data = textureFormat.Data.MipData;

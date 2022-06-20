@@ -23,7 +23,7 @@ internal class ConsoleTab : BaseTab
 
 	public ConsoleTab()
 	{
-		Logger.OnLog += ( severity, str ) =>
+		Logger.OnLog += ( severity, str, _ ) =>
 		{
 			var color = severity switch
 			{

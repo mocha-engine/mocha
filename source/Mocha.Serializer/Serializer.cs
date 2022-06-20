@@ -15,7 +15,7 @@ public static class Serializer
 		return serializeOptions;
 	}
 
-	public static byte[] Serialize<T>( MochaFile<T> obj )
+	public static byte[] Serialize<T>( T obj )
 	{
 		using var stream = new MemoryStream();
 		using var deflate = new DeflateStream( stream, CompressionLevel.Fastest );
@@ -28,7 +28,7 @@ public static class Serializer
 		return stream.ToArray();
 	}
 
-	public static MochaFile<T> Deserialize<T>( byte[] serialized )
+	public static T Deserialize<T>( byte[] serialized )
 	{
 		using var outputStream = new MemoryStream();
 
@@ -38,6 +38,6 @@ public static class Serializer
 			deflateStream.CopyTo( outputStream );
 		}
 
-		return JsonSerializer.Deserialize<MochaFile<T>>( outputStream.ToArray(), CreateSerializerOptions() );
+		return JsonSerializer.Deserialize<T>( outputStream.ToArray(), CreateSerializerOptions() );
 	}
 }
