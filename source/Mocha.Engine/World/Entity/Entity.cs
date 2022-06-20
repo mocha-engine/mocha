@@ -34,9 +34,11 @@ public class Entity : IEntity
 	}
 
 	public string Name { get; set; }
+	public int Id { get; set; }
 
 	public Entity()
 	{
+		Id = All.Count; // TODO: Pooling
 		All.Add( this );
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
@@ -46,4 +48,13 @@ public class Entity : IEntity
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();
 	public int GetHashCode( [DisallowNull] Entity obj ) => base.GetHashCode();
+
+	private int parentId;
+	public Entity Parent => Entity.All.First( x => x.Id == parentId );
+	public List<Entity> Children => Entity.All.Where( x => x.parentId == Id ).ToList();
+
+	public void SetParent( Entity newParent )
+	{
+		newParent.parentId = newParent.Id;
+	}
 }

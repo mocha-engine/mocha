@@ -38,7 +38,7 @@ internal partial class Editor
 	{
 		var io = ImGui.GetIO();
 
-		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB;
+		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
 
 		io.Fonts.Clear();
 
