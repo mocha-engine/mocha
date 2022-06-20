@@ -115,6 +115,12 @@ public static partial class Input
 							Screen.UpdateFrom( newSize );
 							Event.Run( Event.Window.ResizedAttribute.Name, newSize );
 							break;
+
+						case SDL_WindowEventID.Close:
+							// TODO: Unload & destroy everything nicely
+							Environment.Exit( 0 );
+							break;
+
 						default:
 							break;
 					}
