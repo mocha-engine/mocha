@@ -9,20 +9,20 @@ internal class SceneTab : BaseTab
 {
 	private Entity? selectedEntity;
 
-	class ReflectedThing
+	class ReflectedElement
 	{
 		public string Name { get; set; }
 		public object? Value { get; set; }
 		public Action<object> SetValue { get; set; }
 
-		public ReflectedThing( object o, FieldInfo fieldInfo )
+		public ReflectedElement( object o, FieldInfo fieldInfo )
 		{
 			Name = fieldInfo.Name;
 			Value = fieldInfo.GetValue( o );
 			SetValue = ( v ) => fieldInfo.SetValue( o, v );
 		}
 
-		public ReflectedThing( object o, PropertyInfo propertyInfo )
+		public ReflectedElement( object o, PropertyInfo propertyInfo )
 		{
 			Name = propertyInfo.Name;
 			Value = propertyInfo.GetValue( o );
@@ -32,7 +32,7 @@ internal class SceneTab : BaseTab
 		}
 	}
 
-	private void DrawElement( ReflectedThing thing )
+	private void DrawElement( ReflectedElement thing )
 	{
 		if ( thing.Value is Vector3 vec3 )
 		{
@@ -153,14 +153,14 @@ internal class SceneTab : BaseTab
 							if ( item.MemberType == MemberTypes.Field )
 							{
 								var field = item as FieldInfo;
-								var thing = new ReflectedThing( selectedEntity, field );
+								var thing = new ReflectedElement( selectedEntity, field );
 
 								DrawElement( thing );
 							}
 							else if ( item.MemberType == MemberTypes.Property )
 							{
 								var property = item as PropertyInfo;
-								var thing = new ReflectedThing( selectedEntity, property );
+								var thing = new ReflectedElement( selectedEntity, property );
 
 								DrawElement( thing );
 							}
