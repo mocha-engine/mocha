@@ -48,12 +48,10 @@ public class RendererInstance
 			Update();
 			PreRender();
 
-			Render( Device.SwapchainFramebuffer );
+			world.Sun.CalcViewProjMatrix();
 
-			foreach ( var shadowBuffer in SceneObject.All.OfType<SkySceneObject>().Select( x => x.ShadowBuffer ) )
-			{
-				Render( shadowBuffer );
-			}
+			RenderPass( "Main Pass", world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
+			RenderPass( "Shadow Pass", world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
 
 			PostRender();
 		}
@@ -69,30 +67,34 @@ public class RendererInstance
 		}
 
 		commandList.Begin();
-		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
-		commandList.ClearColorTarget( 0, RgbaFloat.Black );
-		commandList.ClearDepthStencil( 1 );
 	}
 
 	private void PostRender()
 	{
-		imguiRenderer?.Render( Device, commandList );
+		// imguiRenderer?.Render( Device, commandList );
+
 		commandList.End();
+
 		Device.SyncToVerticalBlank = false;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
 	}
 
-	private void Render( Framebuffer framebuffer )
+	private void RenderPass( string name, Matrix4x4 viewProjMatrix, Framebuffer framebuffer )
 	{
+		commandList.PushDebugGroup( name );
 		commandList.SetFramebuffer( framebuffer );
+		commandList.SetViewport( 0, new Viewport( 0, 0, framebuffer.Width, framebuffer.Height, 0, 1 ) );
+		commandList.SetFullViewports();
+		commandList.SetFullScissorRects();
 
 		for ( uint i = 0; i < framebuffer.ColorTargets.Count; ++i )
 			commandList.ClearColorTarget( i, RgbaFloat.Black );
 
 		commandList.ClearDepthStencil( 1 );
 
-		world.Render( commandList );
+		world.Render( viewProjMatrix, framebuffer, commandList );
+		commandList.PopDebugGroup();
 	}
 
 	private void Update()

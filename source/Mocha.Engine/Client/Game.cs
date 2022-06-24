@@ -10,6 +10,12 @@ internal class Game
 
 	internal Game()
 	{
+		if ( Veldrid.RenderDoc.Load( out var renderDoc ) )
+		{
+			renderDoc.OverlayEnabled = false;
+			Log.Trace( "Loaded RenderDoc" );
+		}
+
 		using ( var _ = new Stopwatch( "Game init" ) )
 		{
 			Log.Trace( "Game init" );
