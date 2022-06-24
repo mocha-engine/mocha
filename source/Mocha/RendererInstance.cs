@@ -50,8 +50,8 @@ public class RendererInstance
 
 			world.Sun.CalcViewProjMatrix();
 
-			RenderPass( "Main Pass", world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
 			RenderPass( "Shadow Pass", world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
+			RenderPass( "Main Pass", world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
 
 			PostRender();
 		}
@@ -71,7 +71,13 @@ public class RendererInstance
 
 	private void PostRender()
 	{
-		// imguiRenderer?.Render( Device, commandList );
+		commandList.PushDebugGroup( "ImGUI" );
+		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
+		commandList.SetViewport( 0, new Viewport( 0, 0, Device.SwapchainFramebuffer.Width, Device.SwapchainFramebuffer.Height, 0, 1 ) );
+		commandList.SetFullViewports();
+		commandList.SetFullScissorRects();
+		imguiRenderer?.Render( Device, commandList );
+		commandList.PopDebugGroup();
 
 		commandList.End();
 
