@@ -1,12 +1,12 @@
-﻿using System.Diagnostics;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
+﻿using System.Net.Sockets;
 
 namespace Mocha.Common;
 
 public class RemoteConsoleConnection
 {
+	protected DateTime lastServerKeepAlive = DateTime.Now; // Last received a keepalive
+	protected DateTime lastClientKeepAlive = DateTime.Now; // Last sent a keepalive
+
 	protected NetworkStream stream;
 
 	protected void SerializeAndSend<T>( T obj ) where T : struct
@@ -14,10 +14,10 @@ public class RemoteConsoleConnection
 		if ( stream != null && !stream.CanWrite )
 			return;
 
-		var consolePacket = new ConsolePacket<T>
+		var consolePacket = new ConsolePacket
 		{
 			ProtocolVersion = 1,
-			Data = obj
+			Data = Serializer.Serialize( obj )
 		};
 
 		var data = Serializer.Serialize( consolePacket );

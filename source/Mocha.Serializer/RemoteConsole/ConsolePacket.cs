@@ -1,8 +1,9 @@
 ﻿namespace Mocha.Common;
 
-public struct ConsolePacket<T>
+public struct ConsolePacket
 {
 	public int ProtocolVersion { get; set; }
+	public string Identifier { get; set; }
 	public int DataSize { get; set; }
-	public T Data { get; set; }
+	public byte[] Data { get; set; }
 }
