@@ -15,7 +15,7 @@ public class SceneObject
 		Entity = entity;
 	}
 
-	public virtual void Render( CommandList commandList ) { }
+	public virtual void Render( Matrix4x4 viewProjMatrix, Framebuffer framebuffer, CommandList commandList ) { }
 
 	public virtual void Delete() { }
 

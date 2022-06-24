@@ -13,6 +13,8 @@ public class SceneCamera : SceneObject
 
 	public void CalcViewProjMatrix()
 	{
+		FieldOfView = FieldOfView.Clamp( 1, 179 );
+
 		var cameraPos = Transform.Position;
 		var cameraFront = Transform.Rotation.Forward;
 		var cameraUp = new Vector3( 0, 0, 1 );

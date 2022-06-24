@@ -1,9 +1,5 @@
-﻿using Microsoft.Win32;
-using StbImageSharp;
-using System;
-using System.Numerics;
+﻿using StbImageSharp;
 using System.Runtime.InteropServices;
-using Veldrid;
 
 namespace Mocha.Renderer;
 
@@ -16,6 +12,9 @@ public partial class TextureBuilder
 	private uint height;
 
 	private string path;
+
+	private bool isRenderTarget;
+	private TextureUsage textureUsage = TextureUsage.Sampled;
 
 	private int mipCount = 1;
 	private PixelFormat compressionFormat;
@@ -53,32 +52,35 @@ public partial class TextureBuilder
 			(uint)mipCount,
 			1,
 			compressionFormat,
-			TextureUsage.Sampled
+			textureUsage
 		);
 
 		var texture = Device.ResourceFactory.CreateTexture( textureDescription );
 
-		for ( int i = 0; i < mipCount; i++ )
+		if ( !isRenderTarget )
 		{
-			var mipData = data[i];
-			var mipDataPtr = Marshal.AllocHGlobal( mipData.Length );
+			for ( int i = 0; i < mipCount; i++ )
+			{
+				var mipData = data[i];
+				var mipDataPtr = Marshal.AllocHGlobal( mipData.Length );
 
-			int mipWidth = Mips.CalcSize( (int)width, i );
-			int mipHeight = Mips.CalcSize( (int)height, i );
+				int mipWidth = Mips.CalcSize( (int)width, i );
+				int mipHeight = Mips.CalcSize( (int)height, i );
 
-			Marshal.Copy( mipData, 0, mipDataPtr, mipData.Length );
-			Device.UpdateTexture( texture,
-						mipDataPtr,
-						(uint)mipData.Length,
-						0,
-						0,
-						0,
-						(uint)mipWidth,
-						(uint)mipHeight,
-						1,
-						(uint)i,
-						0 );
-			Marshal.FreeHGlobal( mipDataPtr );
+				Marshal.Copy( mipData, 0, mipDataPtr, mipData.Length );
+				Device.UpdateTexture( texture,
+							mipDataPtr,
+							(uint)mipData.Length,
+							0,
+							0,
+							0,
+							(uint)mipWidth,
+							(uint)mipHeight,
+							1,
+							(uint)i,
+							0 );
+				Marshal.FreeHGlobal( mipDataPtr );
+			}
 		}
 
 		var textureView = Device.ResourceFactory.CreateTextureView( texture );
@@ -150,6 +152,23 @@ public partial class TextureBuilder
 	public TextureBuilder WithName( string name )
 	{
 		this.path = name;
+
+		return this;
+	}
+
+	public TextureBuilder AsColorAttachment()
+	{
+		this.textureUsage |= TextureUsage.RenderTarget;
+		this.isRenderTarget = true;
+
+		return this;
+	}
+
+	public TextureBuilder AsDepthAttachment()
+	{
+		this.textureUsage |= TextureUsage.DepthStencil;
+		this.compressionFormat = PixelFormat.D24_UNorm_S8_UInt;
+		this.isRenderTarget = true;
 
 		return this;
 	}
