@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<OutputType>WinExe</OutputType>
+		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<ApplicationIcon>mocha.ico</ApplicationIcon>
 		<DebugSymbols>true</DebugSymbols>
