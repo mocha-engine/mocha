@@ -14,7 +14,7 @@ public class SceneLight : SceneObject
 	public SceneLight( IEntity entity ) : base( entity )
 	{
 		DepthTexture = Texture.Builder
-			.FromEmpty( 1024, 1024 )
+			.FromEmpty( 4096, 4096 )
 			.AsDepthAttachment()
 			.Build();
 
@@ -24,11 +24,7 @@ public class SceneLight : SceneObject
 
 	public void CalcViewProjMatrix()
 	{
-		var cameraPos = Transform.Position;
-		var cameraFront = Transform.Rotation.Forward;
-		var cameraUp = new Vector3( 0, 0, 1 );
-
-		ViewMatrix = Matrix4x4.CreateLookAt( cameraPos, cameraPos + cameraFront, cameraUp );
-		ProjMatrix = Matrix4x4.CreateOrthographic( 20f, 20f, -10f, 20f );
+		ViewMatrix = Matrix4x4.CreateLookAt( Transform.Position, Vector3.Zero, Vector3.Up );
+		ProjMatrix = Matrix4x4.CreateOrthographic( 100f, 100f, 1.0f, 200f );
 	}
 }

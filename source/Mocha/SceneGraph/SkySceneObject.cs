@@ -10,7 +10,7 @@ public class SkySceneObject : ModelSceneObject
 	{
 	}
 
-	public override void Render( Matrix4x4 viewProjMatrix, Framebuffer framebuffer, CommandList commandList )
+	public override void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList )
 	{
 		var currentCamera = SceneWorld.Current.Camera;
 
@@ -30,6 +30,6 @@ public class SkySceneObject : ModelSceneObject
 			g_vSunPos = SceneWorld.Current.Sun.Transform.Rotation.Backward
 		};
 
-		models.ForEach( x => x.Draw( framebuffer, uniformBuffer, commandList ) );
+		models.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
 	}
 }

@@ -14,6 +14,7 @@ public struct GenericModelUniformBuffer
 	public Matrix4x4 g_mModel; // 64
 	public Matrix4x4 g_mViewProj; // 64
 	public Matrix4x4 g_mPadding; // 64
+	public Matrix4x4 g_mLightViewProj;
 
 	public System.Numerics.Vector3 g_vSunLightDir;
 	public float g_flTime; // 4
