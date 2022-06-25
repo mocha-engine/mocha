@@ -35,7 +35,7 @@ public class ModelSceneObject : SceneObject
 			g_flTime = Time.Now,
 			g_mLightViewProj = SceneWorld.Current.Sun.ViewMatrix * SceneWorld.Current.Sun.ProjMatrix,
 
-			g_vSunLightDir = SceneWorld.Current.Sun.Transform.Rotation.Backward,
+			g_vSunLightDir = -SceneWorld.Current.Sun.ViewMatrix.Forward(),
 			g_vSunLightColor = SceneWorld.Current.Sun.Color.ToVector4(),
 			g_flSunLightIntensity = SceneWorld.Current.Sun.Intensity,
 			g_vCameraPos = currentCamera.Transform.Position,

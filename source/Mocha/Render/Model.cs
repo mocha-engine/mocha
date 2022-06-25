@@ -12,9 +12,10 @@ public class Model
 	public DeviceBuffer IndexBuffer { get; private set; }
 
 	public Material Material { get; private set; }
+	private Material DepthOnlyMaterial { get; set; }
 
-	private RenderPipeline mainRenderPipeline;
-	private RenderPipeline shadowRenderPipeline;
+	private ResourceSet objectResourceSet;
+	private ResourceSet lightingResourceSet;
 
 	public bool IsIndexed { get; private set; }
 
@@ -23,6 +24,15 @@ public class Model
 
 	public Model( Vertex[] vertices, uint[] indices, Material material )
 	{
+		DepthOnlyMaterial = new Material()
+		{
+			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/depthonly.mshdr" )
+										  .WithFaceCullMode( FaceCullMode.None )
+										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
+										  .Build(),
+			UniformBufferType = typeof( GenericModelUniformBuffer )
+		};
+
 		Material = material;
 		IsIndexed = true;
 
@@ -35,6 +45,15 @@ public class Model
 
 	public Model( Vertex[] vertices, Material material )
 	{
+		DepthOnlyMaterial = new Material()
+		{
+			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/depthonly.mshdr" )
+										  .WithFaceCullMode( FaceCullMode.None )
+										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
+										  .Build(),
+			UniformBufferType = typeof( GenericModelUniformBuffer )
+		};
+
 		Material = material;
 		IsIndexed = false;
 
@@ -74,23 +93,39 @@ public class Model
 
 	private void CreateResources()
 	{
-		mainRenderPipeline.Delete();
-		shadowRenderPipeline.Delete();
+		var objectResourceSetDescription = new ResourceSetDescription(
+			Material.Shader.Pipeline.ResourceLayouts[0],
+			Material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
+			Material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
+			Material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
+			Material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
+			Device.Aniso4xSampler,
+			uniformBuffer );
 
-		mainRenderPipeline = RenderPipeline.Factory
-			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
-			.WithMaterial( Material )
-			.WithUniformBuffer( uniformBuffer )
-			.WithFramebuffer( Device.SwapchainFramebuffer )
-			.Build();
+		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
 
-		shadowRenderPipeline = RenderPipeline.Factory
-			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
-			.WithMaterial( Material )
-			.WithUniformBuffer( uniformBuffer )
-			.WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
-			.WithFaceCullMode( FaceCullMode.None )
-			.Build();
+		var shadowSamplerDescription = new SamplerDescription(
+			SamplerAddressMode.Border,
+			SamplerAddressMode.Border,
+			SamplerAddressMode.Border,
+
+			SamplerFilter.Anisotropic,
+			null,
+			16,
+			0,
+			uint.MaxValue,
+			0,
+			SamplerBorderColor.OpaqueBlack
+		);
+
+		var shadowSampler = Device.ResourceFactory.CreateSampler( shadowSamplerDescription );
+
+		var lightingResourceSetDescription = new ResourceSetDescription(
+			Material.Shader.Pipeline.ResourceLayouts[1],
+			SceneWorld.Current.Sun.DepthTexture.VeldridTexture,
+			shadowSampler );
+
+		lightingResourceSet = Device.ResourceFactory.CreateResourceSet( lightingResourceSetDescription );
 	}
 
 	private void CreateUniformBuffer()
@@ -111,8 +146,8 @@ public class Model
 
 		RenderPipeline renderPipeline = renderPass switch
 		{
-			RenderPass.Main => mainRenderPipeline,
-			RenderPass.ShadowMap => shadowRenderPipeline,
+			RenderPass.Main => Material.Shader.Pipeline,
+			RenderPass.ShadowMap => DepthOnlyMaterial.Shader.Pipeline,
 
 			_ => throw new NotImplementedException(),
 		};
@@ -121,10 +156,8 @@ public class Model
 		commandList.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
 		commandList.SetPipeline( renderPipeline.Pipeline );
 
-		for ( uint i = 0; i < renderPipeline.ResourceSets.Length; i++ )
-		{
-			commandList.SetGraphicsResourceSet( i, renderPipeline.ResourceSets[i] );
-		}
+		commandList.SetGraphicsResourceSet( 0, objectResourceSet );
+		commandList.SetGraphicsResourceSet( 1, lightingResourceSet );
 
 		if ( IsIndexed )
 		{

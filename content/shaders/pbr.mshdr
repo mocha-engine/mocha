@@ -6,7 +6,7 @@
  * 
  * Copyright (c) 2022 Alex Guthrie
  */
-
+#pragma optionNV (unroll all)
 //
 // Common
 //
@@ -143,7 +143,7 @@ vec3 ReinhardJodie(vec3 v)
 
 float ShadowCalculation( vec4 fragPosLightSpace )
 {
-    const float bias = 0.0005;
+    const float bias = 0.0022;
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
         
     projCoords.y = -projCoords.y; // FUCK OFF. SUCK MY COCK. EAT MY ASSHOLE.
@@ -155,8 +155,8 @@ float ShadowCalculation( vec4 fragPosLightSpace )
     float currentDepth = projCoords.z;
     
     float shadow = 0.0;
-    int sampleRes = 9;
-    vec2 scale = vec2( 1.0 / 4096 );
+    int sampleRes = 3;
+    vec2 scale = vec2( 1.0 / 16384 );;
 
     for(int x = -sampleRes / 2; x <= sampleRes / 2; ++x)
     {
@@ -168,7 +168,7 @@ float ShadowCalculation( vec4 fragPosLightSpace )
             }
             else 
             {
-                float pcfDepth = texture( sampler2D( g_tShadowMap, g_sShadowSampler ), projCoords.xy + vec2(x, y) * scale).r;                
+                float pcfDepth = texture( sampler2D( g_tShadowMap, g_sShadowSampler ), projCoords.xy + vec2( x, y ) * scale).r;                
                 shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
             }
         }    
@@ -194,37 +194,45 @@ void main()
     vec3 color = pow( GetTextureSample( g_tDiffuse ), vec3( 2.2 ) );
     
     // Ambient
-    vec3 ambient = 0.1 * color;
+    vec3 ambient = 0.03 * color;
 
     // Diffuse
     vec3 lightDir = normalize( g_oUbo.g_vSunLightDir );
     float diff = max( dot( lightDir, normal ), 0.0 );
     vec3 diffuse = diff * color;
+
+    // Get metalness
+    float metalness = 1.0 - GetTextureSample( g_tORM ).b;
+    float specularPower = metalness * 32.0 + 32.0;
     
     // Specular
     vec3 viewDir = normalize( g_oUbo.g_vCameraPos - fs_in.vPositionWS );
     vec3 reflectDir = reflect( -lightDir, normal );
     vec3 halfwayDir = normalize( lightDir + viewDir );
-    float spec = pow( max( dot( normal, halfwayDir ), 0.0 ), 8.0 );
+    float spec = pow( max( dot( normal, halfwayDir ), 0.0 ), specularPower );
 
-    vec3 specular = vec3( 0.1 ) * spec;
+    // Get roughness
+    float roughness = GetTextureSample( g_tORM ).g;
+    vec3 specular = vec3( roughness ) * spec;
 
     // Shadow
     float shadow = ShadowCalculation( fs_in.vFragPosLightSpace );
     
     // Mix lighting
     vec3 lighting = (diffuse + specular) * g_oUbo.g_vSunLightColor.xyz;
-    fragColor = vec4( ambient + ( shadow * color ), 1.0 );
+    fragColor = vec4( ambient + ( shadow * lighting ), 1.0 );
+
+    // Occlusion
+    // float occlusion = GetTextureSample( g_tORM ).b;
+    // fragColor = vec4( fragColor.rgb * occlusion, 1.0 );
     
     // Reinhard-Jodie tone mapping
     fragColor.xyz = ReinhardJodie( fragColor.xyz );
-    fragColor.xyz *= pow( 2, 0.5 );
+    // fragColor.xyz *= pow( 2, 0.5 );
 
     // Gamma correction
+    fragColor.xyz = 1.0 - exp( -5.0 * fragColor.xyz );
     fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
-    // fragColor.xyz = 1.0 - exp( -2.0 * fragColor.xyz );
-
-    // fragColor.xyz = shadow.xxx;
 }
 #endif
 // ==========================================================================================================================

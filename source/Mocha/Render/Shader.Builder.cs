@@ -9,6 +9,9 @@ public class ShaderBuilder
 	private ShaderDescription VertexShaderDescription;
 	private ShaderDescription FragmentShaderDescription;
 
+	private Framebuffer targetFramebuffer = Device.SwapchainFramebuffer;
+	private FaceCullMode faceCullMode = FaceCullMode.Back;
+
 	public static ShaderBuilder Default => new ShaderBuilder();
 
 	public string Path { get; set; }
@@ -43,17 +46,15 @@ public class ShaderBuilder
 		return this;
 	}
 
-	public ShaderBuilder WithFragment( string fragPath )
+	public ShaderBuilder WithFramebuffer( Framebuffer framebuffer )
 	{
-		Path += $"{fragPath};";
-		FragmentShaderDescription = CreateShaderDescription( fragPath, ShaderStages.Fragment );
+		this.targetFramebuffer = framebuffer;
 		return this;
 	}
 
-	public ShaderBuilder WithVertex( string vertPath )
+	public ShaderBuilder WithFaceCullMode( FaceCullMode faceCullMode )
 	{
-		Path += $"{vertPath};";
-		VertexShaderDescription = CreateShaderDescription( vertPath, ShaderStages.Vertex );
+		this.faceCullMode = faceCullMode;
 		return this;
 	}
 
@@ -83,7 +84,7 @@ public class ShaderBuilder
 			VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
-			return new Shader( Path, shaderProgram );
+			return new Shader( Path, targetFramebuffer, faceCullMode, shaderProgram );
 		}
 		catch ( Exception ex )
 		{

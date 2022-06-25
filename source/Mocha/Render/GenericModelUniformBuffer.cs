@@ -22,10 +22,10 @@ public struct GenericModelUniformBuffer
 	public System.Numerics.Vector3 g_vLightPos; // 12
 	public float g_flSunLightIntensity; // 4
 
-	public System.Numerics.Vector3 g_vLightColor; // 12
+	public System.Numerics.Vector3 g_vCameraPos; // 12
 	public float _padding1; // 4
 
-	public System.Numerics.Vector3 g_vCameraPos; // 12
+	public System.Numerics.Vector3 g_vLightColor; // 12
 	public float _padding2; // 4
 
 	public System.Numerics.Vector4 g_vSunLightColor; // 16

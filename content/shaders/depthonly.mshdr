@@ -16,11 +16,6 @@
 // Uniforms
 //
 // Object
-layout( set = 0, binding = 0 ) uniform texture2D g_tDiffuse;
-layout( set = 0, binding = 1 ) uniform texture2D g_tAlpha;
-layout( set = 0, binding = 2 ) uniform texture2D g_tNormal;
-layout( set = 0, binding = 3 ) uniform texture2D g_tORM;
-layout( set = 0, binding = 4 ) uniform sampler g_sSampler;
 layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
     mat4 g_mModel;
     mat4 g_mViewProj;
@@ -42,25 +37,6 @@ layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
     vec4 g_vSunLightColor;
 } g_oUbo;
 
-// Lighting
-layout( set = 1, binding = 0 ) uniform texture2D g_tShadowMap;
-layout( set = 1, binding = 1 ) uniform sampler g_sShadowSampler;
-
-struct VS_OUT {
-    vec2 vTexCoords;
-    vec3 vNormal;
-    vec3 vTangent;
-    vec3 vPositionWS;
-
-    mat3 TBN;
-
-    vec3 vLightPosTS;
-    vec3 vCameraPosTS;
-    vec3 vPositionTS;
-
-    vec4 vFragPosLightSpace;
-};
-
 // ==========================================================================================================================
 
 //
@@ -72,35 +48,9 @@ struct VS_OUT {
 // Layout
 //
 layout( location = 0 ) in vec3 position;
-layout( location = 1 ) in vec3 normal;
-layout( location = 2 ) in vec2 texCoords;
-layout( location = 3 ) in vec3 tangent;
-layout( location = 4 ) in vec3 bitangent;
 
-//
-// Out
-//
-layout( location = 0 ) out VS_OUT vs_out;
-
-void main() {
-    vec3 T = normalize( vec3( g_oUbo.g_mModel * vec4( tangent, 1.0 ) ) );
-    vec3 B = normalize( vec3( g_oUbo.g_mModel * vec4( bitangent, 1.0 ) ) );
-    vec3 N = normalize( vec3( g_oUbo.g_mModel * vec4( normal, 1.0 ) ) );
-    mat3 TBN = mat3( T, B, N );
-
-    vs_out.vPositionWS = vec3( g_oUbo.g_mModel * vec4( position, 1.0 ) );
-    vs_out.vTexCoords = texCoords;
-    vs_out.vNormal = normal;
-    vs_out.vTangent = tangent;
-
-    vs_out.vLightPosTS = TBN * g_oUbo.g_vLightPos;
-    vs_out.vCameraPosTS = TBN * g_oUbo.g_vCameraPos;
-    vs_out.vPositionTS = TBN * vs_out.vPositionWS;
-
-    vs_out.TBN = TBN;
-
-    vs_out.vFragPosLightSpace = g_oUbo.g_mLightViewProj * vec4( vs_out.vPositionWS, 1.0 );
-   
+void main() 
+{
     vec4 pos = g_oUbo.g_mModel * vec4( position, 1.0 );
     gl_Position = g_oUbo.g_mViewProj * pos;
 }
@@ -114,98 +64,9 @@ void main() {
 //
 #ifdef FRAGMENT
 
-//
-// In
-//
-layout( location = 0 ) in VS_OUT fs_in;
-
-//
-// Out
-//
-layout( location = 0 ) out vec4 fragColor;
-
-vec3 GetTextureSample( texture2D tex )
-{
-    return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords ).xyz;
-}
-
-float Luminance(vec3 v)
-{
-    return dot(v, vec3(0.2126, 0.7152, 0.0722));
-}
-
-vec3 ReinhardJodie(vec3 v)
-{
-    float l = Luminance(v);
-    vec3 tv = v / (1.0 + v);
-    return mix(v / (1.0 + l), tv, tv);
-}
-
-float ShadowCalculation( vec4 fragPosLightSpace )
-{
-    const float bias = 0.0005;
-    vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-
-    if ( projCoords.z > 1.0 )
-        return 0.0;
-    
-    projCoords = projCoords * 0.5 + 0.5;
-    projCoords.y = 1.0 - projCoords.y;
-    
-    float currentDepth = projCoords.z;
-
-    float closestDepth = texture( sampler2D( g_tShadowMap, g_sShadowSampler ), projCoords.xy ).r * 2;
-    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
-    return shadow;
-}
-
 void main() 
 {
-    // Obtain normal from normal map in range [0,1]
-    vec3 normal = GetTextureSample( g_tNormal );
-
-    // Transform normal vector to range [-1, 1]
-    normal = normal * 2.0 - 1.0;
-    normal.y = -normal.y;
-
-    // Transform normal vector into tangent space
-    normal = normalize( fs_in.TBN * normal );
-
-    // Get diffuse color
-    vec3 color = pow( GetTextureSample( g_tDiffuse ), vec3( 2.2 ) );
-    
-    // Ambient
-    vec3 ambient = 0 * color;
-
-    // Diffuse
-    vec3 lightDir = normalize( g_oUbo.g_vSunLightDir );
-    float diff = max( dot( lightDir, normal ), 0.0 );
-    vec3 diffuse = diff * color;
-    
-    // Specular
-    vec3 viewDir = normalize( g_oUbo.g_vCameraPos - fs_in.vPositionWS );
-    vec3 reflectDir = reflect( -lightDir, normal );
-    vec3 halfwayDir = normalize( lightDir + viewDir );
-    float spec = pow( max( dot( normal, halfwayDir ), 0.0 ), 8.0 );
-
-    vec3 specular = vec3( 0.1 ) * spec;
-
-    // Shadow
-    float shadow = ShadowCalculation( fs_in.vFragPosLightSpace );
-    
-    // Mix lighting
-    vec3 lighting = (diffuse + specular) * g_oUbo.g_vSunLightColor.xyz;
-    fragColor = vec4( ambient + (1.0 - shadow) * color, 1.0 );
-    
-    // Reinhard-Jodie tone mapping
-    fragColor.xyz = ReinhardJodie( fragColor.xyz );
-    fragColor.xyz *= pow( 2, 0.5 );
-
-    // Gamma correction
-    fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
-    // fragColor.xyz = 1.0 - exp( -2.0 * fragColor.xyz );
-
-    fragColor.xyz = 1.0 - shadow.xxx;
+    // Don't do shit
 }
 #endif
 // ==========================================================================================================================

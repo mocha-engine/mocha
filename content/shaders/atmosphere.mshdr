@@ -90,8 +90,8 @@ layout( location = 0 ) in struct VS_OUT {
 //
 layout( location = 0 ) out vec4 fragColor;
 
-#define iSteps 16
-#define jSteps 8
+#define iSteps 4
+#define jSteps 2
 
 vec2 RaySphereIntersect(vec3 radius, vec3 rd, float sr)
 {

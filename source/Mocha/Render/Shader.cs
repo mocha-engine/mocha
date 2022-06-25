@@ -8,14 +8,17 @@ public class Shader
 {
 	public static List<Shader> All { get; set; } = new();
 	public Veldrid.Shader[] ShaderProgram { get; private set; }
-	public string Path { get; set; }
+	public RenderPipeline Pipeline { get; set; }
 	public Action OnRecompile { get; set; }
-
-	public FileSystemWatcher Watcher;
-
+	public string Path { get; set; }
 	public bool IsDirty { get; private set; }
 
-	internal Shader( string path, Veldrid.Shader[] shaderProgram )
+	private Framebuffer TargetFramebuffer { get; set; }
+	private FaceCullMode FaceCullMode { get; set; }
+
+	private FileSystemWatcher watcher;
+
+	internal Shader( string path, Framebuffer targetFramebuffer, FaceCullMode faceCullMode, Veldrid.Shader[] shaderProgram )
 	{
 		All.Add( this );
 
@@ -26,9 +29,9 @@ public class Shader
 
 		var directoryName = System.IO.Path.GetDirectoryName( Path );
 		var fileName = System.IO.Path.GetFileName( Path );
-		Watcher = new FileSystemWatcher( directoryName, fileName );
+		watcher = new FileSystemWatcher( directoryName, fileName );
 
-		Watcher.NotifyFilter = NotifyFilters.Attributes
+		watcher.NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
 							 | NotifyFilters.DirectoryName
 							 | NotifyFilters.FileName
@@ -37,8 +40,25 @@ public class Shader
 							 | NotifyFilters.Security
 							 | NotifyFilters.Size;
 
-		Watcher.Changed += OnWatcherChanged;
-		Watcher.EnableRaisingEvents = true;
+		watcher.Changed += OnWatcherChanged;
+		watcher.EnableRaisingEvents = true;
+
+		this.TargetFramebuffer = targetFramebuffer;
+		this.FaceCullMode = faceCullMode;
+
+		CreatePipelines();
+	}
+
+	private void CreatePipelines()
+	{
+		Pipeline.Delete();
+
+		Pipeline = RenderPipeline.Factory
+			.WithShader( this )
+			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
+			.WithFramebuffer( TargetFramebuffer )
+			.WithFaceCullMode( FaceCullMode )
+			.Build();
 	}
 
 	private void OnWatcherChanged( object sender, FileSystemEventArgs e )
@@ -81,17 +101,19 @@ public class Shader
 				Encoding.UTF8.GetString( fragmentShaderDescription.ShaderBytes ),
 				Path + "_FS",
 				ShaderStages.Fragment,
-				new GlslCompileOptions( debug: true ) );
+				new GlslCompileOptions( debug: false ) );
 			fragmentShaderDescription.ShaderBytes = fragCompilation.SpirvBytes;
 
 			var vertCompilation = SpirvCompilation.CompileGlslToSpirv(
 				Encoding.UTF8.GetString( vertexShaderDescription.ShaderBytes ),
 				Path + "_VS",
 				ShaderStages.Vertex,
-				new GlslCompileOptions( debug: true ) );
+				new GlslCompileOptions( debug: false ) );
 			vertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			ShaderProgram = Device.ResourceFactory.CreateFromSpirv( vertexShaderDescription, fragmentShaderDescription );
+
+			CreatePipelines();
 
 			Notify.AddNotification( "Shader Compilation Success!", $"Compiled shader {Path}" );
 		}
