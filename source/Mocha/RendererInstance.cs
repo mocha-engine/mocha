@@ -80,7 +80,7 @@ public class RendererInstance
 		commandList.PopDebugGroup();
 
 		commandList.End();
-		
+
 		Device.SyncToVerticalBlank = false;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();

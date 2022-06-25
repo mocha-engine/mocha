@@ -1,47 +1,38 @@
 ﻿namespace Mocha.Renderer;
 
-public class RenderPipelineFactory
+public class PipelineFactory
 {
-	// TODO: Sensible defaults for all of these
 	private VertexElementDescription[] vertexElementDescriptions;
-	private Material material;
 	private FaceCullMode faceCullMode = FaceCullMode.Back;
 	private Shader shader;
 	private Framebuffer framebuffer;
-	private DeviceBuffer uniformBuffer;
 
-	public RenderPipelineFactory() { }
+	public PipelineFactory() { }
 
-	public RenderPipelineFactory WithVertexElementDescriptions( VertexElementDescription[] vertexElementDescriptions )
+	public PipelineFactory WithVertexElementDescriptions( VertexElementDescription[] vertexElementDescriptions )
 	{
 		this.vertexElementDescriptions = vertexElementDescriptions;
 		return this;
 	}
 
-	public RenderPipelineFactory WithMaterial( Material material )
-	{
-		this.shader = material.Shader;
-		this.material = material;
-		return this;
-	}
 
-	public RenderPipelineFactory WithFaceCullMode( FaceCullMode faceCullMode )
+	public PipelineFactory WithFaceCullMode( FaceCullMode faceCullMode )
 	{
 		this.faceCullMode = faceCullMode;
 
 		return this;
 	}
 
-	public RenderPipelineFactory WithFramebuffer( Framebuffer framebuffer )
+	public PipelineFactory WithShader( Shader shader )
 	{
-		this.framebuffer = framebuffer;
+		this.shader = shader;
 
 		return this;
 	}
 
-	public RenderPipelineFactory WithUniformBuffer( DeviceBuffer uniformBuffer )
+	public PipelineFactory WithFramebuffer( Framebuffer framebuffer )
 	{
-		this.uniformBuffer = uniformBuffer;
+		this.framebuffer = framebuffer;
 
 		return this;
 	}
@@ -97,8 +88,8 @@ public class RenderPipelineFactory
 				}
 			}
 		};
-		var objectResourceLayout = Device.ResourceFactory.CreateResourceLayout( objectResourceLayoutDescription );
 
+		var objectResourceLayout = Device.ResourceFactory.CreateResourceLayout( objectResourceLayoutDescription );
 		var lightingResourceLayoutDescription = new ResourceLayoutDescription()
 		{
 			Elements = new[]
@@ -121,7 +112,6 @@ public class RenderPipelineFactory
 		};
 
 		var lightingResourceLayout = Device.ResourceFactory.CreateResourceLayout( lightingResourceLayoutDescription );
-
 		var pipelineDescription = new GraphicsPipelineDescription()
 		{
 			BlendState = BlendStateDescription.SingleAlphaBlend,
@@ -145,42 +135,6 @@ public class RenderPipelineFactory
 		};
 
 		var pipeline = Device.ResourceFactory.CreateGraphicsPipeline( pipelineDescription );
-
-		var objectResourceSetDescription = new ResourceSetDescription(
-			objectResourceLayout,
-			material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
-			material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
-			material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
-			material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
-			Device.Aniso4xSampler,
-			uniformBuffer );
-
-		var objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
-
-		var shadowSamplerDescription = new SamplerDescription(
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-
-			SamplerFilter.Anisotropic,
-			null,
-			16,
-			0,
-			uint.MaxValue,
-			0,
-			SamplerBorderColor.OpaqueBlack
-		);
-
-		var shadowSampler = Device.ResourceFactory.CreateSampler( shadowSamplerDescription );
-
-		var lightingResourceSetDescription = new ResourceSetDescription(
-			lightingResourceLayout,
-			SceneWorld.Current.Sun.DepthTexture.VeldridTexture,
-			shadowSampler );
-
-		var lightingResourceSet = Device.ResourceFactory.CreateResourceSet( lightingResourceSetDescription );
-
-		var renderPipeline = new RenderPipeline( pipeline, objectResourceSet, lightingResourceSet );
-		return renderPipeline;
+		return new RenderPipeline( pipeline, objectResourceLayout, lightingResourceLayout );
 	}
 }

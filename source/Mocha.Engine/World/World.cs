@@ -26,8 +26,8 @@ public class World
 
 		Sun = new Sun()
 		{
-			Position = new( 0, 10, 10 ),
-			Rotation = Rotation.From( 0, 0, 0 )
+			Position = new( 20, 25, 80 ),
+			Rotation = Rotation.From( -28, 55, 0 )
 		};
 
 		Sky = new Sky

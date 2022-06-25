@@ -6,7 +6,7 @@
       <Value Profile="(Default)">1280, 720</Value>
     </Setting>
     <Setting Name="PreferredBackend" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Vulkan</Value>
+      <Value Profile="(Default)">DirectX11</Value>
     </Setting>
   </Settings>
 </SettingsFile>

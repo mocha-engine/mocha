@@ -14,7 +14,7 @@ public class SceneLight : SceneObject
 	public SceneLight( IEntity entity ) : base( entity )
 	{
 		DepthTexture = Texture.Builder
-			.FromEmpty( 4096, 4096 )
+			.FromEmpty( 8192, 8192 )
 			.AsDepthAttachment()
 			.Build();
 

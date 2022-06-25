@@ -2,20 +2,20 @@
 
 public struct RenderPipeline
 {
-	public static RenderPipelineFactory Factory => new();
+	public static PipelineFactory Factory => new();
 
-	public ResourceSet[] ResourceSets;
+	public ResourceLayout[] ResourceLayouts;
 	public Pipeline Pipeline;
 
-	public RenderPipeline( Pipeline pipeline, params ResourceSet[] resourceSets )
+	public RenderPipeline( Pipeline pipeline, params ResourceLayout[] resourceSets )
 	{
-		this.ResourceSets = resourceSets;
+		this.ResourceLayouts = resourceSets;
 		this.Pipeline = pipeline;
 	}
 
 	public void Delete()
 	{
 		Pipeline?.Dispose();
-		ResourceSets?.ToList().ForEach( x => x.Dispose() );
+		ResourceLayouts?.ToList().ForEach( x => x.Dispose() );
 	}
 }
