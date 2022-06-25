@@ -13,6 +13,9 @@ public class Model
 
 	public Material Material { get; private set; }
 
+	private RenderPipeline mainRenderPipeline;
+	private RenderPipeline shadowRenderPipeline;
+
 	public bool IsIndexed { get; private set; }
 
 	private uint indexCount;
@@ -25,6 +28,9 @@ public class Model
 
 		SetupMesh( vertices, indices );
 		CreateUniformBuffer();
+		CreateResources();
+
+		Material.Shader.OnRecompile += CreateResources;
 	}
 
 	public Model( Vertex[] vertices, Material material )
@@ -34,6 +40,9 @@ public class Model
 
 		SetupMesh( vertices );
 		CreateUniformBuffer();
+		CreateResources();
+
+		Material.Shader.OnRecompile += CreateResources;
 	}
 
 	private void SetupMesh( Vertex[] vertices )
@@ -63,6 +72,27 @@ public class Model
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
 	}
 
+	private void CreateResources()
+	{
+		mainRenderPipeline.Delete();
+		shadowRenderPipeline.Delete();
+
+		mainRenderPipeline = RenderPipeline.Factory
+			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
+			.WithMaterial( Material )
+			.WithUniformBuffer( uniformBuffer )
+			.WithFramebuffer( Device.SwapchainFramebuffer )
+			.Build();
+
+		shadowRenderPipeline = RenderPipeline.Factory
+			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
+			.WithMaterial( Material )
+			.WithUniformBuffer( uniformBuffer )
+			.WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
+			.WithFaceCullMode( FaceCullMode.None )
+			.Build();
+	}
+
 	private void CreateUniformBuffer()
 	{
 		uint uboSizeInBytes = 4 * (uint)Marshal.SizeOf( Material.UniformBufferType );
@@ -71,7 +101,7 @@ public class Model
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 	}
 
-	public void Draw<T>( Framebuffer framebuffer, T uniformBufferContents, CommandList commandList ) where T : struct
+	public void Draw<T>( RenderPass renderPass, T uniformBufferContents, CommandList commandList ) where T : struct
 	{
 		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
 		{
@@ -79,17 +109,22 @@ public class Model
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
 
-		var (pipeline, resourceSet) = PipelineManager.GetPipelineAndResourceSetFor<T>(
-			Material,
-			framebuffer,
-			Vertex.VertexElementDescriptions,
-			uniformBuffer
-		);
+		RenderPipeline renderPipeline = renderPass switch
+		{
+			RenderPass.Main => mainRenderPipeline,
+			RenderPass.ShadowMap => shadowRenderPipeline,
+
+			_ => throw new NotImplementedException(),
+		};
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
-		commandList.SetPipeline( pipeline );
-		commandList.SetGraphicsResourceSet( 0, resourceSet );
+		commandList.SetPipeline( renderPipeline.Pipeline );
+
+		for ( uint i = 0; i < renderPipeline.ResourceSets.Length; i++ )
+		{
+			commandList.SetGraphicsResourceSet( i, renderPipeline.ResourceSets[i] );
+		}
 
 		if ( IsIndexed )
 		{

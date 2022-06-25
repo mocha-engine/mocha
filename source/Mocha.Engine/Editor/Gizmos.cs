@@ -41,7 +41,7 @@ public static class Gizmos
 					float distance = Vector3.DistanceBetween( World.Current.Camera.Position, ent.Position ) / 16;
 					distance = distance.Clamp( 0.0f, 0.1f );
 					distance = 1.0f - distance;
-					Vector2 size = new Vector2( 64, 64 ) * distance;
+					Vector2 size = new Vector2( 32, 32 ) * distance;
 
 					ImGui.SetCursorPos( new System.Numerics.Vector2( screenPos.X, screenPos.Y ) - (System.Numerics.Vector2)size * 0.5f );
 					EditorHelpers.Image( LightTexture, size );

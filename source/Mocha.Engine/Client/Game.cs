@@ -13,6 +13,7 @@ internal class Game
 		if ( Veldrid.RenderDoc.Load( out var renderDoc ) )
 		{
 			renderDoc.OverlayEnabled = false;
+			renderDoc.RefAllResources = false;
 			Log.Trace( "Loaded RenderDoc" );
 		}
 

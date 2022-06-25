@@ -106,6 +106,14 @@ public static class MathExtensions
 	}
 
 	public static string ToSize( this long value, SizeUnits unit ) => (value / (double)Math.Pow( 1024, (long)unit )).ToString( "0.00" ) + unit.ToString();
+
+	public static float NormalizeDegrees( this float d )
+	{
+		d %= 360f;
+		if ( d < 0f )
+			d += 360f;
+		return d;
+	}
 }
 
 public static class ListExtension

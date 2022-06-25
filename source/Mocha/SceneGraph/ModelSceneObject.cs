@@ -24,7 +24,7 @@ public class ModelSceneObject : SceneObject
 		this.models = models;
 	}
 
-	public override void Render( Matrix4x4 viewProjMatrix, Framebuffer framebuffer, CommandList commandList )
+	public override void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList )
 	{
 		var currentCamera = SceneWorld.Current.Camera;
 
@@ -33,8 +33,9 @@ public class ModelSceneObject : SceneObject
 			g_mModel = ModelMatrix,
 			g_mViewProj = viewProjMatrix,
 			g_flTime = Time.Now,
+			g_mLightViewProj = SceneWorld.Current.Sun.ViewMatrix * SceneWorld.Current.Sun.ProjMatrix,
 
-			g_vSunLightDir = SceneWorld.Current.Sun.Transform.Rotation.Forward,
+			g_vSunLightDir = SceneWorld.Current.Sun.Transform.Rotation.Backward,
 			g_vSunLightColor = SceneWorld.Current.Sun.Color.ToVector4(),
 			g_flSunLightIntensity = SceneWorld.Current.Sun.Intensity,
 			g_vCameraPos = currentCamera.Transform.Position,
@@ -43,6 +44,6 @@ public class ModelSceneObject : SceneObject
 			_padding2 = 0
 		};
 
-		models.ForEach( x => x.Draw( framebuffer, uniformBuffer, commandList ) );
+		models.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
 	}
 }

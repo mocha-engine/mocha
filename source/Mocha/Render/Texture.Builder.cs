@@ -11,6 +11,8 @@ public partial class TextureBuilder
 	private uint width;
 	private uint height;
 
+	private SamplerAddressMode samplerAddressMode = SamplerAddressMode.Wrap;
+
 	private string path;
 
 	private bool isRenderTarget;
@@ -84,6 +86,7 @@ public partial class TextureBuilder
 		}
 
 		var textureView = Device.ResourceFactory.CreateTextureView( texture );
+
 		return new Texture( path, texture, textureView, type, (int)width, (int)height );
 	}
 
@@ -167,7 +170,7 @@ public partial class TextureBuilder
 	public TextureBuilder AsDepthAttachment()
 	{
 		this.textureUsage |= TextureUsage.DepthStencil;
-		this.compressionFormat = PixelFormat.D24_UNorm_S8_UInt;
+		this.compressionFormat = PixelFormat.D32_Float_S8_UInt;
 		this.isRenderTarget = true;
 
 		return this;

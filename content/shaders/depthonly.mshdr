@@ -145,37 +145,18 @@ float ShadowCalculation( vec4 fragPosLightSpace )
 {
     const float bias = 0.0005;
     vec3 projCoords = fragPosLightSpace.xyz / fragPosLightSpace.w;
-        
-    projCoords.y = -projCoords.y; // FUCK OFF. SUCK MY COCK. EAT MY ASSHOLE.
-    projCoords.xy = projCoords.xy * 0.5 + 0.5; // FUCK YOU FUCK YOU FUCK YOU FUCK YOU!!!
 
     if ( projCoords.z > 1.0 )
         return 0.0;
-        
-    float currentDepth = projCoords.z;
     
-    float shadow = 0.0;
-    int sampleRes = 9;
-    vec2 scale = vec2( 1.0 / 4096 );
+    projCoords = projCoords * 0.5 + 0.5;
+    projCoords.y = 1.0 - projCoords.y;
+    
+    float currentDepth = projCoords.z;
 
-    for(int x = -sampleRes / 2; x <= sampleRes / 2; ++x)
-    {
-        for(int y = -sampleRes / 2; y <= sampleRes / 2; ++y)
-        {
-            if ( projCoords.x < 0 || projCoords.x > 1 || projCoords.y < 0 || projCoords.y > 1 )
-            {
-                return 1.0;
-            }
-            else 
-            {
-                float pcfDepth = texture( sampler2D( g_tShadowMap, g_sShadowSampler ), projCoords.xy + vec2(x, y) * scale).r;                
-                shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
-            }
-        }    
-    }
-    shadow /= pow( sampleRes, 2 );
-
-    return min( max( 1.0 - shadow, 0.0 ), 1.0 );
+    float closestDepth = texture( sampler2D( g_tShadowMap, g_sShadowSampler ), projCoords.xy ).r * 2;
+    float shadow = currentDepth - bias > closestDepth ? 1.0 : 0.0;
+    return shadow;
 }
 
 void main() 
@@ -194,7 +175,7 @@ void main()
     vec3 color = pow( GetTextureSample( g_tDiffuse ), vec3( 2.2 ) );
     
     // Ambient
-    vec3 ambient = 0.1 * color;
+    vec3 ambient = 0 * color;
 
     // Diffuse
     vec3 lightDir = normalize( g_oUbo.g_vSunLightDir );
@@ -214,7 +195,7 @@ void main()
     
     // Mix lighting
     vec3 lighting = (diffuse + specular) * g_oUbo.g_vSunLightColor.xyz;
-    fragColor = vec4( ambient + ( shadow * color ), 1.0 );
+    fragColor = vec4( ambient + (1.0 - shadow) * color, 1.0 );
     
     // Reinhard-Jodie tone mapping
     fragColor.xyz = ReinhardJodie( fragColor.xyz );
@@ -224,7 +205,7 @@ void main()
     fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
     // fragColor.xyz = 1.0 - exp( -2.0 * fragColor.xyz );
 
-    // fragColor.xyz = shadow.xxx;
+    fragColor.xyz = 1.0 - shadow.xxx;
 }
 #endif
 // ==========================================================================================================================

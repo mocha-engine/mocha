@@ -50,8 +50,8 @@ public class RendererInstance
 
 			world.Sun.CalcViewProjMatrix();
 
-			RenderPass( "Shadow Pass", world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
-			RenderPass( "Main Pass", world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
+			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
+			RenderPass( Renderer.RenderPass.Main, world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
 
 			PostRender();
 		}
@@ -80,15 +80,15 @@ public class RendererInstance
 		commandList.PopDebugGroup();
 
 		commandList.End();
-
+		
 		Device.SyncToVerticalBlank = false;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
 	}
 
-	private void RenderPass( string name, Matrix4x4 viewProjMatrix, Framebuffer framebuffer )
+	private void RenderPass( RenderPass renderPass, Matrix4x4 viewProjMatrix, Framebuffer framebuffer )
 	{
-		commandList.PushDebugGroup( name );
+		commandList.PushDebugGroup( renderPass.ToString() );
 		commandList.SetFramebuffer( framebuffer );
 		commandList.SetViewport( 0, new Viewport( 0, 0, framebuffer.Width, framebuffer.Height, 0, 1 ) );
 		commandList.SetFullViewports();
@@ -99,7 +99,7 @@ public class RendererInstance
 
 		commandList.ClearDepthStencil( 1 );
 
-		world.Render( viewProjMatrix, framebuffer, commandList );
+		world.Render( viewProjMatrix, renderPass, commandList );
 		commandList.PopDebugGroup();
 	}
 

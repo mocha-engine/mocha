@@ -12,8 +12,8 @@ public class SceneWorld
 		Current = this;
 	}
 
-	public void Render( Matrix4x4 viewProjMatrix, Framebuffer framebuffer, CommandList commandList )
+	public void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList )
 	{
-		SceneObject.All.ForEach( sceneObject => sceneObject.Render( viewProjMatrix, framebuffer, commandList ) );
+		SceneObject.All.ForEach( sceneObject => sceneObject.Render( viewProjMatrix, renderPass, commandList ) );
 	}
 }
