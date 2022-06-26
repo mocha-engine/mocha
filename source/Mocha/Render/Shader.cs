@@ -67,9 +67,6 @@ public class Shader
 			.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
 
 			.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddLightingResource( "g_tShadowPosition", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddLightingResource( "g_tShadowNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddLightingResource( "g_tShadowFlux", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
 			.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment )
 
 			.Build();
