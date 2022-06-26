@@ -58,6 +58,20 @@ public class Shader
 			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
 			.WithFramebuffer( TargetFramebuffer )
 			.WithFaceCullMode( FaceCullMode )
+
+			.AddObjectResource( "g_tDiffuse", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tAlpha", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tORM", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+			.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
+
+			.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddLightingResource( "g_tShadowPosition", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddLightingResource( "g_tShadowNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddLightingResource( "g_tShadowFlux", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+
 			.Build();
 	}
 
