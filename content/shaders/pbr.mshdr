@@ -187,58 +187,6 @@ float ShadowCalculation( vec4 fragPosLightSpace )
     return min( max( shadow, 0.0 ), 1.0 );
 }
 
-vec2 rsmSamplesSlow[] = vec2[] (vec2(0, 0),vec2(0, 0.1),vec2(0, 0.2),vec2(0, 0.3),vec2(0, 0.4),vec2(0, 0.5),vec2(0, 0.6),vec2(0, 0.7),vec2(0, 0.8),vec2(0, 0.9),vec2(0, 1),vec2(0.1, 0),vec2(0.1, 0.1),vec2(0.1, 0.2),vec2(0.1, 0.3),vec2(0.1, 0.4),vec2(0.1, 0.5),vec2(0.1, 0.6),vec2(0.1, 0.7),vec2(0.1, 0.8),vec2(0.1, 0.9),vec2(0.1, 1),vec2(0.2, 0),vec2(0.2, 0.1),vec2(0.2, 0.2),vec2(0.2, 0.3),vec2(0.2, 0.4),vec2(0.2, 0.5),vec2(0.2, 0.6),vec2(0.2, 0.7),vec2(0.2, 0.8),vec2(0.2, 0.9),vec2(0.2, 1),vec2(0.3, 0),vec2(0.3, 0.1),vec2(0.3, 0.2),vec2(0.3, 0.3),vec2(0.3, 0.4),vec2(0.3, 0.5),vec2(0.3, 0.6),vec2(0.3, 0.7),vec2(0.3, 0.8),vec2(0.3, 0.9),vec2(0.3, 1),vec2(0.4, 0),vec2(0.4, 0.1),vec2(0.4, 0.2),vec2(0.4, 0.3),vec2(0.4, 0.4),vec2(0.4, 0.5),vec2(0.4, 0.6),vec2(0.4, 0.7),vec2(0.4, 0.8),vec2(0.4, 0.9),vec2(0.4, 1),vec2(0.5, 0),vec2(0.5, 0.1),vec2(0.5, 0.2),vec2(0.5, 0.3),vec2(0.5, 0.4),vec2(0.5, 0.5),vec2(0.5, 0.6),vec2(0.5, 0.7),vec2(0.5, 0.8),vec2(0.5, 0.9),vec2(0.5, 1),vec2(0.6, 0),vec2(0.6, 0.1),vec2(0.6, 0.2),vec2(0.6, 0.3),vec2(0.6, 0.4),vec2(0.6, 0.5),vec2(0.6, 0.6),vec2(0.6, 0.7),vec2(0.6, 0.8),vec2(0.6, 0.9),vec2(0.6, 1),vec2(0.7, 0),vec2(0.7, 0.1),vec2(0.7, 0.2),vec2(0.7, 0.3),vec2(0.7, 0.4),vec2(0.7, 0.5),vec2(0.7, 0.6),vec2(0.7, 0.7),vec2(0.7, 0.8),vec2(0.7, 0.9),vec2(0.7, 1),vec2(0.8, 0),vec2(0.8, 0.1),vec2(0.8, 0.2),vec2(0.8, 0.3),vec2(0.8, 0.4),vec2(0.8, 0.5),vec2(0.8, 0.6),vec2(0.8, 0.7),vec2(0.8, 0.8),vec2(0.8, 0.9),vec2(0.8, 1),vec2(0.9, 0),vec2(0.9, 0.1),vec2(0.9, 0.2),vec2(0.9, 0.3),vec2(0.9, 0.4),vec2(0.9, 0.5),vec2(0.9, 0.6),vec2(0.9, 0.7),vec2(0.9, 0.8),vec2(0.9, 0.9),vec2(0.9, 1),vec2(1, 0),vec2(1, 0.1),vec2(1, 0.2),vec2(1, 0.3),vec2(1, 0.4),vec2(1, 0.5),vec2(1, 0.6),vec2(1, 0.7),vec2(1, 0.8),vec2(1, 0.9),vec2(1, 1));
-vec2 rsmSamplesFast[] = vec2[] ( vec2( 0, 0 ), vec2( 0, 0.2 ), vec2( 0, 0.4 ), vec2( 0, 0.6 ), vec2( 0, 0.8 ), vec2( 0, 1 ), vec2( 0.2, 0 ), vec2( 0.2, 0.2 ), vec2( 0.2, 0.4 ), vec2( 0.2, 0.6 ), vec2( 0.2, 0.8 ), vec2( 0.2, 1 ), vec2( 0.4, 0 ), vec2( 0.4, 0.2 ), vec2( 0.4, 0.4 ), vec2( 0.4, 0.6 ), vec2( 0.4, 0.8 ), vec2( 0.4, 1 ), vec2( 0.6, 0 ), vec2( 0.6, 0.2 ), vec2( 0.6, 0.4 ), vec2( 0.6, 0.6 ), vec2( 0.6, 0.8 ), vec2( 0.6, 1 ), vec2( 0.8, 0 ), vec2( 0.8, 0.2 ), vec2( 0.8, 0.4 ), vec2( 0.8, 0.6 ), vec2( 0.8, 0.8 ), vec2( 0.8, 1 ), vec2( 1, 0 ), vec2( 1, 0.2 ), vec2( 1, 0.4 ), vec2( 1, 0.6 ), vec2( 1, 0.8 ), vec2( 1, 1 ) );
-vec2 poissonDisk[16] = vec2[] (
-    vec2(-0.94201624,    -0.39906216), 
-    vec2(0.94558609,     -0.76890725), 
-    vec2(-0.094184101,    -0.92938870), 
-    vec2(0.34495938,     0.29387760), 
-    vec2(-0.91588581,    0.45771432), 
-    vec2(-0.81544232,    -0.87912464), 
-    vec2(-0.38277543,    0.27676845), 
-    vec2(0.97484398,     0.75648379), 
-    vec2(0.44323325,     -0.97511554), 
-    vec2(0.53742981,     -0.47373420), 
-    vec2(-0.26496911,    -0.41893023), 
-    vec2(0.79197514,     0.19090188), 
-    vec2(-0.24188840,    0.99706507), 
-    vec2(-0.81409955,    0.91437590), 
-    vec2(0.19984126,     0.78641367), 
-    vec2(0.14383161,     -0.14100790)
-);
-
-#define rsmSamples rsmSamplesSlow
-#define rsmRadius 0.0075
-
-vec3 GetAmbient( vec4 fragPosLightSpace )
-{
-    vec3 projCoords = GetShadowProjCoords( fragPosLightSpace );
-    vec3 ambient = vec3( 0.0 );
-
-    for ( int i = 0; i < rsmSamples.length(); ++i )
-    {
-        vec2 rnd = rsmSamples[i].xy;
-
-        vec2 coords = projCoords.xy + rnd * rsmRadius;
-
-        vec3 vplPositionWS = texture( sampler2D( g_tShadowPosition, g_sShadowSampler ), coords.xy ).rgb;
-        vec3 vplNormalWS = texture( sampler2D( g_tShadowNormal, g_sShadowSampler ), coords.xy ).rgb;
-        vec3 flux = texture( sampler2D( g_tShadowFlux, g_sShadowSampler ), coords.xy ).rgb;
-
-        float lightContrib =     max( 0, dot( vplNormalWS, fs_in.vPositionWS - vplPositionWS )) 
-                                 // * max( 0, dot( fs_in.vNormalWS, vplPositionWS - fs_in.vPositionWS ))
-                                 / pow( length( fs_in.vPositionWS - vplPositionWS ), 4 );
-        
-        float dist = length( rnd );
-        lightContrib *= dist * dist;
-
-        ambient += lightContrib * vec3( 1.0 );
-    }
-
-    return ambient * 1000;
-}
-
 void main() 
 {
     // Obtain normal from normal map in range [0,1]
