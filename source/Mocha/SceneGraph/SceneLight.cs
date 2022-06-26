@@ -9,9 +9,6 @@ public class SceneLight : SceneObject
 
 	internal Framebuffer ShadowBuffer { get; set; }
 	internal Texture DepthTexture { get; set; }
-	internal Texture PositionTexture { get; set; }
-	internal Texture NormalTexture { get; set; }
-	internal Texture FluxTexture { get; set; }
 
 	internal OutputDescription Output { get; set; }
 
@@ -20,7 +17,7 @@ public class SceneLight : SceneObject
 
 	public SceneLight( IEntity entity ) : base( entity )
 	{
-		uint res = 1024;
+		uint res = 8192;
 
 		DepthTexture = Texture.Builder
 			.FromEmpty( res, res )
@@ -28,26 +25,7 @@ public class SceneLight : SceneObject
 			.WithName( "Sun Light Depth" )
 			.Build();
 
-		PositionTexture = Texture.Builder
-			.FromEmpty( res, res )
-			.AsColorAttachment()
-			.WithName( "Sun Light Position" )
-			.Build();
-
-		NormalTexture = Texture.Builder
-			.FromEmpty( res, res )
-			.AsColorAttachment()
-			.WithName( "Sun Light Normal" )
-			.Build();
-
-		FluxTexture = Texture.Builder
-			.FromEmpty( res, res )
-			.AsColorAttachment()
-			.WithName( "Sun Light Flux" )
-			.Build();
-
-		var framebufferDescription = new FramebufferDescription( DepthTexture.VeldridTexture,
-			PositionTexture.VeldridTexture, NormalTexture.VeldridTexture, FluxTexture.VeldridTexture );
+		var framebufferDescription = new FramebufferDescription( DepthTexture.VeldridTexture );
 
 		ShadowBuffer = Device.ResourceFactory.CreateFramebuffer( framebufferDescription );
 	}
@@ -55,6 +33,6 @@ public class SceneLight : SceneObject
 	public void CalcViewProjMatrix()
 	{
 		ViewMatrix = Matrix4x4.CreateLookAt( Transform.Position, Vector3.Zero, Vector3.Up );
-		ProjMatrix = Matrix4x4.CreateOrthographic( 400f, 400f, 1.0f, 200f );
+		ProjMatrix = Matrix4x4.CreateOrthographic( 100f, 100f, 1.0f, 200f );
 	}
 }

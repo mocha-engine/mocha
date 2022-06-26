@@ -123,9 +123,6 @@ public class Model
 		var lightingResourceSetDescription = new ResourceSetDescription(
 			Material.Shader.Pipeline.ResourceLayouts[1],
 			SceneWorld.Current.Sun.DepthTexture.VeldridTexture,
-			SceneWorld.Current.Sun.PositionTexture.VeldridTexture,
-			SceneWorld.Current.Sun.NormalTexture.VeldridTexture,
-			SceneWorld.Current.Sun.FluxTexture.VeldridTexture,
 			shadowSampler );
 
 		lightingResourceSet = Device.ResourceFactory.CreateResourceSet( lightingResourceSetDescription );

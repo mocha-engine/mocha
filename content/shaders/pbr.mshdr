@@ -44,10 +44,7 @@ layout( set = 0, binding = 5 ) uniform ObjectUniformBuffer {
 
 // Lighting
 layout( set = 1, binding = 0 ) uniform texture2D g_tShadowMap;
-layout( set = 1, binding = 1 ) uniform texture2D g_tShadowPosition;
-layout( set = 1, binding = 2 ) uniform texture2D g_tShadowNormal;
-layout( set = 1, binding = 3 ) uniform texture2D g_tShadowFlux;
-layout( set = 1, binding = 4 ) uniform sampler g_sShadowSampler;
+layout( set = 1, binding = 1 ) uniform sampler g_sShadowSampler;
 
 struct VS_OUT {
     vec2 vTexCoords;
@@ -160,7 +157,7 @@ vec3 GetShadowProjCoords( vec4 fragPosLightSpace )
 
 float ShadowCalculation( vec4 fragPosLightSpace )
 {
-    const float bias = 0.0022;
+    const float bias = 0.0025;
 
     vec3 projCoords = GetShadowProjCoords( fragPosLightSpace );
 
