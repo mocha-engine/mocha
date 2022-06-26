@@ -6,6 +6,8 @@ public class PipelineFactory
 	private FaceCullMode faceCullMode = FaceCullMode.Back;
 	private Shader shader;
 	private Framebuffer framebuffer;
+	private List<ResourceLayoutElementDescription> objectResources = new();
+	private List<ResourceLayoutElementDescription> lightingResources = new();
 
 	public PipelineFactory() { }
 
@@ -14,7 +16,6 @@ public class PipelineFactory
 		this.vertexElementDescriptions = vertexElementDescriptions;
 		return this;
 	}
-
 
 	public PipelineFactory WithFaceCullMode( FaceCullMode faceCullMode )
 	{
@@ -37,84 +38,47 @@ public class PipelineFactory
 		return this;
 	}
 
+	public PipelineFactory AddObjectResource( string name, ResourceKind kind, ShaderStages shaderStages )
+	{
+		objectResources.Add( new ResourceLayoutElementDescription( name, kind, shaderStages ) );
+		return this;
+	}
+
+	public PipelineFactory AddLightingResource( string name, ResourceKind kind, ShaderStages shaderStages )
+	{
+		lightingResources.Add( new ResourceLayoutElementDescription( name, kind, shaderStages ) );
+		return this;
+	}
+
 	public RenderPipeline Build()
 	{
+		var blendState = new BlendStateDescription()
+		{
+			AttachmentStates = new BlendAttachmentDescription[framebuffer.ColorTargets.Count],
+			BlendFactor = RgbaFloat.Black
+		};
+
+		for ( int i = 0; i < framebuffer.ColorTargets.Count; i++ )
+		{
+			blendState.AttachmentStates[i] = BlendAttachmentDescription.OverrideBlend;
+		}
+
 		var vertexLayoutDescription = new VertexLayoutDescription( vertexElementDescriptions );
 		var objectResourceLayoutDescription = new ResourceLayoutDescription()
 		{
-			Elements = new[]
-			{
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tDiffuse",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tAlpha",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tNormal",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tORM",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.Sampler,
-					Name = "g_sSampler",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.UniformBuffer,
-					Name = "g_oUbo",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Vertex | ShaderStages.Fragment
-				}
-			}
+			Elements = objectResources.ToArray()
 		};
 
 		var objectResourceLayout = Device.ResourceFactory.CreateResourceLayout( objectResourceLayoutDescription );
 		var lightingResourceLayoutDescription = new ResourceLayoutDescription()
 		{
-			Elements = new[]
-			{
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.TextureReadOnly,
-					Name = "g_tShadowMap",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				},
-				new ResourceLayoutElementDescription()
-				{
-					Kind = ResourceKind.Sampler,
-					Name = "g_sSampler",
-					Options = ResourceLayoutElementOptions.None,
-					Stages = ShaderStages.Fragment
-				}
-			}
+			Elements = lightingResources.ToArray()
 		};
 
 		var lightingResourceLayout = Device.ResourceFactory.CreateResourceLayout( lightingResourceLayoutDescription );
 		var pipelineDescription = new GraphicsPipelineDescription()
 		{
-			BlendState = BlendStateDescription.SingleAlphaBlend,
+			BlendState = blendState,
 
 			DepthStencilState = new DepthStencilStateDescription(
 				true,
