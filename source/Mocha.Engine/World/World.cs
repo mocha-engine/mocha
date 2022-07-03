@@ -1,6 +1,4 @@
-﻿using Veldrid;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 public class World
 {
@@ -35,7 +33,7 @@ public class World
 			Scale = Vector3.One * -100f
 		};
 
-		_ = new ModelEntity( "content/models/sponza/sponza.mmdl" )
+		_ = new ModelEntity( "content/models/dev/dev.mmdl" )
 		{
 			//rotation = new Vector3( 90, 0, 0 ),
 			Scale = new Vector3( 0.025f )

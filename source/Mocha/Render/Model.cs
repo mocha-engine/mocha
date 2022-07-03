@@ -148,6 +148,7 @@ public class Model
 		{
 			RenderPass.Main => Material.Shader.Pipeline,
 			RenderPass.ShadowMap => DepthOnlyMaterial.Shader.Pipeline,
+			RenderPass.Combine => Material.Shader.Pipeline,
 
 			_ => throw new NotImplementedException(),
 		};
