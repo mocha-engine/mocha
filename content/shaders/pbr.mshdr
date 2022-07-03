@@ -53,6 +53,8 @@ struct VS_OUT {
     vec3 vPositionWS;
     vec3 vNormalWS;
 
+    vec3 vColor;
+
     mat3 TBN;
 
     vec3 vLightPosTS;
@@ -61,6 +63,28 @@ struct VS_OUT {
 
     vec4 vFragPosLightSpace;
 };
+
+//get a scalar random value from a 3d value
+float rand3dTo1d(vec3 value, vec3 dotDir)
+{
+    //make value smaller to avoid artefacts
+    vec3 smallValue = sin(value);
+    //get scalar value from 3d vector
+    float random = dot(smallValue, dotDir);
+    //make value more random by making it bigger and then taking the factional part
+    random = fract(sin(random) * 143758.5453);
+    return random;
+}
+
+vec3 rand3dTo3d(vec3 value)
+{
+    return vec3(
+        rand3dTo1d(value, vec3(12.989, 78.233, 37.719)),
+        rand3dTo1d(value, vec3(39.346, 11.135, 83.155)),
+        rand3dTo1d(value, vec3(73.156, 52.235, 09.151))
+    );
+}
+
 
 // ==========================================================================================================================
 
@@ -102,6 +126,9 @@ void main() {
     vs_out.vPositionTS = TBN * vs_out.vPositionWS;
 
     vs_out.TBN = TBN;
+
+    vec3 index = vec3( gl_VertexIndex, gl_VertexIndex + 1, gl_VertexIndex + 2 );
+    vs_out.vColor = rand3dTo3d( normal * index );
 
     vs_out.vFragPosLightSpace = g_oUbo.g_mLightViewProj * vec4( vs_out.vPositionWS, 1.0 );
    
@@ -186,6 +213,9 @@ float ShadowCalculation( vec4 fragPosLightSpace )
 
 void main() 
 {
+    fragColor = vec4( fs_in.vColor, 1.0 );
+    return;
+
     // Obtain normal from normal map in range [0,1]
     vec3 normal = GetTextureSample( g_tNormal );
 

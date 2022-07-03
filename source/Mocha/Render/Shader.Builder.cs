@@ -1,4 +1,4 @@
-﻿using SharpDX.Text;
+﻿using System.Text;
 using Veldrid;
 using Veldrid.SPIRV;
 
@@ -9,7 +9,7 @@ public class ShaderBuilder
 	private ShaderDescription VertexShaderDescription;
 	private ShaderDescription FragmentShaderDescription;
 
-	private Framebuffer targetFramebuffer = Device.SwapchainFramebuffer;
+	private Framebuffer targetFramebuffer = SceneWorld.Current.Camera.Framebuffer;
 	private FaceCullMode faceCullMode = FaceCullMode.Back;
 
 	public static ShaderBuilder Default => new ShaderBuilder();

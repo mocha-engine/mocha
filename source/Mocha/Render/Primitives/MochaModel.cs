@@ -25,7 +25,6 @@ public partial class Primitives
 
 			Log.Trace( $"{meshCount} meshes" );
 
-
 			for ( int i = 0; i < meshCount; i++ )
 			{
 				binaryReader.ReadChars( 4 ); // MTRL

@@ -13,6 +13,9 @@ public class RendererInstance
 	private CommandList commandList;
 	private ImGuiRenderer imguiRenderer;
 
+	private Material gbufferCombineMaterial;
+	private Model fullscreenQuad;
+
 	public Action PreUpdate;
 	public Action OnUpdate;
 	public Action PostUpdate;
@@ -43,6 +46,18 @@ public class RendererInstance
 
 	public void Run()
 	{
+		gbufferCombineMaterial = new Material()
+		{
+			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/combine.mshdr" )
+											.WithFramebuffer( Device.SwapchainFramebuffer )
+											.WithFaceCullMode( FaceCullMode.None )
+											.Build(),
+			UniformBufferType = typeof( EmptyUniformBuffer ),
+			DiffuseTexture = world.Camera.ColorTexture
+		};
+
+		fullscreenQuad = Primitives.Plane.GenerateModel( gbufferCombineMaterial );
+
 		while ( window.SdlWindow.Exists )
 		{
 			Update();
@@ -51,7 +66,7 @@ public class RendererInstance
 			world.Sun.CalcViewProjMatrix();
 
 			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
-			RenderPass( Renderer.RenderPass.Main, world.Camera.ViewMatrix * world.Camera.ProjMatrix, Device.SwapchainFramebuffer );
+			RenderPass( Renderer.RenderPass.Main, world.Camera.ViewMatrix * world.Camera.ProjMatrix, world.Camera.Framebuffer );
 
 			PostRender();
 		}
@@ -71,11 +86,18 @@ public class RendererInstance
 
 	private void PostRender()
 	{
-		commandList.PushDebugGroup( "ImGUI" );
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
 		commandList.SetViewport( 0, new Viewport( 0, 0, Device.SwapchainFramebuffer.Width, Device.SwapchainFramebuffer.Height, 0, 1 ) );
 		commandList.SetFullViewports();
 		commandList.SetFullScissorRects();
+		commandList.ClearColorTarget( 0, RgbaFloat.Black );
+		commandList.ClearDepthStencil( 1 );
+
+		commandList.PushDebugGroup( "GBuffer Combine" );
+		fullscreenQuad.Draw( Renderer.RenderPass.Combine, new EmptyUniformBuffer(), commandList );
+		commandList.PopDebugGroup();
+
+		commandList.PushDebugGroup( "ImGUI" );
 		imguiRenderer?.Render( Device, commandList );
 		commandList.PopDebugGroup();
 
@@ -127,7 +149,7 @@ public class RendererInstance
 			SyncToVerticalBlank = false
 		};
 
-		var preferredBackend = GraphicsBackend.Vulkan;
+		var preferredBackend = GraphicsBackend.Direct3D11;
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
 
 		var windowTitle = $"Mocha | {Device.BackendType}";

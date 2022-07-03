@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Engine", "Mocha.Engin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Console", "Mocha.Console\Mocha.Console.csproj", "{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CB07C6D5-36BE-4B1E-B29D-7372756F892F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +50,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F3B5FCCE-3C09-4EAB-A7A7-B148CEB0B682} = {CB07C6D5-36BE-4B1E-B29D-7372756F892F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {501E447E-DCFC-42D2-AF68-88486D3529DD}
