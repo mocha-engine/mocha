@@ -1,5 +1,7 @@
 ﻿using ImGuiNET;
+using Microsoft.Toolkit.HighPerformance.Buffers;
 using System.Reflection;
+using System.Reflection.Metadata;
 
 namespace Mocha.Engine;
 
@@ -22,6 +24,14 @@ internal static class EditorHelpers
 	{
 		var padding = new System.Numerics.Vector2( 4, 2 );
 		ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
+	}
+
+	public static bool ImageButton( Texture texture, Vector2 size )
+	{
+		var texPtr = Editor.Instance.Renderer.GetImGuiBinding( texture );
+
+		return ImGui.ImageButton( texPtr, size,
+			new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ) );
 	}
 
 	public static void Image( Texture texture, Vector2 size )
@@ -61,7 +71,7 @@ internal static class EditorHelpers
 		float y = sysVec3.Y;
 		float z = sysVec3.Z;
 
-		float itemWidth = ( ImGui.GetColumnWidth() / 3.0f ) - 7f;
+		float itemWidth = (ImGui.GetColumnWidth() / 3.0f) - 7f;
 
 		float buttonWidth = 5.0f;
 		float dragFloatWidth = itemWidth - buttonWidth;
@@ -97,7 +107,7 @@ internal static class EditorHelpers
 			ImGui.PushStyleColor( ImGuiCol.Button, OneDark.Info );
 			ImGui.Button( $"Z##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor(2);
+			ImGui.PopStyleColor( 2 );
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_z", ref z );
@@ -106,7 +116,7 @@ internal static class EditorHelpers
 		ImGui.PopStyleVar();
 
 		var vec3 = new Vector3( x, y, z );
-		bool changed = !(sysVec3.X == vec3.X && sysVec3.Y  == vec3.Y && sysVec3.Z == vec3.Z);
+		bool changed = !(sysVec3.X == vec3.X && sysVec3.Y == vec3.Y && sysVec3.Z == vec3.Z);
 
 		if ( changed )
 			sysVec3 = vec3;
@@ -160,7 +170,7 @@ internal static class EditorHelpers
 	{
 		var viewport = ImGui.GetMainViewport();
 
-		ImGui.SetNextWindowPos( viewport.WorkPos);
+		ImGui.SetNextWindowPos( viewport.WorkPos );
 		ImGui.SetNextWindowSize( viewport.WorkSize );
 		ImGui.SetNextWindowViewport( viewport.ID );
 
@@ -186,5 +196,38 @@ internal static class EditorHelpers
 		}
 
 		ImGui.PopStyleVar( 3 );
+	}
+
+	public static void TextSubheading( string text )
+	{
+		ImGui.PushFont( Editor.SubheadingFont );
+		ImGui.Dummy( new System.Numerics.Vector2( 0, 2 ) );
+		ImGui.Text( text );
+		ImGui.PopFont();
+	}
+
+	public static void TextLight( string text )
+	{
+		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+		ImGui.Dummy( new System.Numerics.Vector2( 0, 2 ) );
+		ImGui.Text( text );
+		ImGui.PopStyleColor();
+	}
+
+	public static void TextBold( string text )
+	{
+		ImGui.PushFont( Editor.BoldFont );
+		ImGui.Dummy( new System.Numerics.Vector2( 0, 2 ) );
+		ImGui.Text( text );
+		ImGui.Dummy( new System.Numerics.Vector2( 0, 2 ) );
+		ImGui.PopFont();
+	}
+
+	public static void Title( string text, string subtext )
+	{
+		TextSubheading( text );
+		TextLight( subtext );
+
+		EditorHelpers.Separator();
 	}
 }
