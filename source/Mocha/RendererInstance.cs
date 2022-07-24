@@ -103,7 +103,6 @@ public class RendererInstance
 
 		commandList.End();
 
-		Device.SyncToVerticalBlank = false;
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
 	}
@@ -151,6 +150,8 @@ public class RendererInstance
 
 		var preferredBackend = GraphicsBackend.Direct3D11;
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
+
+		Device.SyncToVerticalBlank = true;
 
 		var windowTitle = $"Mocha | {Device.BackendType}";
 		Window.Current.SdlWindow.Title = windowTitle;

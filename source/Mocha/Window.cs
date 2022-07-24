@@ -1,4 +1,5 @@
-﻿using Veldrid.Sdl2;
+﻿using System.Runtime.InteropServices;
+using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
 namespace Mocha.Renderer;
@@ -23,7 +24,18 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
-
 		Screen.UpdateFrom( Size );
+
+		SetDarkModeTitlebar();
+	}
+
+	[DllImport( "dwmapi.dll" )]
+	public static extern int DwmSetWindowAttribute( IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute );
+
+	private void SetDarkModeTitlebar()
+	{
+		var value = 1;
+		const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+		DwmSetWindowAttribute( SdlWindow.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, Marshal.SizeOf( typeof( int ) ) );
 	}
 }

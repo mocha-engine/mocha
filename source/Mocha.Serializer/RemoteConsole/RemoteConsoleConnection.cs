@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using Mocha.Common.Serialization;
+using System.Net.Sockets;
 
 namespace Mocha.Common;
 
@@ -9,7 +10,7 @@ public class RemoteConsoleConnection
 
 	protected NetworkStream stream;
 
-	protected void SerializeAndSend<T>( T obj ) where T : struct
+	protected void SerializeAndSend<T>( string identifier, T obj ) where T : struct
 	{
 		if ( stream != null && !stream.CanWrite )
 			return;
@@ -17,6 +18,7 @@ public class RemoteConsoleConnection
 		var consolePacket = new ConsolePacket
 		{
 			ProtocolVersion = 1,
+			Identifier = identifier,
 			Data = Serializer.Serialize( obj )
 		};
 
@@ -53,7 +55,7 @@ public class RemoteConsoleConnection
 			StackTrace = stackTrace
 		};
 
-		SerializeAndSend( obj );
+		SerializeAndSend( "PRNT", obj );
 	}
 
 	protected virtual void ListenThread()
@@ -62,7 +64,8 @@ public class RemoteConsoleConnection
 
 	public virtual void ConnectionStarted()
 	{
-
+		lastClientKeepAlive = DateTime.Now;
+		lastServerKeepAlive = DateTime.Now;
 	}
 
 	public virtual void MessageReceived( byte[] data )

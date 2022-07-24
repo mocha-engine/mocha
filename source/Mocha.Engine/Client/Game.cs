@@ -36,9 +36,13 @@ internal class Game
 
 			var world = new World();
 
-			renderer.PreUpdate += Input.Update; // Must be called before everything else
+			// Must be called before everything else
+			renderer.PreUpdate += Input.Update;
+
 			renderer.OnUpdate += world.Update;
-			renderer.PostUpdate += editor.Update; // Must be called after everything else
+
+			// Must be called after everything else
+			renderer.PostUpdate += editor.Update;
 		}
 
 		renderer.Run();

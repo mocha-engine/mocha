@@ -30,4 +30,16 @@ public class MochaInputSnapshot : InputSnapshot
 
 	public List<SDL_Keysym> LastKeysDown { get; set; } = new();
 	public List<SDL_Keysym> KeysDown { get; set; } = new();
+
+	public override string ToString()
+	{
+		string str = "";
+
+		foreach ( var property in this.GetType().GetProperties() )
+		{
+			str += $"{property.Name}: {property.GetValue( this )}\n";
+		}
+
+		return str;
+	}
 }

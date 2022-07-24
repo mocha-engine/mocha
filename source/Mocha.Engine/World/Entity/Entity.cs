@@ -1,8 +1,10 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Mocha.Common.World;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Mocha.Engine;
 
+[Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class Entity : IEntity
 {
 	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
@@ -33,7 +35,10 @@ public class Entity : IEntity
 		set => transform.Rotation = value;
 	}
 
+	[HideInInspector]
 	public string Name { get; set; }
+
+	[HideInInspector]
 	public int Id { get; set; }
 
 	public Entity()
@@ -50,7 +55,11 @@ public class Entity : IEntity
 	public int GetHashCode( [DisallowNull] Entity obj ) => base.GetHashCode();
 
 	private int parentId;
+
+	[HideInInspector]
 	public Entity Parent => Entity.All.First( x => x.Id == parentId );
+
+	[HideInInspector]
 	public List<Entity> Children => Entity.All.Where( x => x.parentId == Id ).ToList();
 
 	public void SetParent( Entity newParent )

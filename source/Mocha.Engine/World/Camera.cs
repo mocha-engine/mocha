@@ -1,7 +1,11 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
 
+namespace Mocha.Engine;
+
+[Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
 public class Camera : Entity
 {
+	[HideInInspector]
 	public SceneCamera SceneCamera { get; set; }
 
 	private Vector3 velocity = new();
@@ -17,7 +21,10 @@ public class Camera : Entity
 
 	private float wishFov = 90f;
 
+	[HideInInspector]
 	public Matrix4x4 ProjMatrix => SceneCamera.ProjMatrix;
+
+	[HideInInspector]
 	public Matrix4x4 ViewMatrix => SceneCamera.ViewMatrix;
 
 	public Camera()
