@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( "Game/Viewport" )]
+[EditorMenu( $"{FontAwesome.Gamepad} Game/Viewport" )]
 internal class ViewportTab : BaseTab
 {
 	public ViewportTab()
@@ -12,9 +12,9 @@ internal class ViewportTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Viewport", ref isVisible );
+		ImGui.Begin( "Viewport" );
 
-		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 0, 42 );
+		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 16, 42 );
 		EditorHelpers.Image( SceneWorld.Current.Camera.ColorTexture, windowSize );
 
 		ImGui.End();

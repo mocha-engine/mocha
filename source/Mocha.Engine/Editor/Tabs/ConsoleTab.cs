@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( "Debug/Console" )]
+[EditorMenu( $"{FontAwesome.Bug} Debug/Console" )]
 internal class ConsoleTab : BaseTab
 {
 	List<ConsoleItem> items = new();
@@ -41,7 +41,7 @@ internal class ConsoleTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Console", ref isVisible );
+		ImGui.Begin( "Console" );
 
 		ImGui.BeginChild( "logs", new System.Numerics.Vector2( 0, -32 ) );
 		if ( ImGui.BeginTable( $"##table_logs", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )

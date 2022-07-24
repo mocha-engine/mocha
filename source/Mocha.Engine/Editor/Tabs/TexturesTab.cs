@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( "Debug/Textures" )]
+[EditorMenu( $"{FontAwesome.Bug} Debug/Textures" )]
 internal class TexturesTab : BaseTab
 {
 	public TexturesTab()
@@ -14,30 +14,54 @@ internal class TexturesTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Textures", ref isVisible );
+		if ( ImGui.Begin( "Texture Debug", ref isVisible ) )
+		{
+			EditorHelpers.Title(
+				$"{FontAwesome.Image} Textures",
+				"Here's where you can see all the currently loaded textures."
+			);
 
-		var textureList = Asset.All.OfType<Texture>().ToList();
+			EditorHelpers.TextLight( $"Loaded textures: {Asset.All.OfType<Texture>().Count()}" );
 
-		var texturePaths = textureList.Select( texture => $"{texture.Path}" ).ToList();
+			ImGui.Dummy( new System.Numerics.Vector2( 0, 4 ) );
 
-		ImGui.Combo( "Texture", ref selectedTexture, texturePaths.ToArray(), texturePaths.Count );
+			ImGui.BeginListBox( "##textures", new System.Numerics.Vector2( 250, -1 ) );
+			var textureList = Asset.All.OfType<Texture>().ToList();
 
-		if ( selectedTexture > textureList.Count - 1 )
-			selectedTexture = textureList.Count - 1;
+			for ( int i = 0; i < textureList.Count; i++ )
+			{
+				Texture? tex = textureList[i];
+				EditorHelpers.Image( tex, new Vector2( 32, 32 ) );
+				ImGui.SameLine();
+				if ( ImGui.Selectable( tex.Path + "\n" + tex.Width + ", " + tex.Height + " | " + tex.Type ) )
+				{
+					selectedTexture = i;
+				}
+			}
 
-		if ( selectedTexture < 0 )
-			selectedTexture = 0;
+			ImGui.EndListBox();
 
-		var texture = textureList[selectedTexture];
+			if ( selectedTexture > textureList.Count - 1 )
+				selectedTexture = textureList.Count - 1;
 
-		var windowWidth = ImGui.GetWindowSize().X;
-		float ratio = texture.Height / (float)texture.Width;
+			if ( selectedTexture < 0 )
+				selectedTexture = 0;
 
-		if ( ratio is float.NaN )
-			ratio = 1f;
+			var texture = textureList[selectedTexture];
 
-		EditorHelpers.Image( texture, new Vector2( windowWidth, windowWidth * ratio ) );
+			ImGui.SameLine();
+			ImGui.BeginChild( "##texture_preview" );
 
-		ImGui.End();
+			var childWidth = ImGui.GetItemRectSize().X;
+			float ratio = texture.Height / (float)texture.Width;
+
+			if ( ratio is float.NaN )
+				ratio = 1f;
+
+			EditorHelpers.Image( texture, new Vector2( childWidth, childWidth * ratio ) );
+
+			ImGui.EndChild();
+			ImGui.End();
+		}
 	}
 }

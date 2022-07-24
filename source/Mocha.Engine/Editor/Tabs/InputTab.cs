@@ -2,14 +2,19 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( "Debug/Input" )]
+[EditorMenu( $"{FontAwesome.Bug} Debug/Input" )]
 internal class InputTab : BaseTab
 {
 	public override void Draw()
 	{
 		ImGui.Begin( "Input", ref isVisible );
 
-		ImGui.Text( $"{Input.Snapshot}");
+		EditorHelpers.Title(
+			$"{FontAwesome.Gamepad} Input",
+			"This is where you can see things like input buttons and mouse info."
+		);
+
+		ImGui.Text( $"{Input.Snapshot}" );
 
 		ImGui.End();
 	}
