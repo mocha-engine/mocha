@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
@@ -24,9 +25,10 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
-		Screen.UpdateFrom( Size );
-
+		SdlWindow.WindowState = WindowState.Maximized;
 		SetDarkModeTitlebar();
+
+		Screen.UpdateFrom( Size );
 	}
 
 	[DllImport( "dwmapi.dll" )]

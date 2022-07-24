@@ -34,6 +34,9 @@ public class RendererInstance
 		window = new();
 
 		CreateGraphicsDevice();
+		// Swap the buffers so that the screen isn't a mangled mess
+		Device.SwapBuffers();
+
 		commandList = Device.ResourceFactory.CreateCommandList();
 
 		imguiRenderer = new( Device,
@@ -97,14 +100,19 @@ public class RendererInstance
 		fullscreenQuad.Draw( Renderer.RenderPass.Combine, new EmptyUniformBuffer(), commandList );
 		commandList.PopDebugGroup();
 
-		commandList.PushDebugGroup( "ImGUI" );
-		imguiRenderer?.Render( Device, commandList );
-		commandList.PopDebugGroup();
+		RenderImGui();
 
 		commandList.End();
 
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
+	}
+
+	private void RenderImGui()
+	{
+		commandList.PushDebugGroup( "ImGUI" );
+		imguiRenderer?.Render( Device, commandList );
+		commandList.PopDebugGroup();
 	}
 
 	private void RenderPass( RenderPass renderPass, Matrix4x4 viewProjMatrix, Framebuffer framebuffer )
