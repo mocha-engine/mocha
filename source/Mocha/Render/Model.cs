@@ -7,6 +7,7 @@ public class Model
 {
 	private DeviceBuffer uniformBuffer;
 
+	public string Path { get; private set; }
 	public DeviceBuffer TBNBuffer { get; private set; }
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
@@ -22,7 +23,7 @@ public class Model
 	private uint indexCount;
 	private uint vertexCount;
 
-	public Model( Vertex[] vertices, uint[] indices, Material material )
+	public Model( string path, Vertex[] vertices, uint[] indices, Material material )
 	{
 		DepthOnlyMaterial = new Material()
 		{
@@ -33,6 +34,7 @@ public class Model
 			UniformBufferType = typeof( GenericModelUniformBuffer )
 		};
 
+		Path = path;
 		Material = material;
 		IsIndexed = true;
 
@@ -43,7 +45,7 @@ public class Model
 		Material.Shader.OnRecompile += CreateResources;
 	}
 
-	public Model( Vertex[] vertices, Material material )
+	public Model( string path, Vertex[] vertices, Material material )
 	{
 		DepthOnlyMaterial = new Material()
 		{
@@ -54,6 +56,7 @@ public class Model
 			UniformBufferType = typeof( GenericModelUniformBuffer )
 		};
 
+		Path = path;
 		Material = material;
 		IsIndexed = false;
 
@@ -95,7 +98,7 @@ public class Model
 	{
 		var objectResourceSetDescription = new ResourceSetDescription(
 			Material.Shader.Pipeline.ResourceLayouts[0],
-			Material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
+			Material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
 			Material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
 			Material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
 			Material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,

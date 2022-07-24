@@ -95,7 +95,7 @@ public partial class Primitives
 				}
 
 				if ( material.AlphaTexture == null ) // TODO: Alpha support
-					models.Add( new Model( vertices.ToArray(), indices.ToArray(), material ) );
+					models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
 			}
 
 			return models;
