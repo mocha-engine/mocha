@@ -11,8 +11,8 @@ partial class Editor
 		colors[(int)ImGuiCol.TextDisabled] = new( 0.50f, 0.50f, 0.50f, 1.00f );
 		colors[(int)ImGuiCol.WindowBg] = new( 0.17f, 0.17f, 0.18f, 1.00f );
 		colors[(int)ImGuiCol.ChildBg] = new( 0.00f, 0.00f, 0.00f, 0.00f );
-		colors[(int)ImGuiCol.PopupBg] = new( 0.19f, 0.19f, 0.19f, 0.92f );
-		colors[(int)ImGuiCol.Border] = new( 0.19f, 0.19f, 0.19f, 0.29f );
+		colors[(int)ImGuiCol.PopupBg] = new( 0.24f, 0.24f, 0.25f, 1.00f );
+		colors[(int)ImGuiCol.Border] = new( 0.00f, 0.00f, 0.00f, 0.5f );
 		colors[(int)ImGuiCol.BorderShadow] = new( 0.00f, 0.00f, 0.00f, 0.24f );
 		colors[(int)ImGuiCol.FrameBg] = new( 0.10f, 0.11f, 0.11f, 1.00f );
 		colors[(int)ImGuiCol.FrameBgHovered] = new( 0.19f, 0.19f, 0.19f, 0.54f );
@@ -73,7 +73,7 @@ partial class Editor
 		style.IndentSpacing = 25;
 		style.ScrollbarSize = 10;
 		style.GrabMinSize = 10;
-		style.WindowBorderSize = 0;
+		style.WindowBorderSize = 1;
 		style.ChildBorderSize = 0;
 		style.PopupBorderSize = 0;
 		style.FrameBorderSize = 0;

@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Mocha.Common;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Veldrid;
@@ -64,6 +65,7 @@ internal partial class Editor
 		var io = ImGui.GetIO();
 
 		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
+		io.ConfigDockingWithShift = true;
 		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
 
 		io.Fonts.Clear();
@@ -88,10 +90,6 @@ internal partial class Editor
 		int size = width * height * bpp;
 		byte[] data = new byte[size];
 		Marshal.Copy( pixels, data, 0, size );
-
-		//pinnedIconRanges.Free();
-		//Marshal.FreeHGlobal( iconRangesPtr );
-		//Marshal.FreeHGlobal( configPtr );
 
 		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
 	}
@@ -179,6 +177,7 @@ internal partial class Editor
 
 	private void DrawMenuBar()
 	{
+		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#141417" ) );
 		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
 		ImGui.BeginMainMenuBar();
 
@@ -188,8 +187,6 @@ internal partial class Editor
 		EditorHelpers.Image( Logo, new Vector2( 32, 32 ) );
 		ImGui.SetCursorPosY( 0 );
 
-		ImGui.Dummy( new( 4, 0 ) );
-		ImGui.Separator();
 		ImGui.Dummy( new( 4, 0 ) );
 
 		foreach ( var tab in tabs )
@@ -250,11 +247,14 @@ internal partial class Editor
 		}
 
 		ImGui.EndMainMenuBar();
+		ImGui.PopStyleColor();
 	}
 
 	bool quickSwitcherVisible = false;
 	string quickSwitcherInput = "";
+	int selectedQuickSwitcherItem = 0;
 
+	// TODO: Refactor
 	private void DrawQuickSwitcher()
 	{
 		var io = ImGui.GetIO();
@@ -267,9 +267,10 @@ internal partial class Editor
 			ImGuiWindowFlags.NoTitleBar |
 			ImGuiWindowFlags.NoMove;
 
-		var windowSize = new System.Numerics.Vector2( 400, 200 );
+		var windowSize = new System.Numerics.Vector2( 600, 400 );
+		var center = (io.DisplaySize - windowSize) / 2.0f;
 		ImGui.SetNextWindowSize( windowSize );
-		ImGui.SetNextWindowPos( (io.DisplaySize - windowSize) / 2.0f );
+		ImGui.SetNextWindowPos( new System.Numerics.Vector2( center.X, 100 ) );
 
 		var switcherItems = new List<(string, string)>();
 		foreach ( var tab in tabs )
@@ -278,17 +279,18 @@ internal partial class Editor
 			if ( editorMenuAttribute == null )
 				continue;
 
-			switcherItems.Add( ("Editor Menu:", editorMenuAttribute.Path) );
+			switcherItems.Add( ("Menu", editorMenuAttribute.Path) );
 		}
 
 		foreach ( var entity in Entity.All )
 		{
-			switcherItems.Add( ("Entity:", entity.Name) );
+			switcherItems.Add( ("Entity", entity.Name) );
 		}
 
-		switcherItems.Add( ("Action:", "Play" ));
-		switcherItems.Add( ("Action:", "Pause" ));
-		switcherItems.Add( ("Action:", "Step" ));
+		foreach ( var asset in AssetsTab.Instance.fileSystemCache )
+		{
+			switcherItems.Add( ("Asset", asset.Item2.NormalizePath()) );
+		}
 
 		if ( ImGui.Begin( "Quick Switcher", windowFlags ) )
 		{
@@ -299,29 +301,101 @@ internal partial class Editor
 			ImGui.InputText( "##quick_switcher_input", ref quickSwitcherInput, 128 );
 			ImGui.BeginChild( "##quick_switcher_wrapper" );
 
+			var selectedItem = ("", "");
+
 			if ( ImGui.BeginTable( "##quick_switcher_table", 1, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 			{
 				ImGui.TableSetupColumn( "Tab", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-				foreach ( var switcherItem in switcherItems )
+				int index = 0;
+
+				for ( int i = 0; i < switcherItems.Count; i++ )
 				{
-					if ( !string.IsNullOrEmpty( quickSwitcherInput ))
+					(string, string) switcherItem = switcherItems[i];
+
+					if ( !string.IsNullOrEmpty( quickSwitcherInput ) )
 					{
-						if ( !switcherItem.Item2.Contains( quickSwitcherInput, StringComparison.CurrentCultureIgnoreCase ) )
+						bool foundAll = true;
+						var inputs = quickSwitcherInput.Split( " " );
+
+						foreach ( var input in inputs )
+							if ( !switcherItem.Item2.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
+								foundAll = false;
+
+						if ( !foundAll )
 							continue;
+					}
+
+					if ( index == selectedQuickSwitcherItem )
+					{
+						var windowPos = ImGui.GetWindowPos();
+						var drawList = ImGui.GetWindowDrawList();
+						var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
+						var startPos = ImGui.GetCursorPos();
+
+						selectedItem = switcherItem;
+
+						drawList.AddRectFilled(
+							windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
+							windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
+							ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+
+						if ( !ImGui.IsRectVisible( windowPos + startPos - scrollPos - new System.Numerics.Vector2( 0, 32 ) ))
+							ImGui.SetScrollHereY();
 					}
 
 					ImGui.TableNextRow();
 					ImGui.TableNextColumn();
 
 					ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
-					ImGui.Text( switcherItem.Item1 );
+					ImGui.Text( $"{switcherItem.Item1}:" );
 					ImGui.PopStyleColor();
 					ImGui.SameLine();
 					ImGui.Text( switcherItem.Item2 );
+
+					index++;
 				}
 
 				ImGui.EndTable();
+			}
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.DownArrow ))
+				selectedQuickSwitcherItem++;
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.UpArrow ) )
+				selectedQuickSwitcherItem--;
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.PageDown ) )
+				selectedQuickSwitcherItem += 10;
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.PageUp ) )
+				selectedQuickSwitcherItem -= 10;
+
+			if ( selectedQuickSwitcherItem < 0 )
+				selectedQuickSwitcherItem = 0;
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.Enter ) )
+			{
+				switch ( selectedItem.Item1 )
+				{
+					case "Asset":
+						ImGui.SetWindowFocus( "Browser" );
+						AssetsTab.Instance.SelectItem( selectedItem.Item2 );
+						ImGui.SetWindowFocus( "Inspector" );
+						break;
+					case "Menu":
+						ImGui.SetWindowFocus( selectedItem.Item2.Split( '/' )[^1] );
+						break;
+					case "Entity":
+						OutlinerTab.Instance.SelectItem( selectedItem.Item2 );
+						break;
+					default:
+						break;
+				}
+
+				selectedQuickSwitcherItem = 0;
+				quickSwitcherInput = "";
+				quickSwitcherVisible = false;
 			}
 
 			ImGui.EndChild();
@@ -357,6 +431,9 @@ internal partial class Editor
 			if ( tab.isVisible )
 				tab.Draw();
 		} );
+
+		if ( Input.Pressed( InputButton.QuickSwitcher ) )
+			quickSwitcherVisible = !quickSwitcherVisible;
 
 		if ( quickSwitcherVisible )
 			DrawQuickSwitcher();
