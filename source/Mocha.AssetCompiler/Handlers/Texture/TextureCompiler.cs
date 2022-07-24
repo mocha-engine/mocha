@@ -3,6 +3,7 @@ using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
 using System.Security.Cryptography;
 using System.Runtime.ExceptionServices;
+using Mocha.Common.Serialization;
 
 namespace Mocha.AssetCompiler;
 

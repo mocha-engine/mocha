@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Mocha.Common.Serialization;
+using System.Net;
 using System.Net.Sockets;
 
 namespace Mocha.Common;
@@ -46,7 +47,8 @@ public class RemoteConsoleClient : RemoteConsoleConnection
 			if ( (DateTime.Now - lastClientKeepAlive).TotalSeconds > 5f )
 			{
 				// Send a keepalive
-				SerializeAndSend<ConsoleKeepalive>( new() );
+				SerializeAndSend<ConsoleKeepalive>( "KEEP", new() );
+				OnLog?.Invoke( ConsoleMessage.CreateGeneric( "Pushing a keepalive from client" ) );
 				lastClientKeepAlive = DateTime.Now;
 			}
 
@@ -59,8 +61,8 @@ public class RemoteConsoleClient : RemoteConsoleConnection
 
 			try
 			{
-				var readCount = stream.Read( buf, 0, buf.Length );
-				while ( tcpClient.Connected && readCount > 0 )
+				int readCount;
+				while ( tcpClient.Connected && (readCount = stream.Read( buf, 0, buf.Length )) > 0 )
 				{
 					var obj = Serializer.Deserialize<ConsolePacket>( buf );
 
@@ -69,10 +71,14 @@ public class RemoteConsoleClient : RemoteConsoleConnection
 						var data = Serializer.Deserialize<ConsoleMessage>( obj.Data );
 						OnLog?.Invoke( data );
 					}
-					else if ( obj.Identifier == "VFCS" )
+					else if ( obj.Identifier == "KEEP" )
 					{
 						var data = Serializer.Deserialize<ConsoleKeepalive>( obj.Data );
 						lastServerKeepAlive = DateTime.Now;
+					}
+					else
+					{
+						throw new Exception( $"Unknown identifier '{obj.Identifier}'" );
 					}
 				}
 			}

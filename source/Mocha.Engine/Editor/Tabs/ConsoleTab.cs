@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using System.Numerics;
 
 namespace Mocha.Engine;
 
@@ -36,31 +35,39 @@ internal class ConsoleTab : BaseTab
 
 			items.Add( new ConsoleItem( color, str ) );
 		};
+
+		isVisible = true;
 	}
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Console", ref visible );
+		ImGui.Begin( "Console", ref isVisible );
 
-		ImGui.PushStyleColor( ImGuiCol.ChildBg, OneDark.Background );
 		ImGui.BeginChild( "logs", new System.Numerics.Vector2( 0, -32 ) );
-		for ( int i = 0; i < items.Count; i++ )
+		if ( ImGui.BeginTable( $"##table_logs", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 		{
-			var line = items[i];
+			ImGui.TableSetupColumn( "Text", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-			ImGui.PushStyleColor( ImGuiCol.Text, line.Color );
-			ImGui.SetCursorPosX( 5 );
-			ImGui.TextWrapped( line.Text );
-			ImGui.PopStyleColor();
+			for ( int i = 0; i < items.Count; i++ )
+			{
+				var line = items[i];
+
+				ImGui.TableNextRow();
+				ImGui.PushStyleColor( ImGuiCol.Text, line.Color );
+				ImGui.TableNextColumn();
+				ImGui.Text( line.Text );
+				ImGui.PopStyleColor();
+			}
+
+			ImGui.EndTable();
 		}
 
 		if ( ImGui.GetScrollY() >= ImGui.GetScrollMaxY() )
 			ImGui.SetScrollHereY( 1.0f );
 
 		ImGui.EndChild();
-		ImGui.PopStyleColor();
 
-		ImGui.SetNextItemWidth( -58 );
+		ImGui.SetNextItemWidth( -68 );
 		ImGui.InputText( "##console_input", ref consoleInput, 512 );
 		ImGui.SameLine();
 

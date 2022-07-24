@@ -1,7 +1,11 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
 
+namespace Mocha.Engine;
+
+[Category( "World" ), Icon( FontAwesome.Globe ), Title( "Sky" )]
 public class Sky : Entity
 {
+	[HideInInspector]
 	public SkySceneObject SceneObject { get; set; }
 	private Material Material { get; set; }
 

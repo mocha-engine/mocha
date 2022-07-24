@@ -14,7 +14,7 @@ internal class TexturesTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Textures", ref visible );
+		ImGui.Begin( "Textures", ref isVisible );
 
 		var textureList = Asset.All.OfType<Texture>().ToList();
 

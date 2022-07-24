@@ -8,11 +8,14 @@ namespace Mocha.Engine;
 internal partial class Editor
 {
 	public static Editor Instance { get; private set; }
-	public bool ShouldRender { get; set; }
+	public bool ShouldRender { get; set; } = true;
 	public static ImFontPtr MonospaceFont { get; private set; }
 	public static ImFontPtr SansSerifFont { get; private set; }
+	public static ImFontPtr BoldFont { get; private set; }
 	public static ImFontPtr HeadingFont { get; private set; }
 	public static ImFontPtr SubheadingFont { get; private set; }
+
+	private Renderer.Texture Logo { get; set; }
 
 	private Renderer.Texture defaultFontTexture;
 	private List<BaseTab> tabs = new();
@@ -34,6 +37,26 @@ internal partial class Editor
 			.Select( x => Activator.CreateInstance( x ) )
 			.OfType<BaseTab>()
 		);
+
+		Logo = TextureBuilder.UITexture.FromPath( "content/logo.png" ).Build();
+	}
+
+	private static void AddIconFont( ImGuiIOPtr io )
+	{
+		unsafe
+		{
+			var iconConfig = ImGuiNative.ImFontConfig_ImFontConfig();
+			iconConfig->MergeMode = 1;
+			iconConfig->GlyphMinAdvanceX = 24.0f;
+
+			var iconRanges = new ushort[] { FontAwesome.IconMin, FontAwesome.IconMax, 0 };
+
+			fixed ( ushort* rangePtr = iconRanges )
+			{
+				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-solid-900.ttf", 12.0f, iconConfig, (IntPtr)rangePtr );
+				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-regular-400.ttf", 12.0f, iconConfig, (IntPtr)rangePtr );
+			}
+		}
 	}
 
 	public static Mocha.Renderer.Texture GenerateFontTexture()
@@ -41,21 +64,34 @@ internal partial class Editor
 		var io = ImGui.GetIO();
 
 		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
+		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
 
 		io.Fonts.Clear();
 
-		var sansSerifFontFile = "content/fonts/Inter-Regular.ttf";
+		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Regular.ttf", 14f );
+		AddIconFont( io );
 
-		SansSerifFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 14f );
-		HeadingFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 24f );
-		SubheadingFont = io.Fonts.AddFontFromFileTTF( sansSerifFontFile, 20f );
+		BoldFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 14f );
+		AddIconFont( io );
+
+		SubheadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Medium.ttf", 20f );
+		AddIconFont( io );
+
+		HeadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 24f );
+		AddIconFont( io );
+
 		MonospaceFont = io.Fonts.AddFontDefault();
 
+		io.Fonts.Build();
 		io.Fonts.GetTexDataAsRGBA32( out IntPtr pixels, out var width, out var height, out var bpp );
 
 		int size = width * height * bpp;
 		byte[] data = new byte[size];
 		Marshal.Copy( pixels, data, 0, size );
+
+		//pinnedIconRanges.Free();
+		//Marshal.FreeHGlobal( iconRangesPtr );
+		//Marshal.FreeHGlobal( configPtr );
 
 		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
 	}
@@ -99,7 +135,7 @@ internal partial class Editor
 	private void DrawPerfOverlay()
 	{
 		var io = ImGui.GetIO();
-		var window_flags = ImGuiWindowFlags.NoDecoration |
+		var windowFlags = ImGuiWindowFlags.NoDecoration |
 			ImGuiWindowFlags.AlwaysAutoResize |
 			ImGuiWindowFlags.NoSavedSettings |
 			ImGuiWindowFlags.NoFocusOnAppearing |
@@ -123,9 +159,9 @@ internal partial class Editor
 		ImGui.SetNextWindowBgAlpha( 0.5f );
 		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 150, 0 ) );
 
-		if ( ImGui.Begin( $"##overlay", window_flags ) )
+		if ( ImGui.Begin( $"##overlay", windowFlags ) )
 		{
-			string total = GC.GetTotalMemory( false ).ToSize( MathExtensions.SizeUnits.MB );
+			string total = GC.GetTotalMemory( false ).ToSize( MathX.SizeUnits.MB );
 
 			ImGui.PushFont( HeadingFont );
 			ImGui.Text( $"{io.Framerate.CeilToInt()}fps" );
@@ -143,12 +179,16 @@ internal partial class Editor
 
 	private void DrawMenuBar()
 	{
+		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
 		ImGui.BeginMainMenuBar();
 
 		ImGui.Dummy( new( 4, 0 ) );
-		ImGui.Text( "Mocha Engine" );
-		ImGui.Dummy( new( 4, 0 ) );
 
+		ImGui.SetCursorPosY( 8 );
+		EditorHelpers.Image( Logo, new Vector2( 32, 32 ) );
+		ImGui.SetCursorPosY( 0 );
+
+		ImGui.Dummy( new( 4, 0 ) );
 		ImGui.Separator();
 		ImGui.Dummy( new( 4, 0 ) );
 
@@ -168,22 +208,131 @@ internal partial class Editor
 					bool active = ImGui.MenuItem( item );
 
 					if ( i == splitPath.Length - 1 && active )
-						tab.visible = !tab.visible;
+						tab.isVisible = !tab.isVisible;
 				}
 
 				ImGui.EndMenu();
 			}
 		}
 
+		ImGui.PopStyleVar();
+
+		//
+		// Buttons
+		//
+		{
+			ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
+			ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
+
+			// Draw play, pause, resume buttons in center
+			var center = ImGui.GetMainViewport().WorkSize.X / 2.0f;
+			center -= 50f; // Approx.
+			ImGui.SetCursorPosX( center );
+			ImGui.SetCursorPosY( 8 );
+			ImGui.Button( FontAwesome.Play, new System.Numerics.Vector2( 0, 32 ) );
+			ImGui.Button( FontAwesome.Pause, new System.Numerics.Vector2( 0, 32 ) );
+			ImGui.Button( FontAwesome.ForwardStep, new System.Numerics.Vector2( 0, 32 ) );
+
+			// Draw on right
+			var right = ImGui.GetMainViewport().WorkSize.X;
+			right -= 42f;
+			ImGui.SetCursorPosX( right );
+			ImGui.SetCursorPosY( 8 );
+
+			if ( ImGui.Button( FontAwesome.MagnifyingGlass, new System.Numerics.Vector2( 0, 32 ) ) )
+			{
+				quickSwitcherVisible = !quickSwitcherVisible;
+				quickSwitcherInput = "";
+			}
+
+			ImGui.PopStyleVar();
+			ImGui.PopStyleColor();
+		}
+
 		ImGui.EndMainMenuBar();
+	}
+
+	bool quickSwitcherVisible = false;
+	string quickSwitcherInput = "";
+
+	private void DrawQuickSwitcher()
+	{
+		var io = ImGui.GetIO();
+		var windowFlags = ImGuiWindowFlags.NoDecoration |
+			ImGuiWindowFlags.AlwaysAutoResize |
+			ImGuiWindowFlags.NoSavedSettings |
+			ImGuiWindowFlags.NoFocusOnAppearing |
+			ImGuiWindowFlags.NoNav |
+			ImGuiWindowFlags.NoInputs |
+			ImGuiWindowFlags.NoTitleBar |
+			ImGuiWindowFlags.NoMove;
+
+		var windowSize = new System.Numerics.Vector2( 400, 200 );
+		ImGui.SetNextWindowSize( windowSize );
+		ImGui.SetNextWindowPos( (io.DisplaySize - windowSize) / 2.0f );
+
+		var switcherItems = new List<(string, string)>();
+		foreach ( var tab in tabs )
+		{
+			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
+			if ( editorMenuAttribute == null )
+				continue;
+
+			switcherItems.Add( ("Editor Menu:", editorMenuAttribute.Path) );
+		}
+
+		foreach ( var entity in Entity.All )
+		{
+			switcherItems.Add( ("Entity:", entity.Name) );
+		}
+
+		switcherItems.Add( ("Action:", "Play" ));
+		switcherItems.Add( ("Action:", "Pause" ));
+		switcherItems.Add( ("Action:", "Step" ));
+
+		if ( ImGui.Begin( "Quick Switcher", windowFlags ) )
+		{
+			if ( !ImGui.IsAnyItemActive() && !ImGui.IsMouseClicked( 0 ) )
+				ImGui.SetKeyboardFocusHere( 0 );
+
+			ImGui.SetNextItemWidth( -1 );
+			ImGui.InputText( "##quick_switcher_input", ref quickSwitcherInput, 128 );
+			ImGui.BeginChild( "##quick_switcher_wrapper" );
+
+			if ( ImGui.BeginTable( "##quick_switcher_table", 1, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+			{
+				ImGui.TableSetupColumn( "Tab", ImGuiTableColumnFlags.WidthStretch, 1f );
+
+				foreach ( var switcherItem in switcherItems )
+				{
+					if ( !string.IsNullOrEmpty( quickSwitcherInput ))
+					{
+						if ( !switcherItem.Item2.Contains( quickSwitcherInput, StringComparison.CurrentCultureIgnoreCase ) )
+							continue;
+					}
+
+					ImGui.TableNextRow();
+					ImGui.TableNextColumn();
+
+					ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+					ImGui.Text( switcherItem.Item1 );
+					ImGui.PopStyleColor();
+					ImGui.SameLine();
+					ImGui.Text( switcherItem.Item2 );
+				}
+
+				ImGui.EndTable();
+			}
+
+			ImGui.EndChild();
+			ImGui.End();
+		}
 	}
 
 	public void Update()
 	{
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			ShouldRender = !ShouldRender;
-
-		DrawPerfOverlay();
 
 		Input.MouseMode = ShouldRender switch
 		{
@@ -194,19 +343,23 @@ internal partial class Editor
 		Notify.Draw();
 
 		if ( !ShouldRender )
+		{
+			DrawPerfOverlay();
 			return;
+		}
 
 		Gizmos.Draw();
-
+		EditorHelpers.DockSpaceOverViewport();
 		DrawMenuBar();
-
-		ImGui.DockSpaceOverViewport( ImGui.GetMainViewport(), ImGuiDockNodeFlags.PassthruCentralNode );
 
 		tabs.ForEach( tab =>
 		{
-			if ( tab.visible )
+			if ( tab.isVisible )
 				tab.Draw();
 		} );
+
+		if ( quickSwitcherVisible )
+			DrawQuickSwitcher();
 	}
 }
 

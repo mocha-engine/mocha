@@ -2,9 +2,6 @@
 
 namespace Mocha.Common;
 
-/// <summary>
-/// Handles all debug logging functionality.
-/// </summary>
 public class Logger
 {
 	public enum Level
@@ -15,14 +12,14 @@ public class Logger
 		Error
 	};
 
-	public void Trace( object obj ) => Log( obj?.ToString(), Level.Trace );
-	public void Info( object obj ) => Log( obj?.ToString(), Level.Info );
-	public void Warning( object obj ) => Log( obj?.ToString(), Level.Warning );
-	public void Error( object obj ) => Log( obj?.ToString(), Level.Error );
+	public void Trace( object obj ) => InternalLog( obj?.ToString(), Level.Trace );
+	public void Info( object obj ) => InternalLog( obj?.ToString(), Level.Info );
+	public void Warning( object obj ) => InternalLog( obj?.ToString(), Level.Warning );
+	public void Error( object obj ) => InternalLog( obj?.ToString(), Level.Error );
 
 	public static Action<Level, string, StackTrace> OnLog;
 
-	private static void Log( string? str, Level severity = Level.Trace )
+	private static void InternalLog( string? str, Level severity = Level.Trace )
 	{
 		if ( str == null )
 			return;
@@ -32,8 +29,15 @@ public class Logger
 			throw new Exception( str );
 #endif
 
+		Console.Write( $"[{DateTime.Now.ToLongTimeString()}] " );
+
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
-		Console.WriteLine( $"[{DateTime.Now.ToLongTimeString()}] {str}" );
+		Console.Write( $"[{severity}] " );
+		Console.ForegroundColor = ConsoleColor.Gray;
+
+		Console.Write( $"{str}" );
+
+		Console.Write( $"\n" );
 
 		var stackTrace = new System.Diagnostics.StackTrace();
 		OnLog?.Invoke( severity, str, stackTrace );

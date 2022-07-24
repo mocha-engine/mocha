@@ -1,4 +1,5 @@
-﻿using StbImageSharp;
+﻿using Mocha.Common.Serialization;
+using StbImageSharp;
 using System.Runtime.InteropServices;
 
 namespace Mocha.Renderer;
@@ -66,8 +67,8 @@ public partial class TextureBuilder
 				var mipData = data[i];
 				var mipDataPtr = Marshal.AllocHGlobal( mipData.Length );
 
-				int mipWidth = Mips.CalcSize( (int)width, i );
-				int mipHeight = Mips.CalcSize( (int)height, i );
+				int mipWidth = MathX.CalcMipSize( (int)width, i );
+				int mipHeight = MathX.CalcMipSize( (int)height, i );
 
 				Marshal.Copy( mipData, 0, mipDataPtr, mipData.Length );
 				Device.UpdateTexture( texture,

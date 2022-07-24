@@ -34,9 +34,4 @@ public class RemoteConsoleServer : RemoteConsoleConnection
 			}
 		}
 	}
-
-	public override void ConnectionStarted()
-	{
-		Log.Trace( "Connected to remote console instance" );
-	}
 }
