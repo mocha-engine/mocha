@@ -47,3 +47,11 @@ public static class ListExtension
 		list.Add( item );
 	}
 }
+
+public static class StringExtension
+{
+	public static string NormalizePath( this string str )
+	{
+		return str.Replace( "\\", "/" );
+	}
+}
