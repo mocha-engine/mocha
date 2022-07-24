@@ -2,11 +2,11 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( "ImGUI/Demo Window" )]
+[EditorMenu( $"{FontAwesome.VectorSquare} Editor UI/Demo Window" )]
 internal class DemoTab : BaseTab
 {
-    public override void Draw()
-    {
-        ImGui.ShowDemoWindow( ref isVisible );
-    }
+	public override void Draw()
+	{
+		ImGui.ShowDemoWindow( ref isVisible );
+	}
 }

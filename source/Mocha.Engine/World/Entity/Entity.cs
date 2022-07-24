@@ -62,6 +62,9 @@ public class Entity : IEntity
 	[HideInInspector]
 	public List<Entity> Children => Entity.All.Where( x => x.parentId == Id ).ToList();
 
+	[HideInInspector]
+	public bool Visible { get; set; } = true;
+
 	public void SetParent( Entity newParent )
 	{
 		newParent.parentId = newParent.Id;

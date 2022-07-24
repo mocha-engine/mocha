@@ -14,6 +14,10 @@ public class SceneWorld
 
 	public void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList )
 	{
-		SceneObject.All.ForEach( sceneObject => sceneObject.Render( viewProjMatrix, renderPass, commandList ) );
+		SceneObject.All.ForEach( sceneObject =>
+		{
+			if ( sceneObject.Entity.Visible )
+				sceneObject.Render( viewProjMatrix, renderPass, commandList );
+		} );
 	}
 }

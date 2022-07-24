@@ -4,12 +4,10 @@ using System.Reflection;
 
 namespace Mocha.Engine;
 
-[EditorMenu( "Scene/Outliner" )]
+[EditorMenu( $"{FontAwesome.Globe} World/Outliner" )]
 internal class OutlinerTab : BaseTab
 {
 	public static OutlinerTab Instance { get; set; }
-
-	internal Entity? selectedEntity;
 
 	public OutlinerTab()
 	{
@@ -17,9 +15,14 @@ internal class OutlinerTab : BaseTab
 		isVisible = true;
 	}
 
+	public void SelectItem( string name )
+	{
+		InspectorTab.SetSelectedObject( Entity.All.First( x => x.Name == name ) );
+	}
+
 	public override void Draw()
 	{
-		ImGui.Begin( "Outliner", ref isVisible );
+		ImGui.Begin( "Outliner" );
 
 		//
 		// Hierarchy
@@ -27,30 +30,64 @@ internal class OutlinerTab : BaseTab
 		{
 			var groupedEntities = Entity.All.GroupBy( x => x.GetType().GetCustomAttribute<CategoryAttribute>() );
 
+			EditorHelpers.Title(
+				  $"{FontAwesome.Globe} World",
+				"This is where all your entities live."
+			);
+
 			foreach ( var group in groupedEntities )
 			{
-				if ( ImGui.CollapsingHeader( $"{group.Key?.Category ?? "Uncategorised"}" ) )
+				string icon = FontAwesome.Question;
+
+				switch ( group.Key.Category )
 				{
-					if ( ImGui.BeginTable( $"##table_entities", 1, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+					case "Player":
+						icon = FontAwesome.User;
+						break;
+					case "World":
+						icon = FontAwesome.Globe;
+						break;
+				}
+
+				EditorHelpers.TextBold( $"{icon} {group.Key?.Category ?? "Uncategorised"}" );
+
+				{
+					if ( ImGui.BeginTable( $"##table_entities", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 					{
 						ImGui.TableSetupColumn( "Entity", ImGuiTableColumnFlags.WidthStretch, 1f );
+						ImGui.TableSetupColumn( "Visibility", ImGuiTableColumnFlags.WidthFixed, 32 );
 
 						foreach ( var entity in group )
 						{
 							ImGui.TableNextRow();
 							ImGui.TableNextColumn();
 
-							var str = $"{EditorHelpers.GetTypeIcon( entity.GetType() )} {entity.Name}";
+							var str = $"{entity.Name}";
 
 							if ( ImGui.Selectable( str ) )
 							{
-								selectedEntity = entity;
+								SelectItem( str );
 							}
+
+							ImGui.TableNextColumn();
+
+							ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
+							ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
+
+							if ( ImGui.SmallButton( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash ))
+							{
+								entity.Visible = !entity.Visible;
+							}
+
+							ImGui.PopStyleColor();
+							ImGui.PopStyleVar();
 						}
 
 						ImGui.EndTable();
 					}
 				}
+
+				EditorHelpers.Separator();
 			}
 		}
 
