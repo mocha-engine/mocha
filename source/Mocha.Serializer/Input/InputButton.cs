@@ -6,5 +6,6 @@ public enum InputButton
 	RotateLeft,
 	RotateRight,
 	Jump,
-	Sprint
+	Sprint,
+	QuickSwitcher
 }
