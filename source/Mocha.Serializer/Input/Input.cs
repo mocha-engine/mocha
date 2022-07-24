@@ -1,4 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
+using System.Text;
 using Veldrid.Sdl2;
 
 namespace Mocha.Common;
@@ -38,6 +39,7 @@ public static partial class Input
 		Snapshot.KeysDown = lastKeysDown.ToList();
 		Snapshot.LastKeysDown = lastKeysDown;
 		Snapshot.MouseDelta = Vector2.Zero;
+		Snapshot.WheelDelta = 0;
 
 		Sdl2Native.SDL_PumpEvents();
 
@@ -81,9 +83,13 @@ public static partial class Input
 					veldridMouseEvents.RemoveAll( x => x.MouseButton == veldridButton );
 					veldridMouseEvents.Add( mbeVeldrid );
 					break;
+				case SDL_EventType.MouseWheel:
+					SDL_MouseWheelEvent mwe = Unsafe.Read<SDL_MouseWheelEvent>( &e );
+					Snapshot.WheelDelta = mwe.y;
+
+					break;
 				case SDL_EventType.KeyDown:
 				case SDL_EventType.KeyUp:
-
 					SDL_KeyboardEvent kbe = Unsafe.Read<SDL_KeyboardEvent>( &e );
 					bool isKeyDown = (kbe.type == SDL_EventType.KeyDown);
 
@@ -102,6 +108,29 @@ public static partial class Input
 					var kbeVeldrid = new Veldrid.KeyEvent( veldridKey, isKeyDown, veldridModifiers );
 
 					veldridKeyEvents.Add( kbeVeldrid );
+
+					break;
+
+				case SDL_EventType.TextInput:
+					SDL_TextInputEvent tie = Unsafe.Read<SDL_TextInputEvent>( &e );
+
+					uint byteCount = 0;
+					// Loop until the null terminator is found or the max size is reached.
+					while ( byteCount < SDL_TextInputEvent.MaxTextSize && tie.text[byteCount++] != 0 )
+					{ }
+
+					if ( byteCount > 1 )
+					{
+						// We don't want the null terminator.
+						byteCount -= 1;
+						int charCount = Encoding.UTF8.GetCharCount( tie.text, (int)byteCount );
+						char* charsPtr = stackalloc char[charCount];
+						Encoding.UTF8.GetChars( tie.text, (int)byteCount, charsPtr, charCount );
+						for ( int i = 0; i < charCount; i++ )
+						{
+							keyCharPresses.Add( charsPtr[i] );
+						}
+					}
 
 					break;
 
@@ -148,6 +177,10 @@ public static partial class Input
 
 		if ( MouseMode == MouseModes.Unlocked )
 		{
+			Snapshot.Forward = 0;
+			Snapshot.Left = 0;
+			Snapshot.Up = 0;
+
 			Snapshot.MouseDelta = Vector2.Zero;
 			Snapshot.MouseLeft = false;
 			Snapshot.MouseRight = false;
@@ -177,6 +210,7 @@ public static partial class Input
 		InputButton.RotateRight => SDL_Keycode.SDLK_RIGHT,
 		InputButton.Jump => SDL_Keycode.SDLK_SPACE,
 		InputButton.Sprint => SDL_Keycode.SDLK_LSHIFT,
+		InputButton.QuickSwitcher => SDL_Keycode.SDLK_F2,
 
 		_ => SDL_Keycode.SDLK_UNKNOWN
 	};
