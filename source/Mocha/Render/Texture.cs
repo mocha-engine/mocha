@@ -24,4 +24,12 @@ public class Texture : Asset
 
 		All.Add( this );
 	}
+
+	public void Delete()
+	{
+		Asset.All.Remove( this );
+
+		VeldridTexture.Dispose();
+		VeldridTextureView.Dispose();
+	}
 }

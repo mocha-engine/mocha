@@ -64,11 +64,13 @@ public partial class TextureBuilder
 		{
 			for ( int i = 0; i < mipCount; i++ )
 			{
-				var mipData = data[i];
+				int mip = i;
+
+				var mipData = data[mip];
 				var mipDataPtr = Marshal.AllocHGlobal( mipData.Length );
 
-				int mipWidth = MathX.CalcMipSize( (int)width, i );
-				int mipHeight = MathX.CalcMipSize( (int)height, i );
+				int mipWidth = MathX.CalcMipSize( (int)width, mip );
+				int mipHeight = MathX.CalcMipSize( (int)height, mip );
 
 				Marshal.Copy( mipData, 0, mipDataPtr, mipData.Length );
 				Device.UpdateTexture( texture,
