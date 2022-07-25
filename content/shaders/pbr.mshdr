@@ -236,8 +236,10 @@ void main()
     fragColor.xyz = ReinhardJodie( fragColor.xyz );
     // fragColor.xyz *= pow( 2, 0.5 );
 
+    fragColor.xyz = color;
+
     // Gamma correction
-    fragColor.xyz = 1.0 - exp( -4.0 * fragColor.xyz );
+    fragColor.xyz = 1.0 - exp( -1.0 * fragColor.xyz );
     fragColor.rgb = pow( fragColor.rgb, 1 / vec3( 2.2 ) );
 }
 #endif
