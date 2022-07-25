@@ -109,6 +109,11 @@ internal class AssetsTab : BaseTab
 			var model = Primitives.MochaModel.GenerateModels( name );
 			InspectorTab.SetSelectedObject( model );
 		}
+		else if ( name.EndsWith( "mmat"))
+		{
+			var material = Material.FromMochaMaterial( name );
+			InspectorTab.SetSelectedObject( material );
+		}
 	}
 
 	string assetSearchText = "";
@@ -176,6 +181,20 @@ internal class AssetsTab : BaseTab
 				var item = fileSystemCache[i];
 				Texture icon = item.Item1;
 				string name = item.Item2;
+
+				if ( !string.IsNullOrEmpty( assetSearchText ) )
+				{
+					bool foundAll = true;
+					var inputs = assetSearchText.Split( " " );
+
+					foreach ( var input in inputs )
+						if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
+							foundAll = false;
+
+					if ( !foundAll )
+						continue;
+				}
+
 
 				var startPos = new System.Numerics.Vector2( x, y );
 

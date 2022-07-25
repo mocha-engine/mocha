@@ -15,29 +15,29 @@ public static class Serializer
 		return serializeOptions;
 	}
 
-	public static byte[] Serialize<T>(T obj)
+	public static byte[] Serialize<T>( T obj )
 	{
 		using var stream = new MemoryStream();
-		using var deflate = new DeflateStream(stream, CompressionLevel.Fastest);
+		using var deflate = new DeflateStream( stream, CompressionLevel.Fastest );
 
-		var serialized = JsonSerializer.SerializeToUtf8Bytes(obj, CreateSerializerOptions());
+		var serialized = JsonSerializer.SerializeToUtf8Bytes( obj, CreateSerializerOptions() );
 
-		deflate.Write(serialized);
+		deflate.Write( serialized );
 		deflate.Close();
 
 		return stream.ToArray();
 	}
 
-	public static T Deserialize<T>(byte[] serialized)
+	public static T Deserialize<T>( byte[] serialized )
 	{
 		using var outputStream = new MemoryStream();
 
-		using (var compressStream = new MemoryStream(serialized))
+		using ( var compressStream = new MemoryStream( serialized ) )
 		{
-			using var deflateStream = new DeflateStream(compressStream, CompressionMode.Decompress);
-			deflateStream.CopyTo(outputStream);
+			using var deflateStream = new DeflateStream( compressStream, CompressionMode.Decompress );
+			deflateStream.CopyTo( outputStream );
 		}
 
-		return JsonSerializer.Deserialize<T>(outputStream.ToArray(), CreateSerializerOptions());
+		return JsonSerializer.Deserialize<T>( outputStream.ToArray(), CreateSerializerOptions() );
 	}
 }

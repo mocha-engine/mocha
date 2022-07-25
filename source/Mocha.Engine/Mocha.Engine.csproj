@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<ApplicationIcon>mocha.ico</ApplicationIcon>
+		<ApplicationIcon>logo.ico</ApplicationIcon>
 		<DebugSymbols>true</DebugSymbols>
 	</PropertyGroup>
 
@@ -23,7 +23,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="mocha.ico" />
+		<Content Include="logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

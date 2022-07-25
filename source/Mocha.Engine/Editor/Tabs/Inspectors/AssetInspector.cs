@@ -2,11 +2,11 @@
 
 namespace Mocha.Engine;
 
-public class AssetInspector : BaseInspector
+public class TextureInspector : BaseInspector
 {
 	private Texture texture;
 
-	public AssetInspector( Texture texture )
+	public TextureInspector( Texture texture )
 	{
 		this.texture = texture;
 	}
