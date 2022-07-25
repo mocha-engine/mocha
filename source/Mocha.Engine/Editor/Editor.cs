@@ -429,6 +429,7 @@ internal partial class Editor
 		if ( !ShouldRender )
 		{
 			DrawPerfOverlay();
+			SceneWorld.Current.Camera.UpdateAspect( Window.Current.Size );
 			return;
 		}
 

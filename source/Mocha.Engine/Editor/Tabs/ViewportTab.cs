@@ -17,6 +17,8 @@ internal class ViewportTab : BaseTab
 		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 16, 42 );
 		EditorHelpers.Image( SceneWorld.Current.Camera.ColorTexture, windowSize );
 
+		SceneWorld.Current.Camera.UpdateAspect( new Point2( (int)windowSize.X, (int)windowSize.Y ) );
+
 		ImGui.End();
 	}
 }
