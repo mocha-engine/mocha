@@ -35,7 +35,7 @@ public class World
 
 		_ = new ModelEntity( "content/models/dev/dev.mmdl" )
 		{
-			//rotation = new Vector3( 90, 0, 0 ),
+			Rotation = Rotation.From( 0, 0, 90 ),
 			Scale = new Vector3( 0.025f )
 		};
 	}
