@@ -101,6 +101,19 @@ public class EntityInspector : BaseInspector
 				$"This is a {entity.GetType().Name} entity."
 			);
 
+			var windowPos = ImGui.GetWindowPos();
+			var windowWidth = ImGui.GetWindowSize().X;
+
+			var startPos = ImGui.GetCursorPos();
+			ImGui.SetCursorPos( new System.Numerics.Vector2( windowWidth - 56, 32 ) );
+
+			if ( ImGui.Button( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash, new System.Numerics.Vector2( 0, 56 ) ) )
+			{
+				entity.Visible = !entity.Visible;
+			}
+
+			ImGui.SetCursorPos( startPos );
+
 			foreach ( var group in selectedEntityType.GetMembers()
 				.Where( x => x.GetCustomAttribute<HideInInspectorAttribute>() == null )
 				.Where( x => x.MemberType == MemberTypes.Field || x.MemberType == MemberTypes.Property )
