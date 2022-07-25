@@ -77,6 +77,7 @@ public partial class Primitives
 					indices.Add( binaryReader.ReadUInt32() );
 				}
 
+				// TODO make all paths relative
 				var material = Material.FromMochaMaterial( materialPath );
 				models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
 			}
