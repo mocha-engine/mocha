@@ -153,26 +153,30 @@ internal partial class Editor
 		windowPivot.X = 0.0f;
 		windowPivot.Y = 0.0f;
 
+		ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 0 );
+		ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
 		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
 		ImGui.SetNextWindowBgAlpha( 0.5f );
-		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 150, 0 ) );
+		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 125, 0 ) );
 
 		if ( ImGui.Begin( $"##overlay", windowFlags ) )
 		{
 			string total = GC.GetTotalMemory( false ).ToSize( MathX.SizeUnits.MB );
 
-			ImGui.PushFont( HeadingFont );
+			ImGui.PushFont( Editor.SubheadingFont );
 			ImGui.Text( $"{io.Framerate.CeilToInt()}fps" );
 			ImGui.PopFont();
 
-			ImGui.PushFont( SubheadingFont );
+			ImGui.PushFont( Editor.BoldFont );
 			ImGui.Text( $"{total} total" );
 			ImGui.PopFont();
+
+			ImGui.Text( "F1 for editor" );
+
+			ImGui.End();
 		}
 
-		ImGui.Text( $"Running for {Time.Now:0}s" );
-		ImGui.Text( $"Frame time {Time.Delta:0.0000}s" );
-		ImGui.End();
+		ImGui.PopStyleVar( 2 );
 	}
 
 	private void DrawMenuBar()
@@ -257,6 +261,12 @@ internal partial class Editor
 	// TODO: Refactor
 	private void DrawQuickSwitcher()
 	{
+		if ( Input.Pressed( InputButton.QuickSwitcher ) )
+			quickSwitcherVisible = !quickSwitcherVisible;
+
+		if ( !quickSwitcherVisible )
+			return;
+
 		var io = ImGui.GetIO();
 		var windowFlags = ImGuiWindowFlags.NoDecoration |
 			ImGuiWindowFlags.AlwaysAutoResize |
@@ -340,7 +350,7 @@ internal partial class Editor
 							windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
 							ImGui.GetColorU32( OneDark.Info * 0.75f ) );
 
-						if ( !ImGui.IsRectVisible( windowPos + startPos - scrollPos - new System.Numerics.Vector2( 0, 32 ) ))
+						if ( !ImGui.IsRectVisible( windowPos + startPos - scrollPos - new System.Numerics.Vector2( 0, 32 ) ) )
 							ImGui.SetScrollHereY();
 					}
 
@@ -359,7 +369,7 @@ internal partial class Editor
 				ImGui.EndTable();
 			}
 
-			if ( ImGui.IsKeyPressed( ImGuiKey.DownArrow ))
+			if ( ImGui.IsKeyPressed( ImGuiKey.DownArrow ) )
 				selectedQuickSwitcherItem++;
 
 			if ( ImGui.IsKeyPressed( ImGuiKey.UpArrow ) )
@@ -423,20 +433,17 @@ internal partial class Editor
 		}
 
 		Gizmos.Draw();
+
 		EditorHelpers.DockSpaceOverViewport();
+
 		DrawMenuBar();
+		DrawQuickSwitcher();
 
 		tabs.ForEach( tab =>
 		{
 			if ( tab.isVisible )
 				tab.Draw();
 		} );
-
-		if ( Input.Pressed( InputButton.QuickSwitcher ) )
-			quickSwitcherVisible = !quickSwitcherVisible;
-
-		if ( quickSwitcherVisible )
-			DrawQuickSwitcher();
 	}
 }
 
