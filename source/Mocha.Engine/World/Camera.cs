@@ -58,7 +58,7 @@ public class Camera : Entity
 		Rotation = Rotation.From( targetEuler.X, targetEuler.Y, targetEuler.Z );
 
 		float t = velocity.WithZ( 0 ).Length.LerpInverse( 0, 50 );
-		wishFov = 60f.LerpTo( 90f, t );
+		wishFov = 90f.LerpTo( 100f, t );
 
 		//
 		// Apply everything
