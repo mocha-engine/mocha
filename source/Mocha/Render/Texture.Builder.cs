@@ -22,6 +22,8 @@ public partial class TextureBuilder
 	private int mipCount = 1;
 	private PixelFormat compressionFormat;
 
+	private bool ignoreCache;
+
 	public TextureBuilder()
 	{
 		path = GetHashCode().ToString();
@@ -46,7 +48,7 @@ public partial class TextureBuilder
 
 	public Texture Build()
 	{
-		if ( TryGetExistingTexture( path, out var existingTexture ) )
+		if ( TryGetExistingTexture( path, out var existingTexture ) && !ignoreCache )
 			return existingTexture;
 
 		var textureDescription = TextureDescription.Texture2D(
@@ -151,6 +153,13 @@ public partial class TextureBuilder
 		this.width = width;
 		this.height = height;
 		this.path = $"{GetHashCode()}";
+
+		return this;
+	}
+
+	public TextureBuilder IgnoreCache( bool ignoreCache = true )
+	{
+		this.ignoreCache = ignoreCache;
 
 		return this;
 	}

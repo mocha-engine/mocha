@@ -12,7 +12,7 @@ public class Model
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
 
-	public Material Material { get; private set; }
+	public Material Material { get; set; }
 	private Material DepthOnlyMaterial { get; set; }
 
 	private ResourceSet objectResourceSet;
