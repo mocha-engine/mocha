@@ -177,7 +177,7 @@ internal partial class Editor
 
 	private void DrawMenuBar()
 	{
-		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#141417" ) );
+		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#000000" ) );
 		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
 		ImGui.BeginMainMenuBar();
 

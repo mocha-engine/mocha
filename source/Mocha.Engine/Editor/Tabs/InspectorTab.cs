@@ -15,11 +15,13 @@ internal class InspectorTab : BaseTab
 		if ( obj is Entity entity )
 			Instance.Inspector = new EntityInspector( entity );
 		else if ( obj is Texture texture )
-			Instance.Inspector = new AssetInspector( texture );
+			Instance.Inspector = new TextureInspector( texture );
 		else if ( obj is Shader shader )
 			Instance.Inspector = new ShaderInspector( shader );
 		else if ( obj is List<Model> model )
 			Instance.Inspector = new ModelInspector( model.First() );
+		else if ( obj is Material material )
+			Instance.Inspector = new MaterialInspector( material );
 	}
 
 	public InspectorTab()

@@ -17,8 +17,8 @@ partial class Editor
 		colors[(int)ImGuiCol.FrameBg] = new( 0.10f, 0.11f, 0.11f, 1.00f );
 		colors[(int)ImGuiCol.FrameBgHovered] = new( 0.19f, 0.19f, 0.19f, 0.54f );
 		colors[(int)ImGuiCol.FrameBgActive] = new( 0.20f, 0.22f, 0.23f, 1.00f );
-		colors[(int)ImGuiCol.TitleBg] = new( 0.08f, 0.08f, 0.09f, 1.00f );
-		colors[(int)ImGuiCol.TitleBgActive] = new( 0.06f, 0.06f, 0.06f, 1.00f );
+		colors[(int)ImGuiCol.TitleBg] = new( 0.0f, 0.0f, 0.0f, 1.00f );
+		colors[(int)ImGuiCol.TitleBgActive] = new( 0.00f, 0.00f, 0.00f, 1.00f );
 		colors[(int)ImGuiCol.TitleBgCollapsed] = new( 0.00f, 0.00f, 0.00f, 1.00f );
 		colors[(int)ImGuiCol.MenuBarBg] = new( 0.14f, 0.14f, 0.14f, 1.00f );
 		colors[(int)ImGuiCol.ScrollbarBg] = new( 0.05f, 0.05f, 0.05f, 0.54f );
@@ -34,7 +34,7 @@ partial class Editor
 		colors[(int)ImGuiCol.Header] = new( 0.00f, 0.00f, 0.00f, 0.52f );
 		colors[(int)ImGuiCol.HeaderHovered] = new( 0.00f, 0.00f, 0.00f, 0.36f );
 		colors[(int)ImGuiCol.HeaderActive] = new( 0.20f, 0.22f, 0.23f, 0.33f );
-		colors[(int)ImGuiCol.Separator] = new( 0.28f, 0.28f, 0.28f, 0.29f );
+		colors[(int)ImGuiCol.Separator] = new( 0.0f, 0.0f, 0.0f, 1.0f );
 		colors[(int)ImGuiCol.SeparatorHovered] = new( 0.44f, 0.44f, 0.44f, 0.29f );
 		colors[(int)ImGuiCol.SeparatorActive] = new( 0.40f, 0.44f, 0.47f, 1.00f );
 		colors[(int)ImGuiCol.ResizeGrip] = new( 0.28f, 0.28f, 0.28f, 0.29f );
@@ -71,8 +71,8 @@ partial class Editor
 		style.ItemInnerSpacing = new( 2.00f, 2.00f );
 		style.TouchExtraPadding = new( 0.00f, 0.00f );
 		style.IndentSpacing = 25;
-		style.ScrollbarSize = 10;
-		style.GrabMinSize = 10;
+		style.ScrollbarSize = 12;
+		style.GrabMinSize = 12;
 		style.WindowBorderSize = 1;
 		style.ChildBorderSize = 0;
 		style.PopupBorderSize = 0;

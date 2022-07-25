@@ -45,7 +45,9 @@ internal static class EditorHelpers
 	public static void Separator()
 	{
 		ImGui.Dummy( new( 0, 4 ) );
+		ImGui.PushStyleColor( ImGuiCol.Separator, new System.Numerics.Vector4( 0.28f, 0.28f, 0.28f, 0.29f ) );
 		ImGui.Separator();
+		ImGui.PopStyleColor();
 		ImGui.Dummy( new( 0, 4 ) );
 	}
 
@@ -191,9 +193,14 @@ internal static class EditorHelpers
 		if ( ImGui.Begin( "DockSpaceViewport_main", flags ) )
 		{
 			var dockspaceId = ImGui.GetID( "DockSpace" );
-			ImGui.DockSpace( dockspaceId, new System.Numerics.Vector2( 0, 0 ), ImGuiDockNodeFlags.PassthruCentralNode );
+			ImGui.DockSpace( dockspaceId, new System.Numerics.Vector2( 0, 0 ), 
+				ImGuiDockNodeFlags.PassthruCentralNode );
+
 			ImGui.End();
 		}
+
+		var io = ImGui.GetIO();
+		io.ConfigDockingAlwaysTabBar = true;
 
 		ImGui.PopStyleVar( 3 );
 	}
