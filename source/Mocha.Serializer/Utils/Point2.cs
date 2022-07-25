@@ -29,4 +29,9 @@ public struct Point2
 	{
 
 	}
+
+	public override string ToString()
+	{
+		return $"{X}, {Y}";
+	}
 }
