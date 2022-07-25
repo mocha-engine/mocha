@@ -18,6 +18,8 @@
     </p>
 </p>
 
+![image](https://user-images.githubusercontent.com/12881812/180680088-de6053d1-c8d2-43b8-b193-8387eb03e710.png)
+
 ## Building
 
 ### Prerequisites
