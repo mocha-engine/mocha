@@ -50,8 +50,6 @@ partial class Primitives
 			List<VertexInfo> vertices = new List<VertexInfo>();
 			List<uint> indices = new List<uint>();
 
-			var material = new Material();
-
 			for ( int i = 0; i < mesh.VertexCount; ++i )
 			{
 				var vertex = new VertexInfo()
@@ -88,15 +86,15 @@ partial class Primitives
 				}
 			}
 
+			string material = "";
+
 			if ( mesh.MaterialIndex >= 0 )
 			{
 				var assimpMaterial = scene.Materials[mesh.MaterialIndex];
 
-				material.DiffuseTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
-				material.SpecularTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Specular, "texture_specular", directory );
-				material.NormalTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Normals, "texture_normal", directory );
-				material.EmissiveTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Emissive, "texture_emissive", directory );
-				material.ORMTexturePath = GetMaterialTexture( assimpMaterial, TextureType.Unknown, "texture_unknown", directory );
+				material = GetMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
+				material = Path.ChangeExtension( material, "mmat" );
+				material = material.Replace( "textures", "materials" ); // HACK
 			}
 
 			return new Model( vertices.ToArray(), indices.ToArray(), material );
@@ -106,7 +104,7 @@ partial class Primitives
 		{
 			if ( material.GetMaterialTexture( textureType, 0, out var textureSlot ) )
 			{
-				return Path.Join( directory, textureSlot.FilePath );
+				return textureSlot.FilePath;
 			}
 			else
 			{

@@ -2,12 +2,12 @@
 using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
 using System.Security.Cryptography;
-using System.Runtime.ExceptionServices;
 using Mocha.Common.Serialization;
 
 namespace Mocha.AssetCompiler;
 
-public class TextureCompiler
+[Handles( new[] { ".png", ".jpg" } )]
+public class TextureCompiler : BaseCompiler
 {
 	private static byte[] BlockCompression( byte[] data, int width, int height, int mip, CompressionFormat compressionFormat )
 	{
@@ -21,7 +21,7 @@ public class TextureCompiler
 		return encoder.EncodeToRawBytes( data, width, height, PixelFormat.Rgba32, mip, out _, out _ );
 	}
 
-	public static string CompileFile( string path )
+	public override string CompileFile( string path )
 	{
 		Console.WriteLine( $"[TEXTURE]\t{path}" );
 
@@ -31,6 +31,23 @@ public class TextureCompiler
 		// Load image
 		var fileData = File.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
+
+		// TODO: Move to a nice generic function somewhere
+		if ( File.Exists( destFileName ) )
+		{
+			// Read mocha file
+			var existingFile = File.ReadAllBytes( destFileName );
+			var deserializedFile = Serializer.Deserialize<MochaFile<TextureInfo>>( existingFile );
+
+			using var md5 = MD5.Create();
+			var computedHash = md5.ComputeHash( fileData );
+			if ( Enumerable.SequenceEqual( deserializedFile.AssetHash, computedHash ) )
+			{
+				Console.WriteLine( "Compiled ver matches existing file; skipping..." );
+
+				return destFileName;
+			}
+		}
 
 		textureFormat.Width = (uint)image.Width;
 		textureFormat.Height = (uint)image.Height;

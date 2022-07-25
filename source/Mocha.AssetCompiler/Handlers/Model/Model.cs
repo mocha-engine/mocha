@@ -4,10 +4,10 @@ public class Model
 {
 	public VertexInfo[] Vertices { get; set; }
 	public uint[] Indices { get; set; }
-	public Material Material { get; private set; }
+	public string Material { get; private set; }
 	public bool IsIndexed { get; set; }
 
-	public Model( VertexInfo[] vertices, uint[] indices, Material material )
+	public Model( VertexInfo[] vertices, uint[] indices, string material )
 	{
 		Vertices = vertices;
 		Indices = indices;
@@ -15,7 +15,7 @@ public class Model
 		IsIndexed = true;
 	}
 
-	public Model( VertexInfo[] vertices, Material material )
+	public Model( VertexInfo[] vertices, string material )
 	{
 		Vertices = vertices;
 		Material = material;

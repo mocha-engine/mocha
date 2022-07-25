@@ -29,24 +29,7 @@ public partial class Primitives
 			{
 				binaryReader.ReadChars( 4 ); // MTRL
 
-				var material = new Material
-				{
-					Shader = ShaderBuilder.Default
-										  .FromMoyaiShader( "content/shaders/pbr.mshdr" )
-										  .Build(),
-					UniformBufferType = typeof( GenericModelUniformBuffer )
-				};
-
-				var baseTexture = binaryReader.ReadString();
-				binaryReader.ReadString();
-				binaryReader.ReadString();
-				binaryReader.ReadString();
-				binaryReader.ReadString();
-
-				material.DiffuseTexture = LoadMaterialTexture( "BaseColor", baseTexture );
-				material.AlphaTexture = LoadMaterialTexture( "Mask", baseTexture );
-				material.NormalTexture = LoadMaterialTexture( "Normal", baseTexture );
-				material.ORMTexture = LoadMaterialTexture( "Metalness", baseTexture );
+				var materialPath = binaryReader.ReadString();
 
 				binaryReader.ReadChars( 4 ); // VRTX
 
@@ -94,8 +77,8 @@ public partial class Primitives
 					indices.Add( binaryReader.ReadUInt32() );
 				}
 
-				if ( material.AlphaTexture == null ) // TODO: Alpha support
-					models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
+				var material = Material.FromMochaMaterial( materialPath );
+				models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
 			}
 
 			return models;
