@@ -13,6 +13,7 @@ internal class AssetsTab : BaseTab
 	private Texture ImageTexture { get; }
 	private Texture ModelTexture { get; }
 	private Texture SoundTexture { get; }
+	private Texture MaterialTexture { get; }
 
 	private int selectedIndex;
 
@@ -45,6 +46,7 @@ internal class AssetsTab : BaseTab
 		ImageTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Image.mtex" ).Build();
 		ModelTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Model.mtex" ).Build();
 		SoundTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Sound.mtex" ).Build();
+		MaterialTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Material.mtex" ).Build();
 
 		fileSystemCache = new();
 		iconCache = new();
@@ -61,6 +63,8 @@ internal class AssetsTab : BaseTab
 					icon = ModelTexture;
 				else if ( file.EndsWith( "mshdr" ) )
 					icon = DocumentTexture;
+				else if ( file.EndsWith( "mmat" ) )
+					icon = MaterialTexture;
 
 				fileSystemCache.Add( (icon, file) );
 			}
@@ -109,7 +113,7 @@ internal class AssetsTab : BaseTab
 			var model = Primitives.MochaModel.GenerateModels( name );
 			InspectorTab.SetSelectedObject( model );
 		}
-		else if ( name.EndsWith( "mmat"))
+		else if ( name.EndsWith( "mmat" ) )
 		{
 			var material = Material.FromMochaMaterial( name );
 			InspectorTab.SetSelectedObject( material );
