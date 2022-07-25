@@ -8,14 +8,6 @@
         <a href="https://github.com/xezno/mocha/issues">Issues</a> |
         <a href="https://github.com/xezno/mocha/pulls">Pull Requests</a>
     </p>
-    <p align="center">
-        <img src="https://img.shields.io/github/repo-size/xezno/mocha?style=flat-square" alt="Repo Size">
-        <img src="https://img.shields.io/github/contributors/xezno/mocha?style=flat-square" alt="Contributors">
-        <img src="https://img.shields.io/github/stars/xezno/mocha?style=flat-square" alt="Stars"> 
-        <img src="https://img.shields.io/github/forks/xezno/mocha?style=flat-square" alt="Forks">
-        <img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License">
-        <img src="https://img.shields.io/github/issues/xezno/mocha?style=flat-square" alt="Issues">
-    </p>
 </p>
 
 ![image](https://user-images.githubusercontent.com/12881812/180680088-de6053d1-c8d2-43b8-b193-8387eb03e710.png)
