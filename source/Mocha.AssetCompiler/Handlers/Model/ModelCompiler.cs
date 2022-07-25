@@ -1,8 +1,9 @@
 ﻿namespace Mocha.AssetCompiler;
 
-public class ModelCompiler
+[Handles( new[] { ".fbx", ".obj", ".gltf" } )]
+public class ModelCompiler : BaseCompiler
 {
-	public static string CompileFile( string path )
+	public override string CompileFile( string path )
 	{
 		var destFileName = Path.ChangeExtension( path, "mmdl" );
 		Console.WriteLine( $"[MODEL]\t{path}" );
@@ -33,11 +34,7 @@ public class ModelCompiler
 			//
 			binaryWriter.Write( new char[] { 'M', 'T', 'R', 'L' } );
 
-			binaryWriter.Write( mesh.Material.DiffuseTexturePath );
-			binaryWriter.Write( mesh.Material.SpecularTexturePath );
-			binaryWriter.Write( mesh.Material.NormalTexturePath );
-			binaryWriter.Write( mesh.Material.EmissiveTexturePath );
-			binaryWriter.Write( mesh.Material.ORMTexturePath );
+			binaryWriter.Write( mesh.Material );
 
 			//
 			// Vertex chunk

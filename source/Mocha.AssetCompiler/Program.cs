@@ -1,15 +1,23 @@
 ﻿global using Mocha.Common;
+using System.Reflection;
 
 namespace Mocha.AssetCompiler;
 
 public static class Program
 {
+	private static List<BaseCompiler> Compilers = new();
+
 	public static void Main( string[] args )
 	{
 		if ( args.Length == 0 )
 		{
 			Console.WriteLine( "Expected filename" );
 			return;
+		}
+
+		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes().Where( x => x.BaseType == typeof( BaseCompiler ) ) )
+		{
+			Compilers.Add( Activator.CreateInstance( type ) as BaseCompiler );
 		}
 
 		var path = args[0];
@@ -63,15 +71,26 @@ public static class Program
 		}
 	}
 
+	private static bool GetCompiler( string fileExtension, out BaseCompiler foundCompiler )
+	{
+		foreach ( var compiler in Compilers )
+		{
+			if ( compiler.GetType().GetCustomAttribute<HandlesAttribute>()?.Extensions?.Contains( fileExtension ) ?? false )
+			{
+				foundCompiler = compiler;
+				return true;
+			}
+		}
+
+		foundCompiler = null;
+		return false;
+	}
+
 	private static void QueueFile( ref List<string> queue, string fileName )
 	{
 		var fileExtension = Path.GetExtension( fileName );
 
-		if ( fileExtension == ".fbx" )
-		{
-			queue.Add( fileName );
-		}
-		else if ( fileExtension == ".png" )
+		if ( GetCompiler( fileExtension, out var _ ) )
 		{
 			queue.Add( fileName );
 		}
@@ -85,16 +104,12 @@ public static class Program
 	{
 		var fileExtension = Path.GetExtension( fileName );
 
-		if ( fileExtension == ".fbx" )
+		// TODO: Check if we have an original asset & if it needs recompiling
+
+		if ( GetCompiler( fileExtension, out var compiler ) )
 		{
-			// Check if we have an original asset & if it needs recompiling
-			var destFile = ModelCompiler.CompileFile( fileName );
-			Console.WriteLine( $"[MODEL OK]\t{destFile}" );
-		}
-		else if ( fileExtension == ".png" )
-		{
-			var destFile = TextureCompiler.CompileFile( fileName );
-			Console.WriteLine( $"[TEXTURE OK]\t{destFile}" );
+			var destFile = compiler.CompileFile( fileName );
+			Console.WriteLine( $"[OK]\t\t{destFile}" );
 		}
 	}
 }
