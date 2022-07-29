@@ -10,9 +10,9 @@ public class ModelSceneObject : SceneObject
     {
         get
         {
-            var matrix = Matrix4x4.CreateScale( Entity.Transform.Scale );
+            var matrix = Matrix4x4.CreateFromQuaternion( Entity.Transform.Rotation.GetSystemQuaternion() );
+            matrix *= Matrix4x4.CreateScale( Entity.Transform.Scale );
             matrix *= Matrix4x4.CreateTranslation( Entity.Transform.Position );
-            matrix *= Matrix4x4.CreateFromQuaternion( Entity.Transform.Rotation.GetSystemQuaternion() );
             return matrix;
         }
     }

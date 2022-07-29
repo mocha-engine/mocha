@@ -229,14 +229,48 @@ internal partial class Editor
 			ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
 			ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
 
-			// Draw play, pause, resume buttons in center
+			// Draw play, pause in center
 			var center = ImGui.GetMainViewport().WorkSize.X / 2.0f;
-			center -= 50f; // Approx.
+			center -= 40f; // Approx.
 			ImGui.SetCursorPosX( center );
 			ImGui.SetCursorPosY( 8 );
-			ImGui.Button( FontAwesome.Play, new System.Numerics.Vector2( 0, 32 ) );
-			ImGui.Button( FontAwesome.Pause, new System.Numerics.Vector2( 0, 32 ) );
-			ImGui.Button( FontAwesome.ForwardStep, new System.Numerics.Vector2( 0, 32 ) );
+
+			void DrawButtonUnderline()
+			{
+				var drawList = ImGui.GetWindowDrawList();
+				var buttonCol = ImGui.GetColorU32( OneDark.Info );
+
+				var p0 = ImGui.GetCursorPos() + new System.Numerics.Vector2( 0, 32 );
+				var p1 = p0 + new System.Numerics.Vector2( 32, 4 );
+				drawList.AddRectFilled( p0, p1, buttonCol, 4f );
+			}
+
+
+			//
+			// Play button
+			//
+			{
+				if ( World.Current.State == World.States.Playing )
+				{
+					DrawButtonUnderline();
+				}
+
+				if ( ImGui.Button( FontAwesome.Play, new System.Numerics.Vector2( 0, 32 ) ) )
+					World.Current.State = World.States.Playing;
+			}
+
+			//
+			// Pause button
+			//
+			{
+				if ( World.Current.State == World.States.Paused )
+				{
+					DrawButtonUnderline();
+				}
+
+				if ( ImGui.Button( FontAwesome.Pause, new System.Numerics.Vector2( 0, 32 ) ) )
+					World.Current.State = World.States.Paused;
+			}
 
 			// Draw on right
 			var right = ImGui.GetMainViewport().WorkSize.X;
@@ -420,6 +454,14 @@ internal partial class Editor
 	{
 		if ( Input.Pressed( InputButton.ConsoleToggle ) )
 			ShouldRender = !ShouldRender;
+
+		if ( Input.Pressed( InputButton.SwitchMode ) )
+		{
+			if ( World.Current.State == World.States.Playing )
+				World.Current.State = World.States.Paused;
+			else if ( World.Current.State == World.States.Paused )
+				World.Current.State = World.States.Playing;
+		}
 
 		Input.MouseMode = ShouldRender switch
 		{

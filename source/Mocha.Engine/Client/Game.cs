@@ -6,7 +6,10 @@
 internal class Game
 {
 	private RendererInstance renderer;
+
+#if DEBUG
 	private Editor editor;
+#endif
 
 	internal Game()
 	{
@@ -32,7 +35,9 @@ internal class Game
 					stackTrace.GetFrames().Select( x => x.ToString() ).ToArray() );
 			};
 
+#if DEBUG
 			editor = new( renderer );
+#endif
 
 			var world = new World();
 
@@ -41,8 +46,10 @@ internal class Game
 
 			renderer.OnUpdate += world.Update;
 
+#if DEBUG
 			// Must be called after everything else
 			renderer.PostUpdate += editor.Update;
+#endif
 		}
 
 		renderer.Run();
