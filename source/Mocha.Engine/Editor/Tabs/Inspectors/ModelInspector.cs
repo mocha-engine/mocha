@@ -1,4 +1,6 @@
-﻿namespace Mocha.Engine;
+﻿using ImGuiNET;
+
+namespace Mocha.Engine;
 
 public class ModelInspector : BaseInspector
 {
@@ -25,12 +27,6 @@ public class ModelInspector : BaseInspector
 			( "Uses indices?", $"{model.IsIndexed}" )
 		};
 
-		EditorHelpers.TextBold( $"{FontAwesome.Cube} Model" );
-
-		DrawTable( items );
-
-		EditorHelpers.Separator();
-
-		DrawButtons( Path.GetFullPath( model.Path ) );
+		DrawProperties( $"{FontAwesome.Cube} Model", items, model.Path );
 	}
 }

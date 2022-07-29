@@ -266,11 +266,13 @@ internal static class EditorHelpers
 
 	public static bool MenuItem( string icon, string text, string shortcut = "ALT+F4" )
 	{
+		SetCursorPosYRelative( -4 );
+
 		var drawList = ImGui.GetForegroundDrawList();
 		var windowPos = ImGui.GetWindowPos();
 		var windowSize = ImGui.GetWindowSize();
 
-		var padding = new System.Numerics.Vector2( 16, 8 );
+		var padding = new System.Numerics.Vector2( 8, 8 );
 
 		var size = new System.Numerics.Vector2( windowSize.X - (padding.X + 16), ImGui.CalcTextSize( text ).Y ) + padding;
 		bool result = ImGui.InvisibleButton( $"##menu_{text}", size );
@@ -296,7 +298,7 @@ internal static class EditorHelpers
 		SetCursorPosYRelative( -4 );
 
 		ImGui.SameLine();
-		ImGui.SetCursorPosX( 175 );
+		ImGui.SetCursorPosX( 185 );
 		ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 1, 1, 1, 0.5f ) );
 		ImGui.Text( shortcut );
 		ImGui.PopStyleColor();
