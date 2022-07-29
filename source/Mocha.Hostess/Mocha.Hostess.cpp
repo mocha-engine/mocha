@@ -39,36 +39,36 @@ int __cdecl wmain(int argc, wchar_t* argv[])
 	// Load HostFxr and get exported hosting functions
 	if (!load_hostfxr())
 	{
-		assert(false && "Failure: load_hostfxr()");
+		assert(false && "Failed to load hostfxr");
 		return EXIT_FAILURE;
 	}
 
 	// Initialize and start the .NET Core runtime
-	const string_t config_path = root_path + STR("\\source\\Mocha.Script\\bin\\Debug\\net6.0\\Mocha.Script.runtimeconfig.json");
+	const string_t config_path = root_path + STR("Mocha\\source\\Mocha.Engine\\bin\\Debug\\net6.0\\Mocha.Engine.runtimeconfig.json");
 	load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer = nullptr;
 	load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
 	assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
 
 	// Load managed assembly and get function pointer to a managed method
-	const string_t dotnetlib_path = root_path + STR("\\source\\Mocha.Script\\bin\\Debug\\net6.0\\Mocha.Script.dll");
-	const char_t* dotnet_type = STR("Mocha.Script.Program, Mocha.Script");
-	const char_t* dotnet_type_method = STR("Hello");
+	const string_t dotnetlib_path = root_path + STR("Mocha\\source\\Mocha.Engine\\bin\\Debug\\net6.0\\Mocha.Engine.dll");
+	const char_t* dotnet_type = STR("Mocha.Engine.Program, Mocha.Engine");
+	const char_t* dotnet_type_method = STR("Program");
 
 	// Function pointer to managed delegate with non-default signature
-	typedef void (CORECLR_DELEGATE_CALLTYPE* custom_entry_point_fn)(int number);
-	custom_entry_point_fn hello_world_fn = nullptr;
+	typedef void (CORECLR_DELEGATE_CALLTYPE* custom_entry_point_fn)(void);
+	custom_entry_point_fn main_fn = nullptr;
 	int rc = load_assembly_and_get_function_pointer(
 		dotnetlib_path.c_str(),
 		dotnet_type,
-		STR("CustomEntryPointUnmanaged") /*method_name*/,
+		STR("HostedMain") /*method_name*/,
 		UNMANAGEDCALLERSONLY_METHOD,
 		nullptr,
-		(void**)&hello_world_fn);
+		(void**)&main_fn);
 
-	assert(rc == 0 && hello_world_fn != nullptr && "Failure: load_assembly_and_get_function_pointer()");
+	assert(rc == 0 && main_fn != nullptr && "Failed to locate function or assembly");
 
-	// Call managed function with a parameter
-	hello_world_fn(42);
+	std::cout << "=== Running thru Mocha.Hostess ===" << std::endl;
+	main_fn();
 
 	return EXIT_SUCCESS;
 }
