@@ -36,31 +36,32 @@ internal class ViewportTab : BaseTab
 		ImGui.Begin( "Viewport" );
 
 		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 16, 42 );
-		EditorHelpers.Image( SceneWorld.Current.Camera.ColorTexture, windowSize );
+		var tint = (World.Current.State == World.States.Paused) ? new Vector4( 0.5f, 0.5f, 0.5f, 1.0f ) : Vector4.One;
+		EditorHelpers.Image( SceneWorld.Current.Camera.ColorTexture, windowSize, tint );
 
 		SceneWorld.Current.Camera.UpdateAspect( new Point2( (int)windowSize.X, (int)windowSize.Y ) );
 
-		ImGui.SetCursorPos( new Vector2( 24, 48 ) );
+		//ImGui.SetCursorPos( new Vector2( 24, 48 ) );
 
-		DrawWidgetBar( new[] {
-			FontAwesome.ArrowsUpDownLeftRight,
-			FontAwesome.Rotate,
-			FontAwesome.Maximize
-		} );
+		//DrawWidgetBar( new[] {
+		//	FontAwesome.ArrowsUpDownLeftRight,
+		//	FontAwesome.Rotate,
+		//	FontAwesome.Maximize
+		//} );
 
-		ImGui.SameLine();
+		//ImGui.SameLine();
 
-		DrawWidgetBar( new[] {
-			FontAwesome.BorderAll,
-			"  1  "
-		} );
+		//DrawWidgetBar( new[] {
+		//	FontAwesome.BorderAll,
+		//	"  1  "
+		//} );
 
-		ImGui.SameLine();
+		//ImGui.SameLine();
 
-		DrawWidgetBar( new[] {
-			FontAwesome.Globe,
-			FontAwesome.Cubes,
-		} );
+		//DrawWidgetBar( new[] {
+		//	FontAwesome.Globe,
+		//	FontAwesome.Cubes,
+		//} );
 
 		ImGui.End();
 	}

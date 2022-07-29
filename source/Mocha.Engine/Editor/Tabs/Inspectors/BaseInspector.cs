@@ -15,13 +15,12 @@ public class BaseInspector
 	{
 		ImGui.BeginListBox( "##inspector_table", new( -1, items.Length * 32 ) );
 
-		EditorHelpers.TextBold( $"{FontAwesome.Glasses} Shader" );
+		EditorHelpers.TextBold( title );
 		DrawTable( items );
 
 		ImGui.EndListBox();
 
 		EditorHelpers.Separator();
-
 		DrawButtons( filePath );
 	}
 

@@ -42,6 +42,15 @@ internal static class EditorHelpers
 			new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ) );
 	}
 
+	public static void Image( Texture texture, Vector2 size, Vector4 tint )
+	{
+		var texPtr = Editor.Instance.Renderer.GetImGuiBinding( texture );
+
+		ImGui.Image( texPtr, size,
+			new System.Numerics.Vector2( 0, 0 ), new System.Numerics.Vector2( 1, 1 ),
+			tint );
+	}
+
 	public static void Separator()
 	{
 		ImGui.Dummy( new( 0, 4 ) );
