@@ -32,12 +32,6 @@ public class TextureInspector : BaseInspector
 			( "Format", $"{texture.VeldridTexture.Format}" )
 		};
 
-		EditorHelpers.TextBold( $"{FontAwesome.Image} Texture" );
-
-		DrawTable( items );
-
-		EditorHelpers.Separator();
-
-		DrawButtons( Path.GetFullPath( texture.Path ) );
+		DrawProperties( $"{FontAwesome.Image} Texture", items, texture.Path );
 	}
 }

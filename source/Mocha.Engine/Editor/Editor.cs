@@ -313,7 +313,7 @@ internal partial class Editor
 
 			ImGui.SetNextItemWidth( -1 );
 			ImGui.InputText( "##quick_switcher_input", ref quickSwitcherInput, 128 );
-			ImGui.BeginChild( "##quick_switcher_wrapper" );
+			ImGui.BeginListBox( "##quick_switcher_wrapper", new System.Numerics.Vector2( -1, -1 ) );
 
 			var selectedItem = ("", "");
 
@@ -354,8 +354,7 @@ internal partial class Editor
 							windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
 							ImGui.GetColorU32( OneDark.Info * 0.75f ) );
 
-						if ( !ImGui.IsRectVisible( windowPos + startPos - scrollPos - new System.Numerics.Vector2( 0, 32 ) ) )
-							ImGui.SetScrollHereY();
+						ImGui.SetScrollHereY();
 					}
 
 					ImGui.TableNextRow();
@@ -412,7 +411,7 @@ internal partial class Editor
 				quickSwitcherVisible = false;
 			}
 
-			ImGui.EndChild();
+			ImGui.EndListBox();
 			ImGui.End();
 		}
 	}
