@@ -23,7 +23,7 @@ internal static class EditorHelpers
 	public static void ApplyPadding()
 	{
 		var padding = new System.Numerics.Vector2( 4, 2 );
-		ImGui.SetCursorPos( ImGui.GetCursorPos() + padding );
+		SetCursorPosRelative( padding );
 	}
 
 	public static bool ImageButton( Texture texture, Vector2 size )
@@ -193,7 +193,7 @@ internal static class EditorHelpers
 		if ( ImGui.Begin( "DockSpaceViewport_main", flags ) )
 		{
 			var dockspaceId = ImGui.GetID( "DockSpace" );
-			ImGui.DockSpace( dockspaceId, new System.Numerics.Vector2( 0, 0 ), 
+			ImGui.DockSpace( dockspaceId, new System.Numerics.Vector2( 0, 0 ),
 				ImGuiDockNodeFlags.PassthruCentralNode );
 
 			ImGui.End();
@@ -235,6 +235,82 @@ internal static class EditorHelpers
 		TextSubheading( text );
 		TextLight( subtext );
 
-		EditorHelpers.Separator();
+		Separator();
+	}
+
+	public static void SetCursorPosXRelative( float relativePos )
+	{
+		ImGui.SetCursorPosX( ImGui.GetCursorPosX() + relativePos );
+	}
+
+	public static void SetCursorPosYRelative( float relativePos )
+	{
+		ImGui.SetCursorPosY( ImGui.GetCursorPosY() + relativePos );
+	}
+
+	public static void SetCursorPosRelative( System.Numerics.Vector2 relativePos )
+	{
+		ImGui.SetCursorPos( ImGui.GetCursorPos() + relativePos );
+	}
+
+	public static List<string> MenusSubmittedThisFrame { get; } = new();
+
+	public static bool BeginMenu( string name )
+	{
+		SetCursorPosXRelative( 4 );
+		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 250, -1 ) );
+		bool result = ImGui.BeginMenu( name );
+
+		return result;
+	}
+
+	public static bool MenuItem( string icon, string text, string shortcut = "ALT+F4" )
+	{
+		var drawList = ImGui.GetForegroundDrawList();
+		var windowPos = ImGui.GetWindowPos();
+		var windowSize = ImGui.GetWindowSize();
+
+		var padding = new System.Numerics.Vector2( 16, 8 );
+
+		var size = new System.Numerics.Vector2( windowSize.X - (padding.X + 16), ImGui.CalcTextSize( text ).Y ) + padding;
+		bool result = ImGui.InvisibleButton( $"##menu_{text}", size );
+		SetCursorPosYRelative( -size.Y );
+
+		var p0 = ImGui.GetCursorPos() + windowPos - new System.Numerics.Vector2( 0, 2 );
+		var p1 = p0 + size + new System.Numerics.Vector2( 0, 4 );
+
+		uint col = ImGui.GetColorU32( new System.Numerics.Vector4( 0, 0, 0, 0.1f ) );
+
+		if ( ImGui.IsItemHovered() )
+			drawList.AddRectFilled( p0, p1, col );
+
+		SetCursorPosXRelative( padding.X * 0.5f );
+
+		ImGui.PushFont( Editor.SubheadingFont );
+		ImGui.Text( icon );
+		ImGui.SameLine();
+		ImGui.PopFont();
+
+		SetCursorPosYRelative( 4 );
+		ImGui.Text( text );
+		SetCursorPosYRelative( -4 );
+
+		ImGui.SameLine();
+		ImGui.SetCursorPosX( 175 );
+		ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 1, 1, 1, 0.5f ) );
+		ImGui.Text( shortcut );
+		ImGui.PopStyleColor();
+
+		if ( result )
+		{
+			ImGui.CloseCurrentPopup();
+		}
+
+		return result;
+	}
+
+	public static void EndMenu()
+	{
+		ImGui.EndMenu();
 	}
 }

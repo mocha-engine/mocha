@@ -181,6 +181,8 @@ internal partial class Editor
 
 	private void DrawMenuBar()
 	{
+		EditorHelpers.MenusSubmittedThisFrame.Clear();
+
 		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#000000" ) );
 		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
 		ImGui.BeginMainMenuBar();
@@ -201,18 +203,20 @@ internal partial class Editor
 
 			var splitPath = editorMenuAttribute.Path.Split( '/' );
 
-			if ( ImGui.BeginMenu( splitPath[0] ) )
+			if ( EditorHelpers.BeginMenu( splitPath[0] ) )
 			{
 				for ( int i = 1; i < splitPath.Length; i++ )
 				{
-					string? item = splitPath[i];
-					bool active = ImGui.MenuItem( item );
+					string item = splitPath[i];
+					var icon = splitPath[0][0].ToString();
+					var name = item;
+					bool active = EditorHelpers.MenuItem( icon, name );
 
 					if ( i == splitPath.Length - 1 && active )
 						tab.isVisible = !tab.isVisible;
 				}
 
-				ImGui.EndMenu();
+				EditorHelpers.EndMenu();
 			}
 		}
 
