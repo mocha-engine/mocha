@@ -22,6 +22,9 @@ public struct Material
 		{
 			Path = path,
 			DiffuseTexture = TextureBuilder.Default.FromMochaTexture( materialFormat.Data.DiffuseTexture ).Build(),
+			AlphaTexture = TextureBuilder.One,
+			NormalTexture = TextureBuilder.Zero,
+			ORMTexture = TextureBuilder.One,
 			UniformBufferType = typeof( GenericModelUniformBuffer ),
 			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/pbr.mshdr" ).Build()
 		};
