@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Folder} Assets/Browser" )]
+[EditorMenu( FontAwesome.Folder, $"{FontAwesome.Gamepad} Game/Browser" )]
 internal class AssetsTab : BaseTab
 {
 	public static AssetsTab Instance { get; set; }

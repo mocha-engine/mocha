@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Globe} World/Inspector" )]
+[EditorMenu( FontAwesome.List, $"{FontAwesome.Gamepad} Game/Inspector" )]
 internal class InspectorTab : BaseTab
 {
 	private static InspectorTab Instance { get; set; }

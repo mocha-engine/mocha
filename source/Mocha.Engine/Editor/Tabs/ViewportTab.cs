@@ -2,33 +2,12 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Gamepad} Game/Viewport" )]
+[EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gamepad} Game/Game View" )]
 internal class ViewportTab : BaseTab
 {
 	public ViewportTab()
 	{
 		isVisible = true;
-	}
-
-	private void DrawWidgetBar( string[] icons )
-	{
-		var drawList = ImGui.GetWindowDrawList();
-		var windowPos = ImGui.GetWindowPos();
-
-		var padding = new System.Numerics.Vector2( 16, 16 );
-
-		var p0 = windowPos + ImGui.GetCursorPos() - (padding * 0.5f);
-		var p1 = p0 + ImGui.CalcTextSize( String.Join( "     ", icons ) ) + (padding);
-		var col = ImGui.GetColorU32( ImGuiCol.WindowBg );
-		drawList.AddRectFilled( p0, p1, col, 5f );
-
-		var p2 = p0 + ImGui.CalcTextSize( icons[0] ) + padding;
-		var col1 = ImGui.GetColorU32( ImGuiCol.Button );
-		drawList.AddRectFilled( p0, p2, col1, 4f );
-
-		ImGui.Text( String.Join( "     ", icons ) );
-		ImGui.SameLine();
-		ImGui.Dummy( padding );
 	}
 
 	public override void Draw()
@@ -41,27 +20,25 @@ internal class ViewportTab : BaseTab
 
 		SceneWorld.Current.Camera.UpdateAspect( new Point2( (int)windowSize.X, (int)windowSize.Y ) );
 
-		//ImGui.SetCursorPos( new Vector2( 24, 48 ) );
+		if ( World.Current.State == World.States.Paused )
+		{
+			ImGui.PushFont( Editor.HeadingFont );
 
-		//DrawWidgetBar( new[] {
-		//	FontAwesome.ArrowsUpDownLeftRight,
-		//	FontAwesome.Rotate,
-		//	FontAwesome.Maximize
-		//} );
+			var drawList = ImGui.GetWindowDrawList();
+			var center = ImGui.GetWindowPos() + (windowSize / 2.0f) + new System.Numerics.Vector2( 0, 32 );
 
-		//ImGui.SameLine();
+			var text = $"{FontAwesome.Pause} Game paused.";
+			var textSize = ImGui.CalcTextSize( text );
+			var textCol = ImGui.GetColorU32( ImGuiCol.Text );
 
-		//DrawWidgetBar( new[] {
-		//	FontAwesome.BorderAll,
-		//	"  1  "
-		//} );
+			var padding = new System.Numerics.Vector2( 32, 16 );
+			var bgCol = ImGui.GetColorU32( ImGuiCol.WindowBg, 0.5f );
+			drawList.AddRectFilled( center - (textSize / 2.0f) - padding, center + (textSize / 2.0f) + padding, bgCol, 5f );
 
-		//ImGui.SameLine();
+			drawList.AddText( center - (textSize / 2.0f), textCol, text );
 
-		//DrawWidgetBar( new[] {
-		//	FontAwesome.Globe,
-		//	FontAwesome.Cubes,
-		//} );
+			ImGui.PopFont();
+		}
 
 		ImGui.End();
 	}

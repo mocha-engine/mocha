@@ -42,20 +42,20 @@ internal partial class Editor
 		Logo = TextureBuilder.UITexture.FromPath( "content/logo.png" ).Build();
 	}
 
-	private static void AddIconFont( ImGuiIOPtr io )
+	private static void AddIconFont( ImGuiIOPtr io, float fontSize )
 	{
 		unsafe
 		{
 			var iconConfig = ImGuiNative.ImFontConfig_ImFontConfig();
 			iconConfig->MergeMode = 1;
-			iconConfig->GlyphMinAdvanceX = 24.0f;
+			iconConfig->GlyphMinAdvanceX = fontSize * 2.0f;
 
 			var iconRanges = new ushort[] { FontAwesome.IconMin, FontAwesome.IconMax, 0 };
 
 			fixed ( ushort* rangePtr = iconRanges )
 			{
-				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-solid-900.ttf", 12.0f, iconConfig, (IntPtr)rangePtr );
-				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-regular-400.ttf", 12.0f, iconConfig, (IntPtr)rangePtr );
+				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-solid-900.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
+				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-regular-400.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
 			}
 		}
 	}
@@ -64,23 +64,19 @@ internal partial class Editor
 	{
 		var io = ImGui.GetIO();
 
-		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
-		io.ConfigDockingWithShift = true;
-		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
-
 		io.Fonts.Clear();
 
 		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Regular.ttf", 14f );
-		AddIconFont( io );
+		AddIconFont( io, 12f );
 
 		BoldFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 14f );
-		AddIconFont( io );
+		AddIconFont( io, 12f );
 
 		SubheadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Medium.ttf", 20f );
-		AddIconFont( io );
+		AddIconFont( io, 16f );
 
 		HeadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 24f );
-		AddIconFont( io );
+		AddIconFont( io, 20f );
 
 		MonospaceFont = io.Fonts.AddFontDefault();
 
@@ -120,6 +116,11 @@ internal partial class Editor
 	public void Init()
 	{
 		var io = ImGui.GetIO();
+
+		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
+		io.ConfigDockingWithShift = true;
+
+		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
 
 		var editorFontTexture = GenerateFontTexture();
 		var imguiBinding = Renderer.GetImGuiBinding( editorFontTexture );
@@ -192,8 +193,16 @@ internal partial class Editor
 		ImGui.SetCursorPosY( 8 );
 		EditorHelpers.Image( Logo, new Vector2( 32, 32 ) );
 		ImGui.SetCursorPosY( 0 );
-
 		ImGui.Dummy( new( 4, 0 ) );
+
+		if ( EditorHelpers.BeginMenu( $"{FontAwesome.Toolbox} Tools" ) )
+		{
+			EditorHelpers.MenuItem( FontAwesome.Image, "Texture Tool" );
+			EditorHelpers.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
+			EditorHelpers.MenuItem( FontAwesome.Cubes, "Model Tool" );
+			EditorHelpers.MenuItem( FontAwesome.Glasses, "Shader Tool" );
+			EditorHelpers.EndMenu();
+		}
 
 		foreach ( var tab in tabs )
 		{
@@ -202,15 +211,16 @@ internal partial class Editor
 				continue;
 
 			var splitPath = editorMenuAttribute.Path.Split( '/' );
+			var icon = editorMenuAttribute.Icon;
 
 			if ( EditorHelpers.BeginMenu( splitPath[0] ) )
 			{
 				for ( int i = 1; i < splitPath.Length; i++ )
 				{
-					string item = splitPath[i];
-					var icon = splitPath[0][0].ToString();
+					var item = splitPath[i];
 					var name = item;
-					bool active = EditorHelpers.MenuItem( icon, name );
+					var enabled = tab.isVisible;
+					bool active = EditorHelpers.MenuItem( icon, name, enabled );
 
 					if ( i == splitPath.Length - 1 && active )
 						tab.isVisible = !tab.isVisible;
@@ -245,7 +255,6 @@ internal partial class Editor
 				drawList.AddRectFilled( p0, p1, buttonCol, 4f );
 			}
 
-
 			//
 			// Play button
 			//
@@ -272,6 +281,14 @@ internal partial class Editor
 					World.Current.State = World.States.Paused;
 			}
 
+			//
+			// Restart button
+			//
+			{
+				if ( ImGui.Button( FontAwesome.Rotate, new System.Numerics.Vector2( 0, 32 ) ) )
+					World.Current.ResetWorld();
+			}
+
 			// Draw on right
 			var right = ImGui.GetMainViewport().WorkSize.X;
 			right -= 42f;
@@ -295,6 +312,8 @@ internal partial class Editor
 	bool quickSwitcherVisible = false;
 	string quickSwitcherInput = "";
 	int selectedQuickSwitcherItem = 0;
+	bool quickSwitcherUsingKeyboard = false;
+	Vector2 lastMousePos = default;
 
 	// TODO: Refactor
 	private void DrawQuickSwitcher()
@@ -346,7 +365,9 @@ internal partial class Editor
 				ImGui.SetKeyboardFocusHere( 0 );
 
 			ImGui.SetNextItemWidth( -1 );
-			ImGui.InputText( "##quick_switcher_input", ref quickSwitcherInput, 128 );
+			if ( ImGui.InputText( "##quick_switcher_input", ref quickSwitcherInput, 128 ) )
+				quickSwitcherUsingKeyboard = true;
+
 			ImGui.BeginListBox( "##quick_switcher_wrapper", new System.Numerics.Vector2( -1, -1 ) );
 
 			var selectedItem = ("", "");
@@ -374,21 +395,25 @@ internal partial class Editor
 							continue;
 					}
 
-					if ( index == selectedQuickSwitcherItem )
+					var startPos = ImGui.GetCursorPos();
+
+					if ( quickSwitcherUsingKeyboard )
 					{
-						var windowPos = ImGui.GetWindowPos();
-						var drawList = ImGui.GetWindowDrawList();
-						var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
-						var startPos = ImGui.GetCursorPos();
+						if ( index == selectedQuickSwitcherItem )
+						{
+							var windowPos = ImGui.GetWindowPos();
+							var drawList = ImGui.GetWindowDrawList();
+							var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
 
-						selectedItem = switcherItem;
+							selectedItem = switcherItem;
 
-						drawList.AddRectFilled(
-							windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
-							windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
-							ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+							drawList.AddRectFilled(
+								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
+								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
+								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
 
-						ImGui.SetScrollHereY();
+							ImGui.SetScrollHereY();
+						}
 					}
 
 					ImGui.TableNextRow();
@@ -399,6 +424,23 @@ internal partial class Editor
 					ImGui.PopStyleColor();
 					ImGui.SameLine();
 					ImGui.Text( switcherItem.Item2 );
+
+					if ( !quickSwitcherUsingKeyboard )
+					{
+						if ( ImGui.IsItemHovered() )
+						{
+							var windowPos = ImGui.GetWindowPos();
+							var drawList = ImGui.GetWindowDrawList();
+							var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
+
+							selectedItem = switcherItem;
+
+							drawList.AddRectFilled(
+								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
+								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
+								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+						}
+					}
 
 					index++;
 				}
@@ -421,7 +463,15 @@ internal partial class Editor
 			if ( selectedQuickSwitcherItem < 0 )
 				selectedQuickSwitcherItem = 0;
 
-			if ( ImGui.IsKeyPressed( ImGuiKey.Enter ) )
+			var mousePos = new Vector2( ImGui.GetMousePos() );
+			var mouseDelta = (mousePos - lastMousePos).Length;
+
+			if ( mouseDelta > 1.0f )
+				quickSwitcherUsingKeyboard = false;
+
+			lastMousePos = mousePos;
+
+			if ( ImGui.IsKeyPressed( ImGuiKey.Enter ) || ImGui.IsMouseClicked( ImGuiMouseButton.Left ) )
 			{
 				switch ( selectedItem.Item1 )
 				{
