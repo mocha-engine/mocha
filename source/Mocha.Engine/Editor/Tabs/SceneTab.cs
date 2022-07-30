@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Globe} World/Outliner" )]
+[EditorMenu( FontAwesome.Cubes, $"{FontAwesome.Gamepad} Game/Outliner" )]
 internal class OutlinerTab : BaseTab
 {
 	public static OutlinerTab Instance { get; set; }
@@ -35,10 +35,13 @@ internal class OutlinerTab : BaseTab
 				"This is where all your entities live."
 			);
 
+			ImGui.BeginListBox( "##entity_list", new System.Numerics.Vector2( -1, -1 ) );
+
 			foreach ( var group in groupedEntities )
 			{
 				string icon = FontAwesome.Question;
 
+				// TODO: Get rid of this
 				switch ( group.Key.Category )
 				{
 					case "Player":
@@ -86,6 +89,8 @@ internal class OutlinerTab : BaseTab
 
 				EditorHelpers.Separator();
 			}
+
+			ImGui.EndListBox();
 		}
 
 		ImGui.End();

@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Folder} Assets/Browser" )]
+[EditorMenu( FontAwesome.Folder, $"{FontAwesome.Gamepad} Game/Browser" )]
 internal class AssetsTab : BaseTab
 {
 	public static AssetsTab Instance { get; set; }
@@ -24,6 +24,8 @@ internal class AssetsTab : BaseTab
 	private int maxIconsLoaded = 32;
 
 	private int iconsLoadedThisFrame = 0;
+
+	private float iconSize => 64;
 
 	enum SortModes
 	{
@@ -168,16 +170,21 @@ internal class AssetsTab : BaseTab
 		}
 
 		{
-			ImGui.BeginChild( "##asset_list" );
+			ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) );
 
 			var windowSize = ImGui.GetWindowSize();
 			var windowPos = ImGui.GetWindowPos();
 
-			Vector2 margin = new( 32, 8 );
-			const float size = 64;
+			Vector2 margin = new( iconSize / 4f );
 			const int maxFileLength = 8;
 
-			float x = 16;
+			float startX = 16;
+			var availableSpace = windowSize.X;
+			availableSpace += margin.X / 2.0f;
+			var remainingSpace = availableSpace % (iconSize + margin.X);
+			startX = remainingSpace / 2.0f;
+
+			float x = startX;
 			float y = margin.Y;
 
 			for ( int i = 0; i < fileSystemCache.Count; i++ )
@@ -209,13 +216,13 @@ internal class AssetsTab : BaseTab
 
 					drawList.AddRectFilled(
 						windowPos + startPos - new System.Numerics.Vector2( 4, 4 ) - scrollPos,
-						windowPos + startPos + new System.Numerics.Vector2( size + 4, size + 4 ) - scrollPos,
+						windowPos + startPos + new System.Numerics.Vector2( iconSize + 4, iconSize + 20 ) - scrollPos,
 						ImGui.GetColorU32( OneDark.Info * 0.75f ),
 						4f );
 				}
 
 				ImGui.SetCursorPos( startPos );
-				EditorHelpers.Image( icon, new Vector2( size, size ) );
+				EditorHelpers.Image( icon, new Vector2( iconSize, iconSize ) );
 
 				if ( name.EndsWith( ".mtex" ) )
 				{
@@ -243,7 +250,7 @@ internal class AssetsTab : BaseTab
 				}
 
 				ImGui.SetCursorPos( startPos );
-				if ( ImGui.InvisibleButton( $"##{name}", new System.Numerics.Vector2( size, size + 24 ) ) )
+				if ( ImGui.InvisibleButton( $"##{name}", new System.Numerics.Vector2( iconSize, iconSize + 24 ) ) )
 				{
 					selectedIndex = i;
 
@@ -254,23 +261,46 @@ internal class AssetsTab : BaseTab
 				var fileExtension = Path.GetExtension( name );
 				var fileNameWithoutExtension = Path.GetFileNameWithoutExtension( name );
 
-				if ( fileNameWithoutExtension.Length > maxFileLength )
-					fileName = fileName[..maxFileLength] + ".." + fileExtension;
+				var textSize = ImGui.CalcTextSize( fileName, iconSize );
 
-				var textPos = (size - ImGui.CalcTextSize( fileName ).X) / 2.0f;
-				ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( textPos, size + 4f ) );
+				var textPos = (iconSize - textSize.X) / 2.0f;
+				if ( textSize.Y > 16 )
+					textPos = 0.0f;
 
-				ImGui.Text( fileName );
+				var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize + 16 - textSize.Y );
+				ImGui.SetCursorPos( textStartPos );
 
-				x += size + margin.X;
-				if ( x + size + 16 > windowSize.X )
+				void DrawShadowText( int x, int y )
 				{
-					x = 16;
-					y += size + margin.Y + 24;
+					ImGui.SetCursorPos( textStartPos );
+					EditorHelpers.SetCursorPosXRelative( x );
+					EditorHelpers.SetCursorPosYRelative( y );
+					ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
+					ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+					ImGui.TextWrapped( fileName );
+					ImGui.PopStyleColor();
+				}
+
+				DrawShadowText( 1, 1 );
+				DrawShadowText( -1, -1 );
+				DrawShadowText( 1, -1 );
+				DrawShadowText( -1, -1 );
+
+				ImGui.SetCursorPos( textStartPos );
+				ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+				ImGui.TextWrapped( fileName );
+
+				ImGui.PopTextWrapPos();
+
+				x += iconSize + margin.X;
+				if ( x + iconSize + 16 > windowSize.X )
+				{
+					x = startX;
+					y += iconSize + margin.Y + 24;
 				}
 			}
 
-			ImGui.EndChild();
+			ImGui.EndListBox();
 		}
 
 		ImGui.End();

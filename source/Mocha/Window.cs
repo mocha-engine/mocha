@@ -1,5 +1,4 @@
-﻿using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
 
@@ -21,11 +20,11 @@ public class Window
 			WindowHeight = 720,
 			WindowTitle = "Mocha",
 			X = 128,
-			Y = 128
+			Y = 128,
+			WindowInitialState = WindowState.Maximized
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
-		SdlWindow.WindowState = WindowState.Maximized;
 		SetDarkModeTitlebar();
 
 		Screen.UpdateFrom( Size );

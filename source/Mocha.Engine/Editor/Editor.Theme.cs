@@ -10,7 +10,7 @@ partial class Editor
 		colors[(int)ImGuiCol.Text] = new( 1.00f, 1.00f, 1.00f, 1.00f );
 		colors[(int)ImGuiCol.TextDisabled] = new( 0.50f, 0.50f, 0.50f, 1.00f );
 		colors[(int)ImGuiCol.WindowBg] = new( 0.17f, 0.17f, 0.18f, 1.00f );
-		colors[(int)ImGuiCol.ChildBg] = new( 0.00f, 0.00f, 0.00f, 0.00f );
+		colors[(int)ImGuiCol.ChildBg] = new( 0.10f, 0.11f, 0.11f, 1.00f );
 		colors[(int)ImGuiCol.PopupBg] = new( 0.24f, 0.24f, 0.25f, 1.00f );
 		colors[(int)ImGuiCol.Border] = new( 0.00f, 0.00f, 0.00f, 0.5f );
 		colors[(int)ImGuiCol.BorderShadow] = new( 0.00f, 0.00f, 0.00f, 0.24f );

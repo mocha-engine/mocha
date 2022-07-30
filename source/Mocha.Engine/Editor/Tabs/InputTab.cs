@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Bug} Debug/Input" )]
+[EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gears} Engine/Input" )]
 internal class InputTab : BaseTab
 {
 	public override void Draw()

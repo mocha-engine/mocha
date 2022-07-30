@@ -1,6 +1,5 @@
 ﻿using ImGuiNET;
 using System.Diagnostics;
-using System.Reflection;
 
 namespace Mocha.Engine;
 
@@ -12,19 +11,36 @@ public class BaseInspector
 	{
 	}
 
+	protected virtual void DrawProperties( string title, (string, string)[] items, string filePath )
+	{
+		ImGui.BeginListBox( "##inspector_table", new( -1, items.Length * 32 ) );
+
+		EditorHelpers.TextBold( title );
+		DrawTable( items );
+
+		ImGui.EndListBox();
+
+		EditorHelpers.Separator();
+		DrawButtons( filePath );
+	}
+
 	protected void DrawButtons( string filePath )
 	{
 		float width = (ImGui.GetWindowWidth() - 20f) * 0.5f;
 
 		if ( ImGui.Button( $"{FontAwesome.Folder} Open in Explorer", new System.Numerics.Vector2( width, 0 ) ) )
 		{
-			Process.Start( "explorer.exe", $"/select,{filePath}" );
+			Process.Start( "explorer.exe", $"/select,{Path.GetFullPath( filePath )}" );
 		}
 
 		ImGui.SameLine();
-		if ( ImGui.Button( $"{FontAwesome.FaceSmile} Beep", new System.Numerics.Vector2( width, 0 ) ) )
+
+		var copyPathButtonText = (timeSinceCopied < 3) ? $"{FontAwesome.FaceSmileBeam} Copied!" : $"{FontAwesome.Clipboard} Copy Path";
+
+		if ( ImGui.Button( copyPathButtonText, new System.Numerics.Vector2( width, 0 ) ) )
 		{
-			Log.Trace( "Boop" );
+			ImGui.SetClipboardText( filePath.Normalize() );
+			timeSinceCopied = 0;
 		}
 	}
 
@@ -44,20 +60,6 @@ public class BaseInspector
 				ImGui.Text( line.Item1 );
 				ImGui.TableNextColumn();
 				ImGui.Text( line.Item2 );
-
-				if ( ImGui.IsItemClicked() )
-				{
-					ImGui.SetClipboardText( line.Item2 );
-					timeSinceCopied = 0;
-				}
-
-				if ( ImGui.IsItemHovered() )
-				{
-					if ( timeSinceCopied < 3 )
-						ImGui.SetTooltip( "Copied!" );
-					else
-						ImGui.SetTooltip( "Click to copy" );
-				}
 			}
 
 			ImGui.EndTable();

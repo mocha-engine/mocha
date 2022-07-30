@@ -3,10 +3,24 @@
 public class World
 {
 	public static World Current { get; set; }
+	public static float Bounds => 48f;
 
 	public Camera Camera { get; set; }
 	public Sun Sun { get; set; }
 	public Sky Sky { get; set; }
+	public Player Player { get; set; }
+
+	public enum States
+	{
+		Playing,
+		Paused
+	}
+
+#if DEBUG
+	public States State { get; set; } = States.Paused;
+#else
+	public States State { get; set; } = States.Playing;
+#endif
 
 	public World()
 	{
@@ -18,14 +32,23 @@ public class World
 		SetupEntities();
 	}
 
+	private void DeleteEntities()
+	{
+		Log.Trace( $"Deleting all entities..." );
+		Entity.All.ForEach( x => x.Delete() );
+		Entity.All.Clear();
+	}
+
 	private void SetupEntities()
 	{
+		Log.Trace( $"Setting up entities..." );
+
 		Camera = new Camera();
 
 		Sun = new Sun()
 		{
 			Position = new( 20, 25, 80 ),
-			Rotation = Rotation.From( -28, 55, 0 )
+			Rotation = Rotation.From( 27, 15, 0 )
 		};
 
 		Sky = new Sky
@@ -33,15 +56,22 @@ public class World
 			Scale = Vector3.One * -100f
 		};
 
-		_ = new ModelEntity( "content/models/dev/dev.mmdl" )
-		{
-			Rotation = Rotation.From( 0, 0, 90 ),
-			Scale = new Vector3( 0.025f )
-		};
+		_ = new BarrierEntity();
+		Player = new Player();
+	}
+
+	public void ResetWorld()
+	{
+		DeleteEntities();
+		SetupEntities();
+
+		Log.Trace( $"World reset complete." );
+		GC.Collect( 2 );
 	}
 
 	public void Update()
 	{
-		Entity.All.ForEach( entity => entity.Update() );
+		if ( State == States.Playing )
+			Entity.All.ForEach( entity => entity.Update() );
 	}
 }

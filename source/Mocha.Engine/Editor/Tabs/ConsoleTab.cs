@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Bug} Debug/Console" )]
+[EditorMenu( FontAwesome.Terminal, $"{FontAwesome.Gears} Engine/Console" )]
 internal class ConsoleTab : BaseTab
 {
 	List<ConsoleItem> items = new();
@@ -41,42 +41,44 @@ internal class ConsoleTab : BaseTab
 
 	public override void Draw()
 	{
-		ImGui.Begin( "Console" );
-
-		ImGui.BeginChild( "logs", new System.Numerics.Vector2( 0, -32 ) );
-		if ( ImGui.BeginTable( $"##table_logs", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+		if ( ImGui.Begin( "Console" ) )
 		{
-			ImGui.TableSetupColumn( "Text", ImGuiTableColumnFlags.WidthStretch, 1f );
+			ImGui.BeginListBox( "##logs", new System.Numerics.Vector2( -1, -32 ) );
 
-			for ( int i = 0; i < items.Count; i++ )
+			if ( ImGui.BeginTable( $"##table_logs", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 			{
-				var line = items[i];
+				ImGui.TableSetupColumn( "Text", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-				ImGui.TableNextRow();
-				ImGui.PushStyleColor( ImGuiCol.Text, line.Color );
-				ImGui.TableNextColumn();
-				ImGui.Text( line.Text );
-				ImGui.PopStyleColor();
+				for ( int i = 0; i < items.Count; i++ )
+				{
+					var line = items[i];
+
+					ImGui.TableNextRow();
+					ImGui.PushStyleColor( ImGuiCol.Text, line.Color );
+					ImGui.TableNextColumn();
+					ImGui.Text( line.Text );
+					ImGui.PopStyleColor();
+				}
+
+				ImGui.EndTable();
 			}
 
-			ImGui.EndTable();
+			if ( ImGui.GetScrollY() >= ImGui.GetScrollMaxY() )
+				ImGui.SetScrollHereY( 1.0f );
+
+			ImGui.EndListBox();
+
+			ImGui.SetNextItemWidth( -68 );
+			ImGui.InputText( "##console_input", ref consoleInput, 512 );
+			ImGui.SameLine();
+
+			if ( ImGui.Button( "Submit" ) )
+			{
+				Log.Info( $"Console input: '{consoleInput}'" );
+				consoleInput = "";
+			}
+
+			ImGui.End();
 		}
-
-		if ( ImGui.GetScrollY() >= ImGui.GetScrollMaxY() )
-			ImGui.SetScrollHereY( 1.0f );
-
-		ImGui.EndChild();
-
-		ImGui.SetNextItemWidth( -68 );
-		ImGui.InputText( "##console_input", ref consoleInput, 512 );
-		ImGui.SameLine();
-
-		if ( ImGui.Button( "Submit" ) )
-		{
-			Log.Info( $"Console input: '{consoleInput}'" );
-			consoleInput = "";
-		}
-
-		ImGui.End();
 	}
 }

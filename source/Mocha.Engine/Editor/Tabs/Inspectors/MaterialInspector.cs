@@ -45,6 +45,8 @@ public class MaterialInspector : BaseInspector
 		EditorHelpers.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 		EditorHelpers.Separator();
 
+		ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) );
+
 		EditorHelpers.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
 
 		if ( ImGui.BeginTable( $"##material_slots", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
@@ -62,6 +64,8 @@ public class MaterialInspector : BaseInspector
 
 			ImGui.EndTable();
 		}
+
+		ImGui.EndListBox();
 
 		EditorHelpers.Separator();
 

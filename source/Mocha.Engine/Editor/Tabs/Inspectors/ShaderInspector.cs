@@ -1,4 +1,6 @@
-﻿namespace Mocha.Engine;
+﻿using ImGuiNET;
+
+namespace Mocha.Engine;
 
 public class ShaderInspector : BaseInspector
 {
@@ -21,12 +23,6 @@ public class ShaderInspector : BaseInspector
 			( "Full Path", $"{texture.Path.NormalizePath()}" )
 		};
 
-		EditorHelpers.TextBold( $"{FontAwesome.Glasses} Shader" );
-
-		DrawTable( items );
-
-		EditorHelpers.Separator();
-
-		DrawButtons( Path.GetFullPath( texture.Path ) );
+		DrawProperties( $"{FontAwesome.Glasses} Shader", items, texture.Path );
 	}
 }
