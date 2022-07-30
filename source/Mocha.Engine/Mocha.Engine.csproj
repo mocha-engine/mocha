@@ -9,6 +9,9 @@
 		<ApplicationIcon>logo.ico</ApplicationIcon>
 		<DebugSymbols>true</DebugSymbols>
 		<Platforms>AnyCPU;x64;x86</Platforms>
+		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -16,11 +19,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-	  <DefineConstants>$(DefineConstants);</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-	  <DefineConstants>$(DefineConstants);</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
@@ -28,11 +31,11 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-	  <DefineConstants>$(DefineConstants);</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-	  <DefineConstants>$(DefineConstants);</DefineConstants>
+		<DefineConstants>$(DefineConstants);</DefineConstants>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -57,6 +60,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="assimp.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="cimgui.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="libveldrid-spirv.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="SDL2.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Settings.settings">
 			<LastGenOutput>Settings.Designer.cs</LastGenOutput>
 			<Generator>SettingsSingleFileGenerator</Generator>
