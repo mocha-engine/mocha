@@ -8,6 +8,7 @@
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 </Project>

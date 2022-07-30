@@ -7,7 +7,7 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>AnyCPU;x64;x86</Platforms>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -15,6 +15,10 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+	  <DefineConstants>$(DefineConstants)</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
 	  <DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
@@ -26,11 +30,17 @@
 	  <DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
+	  <DefineConstants>$(DefineConstants)</DefineConstants>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
+		<PackageReference Include="ImGui.NET" Version="1.87.2" />
 		<PackageReference Include="StbImageSharp" Version="2.27.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
 		<PackageReference Include="Veldrid" Version="4.8.0" />
+		<PackageReference Include="Veldrid.ImGui" Version="5.72.0" />
 		<PackageReference Include="Veldrid.RenderDoc" Version="1.0.1" />
 		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
