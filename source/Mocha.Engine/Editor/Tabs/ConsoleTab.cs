@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Bug} Debug/Console" )]
+[EditorMenu( FontAwesome.Terminal, $"{FontAwesome.Gears} Engine/Console" )]
 internal class ConsoleTab : BaseTab
 {
 	List<ConsoleItem> items = new();

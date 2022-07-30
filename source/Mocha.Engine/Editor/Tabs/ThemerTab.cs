@@ -5,7 +5,7 @@ namespace Mocha.Engine;
 // Originally by haldean:
 // https://github.com/ocornut/imgui/issues/2265#issuecomment-465432091
 
-[EditorMenu( $"{FontAwesome.VectorSquare} Editor UI/Themer" )]
+[EditorMenu( FontAwesome.Paintbrush, $"{FontAwesome.Gears} Engine/Themer" )]
 internal class ThemerTab : BaseTab
 {
 	System.Numerics.Vector4 baseCol = new( 0.502f, 0.075f, 0.256f, 1.0f );

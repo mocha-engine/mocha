@@ -4,7 +4,7 @@ using System.Reflection;
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Globe} World/Outliner" )]
+[EditorMenu( FontAwesome.Cubes, $"{FontAwesome.Gamepad} Game/Outliner" )]
 internal class OutlinerTab : BaseTab
 {
 	public static OutlinerTab Instance { get; set; }

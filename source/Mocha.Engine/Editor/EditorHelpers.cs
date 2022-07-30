@@ -203,7 +203,7 @@ internal static class EditorHelpers
 		{
 			var dockspaceId = ImGui.GetID( "DockSpace" );
 			ImGui.DockSpace( dockspaceId, new System.Numerics.Vector2( 0, 0 ),
-				ImGuiDockNodeFlags.PassthruCentralNode );
+				ImGuiDockNodeFlags.PassthruCentralNode | ImGuiDockNodeFlags.AutoHideTabBar );
 
 			ImGui.End();
 		}
@@ -273,7 +273,7 @@ internal static class EditorHelpers
 		return result;
 	}
 
-	public static bool MenuItem( string icon, string text, string shortcut = "ALT+F4" )
+	public static bool MenuItem( string icon, string text, bool enabled = false )
 	{
 		SetCursorPosYRelative( -4 );
 
@@ -304,13 +304,17 @@ internal static class EditorHelpers
 
 		SetCursorPosYRelative( 4 );
 		ImGui.Text( text );
-		SetCursorPosYRelative( -4 );
 
-		ImGui.SameLine();
-		ImGui.SetCursorPosX( 185 );
-		ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 1, 1, 1, 0.5f ) );
-		ImGui.Text( shortcut );
-		ImGui.PopStyleColor();
+		if ( enabled )
+		{
+			SetCursorPosYRelative( -4 );
+			ImGui.SameLine();
+			ImGui.SetCursorPosX( 210 );
+			ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 1, 1, 1, 0.5f ) );
+
+			ImGui.Text( FontAwesome.Check );
+			ImGui.PopStyleColor();
+		}
 
 		if ( result )
 		{

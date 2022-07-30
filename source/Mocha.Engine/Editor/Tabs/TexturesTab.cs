@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( $"{FontAwesome.Bug} Debug/Textures" )]
+[EditorMenu( FontAwesome.Image, $"{FontAwesome.Gears} Engine/Textures" )]
 internal class TexturesTab : BaseTab
 {
 	public TexturesTab()

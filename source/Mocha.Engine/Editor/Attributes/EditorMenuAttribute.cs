@@ -4,9 +4,11 @@
 public class EditorMenuAttribute : Attribute
 {
 	public string Path { get; set; }
+	public string Icon { get; set; }
 
-	public EditorMenuAttribute( string path )
+	public EditorMenuAttribute( string icon, string path )
 	{
 		Path = path;
+		Icon = icon;
 	}
 }
