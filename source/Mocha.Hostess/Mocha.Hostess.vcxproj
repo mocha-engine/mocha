@@ -128,7 +128,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bootstrap.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
   </ItemGroup>
   <ItemGroup>
