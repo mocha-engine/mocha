@@ -10,7 +10,7 @@
     </p>
 </p>
 
-![image](https://user-images.githubusercontent.com/12881812/180680088-de6053d1-c8d2-43b8-b193-8387eb03e710.png)
+![image](https://user-images.githubusercontent.com/12881812/181908732-0c4d7d81-3937-46d0-8ed8-ceb5dc03f9a9.png)
 
 ## Building
 
