@@ -49,6 +49,10 @@ public partial struct Rotation : IEquatable<Rotation>
 		yaw = yaw.DegreesToRadians();
 		roll = roll.DegreesToRadians();
 
+		pitch = pitch.Clamp( -180, 180 );
+		yaw = yaw.Clamp( -180, 180 );
+		roll= roll.Clamp( -180, 180 );
+
 		float sp = MathF.Sin( pitch * 0.5f );
 		float cp = MathF.Cos( pitch * 0.5f );
 		float sy = MathF.Sin( yaw * 0.5f );
@@ -84,6 +88,10 @@ public partial struct Rotation : IEquatable<Rotation>
 		angles.X = MathF.Asin( 0f - num ).RadiansToDegrees();
 		angles.Y = MathF.Atan2( y, x ).RadiansToDegrees();
 		angles.Z = MathF.Atan2( y2, x2 ).RadiansToDegrees();
+
+		angles.X = angles.X.Clamp( -180, 180 );
+		angles.Y = angles.Y.Clamp( -180, 180 );
+		angles.Z = angles.Z.Clamp( -180, 180 );
 
 		return angles;
 	}
