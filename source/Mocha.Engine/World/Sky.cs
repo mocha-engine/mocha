@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-[Category( "World" ), Icon( FontAwesome.Globe ), Title( "Sky" )]
+[Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : Entity
 {
 	[HideInInspector]

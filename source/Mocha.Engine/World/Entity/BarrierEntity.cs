@@ -1,5 +1,8 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
 
+namespace Mocha.Engine;
+
+[Icon( FontAwesome.TrowelBricks ), Category( "World" ), Title( "Barrier Entity" )]
 public class BarrierEntity : ModelEntity
 {
 	public float Offset { get; set; }

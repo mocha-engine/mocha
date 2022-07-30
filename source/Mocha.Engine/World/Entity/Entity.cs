@@ -49,7 +49,10 @@ public class Entity : IEntity
 	}
 
 	public virtual void Update() { }
-	public virtual void Delete() { }
+	public virtual void Delete()
+	{
+		Log.Trace( "TODO: Manage entity objects manually" );
+	}
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();
 	public int GetHashCode( [DisallowNull] Entity obj ) => base.GetHashCode();

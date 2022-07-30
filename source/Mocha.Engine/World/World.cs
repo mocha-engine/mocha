@@ -32,8 +32,17 @@ public class World
 		SetupEntities();
 	}
 
+	private void DeleteEntities()
+	{
+		Log.Trace( $"Deleting all entities..." );
+		Entity.All.ForEach( x => x.Delete() );
+		Entity.All.Clear();
+	}
+
 	private void SetupEntities()
 	{
+		Log.Trace( $"Setting up entities..." );
+
 		Camera = new Camera();
 
 		Sun = new Sun()
@@ -49,6 +58,15 @@ public class World
 
 		_ = new BarrierEntity();
 		Player = new Player();
+	}
+
+	public void ResetWorld()
+	{
+		DeleteEntities();
+		SetupEntities();
+
+		Log.Trace( $"World reset complete." );
+		GC.Collect( 2 );
 	}
 
 	public void Update()

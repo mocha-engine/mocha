@@ -1,5 +1,8 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
 
+namespace Mocha.Engine;
+
+[Category( "Player" ), Icon( FontAwesome.User )]
 public class Player : ModelEntity
 {
 	private float velocity;
