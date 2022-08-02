@@ -3,9 +3,9 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Video, $"{FontAwesome.Gamepad} Game/Scene View" )]
-internal class SceneViewTab : BaseTab
+internal class SceneViewWindow : BaseEditorWindow
 {
-	public SceneViewTab()
+	public SceneViewWindow()
 	{
 		isVisible = true;
 	}

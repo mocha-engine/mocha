@@ -3,7 +3,7 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gears} Engine/Input" )]
-internal class InputTab : BaseTab
+internal class InputWindow : BaseEditorWindow
 {
 	public override void Draw()
 	{

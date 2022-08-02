@@ -1,11 +1,7 @@
-﻿using Veldrid;
+﻿namespace Mocha.Engine;
 
-namespace Mocha.Engine;
-
-internal class BaseTab
+internal class BaseEditorWindow
 {
-	public ImGuiRenderer ImGuiRenderer { get; set; }
-
 	public bool isVisible = false;
 
 	public virtual void Draw()

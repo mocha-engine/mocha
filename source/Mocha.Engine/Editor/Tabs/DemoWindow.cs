@@ -2,8 +2,8 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Flask, $"{FontAwesome.Gears} Engine/Demo Window" )]
-internal class DemoTab : BaseTab
+[EditorMenu( FontAwesome.Flask, $"{FontAwesome.Gears} Engine/Demo" )]
+internal class DemoWindow : BaseEditorWindow
 {
 	public override void Draw()
 	{

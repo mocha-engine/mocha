@@ -3,7 +3,7 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Terminal, $"{FontAwesome.Gears} Engine/Console" )]
-internal class ConsoleTab : BaseTab
+internal class ConsoleWindow : BaseEditorWindow
 {
 	List<ConsoleItem> items = new();
 	string consoleInput = "";
@@ -20,7 +20,7 @@ internal class ConsoleTab : BaseTab
 		}
 	}
 
-	public ConsoleTab()
+	public ConsoleWindow()
 	{
 		Logger.OnLog += ( severity, str, _ ) =>
 		{

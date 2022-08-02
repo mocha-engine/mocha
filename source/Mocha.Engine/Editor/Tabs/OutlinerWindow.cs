@@ -5,7 +5,7 @@ using System.Reflection;
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Cubes, $"{FontAwesome.Gamepad} Game/Outliner" )]
-internal class OutlinerTab : BaseTab
+internal class OutlinerTab : BaseEditorWindow
 {
 	public static OutlinerTab Instance { get; set; }
 
@@ -17,7 +17,7 @@ internal class OutlinerTab : BaseTab
 
 	public void SelectItem( string name )
 	{
-		InspectorTab.SetSelectedObject( Entity.All.First( x => x.Name == name ) );
+		InspectorWindow.SetSelectedObject( Entity.All.First( x => x.Name == name ) );
 	}
 
 	public override void Draw()

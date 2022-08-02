@@ -18,7 +18,7 @@ internal partial class Editor
 	private Renderer.Texture Logo { get; set; }
 
 	private Renderer.Texture defaultFontTexture;
-	private List<BaseTab> tabs = new();
+	private List<BaseEditorWindow> windows = new();
 
 	// TODO: I don't like this
 	internal RendererInstance Renderer { get; }
@@ -31,11 +31,11 @@ internal partial class Editor
 		Init();
 		SetTheme();
 
-		tabs.AddRange( Assembly.GetExecutingAssembly()
+		windows.AddRange( Assembly.GetExecutingAssembly()
 			.GetTypes()
-			.Where( x => typeof( BaseTab ).IsAssignableFrom( x ) )
+			.Where( x => typeof( BaseEditorWindow ).IsAssignableFrom( x ) )
 			.Select( x => Activator.CreateInstance( x ) )
-			.OfType<BaseTab>()
+			.OfType<BaseEditorWindow>()
 		);
 
 		Logo = TextureBuilder.UITexture.FromPath( "content/logo.png" ).Build();
@@ -203,9 +203,9 @@ internal partial class Editor
 			EditorHelpers.EndMenu();
 		}
 
-		foreach ( var tab in tabs )
+		foreach ( var window in windows )
 		{
-			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
+			var editorMenuAttribute = window.GetType().GetCustomAttribute<EditorMenuAttribute>();
 			if ( editorMenuAttribute == null )
 				continue;
 
@@ -218,11 +218,11 @@ internal partial class Editor
 				{
 					var item = splitPath[i];
 					var name = item;
-					var enabled = tab.isVisible;
+					var enabled = window.isVisible;
 					bool active = EditorHelpers.MenuItem( icon, name, enabled );
 
 					if ( i == splitPath.Length - 1 && active )
-						tab.isVisible = !tab.isVisible;
+						window.isVisible = !window.isVisible;
 				}
 
 				EditorHelpers.EndMenu();
@@ -339,9 +339,9 @@ internal partial class Editor
 		ImGui.SetNextWindowPos( new System.Numerics.Vector2( center.X, 100 ) );
 
 		var switcherItems = new List<(string, string)>();
-		foreach ( var tab in tabs )
+		foreach ( var window in windows )
 		{
-			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
+			var editorMenuAttribute = window.GetType().GetCustomAttribute<EditorMenuAttribute>();
 			if ( editorMenuAttribute == null )
 				continue;
 
@@ -353,7 +353,7 @@ internal partial class Editor
 			switcherItems.Add( ("Entity", entity.Name) );
 		}
 
-		foreach ( var asset in AssetsTab.Instance.fileSystemCache )
+		foreach ( var asset in BrowserWindow.Instance.fileSystemCache )
 		{
 			switcherItems.Add( ("Asset", asset.Item2.NormalizePath()) );
 		}
@@ -476,7 +476,7 @@ internal partial class Editor
 				{
 					case "Asset":
 						ImGui.SetWindowFocus( "Browser" );
-						AssetsTab.Instance.SelectItem( selectedItem.Item2 );
+						BrowserWindow.Instance.SelectItem( selectedItem.Item2 );
 						ImGui.SetWindowFocus( "Inspector" );
 						break;
 					case "Menu":
@@ -534,10 +534,10 @@ internal partial class Editor
 		DrawMenuBar();
 		DrawQuickSwitcher();
 
-		tabs.ForEach( tab =>
+		windows.ForEach( window =>
 		{
-			if ( tab.isVisible )
-				tab.Draw();
+			if ( window.isVisible )
+				window.Draw();
 		} );
 	}
 }
