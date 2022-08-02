@@ -1,4 +1,5 @@
 #include "CNetCoreHost.h"
+#include "spdlog/spdlog.h"
 
 int main()
 {

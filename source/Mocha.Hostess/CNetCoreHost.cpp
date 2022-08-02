@@ -1,4 +1,6 @@
 #include "CNetCoreHost.h"
+#include "CLogger.h"
+#include <functional>
 
 namespace
 {
@@ -72,8 +74,19 @@ namespace
 	}
 }
 
+struct UnmanagedArgs {
+	CLogger* CLoggerPtr;
+
+	void* CreateMethodPtr;
+	void* DeleteMethodPtr;
+	void* LogMethodPtr;
+	void* InteropTestMethodPtr;
+};
+
 void CNetCoreHost::CallFunction(string_t config_path, string_t dll_path, string_t dotnet_type, string_t dotnet_method)
 {
+	CLogger logger;
+
 	// Load HostFxr and get exported hosting functions
 	if (!load_hostfxr())
 	{
@@ -86,8 +99,18 @@ void CNetCoreHost::CallFunction(string_t config_path, string_t dll_path, string_
 	load_assembly_and_get_function_pointer = get_dotnet_load_assembly(config_path.c_str());
 	assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
 
+	// Create unmanaged args
+	UnmanagedArgs args
+	{
+		&logger,
+		(void*)__CLogger_Create,
+		(void*)__CLogger_Delete,
+		(void*)__CLogger_Log,
+		(void*)__CLogger_InteropTest,
+	};
+
 	// Function pointer to managed delegate with non-default signature
-	typedef void (CORECLR_DELEGATE_CALLTYPE* void_fn)(void);
+	typedef void (CORECLR_DELEGATE_CALLTYPE* void_fn)(UnmanagedArgs*);
 	void_fn function = nullptr;
 	int rc = load_assembly_and_get_function_pointer(
 		dll_path.c_str(),
@@ -100,5 +123,5 @@ void CNetCoreHost::CallFunction(string_t config_path, string_t dll_path, string_
 	assert(rc == 0 && function != nullptr && "Failed to locate function or assembly");
 
 	std::cout << "=== Mocha Bootstrap Init ===" << std::endl;
-	function();
+	function(&args);
 }
