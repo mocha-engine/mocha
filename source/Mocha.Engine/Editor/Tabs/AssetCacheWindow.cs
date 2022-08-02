@@ -2,15 +2,13 @@
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Image, $"{FontAwesome.Gears} Engine/Textures" )]
-internal class TexturesTab : BaseTab
+[EditorMenu( FontAwesome.Image, $"{FontAwesome.Gears} Engine/Asset Cache" )]
+internal class AssetCacheWindow : BaseEditorWindow
 {
-	public TexturesTab()
+	public AssetCacheWindow()
 	{
 
 	}
-
-	private int selectedAssetIndex;
 
 	public override void Draw()
 	{
@@ -33,7 +31,7 @@ internal class TexturesTab : BaseTab
 				if ( ImGui.Selectable( $"{displayInfo.CombinedTitle.Pad()} {path}" ) )
 				{
 					var selectedAsset = assetList[i];
-					InspectorTab.SetSelectedObject( selectedAsset );
+					InspectorWindow.SetSelectedObject( selectedAsset );
 				}
 			}
 

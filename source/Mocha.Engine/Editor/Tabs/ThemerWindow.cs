@@ -6,7 +6,7 @@ namespace Mocha.Engine;
 // https://github.com/ocornut/imgui/issues/2265#issuecomment-465432091
 
 [EditorMenu( FontAwesome.Paintbrush, $"{FontAwesome.Gears} Engine/Themer" )]
-internal class ThemerTab : BaseTab
+internal class ThemerWindow : BaseEditorWindow
 {
 	System.Numerics.Vector4 baseCol = new( 0.502f, 0.075f, 0.256f, 1.0f );
 	System.Numerics.Vector4 bgCol = new( 0.200f, 0.220f, 0.270f, 1.0f );

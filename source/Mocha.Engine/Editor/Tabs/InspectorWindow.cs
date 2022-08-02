@@ -3,9 +3,9 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.List, $"{FontAwesome.Gamepad} Game/Inspector" )]
-internal class InspectorTab : BaseTab
+internal class InspectorWindow : BaseEditorWindow
 {
-	private static InspectorTab Instance { get; set; }
+	private static InspectorWindow Instance { get; set; }
 	private BaseInspector Inspector { get; set; }
 
 	public static void SetSelectedObject( object obj )
@@ -26,7 +26,7 @@ internal class InspectorTab : BaseTab
 			Instance.Inspector = new MaterialInspector( material );
 	}
 
-	public InspectorTab()
+	public InspectorWindow()
 	{
 		Instance = this;
 		isVisible = true;

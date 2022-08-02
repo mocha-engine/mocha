@@ -3,9 +3,9 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gamepad} Game/Game View" )]
-internal class ViewportTab : BaseTab
+internal class GameViewWindow : BaseEditorWindow
 {
-	public ViewportTab()
+	public GameViewWindow()
 	{
 		isVisible = true;
 	}

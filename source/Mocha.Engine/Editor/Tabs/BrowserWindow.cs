@@ -3,9 +3,9 @@
 namespace Mocha.Engine;
 
 [EditorMenu( FontAwesome.Folder, $"{FontAwesome.Gamepad} Game/Browser" )]
-internal class AssetsTab : BaseTab
+internal class BrowserWindow : BaseEditorWindow
 {
-	public static AssetsTab Instance { get; set; }
+	public static BrowserWindow Instance { get; set; }
 
 	private Texture ArchiveTexture { get; }
 	private Texture DocumentTexture { get; }
@@ -36,7 +36,7 @@ internal class AssetsTab : BaseTab
 
 	private SortModes sortMode = SortModes.DateAscending;
 
-	public AssetsTab()
+	public BrowserWindow()
 	{
 		Instance = this;
 
@@ -103,22 +103,22 @@ internal class AssetsTab : BaseTab
 		if ( name.EndsWith( "mtex" ) )
 		{
 			var texture = TextureBuilder.UITexture.FromMochaTexture( name ).Build();
-			InspectorTab.SetSelectedObject( texture );
+			InspectorWindow.SetSelectedObject( texture );
 		}
 		else if ( name.EndsWith( "mshdr" ) )
 		{
 			var shader = ShaderBuilder.Default.FromMoyaiShader( name ).Build();
-			InspectorTab.SetSelectedObject( shader );
+			InspectorWindow.SetSelectedObject( shader );
 		}
 		else if ( name.EndsWith( "mmdl" ) )
 		{
 			var model = Primitives.MochaModel.GenerateModels( name );
-			InspectorTab.SetSelectedObject( model );
+			InspectorWindow.SetSelectedObject( model );
 		}
 		else if ( name.EndsWith( "mmat" ) )
 		{
 			var material = Material.FromMochaMaterial( name );
-			InspectorTab.SetSelectedObject( material );
+			InspectorWindow.SetSelectedObject( material );
 		}
 	}
 
