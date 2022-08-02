@@ -132,10 +132,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CLogger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CLogger.h" />
     <ClInclude Include="CNetCoreHost.h" />
     <ClInclude Include="coreclr_delegates.h" />
     <ClInclude Include="hostfxr.h" />
