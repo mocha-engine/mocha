@@ -25,16 +25,6 @@ internal class Game
 			Log.Trace( "Game init" );
 			renderer = new();
 
-			var remoteConsole = new RemoteConsoleServer();
-			Logger.OnLog += ( level, str, stackTrace ) =>
-			{
-				remoteConsole.Write(
-					level,
-					str,
-					stackTrace.GetFrame( 2 ).GetMethod().DeclaringType.Name,
-					stackTrace.GetFrames().Select( x => x.ToString() ).ToArray() );
-			};
-
 #if DEBUG
 			editor = new( renderer );
 #endif
