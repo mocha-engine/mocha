@@ -79,7 +79,7 @@ public class RendererInstance
 	{
 		// TODO: Make this nicer
 		// Check each shader, if it's dirty then recompile it
-		foreach ( var shader in Shader.All.Where( x => x.IsDirty ) )
+		foreach ( var shader in Asset.All.OfType<Shader>().Where( x => x.IsDirty ) )
 		{
 			shader.Recompile();
 		}

@@ -135,48 +135,6 @@ internal static class EditorHelpers
 		return changed;
 	}
 
-	public static string GetTypeTitle( Type type )
-	{
-		var titleAttribute = type.GetCustomAttribute<TitleAttribute>();
-
-		string str = "";
-		if ( titleAttribute != null )
-			str = titleAttribute.title;
-
-		if ( string.IsNullOrEmpty( str ) )
-			str = type.ToString();
-
-		return str;
-	}
-
-	public static string GetTypeIcon( Type type )
-	{
-		var iconAttribute = type.GetCustomAttribute<IconAttribute>();
-
-		if ( iconAttribute != null )
-			return iconAttribute.icon;
-
-		return "";
-	}
-
-	public static string GetTypeDisplayName( Type type )
-	{
-		var titleAttribute = type.GetCustomAttribute<TitleAttribute>();
-		var iconAttribute = type.GetCustomAttribute<IconAttribute>();
-
-		string str = "";
-		if ( titleAttribute != null )
-			str = titleAttribute.title;
-
-		if ( iconAttribute != null )
-			str = iconAttribute.icon + " " + str;
-
-		if ( string.IsNullOrEmpty( str ) )
-			str = type.ToString();
-
-		return str;
-	}
-
 	public static void DockSpaceOverViewport()
 	{
 		var viewport = ImGui.GetMainViewport();

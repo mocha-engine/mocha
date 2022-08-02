@@ -26,7 +26,6 @@ public partial class TextureBuilder
 
 	public TextureBuilder()
 	{
-		path = GetHashCode().ToString();
 	}
 
 	public static TextureBuilder Default => new TextureBuilder();
@@ -152,7 +151,6 @@ public partial class TextureBuilder
 		this.data = new[] { Enumerable.Repeat( (byte)0, dataLength ).ToArray() };
 		this.width = width;
 		this.height = height;
-		this.path = $"{GetHashCode()}";
 
 		return this;
 	}

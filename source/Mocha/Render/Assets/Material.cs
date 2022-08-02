@@ -2,10 +2,9 @@
 
 namespace Mocha.Renderer;
 
-public struct Material
+[Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
+public class Material : Asset
 {
-	public string Path { get; set; } = "unnamed";
-
 	public Shader Shader { get; set; } = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/pbr.mshdr" ).Build();
 	public Type UniformBufferType { get; set; } = typeof( GenericModelUniformBuffer );
 	public Texture? DiffuseTexture { get; set; } = TextureBuilder.One;
@@ -15,7 +14,7 @@ public struct Material
 
 	public Material()
 	{
-
+		All.Add( this );
 	}
 
 	public static Material FromMochaMaterial( string path )

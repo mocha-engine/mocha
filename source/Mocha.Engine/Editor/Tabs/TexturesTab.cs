@@ -10,57 +10,38 @@ internal class TexturesTab : BaseTab
 
 	}
 
-	private int selectedTexture;
+	private int selectedAssetIndex;
 
 	public override void Draw()
 	{
-		if ( ImGui.Begin( "Texture Debug", ref isVisible ) )
+		if ( ImGui.Begin( "Asset Cache", ref isVisible ) )
 		{
 			EditorHelpers.Title(
-				$"{FontAwesome.Image} Textures",
-				"Here's where you can see all the currently loaded textures."
+				$"{FontAwesome.Database} Asset Cache",
+				"Here's where you can see all the currently cached assets."
 			);
 
-			EditorHelpers.TextLight( $"Loaded textures: {Asset.All.OfType<Texture>().Count()}" );
+			ImGui.BeginListBox( "##textures", new System.Numerics.Vector2( -1, -48 ) );
+			var assetList = Asset.All.ToList();
 
-			ImGui.Dummy( new System.Numerics.Vector2( 0, 4 ) );
-
-			ImGui.BeginListBox( "##textures", new System.Numerics.Vector2( 250, -1 ) );
-			var textureList = Asset.All.OfType<Texture>().ToList();
-
-			for ( int i = 0; i < textureList.Count; i++ )
+			for ( int i = 0; i < assetList.Count; i++ )
 			{
-				Texture? tex = textureList[i];
-				EditorHelpers.Image( tex, new Vector2( 32, 32 ) );
-				ImGui.SameLine();
-				if ( ImGui.Selectable( tex.Path + "\n" + tex.Width + ", " + tex.Height + " | " + tex.Type ) )
+				var asset = assetList[i];
+				var displayInfo = DisplayInfo.For( asset );
+				var path = asset?.Path;
+
+				if ( ImGui.Selectable( $"{displayInfo.CombinedTitle.Pad()} {path}" ) )
 				{
-					selectedTexture = i;
+					var selectedAsset = assetList[i];
+					InspectorTab.SetSelectedObject( selectedAsset );
 				}
 			}
 
 			ImGui.EndListBox();
 
-			if ( selectedTexture > textureList.Count - 1 )
-				selectedTexture = textureList.Count - 1;
+			EditorHelpers.Separator();
 
-			if ( selectedTexture < 0 )
-				selectedTexture = 0;
-
-			var texture = textureList[selectedTexture];
-
-			ImGui.SameLine();
-			ImGui.BeginChild( "##texture_preview" );
-
-			var childWidth = ImGui.GetItemRectSize().X;
-			float ratio = texture.Height / (float)texture.Width;
-
-			if ( ratio is float.NaN )
-				ratio = 1f;
-
-			EditorHelpers.Image( texture, new Vector2( childWidth, childWidth * ratio ) );
-
-			ImGui.EndChild();
+			ImGui.Text( $"Cached assets: {Asset.All.Count()}" );
 			ImGui.End();
 		}
 	}

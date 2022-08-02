@@ -2,6 +2,7 @@
 
 namespace Mocha.Renderer;
 
+[Icon( FontAwesome.Image ), Title( "Texture" )]
 public class Texture : Asset
 {
 	public int Width { get; set; }

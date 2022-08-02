@@ -54,4 +54,9 @@ public static class StringExtension
 	{
 		return str.Replace( "\\", "/" );
 	}
+
+	public static string Pad( this string str )
+	{
+		return str.PadRight( 16 );
+	}
 }

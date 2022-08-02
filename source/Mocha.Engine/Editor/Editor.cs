@@ -87,7 +87,7 @@ internal partial class Editor
 		byte[] data = new byte[size];
 		Marshal.Copy( pixels, data, 0, size );
 
-		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
+		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).WithName( "ImGUI Font Texture" ).Build();
 	}
 
 	private static void SetKeyMappings( ImGuiIOPtr io )
@@ -420,7 +420,7 @@ internal partial class Editor
 					ImGui.TableNextColumn();
 
 					ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
-					ImGui.Text( $"{switcherItem.Item1}:" );
+					ImGui.Text( $"{switcherItem.Item1}:".Pad() );
 					ImGui.PopStyleColor();
 					ImGui.SameLine();
 					ImGui.Text( switcherItem.Item2 );

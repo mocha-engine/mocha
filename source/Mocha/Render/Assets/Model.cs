@@ -1,13 +1,12 @@
 ﻿using System.Runtime.InteropServices;
-using Veldrid;
 
 namespace Mocha.Renderer;
 
-public class Model
+[Icon( FontAwesome.Cube ), Title( "Model" )]
+public class Model : Asset
 {
 	private DeviceBuffer uniformBuffer;
 
-	public string Path { get; private set; }
 	public DeviceBuffer TBNBuffer { get; private set; }
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
@@ -23,7 +22,7 @@ public class Model
 	private uint indexCount;
 	private uint vertexCount;
 
-	public Model( string path, Vertex[] vertices, uint[] indices, Material material )
+	public Model( string path, Material material, bool isIndexed )
 	{
 		DepthOnlyMaterial = new Material()
 		{
@@ -36,35 +35,25 @@ public class Model
 
 		Path = path;
 		Material = material;
-		IsIndexed = true;
+		IsIndexed = isIndexed;
 
-		SetupMesh( vertices, indices );
-		CreateUniformBuffer();
-		CreateResources();
+		All.Add( this );
 
 		Material.Shader.OnRecompile += CreateResources;
 	}
 
-	public Model( string path, Vertex[] vertices, Material material )
+	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
 	{
-		DepthOnlyMaterial = new Material()
-		{
-			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/depthonly.mshdr" )
-										  .WithFaceCullMode( FaceCullMode.None )
-										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
-										  .Build(),
-			UniformBufferType = typeof( GenericModelUniformBuffer )
-		};
+		SetupMesh( vertices, indices );
+		CreateUniformBuffer();
+		CreateResources();
+	}
 
-		Path = path;
-		Material = material;
-		IsIndexed = false;
-
+	public Model( string path, Vertex[] vertices, Material material ) : this( path, material, false )
+	{
 		SetupMesh( vertices );
 		CreateUniformBuffer();
 		CreateResources();
-
-		Material.Shader.OnRecompile += CreateResources;
 	}
 
 	private void SetupMesh( Vertex[] vertices )
