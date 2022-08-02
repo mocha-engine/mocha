@@ -21,6 +21,9 @@
     <ClCompile Include="CNetCoreHost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CLogger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="hostfxr.h">
@@ -30,6 +33,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CNetCoreHost.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
