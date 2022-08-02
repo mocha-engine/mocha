@@ -1,5 +1,4 @@
-﻿using Veldrid;
-using Veldrid.Sdl2;
+﻿using Veldrid.Sdl2;
 
 namespace Mocha.Common;
 

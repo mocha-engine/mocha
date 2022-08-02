@@ -51,7 +51,7 @@ public partial struct Rotation : IEquatable<Rotation>
 
 		pitch = pitch.Clamp( -180, 180 );
 		yaw = yaw.Clamp( -180, 180 );
-		roll= roll.Clamp( -180, 180 );
+		roll = roll.Clamp( -180, 180 );
 
 		float sp = MathF.Sin( pitch * 0.5f );
 		float cp = MathF.Cos( pitch * 0.5f );

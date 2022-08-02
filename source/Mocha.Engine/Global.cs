@@ -1,5 +1,4 @@
-﻿global using Mocha;
-global using Mocha.Common;
+﻿global using Mocha.Common;
 global using Mocha.Renderer;
 
 namespace Mocha.Engine;

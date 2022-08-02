@@ -1,6 +1,4 @@
-﻿using ImGuiNET;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 public class ModelInspector : BaseInspector
 {
