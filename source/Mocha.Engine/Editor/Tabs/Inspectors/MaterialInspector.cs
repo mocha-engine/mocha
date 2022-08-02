@@ -54,7 +54,7 @@ public class MaterialInspector : BaseInspector
 			ImGui.TableSetupColumn( "Preview", ImGuiTableColumnFlags.WidthFixed, 32f );
 			ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthFixed, 100f );
 			ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 1f );
-			
+
 			foreach ( var property in material.GetType().GetProperties().Where( x => x.PropertyType == typeof( Texture ) ) )
 			{
 				var texture = property.GetValue( material ) as Texture;

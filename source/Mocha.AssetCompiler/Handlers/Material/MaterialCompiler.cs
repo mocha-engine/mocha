@@ -1,6 +1,6 @@
-﻿using System.Security.Cryptography;
-using Mocha.Common.Serialization;
+﻿using Mocha.Common.Serialization;
 using Newtonsoft.Json;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Mocha.AssetCompiler;

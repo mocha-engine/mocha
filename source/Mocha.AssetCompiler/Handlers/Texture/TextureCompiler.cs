@@ -1,8 +1,8 @@
-﻿using StbImageSharp;
-using BCnEncoder.Encoder;
+﻿using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
-using System.Security.Cryptography;
 using Mocha.Common.Serialization;
+using StbImageSharp;
+using System.Security.Cryptography;
 
 namespace Mocha.AssetCompiler;
 

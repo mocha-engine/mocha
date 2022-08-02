@@ -1,5 +1,4 @@
-﻿using Veldrid;
-using Veldrid.StartupUtilities;
+﻿using Veldrid.StartupUtilities;
 
 namespace Mocha.Renderer;
 

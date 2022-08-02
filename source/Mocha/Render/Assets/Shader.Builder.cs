@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using Veldrid;
 using Veldrid.SPIRV;
 
 namespace Mocha.Renderer;
