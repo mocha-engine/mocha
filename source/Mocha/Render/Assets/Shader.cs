@@ -4,13 +4,12 @@ using Veldrid.SPIRV;
 
 namespace Mocha.Renderer;
 
-public class Shader
+[Icon( FontAwesome.Glasses ), Title( "Shader" )]
+public class Shader : Asset
 {
-	public static List<Shader> All { get; set; } = new();
 	public Veldrid.Shader[] ShaderProgram { get; private set; }
 	public RenderPipeline Pipeline { get; set; }
 	public Action OnRecompile { get; set; }
-	public string Path { get; set; }
 	public bool IsDirty { get; private set; }
 
 	private Framebuffer TargetFramebuffer { get; set; }

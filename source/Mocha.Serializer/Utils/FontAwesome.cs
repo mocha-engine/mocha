@@ -2,7 +2,7 @@
 // from https://github.com/FortAwesome/Font-Awesome/raw/6.x/metadata/icons.yml
 // for use with https://github.com/FortAwesome/Font-Awesome/blob/6.x/webfonts/fa-regular-400.ttf, https://github.com/FortAwesome/Font-Awesome/blob/6.x/webfonts/fa-solid-900.ttf
 
-namespace Mocha.Engine;
+namespace Mocha.Common;
 
 public class FontAwesome
 {

@@ -18,8 +18,10 @@ internal class InspectorTab : BaseTab
 			Instance.Inspector = new TextureInspector( texture );
 		else if ( obj is Shader shader )
 			Instance.Inspector = new ShaderInspector( shader );
-		else if ( obj is List<Model> model )
-			Instance.Inspector = new ModelInspector( model.First() );
+		else if ( obj is Model model )
+			Instance.Inspector = new ModelInspector( model );
+		else if ( obj is List<Model> modelList )
+			Instance.Inspector = new ModelInspector( modelList.First() );
 		else if ( obj is Material material )
 			Instance.Inspector = new MaterialInspector( material );
 	}

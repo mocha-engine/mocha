@@ -60,10 +60,10 @@ public class ShaderBuilder
 
 	public Shader Build()
 	{
-		if ( Shader.All.Any( x => x.Path == Path ) )
+		if ( Asset.All.OfType<Shader>().Any( x => x.Path == Path ) )
 		{
 			Log.Trace( $"Using cached shader {Path}" );
-			return Shader.All.First( x => x.Path == Path );
+			return Asset.All.OfType<Shader>().First( x => x.Path == Path );
 		}
 
 		Log.Trace( $"Compiling shader {Path}" );

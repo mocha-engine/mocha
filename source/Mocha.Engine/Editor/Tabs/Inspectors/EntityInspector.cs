@@ -95,10 +95,11 @@ public class EntityInspector : BaseInspector
 		if ( entity != null )
 		{
 			var selectedEntityType = entity.GetType();
+			var entityDisplayInfo = DisplayInfo.For( entity );
 
 			EditorHelpers.Title(
-				  $"{EditorHelpers.GetTypeIcon( entity.GetType() )} {entity.Name}",
-				$"This is a {entity.GetType().Name} entity."
+				  $"{entityDisplayInfo.TextIcon} {entity.Name}",
+				$"This is a {entityDisplayInfo.Name} entity."
 			);
 
 			var windowPos = ImGui.GetWindowPos();
@@ -125,7 +126,8 @@ public class EntityInspector : BaseInspector
 				if ( group.Count() <= 0 )
 					continue;
 
-				EditorHelpers.TextBold( EditorHelpers.GetTypeDisplayName( group.Key ) );
+				var groupDisplayInfo = DisplayInfo.For( group.Key );
+				EditorHelpers.TextBold( $"{groupDisplayInfo.CombinedTitle}" );
 
 				if ( ImGui.BeginTable( $"##table_{group}", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 				{

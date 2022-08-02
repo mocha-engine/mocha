@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine;
+﻿namespace Mocha.Common;
 
 [AttributeUsage( AttributeTargets.Class, AllowMultiple = false, Inherited = false )]
 public class IconAttribute : Attribute

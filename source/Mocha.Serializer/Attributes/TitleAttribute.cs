@@ -1,7 +1,7 @@
-﻿namespace Mocha.Engine;
+﻿namespace Mocha.Common;
 
 [AttributeUsage( AttributeTargets.Class, AllowMultiple = false, Inherited = false )]
-internal class TitleAttribute : Attribute
+public class TitleAttribute : Attribute
 {
 	public string title;
 

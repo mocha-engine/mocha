@@ -40,14 +40,14 @@ public class SceneCamera : SceneObject
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsDepthAttachment()
 			.IgnoreCache()
-			.WithName( $"Camera {GetHashCode()} depth" )
+			.WithName( $"SceneCamera {Entity.Id} depth" )
 			.Build();
 
 		ColorTexture = Texture.Builder
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsColorAttachment()
 			.IgnoreCache()
-			.WithName( $"Camera {GetHashCode()} color" )
+			.WithName( $"SceneCamera {Entity.Id} color" )
 			.Build();
 
 		var framebufferDescription = new FramebufferDescription( DepthTexture.VeldridTexture, ColorTexture.VeldridTexture );
