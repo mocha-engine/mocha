@@ -20,7 +20,7 @@ public class MaterialInspector : BaseInspector
 
 		texture ??= TextureBuilder.MissingTexture;
 
-		EditorHelpers.Image( texture, new Vector2( 32f ) );
+		ImGuiX.Image( texture, new Vector2( 32f ) );
 		ImGui.TableNextColumn();
 		ImGui.Text( $"{name}\n{texture.Type}" );
 		ImGui.TableNextColumn();
@@ -37,17 +37,17 @@ public class MaterialInspector : BaseInspector
 	{
 		var windowWidth = ImGui.GetWindowWidth();
 
-		EditorHelpers.Title(
+		ImGuiX.Title(
 			$"{FontAwesome.FaceGrinStars} {Path.GetFileName( material.Path )}",
 			"This is a material."
 		);
 
-		EditorHelpers.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
-		EditorHelpers.Separator();
+		ImGuiX.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		ImGuiX.Separator();
 
 		ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) );
 
-		EditorHelpers.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
+		ImGuiX.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
 
 		if ( ImGui.BeginTable( $"##material_slots", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 		{
@@ -59,7 +59,7 @@ public class MaterialInspector : BaseInspector
 			{
 				var texture = property.GetValue( material ) as Texture;
 
-				TextureSlot( EditorHelpers.GetDisplayName( property.Name ), texture );
+				TextureSlot( ImGuiX.GetDisplayName( property.Name ), texture );
 			}
 
 			ImGui.EndTable();
@@ -67,7 +67,7 @@ public class MaterialInspector : BaseInspector
 
 		ImGui.EndListBox();
 
-		EditorHelpers.Separator();
+		ImGuiX.Separator();
 
 		DrawButtons( material.Path );
 	}

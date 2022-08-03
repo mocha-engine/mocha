@@ -41,7 +41,7 @@ public class EntityInspector : BaseInspector
 		if ( thing.Value is Vector3 vec3 )
 		{
 			var sysVec3 = vec3.GetSystemVector3();
-			if ( EditorHelpers.Vector3Input( $"##thing_{thing.Name}", ref sysVec3 ) )
+			if ( ImGuiX.Vector3Input( $"##thing_{thing.Name}", ref sysVec3 ) )
 				thing.SetValue?.Invoke( new Vector3( sysVec3 ) );
 		}
 		else if ( thing.Value is Matrix4x4 mat4 )
@@ -97,7 +97,7 @@ public class EntityInspector : BaseInspector
 			var selectedEntityType = entity.GetType();
 			var entityDisplayInfo = DisplayInfo.For( entity );
 
-			EditorHelpers.Title(
+			ImGuiX.Title(
 				  $"{entityDisplayInfo.TextIcon} {entity.Name}",
 				$"This is a {entityDisplayInfo.Name} entity."
 			);
@@ -127,7 +127,7 @@ public class EntityInspector : BaseInspector
 					continue;
 
 				var groupDisplayInfo = DisplayInfo.For( group.Key );
-				EditorHelpers.TextBold( $"{groupDisplayInfo.CombinedTitle}" );
+				ImGuiX.TextBold( $"{groupDisplayInfo.CombinedTitle}" );
 
 				if ( ImGui.BeginTable( $"##table_{group}", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 				{
@@ -138,7 +138,7 @@ public class EntityInspector : BaseInspector
 					{
 						ImGui.TableNextRow();
 						ImGui.TableNextColumn();
-						ImGui.Text( $"{EditorHelpers.GetDisplayName( item.Name )}" );
+						ImGui.Text( $"{ImGuiX.GetDisplayName( item.Name )}" );
 						ImGui.TableNextColumn();
 
 						if ( item.MemberType == MemberTypes.Field )
@@ -160,7 +160,7 @@ public class EntityInspector : BaseInspector
 					ImGui.EndTable();
 				}
 
-				EditorHelpers.Separator();
+				ImGuiX.Separator();
 			}
 		}
 	}

@@ -15,13 +15,13 @@ public class TextureInspector : BaseInspector
 	{
 		var windowWidth = ImGui.GetWindowWidth();
 
-		EditorHelpers.Title(
+		ImGuiX.Title(
 			$"{FontAwesome.Image} {Path.GetFileName( texture.Path.NormalizePath() )}",
 			"This is a texture."
 		);
 
-		EditorHelpers.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
-		EditorHelpers.Separator();
+		ImGuiX.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		ImGuiX.Separator();
 
 		var items = new[]
 		{

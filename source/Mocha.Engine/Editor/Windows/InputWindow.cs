@@ -10,7 +10,7 @@ internal class InputWindow : BaseEditorWindow
 	{
 		ImGui.Begin( "Input", ref isVisible );
 
-		EditorHelpers.Title(
+		ImGuiX.Title(
 			$"{FontAwesome.Gamepad} Input",
 			"This is where you can see things like input buttons and mouse info."
 		);

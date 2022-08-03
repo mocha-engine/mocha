@@ -11,7 +11,7 @@ public class ShaderInspector : BaseInspector
 
 	public override void Draw()
 	{
-		EditorHelpers.Title(
+		ImGuiX.Title(
 			$"{FontAwesome.Glasses} {Path.GetFileName( texture.Path.NormalizePath() )}",
 			"This is a shader."
 		);
