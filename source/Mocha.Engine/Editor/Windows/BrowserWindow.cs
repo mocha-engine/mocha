@@ -177,11 +177,12 @@ internal class BrowserWindow : BaseEditorWindow
 			var windowPos = ImGui.GetWindowPos();
 
 			Vector2 margin = new( iconSize / 4f );
-			const int maxFileLength = 8;
 
 			float startX = 16;
+
 			var availableSpace = windowSize.X;
 			availableSpace += margin.X / 2.0f;
+
 			var remainingSpace = availableSpace % (iconSize + margin.X);
 			startX = remainingSpace / 2.0f;
 

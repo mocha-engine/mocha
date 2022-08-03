@@ -12,8 +12,6 @@ public partial class TextureBuilder
 	private uint width;
 	private uint height;
 
-	private SamplerAddressMode samplerAddressMode = SamplerAddressMode.Wrap;
-
 	private string path;
 
 	private bool isRenderTarget;

@@ -5,10 +5,10 @@ namespace Mocha.Common;
 
 public class DisplayInfo
 {
-	public string Name { get; set; }
-	public string Category { get; set; }
-	public string ImageIcon { get; set; }
-	public string TextIcon { get; set; }
+	public string Name { get; set; } = "";
+	public string Category { get; set; } = "";
+	public string ImageIcon { get; set; } = "";
+	public string TextIcon { get; set; } = "";
 
 	public string CombinedTitle => $"{TextIcon} {Name}";
 

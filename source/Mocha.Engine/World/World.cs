@@ -5,10 +5,10 @@ public class World
 	public static World Current { get; set; }
 	public static float Bounds => 48f;
 
-	public Camera Camera { get; set; }
-	public Sun Sun { get; set; }
-	public Sky Sky { get; set; }
-	public Player Player { get; set; }
+	public Camera? Camera { get; set; }
+	public Sun? Sun { get; set; }
+	public Sky? Sky { get; set; }
+	public Player? Player { get; set; }
 
 	public enum States
 	{

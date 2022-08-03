@@ -16,8 +16,8 @@ internal partial class Editor
 	public static ImFontPtr SubheadingFont { get; private set; }
 
 	private Renderer.Texture Logo { get; set; }
+	private Renderer.Texture DefaultFontTexture { get; set; }
 
-	private Renderer.Texture defaultFontTexture;
 	private List<BaseEditorWindow> windows = new();
 
 	// TODO: I don't like this
@@ -25,7 +25,7 @@ internal partial class Editor
 
 	public Editor( RendererInstance renderer )
 	{
-		Instance ??= this;
+		Instance = this;
 		Renderer = renderer;
 
 		Init();
