@@ -124,12 +124,12 @@ public class Shader : Asset
 
 			CreatePipelines();
 
-			Notify.AddNotification( "Shader Compilation Success!", $"Compiled shader {Path}" );
+			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader {Path}", FontAwesome.FaceGrinStars );
 		}
 		catch ( Exception ex )
 		{
 			Log.Warning( $"Compile failed:\n{ex.Message}" );
-			Notify.AddNotification( "Shader Compilation Fail", $"{ex.Message}" );
+			Notify.AddNotification( $"Shader Compilation Fail", $"{ex.Message}", FontAwesome.FaceSadCry );
 		}
 
 		IsDirty = false;
