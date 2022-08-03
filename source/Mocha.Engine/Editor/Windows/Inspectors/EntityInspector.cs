@@ -85,7 +85,7 @@ public class EntityInspector : BaseInspector
 		{
 			ImGui.Text( $"{thing.Value}" );
 			ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
-			ImGui.Text( $"[{thing.Value.GetType()}]" );
+			ImGui.Text( $"[{thing.Value?.GetType()}]" );
 			ImGui.PopStyleColor();
 		}
 	}
@@ -120,6 +120,9 @@ public class EntityInspector : BaseInspector
 				.Where( x => x.MemberType == MemberTypes.Field || x.MemberType == MemberTypes.Property )
 				.GroupBy( x => x.DeclaringType ) )
 			{
+				if ( group.Key == null )
+					continue;
+
 				if ( group.Key == typeof( object ) )
 					continue;
 

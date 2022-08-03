@@ -42,7 +42,7 @@ internal class OutlinerTab : BaseEditorWindow
 				string icon = FontAwesome.Question;
 
 				// TODO: Get rid of this
-				switch ( group.Key.Category )
+				switch ( group.Key?.Category )
 				{
 					case "Player":
 						icon = FontAwesome.User;
@@ -54,37 +54,35 @@ internal class OutlinerTab : BaseEditorWindow
 
 				ImGuiX.TextBold( $"{icon} {group.Key?.Category ?? "Uncategorised"}" );
 
+				if ( ImGui.BeginTable( $"##table_entities", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 				{
-					if ( ImGui.BeginTable( $"##table_entities", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+					ImGui.TableSetupColumn( "Entity", ImGuiTableColumnFlags.WidthStretch, 1f );
+					ImGui.TableSetupColumn( "Visibility", ImGuiTableColumnFlags.WidthFixed, 32 );
+
+					foreach ( var entity in group )
 					{
-						ImGui.TableSetupColumn( "Entity", ImGuiTableColumnFlags.WidthStretch, 1f );
-						ImGui.TableSetupColumn( "Visibility", ImGuiTableColumnFlags.WidthFixed, 32 );
+						ImGui.TableNextRow();
+						ImGui.TableNextColumn();
 
-						foreach ( var entity in group )
+						var str = $"{entity.Name}";
+
+						if ( ImGui.Selectable( str ) )
 						{
-							ImGui.TableNextRow();
-							ImGui.TableNextColumn();
-
-							var str = $"{entity.Name}";
-
-							if ( ImGui.Selectable( str ) )
-							{
-								SelectItem( str );
-							}
-
-							ImGui.TableNextColumn();
-
-							ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
-							ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
-
-							ImGui.SmallButton( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash );
-
-							ImGui.PopStyleColor();
-							ImGui.PopStyleVar();
+							SelectItem( str );
 						}
 
-						ImGui.EndTable();
+						ImGui.TableNextColumn();
+
+						ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
+						ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
+
+						ImGui.SmallButton( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash );
+
+						ImGui.PopStyleColor();
+						ImGui.PopStyleVar();
 					}
+
+					ImGui.EndTable();
 				}
 
 				ImGuiX.Separator();

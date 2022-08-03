@@ -17,7 +17,10 @@ public static class Program
 
 		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes().Where( x => x.BaseType == typeof( BaseCompiler ) ) )
 		{
-			Compilers.Add( Activator.CreateInstance( type ) as BaseCompiler );
+			var instance = Activator.CreateInstance( type ) as BaseCompiler;
+
+			if ( instance != null )
+				Compilers.Add( instance );
 		}
 
 		var path = args[0];
@@ -71,7 +74,7 @@ public static class Program
 		}
 	}
 
-	private static bool GetCompiler( string fileExtension, out BaseCompiler foundCompiler )
+	private static bool GetCompiler( string fileExtension, out BaseCompiler? foundCompiler )
 	{
 		foreach ( var compiler in Compilers )
 		{

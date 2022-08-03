@@ -218,7 +218,7 @@ public partial struct Rotation : IEquatable<Rotation>
 		return new Rotation( r.X / mag, r.Y / mag, r.Z / mag, r.W / mag );
 	}
 
-	public override bool Equals( object obj )
+	public override bool Equals( object? obj )
 	{
 		if ( obj is not Rotation )
 			return false;
@@ -236,4 +236,9 @@ public partial struct Rotation : IEquatable<Rotation>
 
 	public override string ToString() => internalQuaternion.ToString();
 	public System.Numerics.Quaternion GetSystemQuaternion() => internalQuaternion;
+
+	public override int GetHashCode()
+	{
+		return base.GetHashCode();
+	}
 }
