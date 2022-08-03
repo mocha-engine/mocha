@@ -217,7 +217,7 @@ internal class BrowserWindow : BaseEditorWindow
 					drawList.AddRectFilled(
 						windowPos + startPos - new System.Numerics.Vector2( 4, 4 ) - scrollPos,
 						windowPos + startPos + new System.Numerics.Vector2( iconSize + 4, iconSize + 20 ) - scrollPos,
-						ImGui.GetColorU32( OneDark.Info * 0.75f ),
+						ImGui.GetColorU32( Colors.Blue * 0.75f ),
 						4f );
 				}
 

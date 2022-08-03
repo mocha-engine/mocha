@@ -87,8 +87,7 @@ internal static class EditorHelpers
 		ImGui.PushStyleVar( ImGuiStyleVar.ItemInnerSpacing, new System.Numerics.Vector2( 0, 0 ) );
 
 		{
-			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Background );
-			ImGui.PushStyleColor( ImGuiCol.Button, OneDark.Error );
+			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Red );
 			ImGui.Button( $"X##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
 			ImGui.PopStyleColor( 2 );
@@ -99,8 +98,7 @@ internal static class EditorHelpers
 		}
 
 		{
-			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Background );
-			ImGui.PushStyleColor( ImGuiCol.Button, OneDark.String );
+			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Green );
 			ImGui.Button( $"Y##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
 			ImGui.PopStyleColor( 2 );
@@ -111,8 +109,7 @@ internal static class EditorHelpers
 		}
 
 		{
-			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Background );
-			ImGui.PushStyleColor( ImGuiCol.Button, OneDark.Info );
+			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Blue );
 			ImGui.Button( $"Z##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
 			ImGui.PopStyleColor( 2 );
@@ -179,7 +176,7 @@ internal static class EditorHelpers
 
 	public static void TextLight( string text )
 	{
-		ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+		ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
 		ImGui.Dummy( new System.Numerics.Vector2( 0, 2 ) );
 		ImGui.Text( text );
 		ImGui.PopStyleColor();

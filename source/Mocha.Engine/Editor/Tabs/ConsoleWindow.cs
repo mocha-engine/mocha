@@ -26,11 +26,11 @@ internal class ConsoleWindow : BaseEditorWindow
 		{
 			var color = severity switch
 			{
-				Logger.Level.Trace => OneDark.Trace,
-				Logger.Level.Info => OneDark.Info,
-				Logger.Level.Warning => OneDark.Warning,
-				Logger.Level.Error => OneDark.Error,
-				_ => OneDark.Info,
+				Logger.Level.Trace => Colors.LightText,
+				Logger.Level.Info => Colors.Blue,
+				Logger.Level.Warning => Colors.Orange,
+				Logger.Level.Error => Colors.Red,
+				_ => Colors.Blue,
 			};
 
 			items.Add( new ConsoleItem( color, str ) );

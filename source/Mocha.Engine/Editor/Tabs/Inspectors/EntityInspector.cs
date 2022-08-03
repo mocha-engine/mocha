@@ -84,7 +84,7 @@ public class EntityInspector : BaseInspector
 		else
 		{
 			ImGui.Text( $"{thing.Value}" );
-			ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+			ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
 			ImGui.Text( $"[{thing.Value.GetType()}]" );
 			ImGui.PopStyleColor();
 		}
