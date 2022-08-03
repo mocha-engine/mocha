@@ -1,5 +1,5 @@
 ﻿namespace Mocha.Engine;
 
-internal class HideInInspectorAttribute : Attribute
+public class HideInInspectorAttribute : Attribute
 {
 }

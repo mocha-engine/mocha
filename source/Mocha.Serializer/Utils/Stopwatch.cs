@@ -2,8 +2,8 @@
 
 public class Stopwatch : IDisposable
 {
-	private DateTime start;
-	private string name;
+	private readonly DateTime start;
+	private readonly string name;
 
 	public Stopwatch( string name )
 	{
@@ -15,11 +15,8 @@ public class Stopwatch : IDisposable
 	void IDisposable.Dispose()
 	{
 		var end = DateTime.Now;
-		var duration = (end - start).TotalMilliseconds;
+		var durationMs = (end - start).TotalMilliseconds;
 
-		if ( duration > 2500 )
-			Log.Warning( $"{name} took {duration / 1000:F0}s!" );
-		else
-			Log.Info( $"{name} took {duration:F0}ms" );
+		Log.Info( $"{name} took {durationMs:F0}ms" );
 	}
 }
