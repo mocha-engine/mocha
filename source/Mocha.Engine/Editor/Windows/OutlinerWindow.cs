@@ -30,7 +30,7 @@ internal class OutlinerTab : BaseEditorWindow
 		{
 			var groupedEntities = Entity.All.GroupBy( x => x.GetType().GetCustomAttribute<CategoryAttribute>() );
 
-			EditorHelpers.Title(
+			ImGuiX.Title(
 				  $"{FontAwesome.Globe} World",
 				"This is where all your entities live."
 			);
@@ -52,7 +52,7 @@ internal class OutlinerTab : BaseEditorWindow
 						break;
 				}
 
-				EditorHelpers.TextBold( $"{icon} {group.Key?.Category ?? "Uncategorised"}" );
+				ImGuiX.TextBold( $"{icon} {group.Key?.Category ?? "Uncategorised"}" );
 
 				{
 					if ( ImGui.BeginTable( $"##table_entities", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
@@ -87,7 +87,7 @@ internal class OutlinerTab : BaseEditorWindow
 					}
 				}
 
-				EditorHelpers.Separator();
+				ImGuiX.Separator();
 			}
 
 			ImGui.EndListBox();

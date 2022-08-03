@@ -17,7 +17,7 @@ internal class GameViewWindow : BaseEditorWindow
 
 		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 16, 42 );
 		var tint = (World.Current.State == World.States.Paused) ? new Vector4( 0.5f, 0.5f, 0.5f, 1.0f ) : Vector4.One;
-		EditorHelpers.Image( SceneWorld.Current.Camera.ColorTexture, windowSize, tint );
+		ImGuiX.Image( SceneWorld.Current.Camera.ColorTexture, windowSize, tint );
 
 		SceneWorld.Current.Camera.UpdateAspect( new Point2( (int)windowSize.X, (int)windowSize.Y ) );
 

@@ -15,7 +15,7 @@ internal class AssetCacheWindow : BaseEditorWindow
 	{
 		if ( ImGui.Begin( "Asset Cache", ref isVisible ) )
 		{
-			EditorHelpers.Title(
+			ImGuiX.Title(
 				$"{FontAwesome.Database} Asset Cache",
 				"Here's where you can see all the currently cached assets."
 			);
@@ -38,7 +38,7 @@ internal class AssetCacheWindow : BaseEditorWindow
 
 			ImGui.EndListBox();
 
-			EditorHelpers.Separator();
+			ImGuiX.Separator();
 
 			ImGui.Text( $"Cached assets: {Asset.All.Count()}" );
 			ImGui.End();

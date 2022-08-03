@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine;
 
-internal static class EditorHelpers
+internal static class ImGuiX
 {
 	public static string Align( string str ) => str.PadRight( 16, ' ' );
 

@@ -15,12 +15,12 @@ public class BaseInspector
 	{
 		ImGui.BeginListBox( "##inspector_table", new( -1, items.Length * 32 ) );
 
-		EditorHelpers.TextBold( title );
+		ImGuiX.TextBold( title );
 		DrawTable( items );
 
 		ImGui.EndListBox();
 
-		EditorHelpers.Separator();
+		ImGuiX.Separator();
 		DrawButtons( filePath );
 	}
 

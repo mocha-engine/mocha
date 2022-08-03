@@ -167,7 +167,7 @@ internal class BrowserWindow : BaseEditorWindow
 			ImGui.SameLine();
 			ImGui.Button( $"{FontAwesome.Gear}" );
 
-			EditorHelpers.Separator();
+			ImGuiX.Separator();
 		}
 
 		{
@@ -223,7 +223,7 @@ internal class BrowserWindow : BaseEditorWindow
 				}
 
 				ImGui.SetCursorPos( startPos );
-				EditorHelpers.Image( icon, new Vector2( iconSize, iconSize ) );
+				ImGuiX.Image( icon, new Vector2( iconSize, iconSize ) );
 
 				if ( name.EndsWith( ".mtex" ) )
 				{
@@ -274,8 +274,8 @@ internal class BrowserWindow : BaseEditorWindow
 				void DrawShadowText( int x, int y )
 				{
 					ImGui.SetCursorPos( textStartPos );
-					EditorHelpers.SetCursorPosXRelative( x );
-					EditorHelpers.SetCursorPosYRelative( y );
+					ImGuiX.SetCursorPosXRelative( x );
+					ImGuiX.SetCursorPosYRelative( y );
 					ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
 					ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
 					ImGui.TextWrapped( fileName );

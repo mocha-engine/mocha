@@ -37,7 +37,7 @@ internal class SceneViewWindow : BaseEditorWindow
 		ImGui.Begin( "Scene View" );
 
 		var windowSize = ImGui.GetWindowSize() - new System.Numerics.Vector2( 16, 42 );
-		EditorHelpers.Image( Asset.All.OfType<Texture>().ToList()[1], windowSize );
+		ImGuiX.Image( Asset.All.OfType<Texture>().ToList()[1], windowSize );
 
 		SceneWorld.Current.Camera.UpdateAspect( new Point2( (int)windowSize.X, (int)windowSize.Y ) );
 

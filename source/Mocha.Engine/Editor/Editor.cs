@@ -181,7 +181,7 @@ internal partial class Editor
 
 	private void DrawMenuBar()
 	{
-		EditorHelpers.MenusSubmittedThisFrame.Clear();
+		ImGuiX.MenusSubmittedThisFrame.Clear();
 
 		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#000000" ) );
 		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
@@ -190,32 +190,32 @@ internal partial class Editor
 		ImGui.Dummy( new( 4, 0 ) );
 
 		ImGui.SetCursorPosY( 8 );
-		EditorHelpers.Image( Logo, new Vector2( 32, 32 ) );
+		ImGuiX.Image( Logo, new Vector2( 32, 32 ) );
 		ImGui.SetCursorPosY( 0 );
 		ImGui.Dummy( new( 4, 0 ) );
 
-		if ( EditorHelpers.BeginMenu( $"Tools" ) )
+		if ( ImGuiX.BeginMenu( $"Tools" ) )
 		{
-			EditorHelpers.MenuItem( FontAwesome.Image, "Texture Tool" );
-			EditorHelpers.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
-			EditorHelpers.MenuItem( FontAwesome.Cubes, "Model Tool" );
-			EditorHelpers.MenuItem( FontAwesome.Glasses, "Shader Tool" );
-			EditorHelpers.EndMenu();
+			ImGuiX.MenuItem( FontAwesome.Image, "Texture Tool" );
+			ImGuiX.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
+			ImGuiX.MenuItem( FontAwesome.Cubes, "Model Tool" );
+			ImGuiX.MenuItem( FontAwesome.Glasses, "Shader Tool" );
+			ImGuiX.EndMenu();
 		}
 
 		foreach ( var window in windows )
 		{
 			var displayInfo = DisplayInfo.For( window );
 
-			if ( EditorHelpers.BeginMenu( displayInfo.Category ) )
+			if ( ImGuiX.BeginMenu( displayInfo.Category ) )
 			{
 				var enabled = window.isVisible;
-				bool active = EditorHelpers.MenuItem( displayInfo.TextIcon, displayInfo.Name, enabled );
+				bool active = ImGuiX.MenuItem( displayInfo.TextIcon, displayInfo.Name, enabled );
 
 				if ( active )
 					window.isVisible = !window.isVisible;
 
-				EditorHelpers.EndMenu();
+				ImGuiX.EndMenu();
 			}
 		}
 
@@ -509,9 +509,7 @@ internal partial class Editor
 			return;
 		}
 
-		Gizmos.Draw();
-
-		EditorHelpers.DockSpaceOverViewport();
+		ImGuiX.DockSpaceOverViewport();
 
 		DrawMenuBar();
 		DrawQuickSwitcher();
