@@ -24,6 +24,8 @@ public class Logger
 		if ( str == null )
 			return;
 
+		var stackTrace = new System.Diagnostics.StackTrace();
+
 #if RELEASE
 		if ( severity == Level.Error )
 			throw new Exception( str );
@@ -32,14 +34,11 @@ public class Logger
 		Console.Write( $"[{DateTime.Now.ToLongTimeString()}] " );
 
 		Console.ForegroundColor = SeverityToConsoleColor( severity );
-		Console.Write( $"[{severity}] " );
+		Console.Write( $"[{severity}] ".Pad() );
 		Console.ForegroundColor = ConsoleColor.Gray;
 
-		Console.Write( $"{str}" );
+		Console.WriteLine( $"{str}" );
 
-		Console.Write( $"\n" );
-
-		var stackTrace = new System.Diagnostics.StackTrace();
 		OnLog?.Invoke( severity, str, stackTrace );
 	}
 
