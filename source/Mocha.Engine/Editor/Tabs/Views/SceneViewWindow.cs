@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Video, $"{FontAwesome.Gamepad} Game/Scene View" )]
+[Icon( FontAwesome.Video ), Title( "Scene View" ), Category( "Game" )]
 internal class SceneViewWindow : BaseEditorWindow
 {
 	public SceneViewWindow()

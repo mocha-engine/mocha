@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gears} Engine/Input" )]
+[Icon( FontAwesome.Gamepad ), Title( "Input" ), Category( "Engine" )]
 internal class InputWindow : BaseEditorWindow
 {
 	public override void Draw()

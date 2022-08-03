@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Terminal, $"{FontAwesome.Gears} Engine/Console" )]
+[Icon( FontAwesome.Terminal ), Title( "Console" ), Category( "Engine" )]
 internal class ConsoleWindow : BaseEditorWindow
 {
 	List<ConsoleItem> items = new();

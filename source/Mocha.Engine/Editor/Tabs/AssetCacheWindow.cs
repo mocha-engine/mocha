@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Image, $"{FontAwesome.Gears} Engine/Asset Cache" )]
+[Icon( FontAwesome.Database ), Title( "Asset Cache" ), Category( "Engine" )]
 internal class AssetCacheWindow : BaseEditorWindow
 {
 	public AssetCacheWindow()

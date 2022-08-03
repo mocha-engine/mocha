@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Gamepad, $"{FontAwesome.Gamepad} Game/Game View" )]
+[Icon( FontAwesome.Gamepad ), Title( "Game View" ), Category( "Game" )]
 internal class GameViewWindow : BaseEditorWindow
 {
 	public GameViewWindow()
