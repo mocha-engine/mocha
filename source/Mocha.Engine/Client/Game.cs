@@ -16,7 +16,6 @@ internal class Game
 		if ( Veldrid.RenderDoc.Load( out var renderDoc ) )
 		{
 			renderDoc.OverlayEnabled = false;
-			// renderDoc.RefAllResources = false;
 			Log.Trace( "Loaded RenderDoc" );
 		}
 
@@ -24,18 +23,15 @@ internal class Game
 		{
 			Log.Trace( "Game init" );
 			renderer = new();
-
 #if DEBUG
 			editor = new( renderer );
 #endif
-
 			var world = new World();
 
 			// Must be called before everything else
 			renderer.PreUpdate += Input.Update;
 
 			renderer.OnUpdate += world.Update;
-
 #if DEBUG
 			// Must be called after everything else
 			renderer.PostUpdate += editor.Update;

@@ -12,10 +12,10 @@ public class BarrierEntity : ModelEntity
 		Rotation = Rotation.From( 0, 0, 90 );
 		Scale = new Vector3( 0.025f );
 
-		Spawn();
+		Respawn();
 	}
 
-	private void Spawn()
+	private void Respawn()
 	{
 		Position = new( 32, -World.Bounds, 0 );
 
@@ -31,12 +31,12 @@ public class BarrierEntity : ModelEntity
 
 		if ( Position.Y > World.Bounds )
 		{
-			Spawn();
+			Respawn();
 		}
 
 		if ( Position.Y < -World.Bounds )
 		{
-			Spawn();
+			Respawn();
 		}
 	}
 }
