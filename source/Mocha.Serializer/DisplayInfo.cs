@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.ComponentModel;
+using System.Reflection;
 
 namespace Mocha.Common;
 
@@ -23,7 +24,8 @@ public class DisplayInfo
 		return new DisplayInfo()
 		{
 			Name = GetTypeTitle( type ),
-			TextIcon = GetTypeIcon( type )
+			TextIcon = GetTypeIcon( type ),
+			Category = GetTypeCategory( type )
 		};
 	}
 
@@ -47,6 +49,16 @@ public class DisplayInfo
 
 		if ( iconAttribute != null )
 			return iconAttribute.icon;
+
+		return "";
+	}
+
+	public static string GetTypeCategory( Type type )
+	{
+		var categoryAttribute = type.GetCustomAttribute<CategoryAttribute>();
+
+		if ( categoryAttribute != null )
+			return categoryAttribute.Category;
 
 		return "";
 	}

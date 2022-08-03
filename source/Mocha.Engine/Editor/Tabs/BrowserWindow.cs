@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Folder, $"{FontAwesome.Gamepad} Game/Browser" )]
+[Icon( FontAwesome.Folder ), Title( "Browser" ), Category( "Game" )]
 internal class BrowserWindow : BaseEditorWindow
 {
 	public static BrowserWindow Instance { get; set; }

@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.List, $"{FontAwesome.Gamepad} Game/Inspector" )]
+[Icon( FontAwesome.List ), Title( "Inspector" ), Category( "Game" )]
 internal class InspectorWindow : BaseEditorWindow
 {
 	private static InspectorWindow Instance { get; set; }

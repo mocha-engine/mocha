@@ -1,8 +1,9 @@
 ﻿using ImGuiNET;
+using System.ComponentModel;
 
 namespace Mocha.Engine;
 
-[EditorMenu( FontAwesome.Flask, $"{FontAwesome.Gears} Engine/Demo" )]
+[Icon( FontAwesome.Flask ), Title( "Demo" ), Category( "Engine" )]
 internal class DemoWindow : BaseEditorWindow
 {
 	public override void Draw()
