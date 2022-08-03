@@ -6,7 +6,7 @@ public static class Notify
 {
 	public static void Draw()
 	{
-		var window_flags = ImGuiWindowFlags.NoDecoration |
+		var windowFlags = ImGuiWindowFlags.NoDecoration |
 			ImGuiWindowFlags.AlwaysAutoResize |
 			ImGuiWindowFlags.NoSavedSettings |
 			ImGuiWindowFlags.NoFocusOnAppearing |
@@ -22,8 +22,8 @@ public static class Notify
 
 		System.Numerics.Vector2 windowPos;
 
-		windowPos.X = workPos.X + padding;
-		windowPos.Y = workPos.Y + padding + 108;
+		windowPos.X = workPos.X + workSize.X - padding;
+		windowPos.Y = workPos.Y + padding;
 
 		float y = 0;
 
@@ -41,18 +41,20 @@ public static class Notify
 			t0 = EasingFunctions.InExpo( t0 );
 			float t = t0.Clamp( 0, 1 );
 
-			float xOffset = t;
+			float xOffset = 1.0f - t;
 			var windowPivot = new System.Numerics.Vector2( xOffset, 0 );
 
+			ImGui.PushStyleColor( ImGuiCol.WindowBg, new Vector4( 0, 0, 0, 1 ) );
+			ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 1 );
 			ImGui.SetNextWindowPos( windowPos + new System.Numerics.Vector2( 0, y ), ImGuiCond.Always, windowPivot );
-			ImGui.SetNextWindowBgAlpha( 0.0f.LerpTo( 0.5f, alpha ) );
+			ImGui.SetNextWindowBgAlpha( 0.0f.LerpTo( 1, alpha ) );
 			ImGui.SetNextWindowSize( new System.Numerics.Vector2( 0, 0 ) );
 
-			if ( ImGui.Begin( $"##{notification.GetHashCode()}_overlay", window_flags ) )
+			if ( ImGui.Begin( $"##{notification.GetHashCode()}_overlay", windowFlags ) )
 			{
 				ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 1, 1, 1, alpha ) );
 
-				ImGui.PushFont( Editor.HeadingFont );
+				ImGui.PushFont( Editor.BoldFont );
 				ImGui.Text( notification.Title );
 				ImGui.PopFont();
 
@@ -63,6 +65,9 @@ public static class Notify
 
 				ImGui.PopStyleColor();
 			}
+
+			ImGui.PopStyleVar( 1 );
+			ImGui.PopStyleColor();
 		}
 	}
 }
