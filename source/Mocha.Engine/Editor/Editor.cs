@@ -34,6 +34,7 @@ internal partial class Editor
 		windows.AddRange( Assembly.GetExecutingAssembly()
 			.GetTypes()
 			.Where( x => typeof( BaseEditorWindow ).IsAssignableFrom( x ) )
+			.Where( x => x != typeof( BaseEditorWindow ) )
 			.Select( x => Activator.CreateInstance( x ) )
 			.OfType<BaseEditorWindow>()
 		);
@@ -154,7 +155,6 @@ internal partial class Editor
 		windowPivot.Y = 0.0f;
 
 		ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 0 );
-		ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
 		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
 		ImGui.SetNextWindowBgAlpha( 0.5f );
 		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 125, 0 ) );
@@ -176,7 +176,7 @@ internal partial class Editor
 			ImGui.End();
 		}
 
-		ImGui.PopStyleVar( 2 );
+		ImGui.PopStyleVar( 1 );
 	}
 
 	private void DrawMenuBar()
@@ -194,7 +194,7 @@ internal partial class Editor
 		ImGui.SetCursorPosY( 0 );
 		ImGui.Dummy( new( 4, 0 ) );
 
-		if ( EditorHelpers.BeginMenu( $"{FontAwesome.Toolbox} Tools" ) )
+		if ( EditorHelpers.BeginMenu( $"Tools" ) )
 		{
 			EditorHelpers.MenuItem( FontAwesome.Image, "Texture Tool" );
 			EditorHelpers.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
@@ -205,25 +205,15 @@ internal partial class Editor
 
 		foreach ( var window in windows )
 		{
-			var editorMenuAttribute = window.GetType().GetCustomAttribute<EditorMenuAttribute>();
-			if ( editorMenuAttribute == null )
-				continue;
+			var displayInfo = DisplayInfo.For( window );
 
-			var splitPath = editorMenuAttribute.Path.Split( '/' );
-			var icon = editorMenuAttribute.Icon;
-
-			if ( EditorHelpers.BeginMenu( splitPath[0] ) )
+			if ( EditorHelpers.BeginMenu( displayInfo.Category ) )
 			{
-				for ( int i = 1; i < splitPath.Length; i++ )
-				{
-					var item = splitPath[i];
-					var name = item;
-					var enabled = window.isVisible;
-					bool active = EditorHelpers.MenuItem( icon, name, enabled );
+				var enabled = window.isVisible;
+				bool active = EditorHelpers.MenuItem( displayInfo.TextIcon, displayInfo.Name, enabled );
 
-					if ( i == splitPath.Length - 1 && active )
-						window.isVisible = !window.isVisible;
-				}
+				if ( active )
+					window.isVisible = !window.isVisible;
 
 				EditorHelpers.EndMenu();
 			}
@@ -247,7 +237,7 @@ internal partial class Editor
 			void DrawButtonUnderline()
 			{
 				var drawList = ImGui.GetWindowDrawList();
-				var buttonCol = ImGui.GetColorU32( OneDark.Info );
+				var buttonCol = ImGui.GetColorU32( Colors.Blue );
 
 				var p0 = ImGui.GetCursorPos() + new System.Numerics.Vector2( 0, 32 );
 				var p1 = p0 + new System.Numerics.Vector2( 32, 4 );
@@ -339,14 +329,6 @@ internal partial class Editor
 		ImGui.SetNextWindowPos( new System.Numerics.Vector2( center.X, 100 ) );
 
 		var switcherItems = new List<(string, string)>();
-		foreach ( var window in windows )
-		{
-			var editorMenuAttribute = window.GetType().GetCustomAttribute<EditorMenuAttribute>();
-			if ( editorMenuAttribute == null )
-				continue;
-
-			switcherItems.Add( ("Menu", editorMenuAttribute.Path) );
-		}
 
 		foreach ( var entity in Entity.All )
 		{
@@ -409,7 +391,7 @@ internal partial class Editor
 							drawList.AddRectFilled(
 								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
 								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
-								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+								ImGui.GetColorU32( Colors.Blue * 0.75f ) );
 
 							ImGui.SetScrollHereY();
 						}
@@ -418,7 +400,7 @@ internal partial class Editor
 					ImGui.TableNextRow();
 					ImGui.TableNextColumn();
 
-					ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
+					ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
 					ImGui.Text( $"{switcherItem.Item1}:".Pad() );
 					ImGui.PopStyleColor();
 					ImGui.SameLine();
@@ -437,7 +419,7 @@ internal partial class Editor
 							drawList.AddRectFilled(
 								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
 								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
-								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+								ImGui.GetColorU32( Colors.Blue * 0.75f ) );
 						}
 					}
 
