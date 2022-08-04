@@ -6,6 +6,8 @@ public class FileWriter : IWriter
 
 	public FileWriter( string filePath )
 	{
+		Directory.CreateDirectory( Path.GetDirectoryName( filePath ) );
+
 		if ( File.Exists( filePath ) )
 			File.Delete( filePath );
 

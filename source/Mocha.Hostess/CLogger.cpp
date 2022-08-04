@@ -3,25 +3,22 @@
 #include "spdlog/spdlog.h"
 #include <iostream>
 
-CLogger::CLogger()
-{
-}
-
-CLogger::~CLogger()
-{
-}
-
-void CLogger::Log(const char* str)
+void CLogger::Info(const char* str)
 {
 	spdlog::info(str);
 }
 
-int* CLogger::InteropTest(const char* a, const char* b, int* c)
+void CLogger::Warning(const char* str)
 {
-	return nullptr;
+	spdlog::warn(str);
 }
 
-CLogger* CLogger::GetActiveLogger()
+void CLogger::Error(const char* str)
 {
-	return nullptr;
+	spdlog::error(str);
+}
+
+void CLogger::Trace(const char* str)
+{
+	spdlog::trace(str);
 }

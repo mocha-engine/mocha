@@ -2,32 +2,33 @@
 
 public class Program
 {
-	private static void ProcessHeader( string headerPath )
+	private static void ProcessHeader( string baseDir, string headerPath )
 	{
-		Console.WriteLine( $"-- Processing header {headerPath}" );
+		Console.WriteLine( $"\t Processing header {headerPath}" );
 
 		var fileContents = File.ReadAllText( headerPath );
-		var headerParser = new HeaderParser( fileContents );
+		var headerParser = new HeaderParser( baseDir, headerPath, fileContents );
 	}
 
-	private static void ProcessDirectory( string directoryPath )
+	private static void ProcessDirectory( string baseDir, string directoryPath )
 	{
 		foreach ( var file in Directory.GetFiles( directoryPath ) )
 		{
-			if ( file.EndsWith( ".h" ) )
+			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
 			{
-				ProcessHeader( file );
+				ProcessHeader( baseDir, file );
 			}
 		}
 
 		foreach ( var subDirectory in Directory.GetDirectories( directoryPath ) )
 		{
-			ProcessDirectory( subDirectory );
+			ProcessDirectory( baseDir, subDirectory );
 		}
 	}
 
-	public static void Main()
+	public static void Main( string[] args )
 	{
-		ProcessDirectory( "." );
+		Console.WriteLine( "Generating C# <--> C++ interop code..." );
+		ProcessDirectory( args[0], args[0] );
 	}
 }
