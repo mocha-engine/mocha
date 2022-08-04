@@ -3,6 +3,8 @@
 
 int main()
 {
+	spdlog::set_level(spdlog::level::trace);
+
 	char_t host_path[MAX_PATH];
 	auto size = GetCurrentDirectory(MAX_PATH, host_path);
 	assert(size != 0);

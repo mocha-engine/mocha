@@ -4,6 +4,8 @@ namespace Mocha.Common;
 
 public class Logger
 {
+	public CLogger NativeLogger { get; set; }
+
 	public enum Level
 	{
 		Trace,
@@ -12,10 +14,10 @@ public class Logger
 		Error
 	};
 
-	public void Trace( object obj ) => InternalLog( obj?.ToString(), Level.Trace );
-	public void Info( object obj ) => InternalLog( obj?.ToString(), Level.Info );
-	public void Warning( object obj ) => InternalLog( obj?.ToString(), Level.Warning );
-	public void Error( object obj ) => InternalLog( obj?.ToString(), Level.Error );
+	public void Trace( object obj ) => NativeLogger.Trace( obj?.ToString() );
+	public void Info( object obj ) => NativeLogger.Info( obj?.ToString() );
+	public void Warning( object obj ) => NativeLogger.Warning( obj?.ToString() );
+	public void Error( object obj ) => NativeLogger.Error( obj?.ToString() );
 
 	public static Action<Level, string, StackTrace> OnLog;
 

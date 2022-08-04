@@ -2,7 +2,7 @@
   "profiles": {
     "Mocha.InteropGen": {
       "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)\\Mocha.Hostess\\"
+      "commandLineArgs": "$(SolutionDir)"
     }
   }
 }
