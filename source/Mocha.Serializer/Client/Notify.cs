@@ -20,8 +20,10 @@ public static class Notify
 
 	public static List<Notification> Notifications { get; set; } = new();
 
-	public static void AddNotification( string title, string text )
+	public static void AddNotification( string title, string text, string? icon = null )
 	{
-		Notifications.Add( new Notification( title, text ) );
+		var mergedTitle = (icon == null) ? title : $"{icon} {title}";
+
+		Notifications.Add( new Notification( mergedTitle, text ) );
 	}
 }

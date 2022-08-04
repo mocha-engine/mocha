@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using Mocha.Common;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Veldrid;
@@ -17,26 +16,27 @@ internal partial class Editor
 	public static ImFontPtr SubheadingFont { get; private set; }
 
 	private Renderer.Texture Logo { get; set; }
+	private Renderer.Texture DefaultFontTexture { get; set; }
 
-	private Renderer.Texture defaultFontTexture;
-	private List<BaseTab> tabs = new();
+	private List<BaseEditorWindow> windows = new();
 
 	// TODO: I don't like this
 	internal RendererInstance Renderer { get; }
 
 	public Editor( RendererInstance renderer )
 	{
-		Instance ??= this;
+		Instance = this;
 		Renderer = renderer;
 
 		Init();
 		SetTheme();
 
-		tabs.AddRange( Assembly.GetExecutingAssembly()
+		windows.AddRange( Assembly.GetExecutingAssembly()
 			.GetTypes()
-			.Where( x => typeof( BaseTab ).IsAssignableFrom( x ) )
+			.Where( x => typeof( BaseEditorWindow ).IsAssignableFrom( x ) )
+			.Where( x => x != typeof( BaseEditorWindow ) )
 			.Select( x => Activator.CreateInstance( x ) )
-			.OfType<BaseTab>()
+			.OfType<BaseEditorWindow>()
 		);
 
 		Logo = TextureBuilder.UITexture.FromPath( "content/logo.png" ).Build();
@@ -87,7 +87,7 @@ internal partial class Editor
 		byte[] data = new byte[size];
 		Marshal.Copy( pixels, data, 0, size );
 
-		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).Build();
+		return TextureBuilder.UITexture.FromData( data, (uint)width, (uint)height ).WithName( "ImGUI Font Texture" ).Build();
 	}
 
 	private static void SetKeyMappings( ImGuiIOPtr io )
@@ -155,7 +155,6 @@ internal partial class Editor
 		windowPivot.Y = 0.0f;
 
 		ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 0 );
-		ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
 		ImGui.SetNextWindowPos( windowPos, ImGuiCond.Always, windowPivot );
 		ImGui.SetNextWindowBgAlpha( 0.5f );
 		ImGui.SetNextWindowSize( new System.Numerics.Vector2( 125, 0 ) );
@@ -177,12 +176,12 @@ internal partial class Editor
 			ImGui.End();
 		}
 
-		ImGui.PopStyleVar( 2 );
+		ImGui.PopStyleVar( 1 );
 	}
 
 	private void DrawMenuBar()
 	{
-		EditorHelpers.MenusSubmittedThisFrame.Clear();
+		ImGuiX.MenusSubmittedThisFrame.Clear();
 
 		ImGui.PushStyleColor( ImGuiCol.MenuBarBg, MathX.GetColor( "#000000" ) );
 		ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 0, 16 ) );
@@ -191,42 +190,32 @@ internal partial class Editor
 		ImGui.Dummy( new( 4, 0 ) );
 
 		ImGui.SetCursorPosY( 8 );
-		EditorHelpers.Image( Logo, new Vector2( 32, 32 ) );
+		ImGuiX.Image( Logo, new Vector2( 32, 32 ) );
 		ImGui.SetCursorPosY( 0 );
 		ImGui.Dummy( new( 4, 0 ) );
 
-		if ( EditorHelpers.BeginMenu( $"{FontAwesome.Toolbox} Tools" ) )
+		if ( ImGuiX.BeginMenu( $"Tools" ) )
 		{
-			EditorHelpers.MenuItem( FontAwesome.Image, "Texture Tool" );
-			EditorHelpers.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
-			EditorHelpers.MenuItem( FontAwesome.Cubes, "Model Tool" );
-			EditorHelpers.MenuItem( FontAwesome.Glasses, "Shader Tool" );
-			EditorHelpers.EndMenu();
+			ImGuiX.MenuItem( FontAwesome.Image, "Texture Tool" );
+			ImGuiX.MenuItem( FontAwesome.FaceGrinStars, "Material Tool" );
+			ImGuiX.MenuItem( FontAwesome.Cubes, "Model Tool" );
+			ImGuiX.MenuItem( FontAwesome.Glasses, "Shader Tool" );
+			ImGuiX.EndMenu();
 		}
 
-		foreach ( var tab in tabs )
+		foreach ( var window in windows )
 		{
-			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
-			if ( editorMenuAttribute == null )
-				continue;
+			var displayInfo = DisplayInfo.For( window );
 
-			var splitPath = editorMenuAttribute.Path.Split( '/' );
-			var icon = editorMenuAttribute.Icon;
-
-			if ( EditorHelpers.BeginMenu( splitPath[0] ) )
+			if ( ImGuiX.BeginMenu( displayInfo.Category ) )
 			{
-				for ( int i = 1; i < splitPath.Length; i++ )
-				{
-					var item = splitPath[i];
-					var name = item;
-					var enabled = tab.isVisible;
-					bool active = EditorHelpers.MenuItem( icon, name, enabled );
+				var enabled = window.isVisible;
+				bool active = ImGuiX.MenuItem( displayInfo.TextIcon, displayInfo.Name, enabled );
 
-					if ( i == splitPath.Length - 1 && active )
-						tab.isVisible = !tab.isVisible;
-				}
+				if ( active )
+					window.isVisible = !window.isVisible;
 
-				EditorHelpers.EndMenu();
+				ImGuiX.EndMenu();
 			}
 		}
 
@@ -248,7 +237,7 @@ internal partial class Editor
 			void DrawButtonUnderline()
 			{
 				var drawList = ImGui.GetWindowDrawList();
-				var buttonCol = ImGui.GetColorU32( OneDark.Info );
+				var buttonCol = ImGui.GetColorU32( Colors.Blue );
 
 				var p0 = ImGui.GetCursorPos() + new System.Numerics.Vector2( 0, 32 );
 				var p1 = p0 + new System.Numerics.Vector2( 32, 4 );
@@ -340,21 +329,13 @@ internal partial class Editor
 		ImGui.SetNextWindowPos( new System.Numerics.Vector2( center.X, 100 ) );
 
 		var switcherItems = new List<(string, string)>();
-		foreach ( var tab in tabs )
-		{
-			var editorMenuAttribute = tab.GetType().GetCustomAttribute<EditorMenuAttribute>();
-			if ( editorMenuAttribute == null )
-				continue;
-
-			switcherItems.Add( ("Menu", editorMenuAttribute.Path) );
-		}
 
 		foreach ( var entity in Entity.All )
 		{
 			switcherItems.Add( ("Entity", entity.Name) );
 		}
 
-		foreach ( var asset in AssetsTab.Instance.fileSystemCache )
+		foreach ( var asset in BrowserWindow.Instance.fileSystemCache )
 		{
 			switcherItems.Add( ("Asset", asset.Item2.NormalizePath()) );
 		}
@@ -410,7 +391,7 @@ internal partial class Editor
 							drawList.AddRectFilled(
 								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
 								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
-								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+								ImGui.GetColorU32( Colors.Blue * 0.75f ) );
 
 							ImGui.SetScrollHereY();
 						}
@@ -419,8 +400,8 @@ internal partial class Editor
 					ImGui.TableNextRow();
 					ImGui.TableNextColumn();
 
-					ImGui.PushStyleColor( ImGuiCol.Text, OneDark.Generic );
-					ImGui.Text( $"{switcherItem.Item1}:" );
+					ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
+					ImGui.Text( $"{switcherItem.Item1}:".Pad() );
 					ImGui.PopStyleColor();
 					ImGui.SameLine();
 					ImGui.Text( switcherItem.Item2 );
@@ -438,7 +419,7 @@ internal partial class Editor
 							drawList.AddRectFilled(
 								windowPos + startPos + new System.Numerics.Vector2( 0, 0 ) - scrollPos,
 								windowPos + startPos + new System.Numerics.Vector2( 1000, 24 ) - scrollPos,
-								ImGui.GetColorU32( OneDark.Info * 0.75f ) );
+								ImGui.GetColorU32( Colors.Blue * 0.75f ) );
 						}
 					}
 
@@ -477,7 +458,7 @@ internal partial class Editor
 				{
 					case "Asset":
 						ImGui.SetWindowFocus( "Browser" );
-						AssetsTab.Instance.SelectItem( selectedItem.Item2 );
+						BrowserWindow.Instance.SelectItem( selectedItem.Item2 );
 						ImGui.SetWindowFocus( "Inspector" );
 						break;
 					case "Menu":
@@ -528,17 +509,15 @@ internal partial class Editor
 			return;
 		}
 
-		Gizmos.Draw();
-
-		EditorHelpers.DockSpaceOverViewport();
+		ImGuiX.DockSpaceOverViewport();
 
 		DrawMenuBar();
 		DrawQuickSwitcher();
 
-		tabs.ForEach( tab =>
+		windows.ForEach( window =>
 		{
-			if ( tab.isVisible )
-				tab.Draw();
+			if ( window.isVisible )
+				window.Draw();
 		} );
 	}
 }

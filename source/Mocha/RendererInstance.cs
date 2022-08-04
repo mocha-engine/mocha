@@ -1,5 +1,4 @@
-﻿using Veldrid;
-using Veldrid.StartupUtilities;
+﻿using Veldrid.StartupUtilities;
 
 namespace Mocha.Renderer;
 
@@ -79,7 +78,7 @@ public class RendererInstance
 	{
 		// TODO: Make this nicer
 		// Check each shader, if it's dirty then recompile it
-		foreach ( var shader in Shader.All.Where( x => x.IsDirty ) )
+		foreach ( var shader in Asset.All.OfType<Shader>().Where( x => x.IsDirty ) )
 		{
 			shader.Recompile();
 		}
@@ -156,9 +155,7 @@ public class RendererInstance
 			SyncToVerticalBlank = false
 		};
 
-		var preferredBackend = GraphicsBackend.Direct3D11;
-		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options, preferredBackend );
-
+		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options );
 		Device.SyncToVerticalBlank = true;
 
 		var windowTitle = $"Mocha | {Device.BackendType}";

@@ -28,7 +28,7 @@ public static class Serializer
 		return stream.ToArray();
 	}
 
-	public static T Deserialize<T>( byte[] serialized )
+	public static T? Deserialize<T>( byte[] serialized )
 	{
 		using var outputStream = new MemoryStream();
 

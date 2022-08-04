@@ -1,14 +1,13 @@
-﻿using Veldrid;
-using Veldrid.Sdl2;
+﻿using Veldrid.Sdl2;
 
 namespace Mocha.Common;
 
 public class MochaInputSnapshot : InputSnapshot
 {
 	#region "InputSnapshot Interface"
-	public IReadOnlyList<KeyEvent> KeyEvents { get; internal set; }
-	public IReadOnlyList<MouseEvent> MouseEvents { get; internal set; }
-	public IReadOnlyList<char> KeyCharPresses { get; internal set; }
+	public IReadOnlyList<KeyEvent>? KeyEvents { get; internal set; }
+	public IReadOnlyList<MouseEvent>? MouseEvents { get; internal set; }
+	public IReadOnlyList<char>? KeyCharPresses { get; internal set; }
 	public System.Numerics.Vector2 MousePosition { get; internal set; }
 	public float WheelDelta { get; internal set; }
 	public bool IsMouseDown( MouseButton button ) => button switch
