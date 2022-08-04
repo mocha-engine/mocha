@@ -2,6 +2,10 @@
 #include "CLogger.h"
 #include <functional>
 
+// TODO(AG): InteropGen this
+#include "../Mocha.NeoRenderer/generated/CNativeWindow.generated.h"
+#include "generated/CLogger.generated.h"
+
 namespace
 {
 	hostfxr_initialize_for_runtime_config_fn init_fptr;
@@ -74,18 +78,25 @@ namespace
 	}
 }
 
+// TODO(AG): InteropGen this
 struct UnmanagedArgs {
+	CNativeWindow* CNativeWindowPtr;
 	CLogger* CLoggerPtr;
 
 	void* CreateMethodPtr;
-	void* DeleteMethodPtr;
-	void* LogMethodPtr;
-	void* InteropTestMethodPtr;
+	void* RunMethodPtr;
+	void* GetWindowPointerMethodPtr;
+
+	void* InfoMethodPtr;
+	void* WarningMethodPtr;
+	void* ErrorMethodPtr;
+	void* TraceMethodPtr;
 };
 
 void CNetCoreHost::CallFunction(string_t config_path, string_t dll_path, string_t dotnet_type, string_t dotnet_method)
 {
 	CLogger logger;
+	CNativeWindow window;
 
 	// Load HostFxr and get exported hosting functions
 	if (!load_hostfxr())
@@ -100,13 +111,20 @@ void CNetCoreHost::CallFunction(string_t config_path, string_t dll_path, string_
 	assert(load_assembly_and_get_function_pointer != nullptr && "Failure: get_dotnet_load_assembly()");
 
 	// Create unmanaged args
+	// TODO(AG): InteropGen this
 	UnmanagedArgs args
 	{
+		&window,
 		&logger,
-		(void*)__CLogger_Create,
-		(void*)__CLogger_Delete,
-		(void*)__CLogger_Log,
-		(void*)__CLogger_InteropTest,
+
+		(void*)__CNativeWindow_Create,
+		(void*)__CNativeWindow_Run,
+		(void*)__CNativeWindow_GetWindowPointer,
+
+		(void*)__CLogger_Info,
+		(void*)__CLogger_Warning,
+		(void*)__CLogger_Error,
+		(void*)__CLogger_Trace
 	};
 
 	// Function pointer to managed delegate with non-default signature

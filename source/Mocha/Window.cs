@@ -25,6 +25,7 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
+
 		SetDarkModeTitlebar();
 
 		Screen.UpdateFrom( Size );

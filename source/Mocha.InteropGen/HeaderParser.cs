@@ -61,8 +61,14 @@ internal class HeaderParser : BaseParser
 		}
 	}
 
-	public HeaderParser( string input ) : base( input )
+	private string Path { get; }
+	private string BaseDir { get; }
+
+	public HeaderParser( string baseDir, string path, string input ) : base( input )
 	{
+		BaseDir = baseDir;
+		Path = path;
+
 		Input = Regex.Replace( Input, @"//(?!@InteropGen).*", "" );
 		Input = Regex.Replace( Input, @"/\*(.|\n)*?\*/", "", RegexOptions.Singleline );
 
@@ -94,11 +100,19 @@ internal class HeaderParser : BaseParser
 		return ConsumeWhile( x => x != '{' && !char.IsWhiteSpace( x ) );
 	}
 
-	private Function ReadFunctionSignature()
+	private Function? ReadFunctionSignature()
 	{
 		ConsumeWhitespace();
 
-		var preamble = ConsumeWhile( x => x != '(' );
+		var preamble = ConsumeWhile( x => x != '(' && x != ';' );
+		bool isFunction = NextChar() == '(';
+
+		if ( !isFunction )
+		{
+			Assert( ConsumeChar() == ';' );
+			return null;
+		}
+
 		ConsumeChar();
 		ConsumeWhitespace();
 
@@ -117,7 +131,7 @@ internal class HeaderParser : BaseParser
 		{
 			nextChar = NextChar();
 
-			if ( nextChar == ',' || nextChar == ')' )
+			void AddParameter()
 			{
 				if ( !string.IsNullOrEmpty( currentParameter ) )
 				{
@@ -127,12 +141,22 @@ internal class HeaderParser : BaseParser
 					args.Add( new VariableType( parameterType, parameterName ) );
 
 					currentParameter = "";
-					ConsumeChar();
-					ConsumeWhitespace();
 				}
+			}
 
-				if ( nextChar == ')' )
-					break;
+			if ( nextChar == ',' )
+			{
+				AddParameter();
+
+				ConsumeChar();
+				ConsumeWhitespace();
+			}
+			else if ( nextChar == ')' )
+			{
+				AddParameter();
+
+				ConsumeChar();
+				break;
 			}
 			else
 			{
@@ -154,13 +178,15 @@ internal class HeaderParser : BaseParser
 	{
 		List<Function> values = new();
 
-		if ( StartsWith( "public:" ) || StartsWith( "private:" ) || StartsWith( "protected:" ) )
-			ConsumeWhile( x => x != '\n' );
-
 		List<string> flags = new();
 
 		while ( NextChar() != '}' )
 		{
+			ConsumeWhitespace();
+
+			if ( StartsWith( "public:" ) || StartsWith( "private:" ) || StartsWith( "protected:" ) )
+				ConsumeWhile( x => x != '\n' );
+
 			ConsumeWhitespace();
 
 			if ( StartsWith( "//@InteropGen" ) )
@@ -205,9 +231,14 @@ internal class HeaderParser : BaseParser
 			ConsumeWhitespace();
 
 			var function = ReadFunctionSignature();
-			function.Flags = flags;
+			if ( function.HasValue )
+			{
+				var functionCopy = function.Value;
+				functionCopy.Flags = flags;
 
-			values.Add( function );
+				values.Add( functionCopy );
+			}
+
 			flags = new();
 
 			ConsumeWhitespace();
@@ -230,7 +261,7 @@ internal class HeaderParser : BaseParser
 		else
 			functionBody += $"return instance->{function.Type.Name}( {functionArgs} );";
 
-		return $"{functionSignature} {{ {functionBody} }};";
+		return $"{functionSignature}\r\n{{\r\n\t{functionBody}\r\n}};";
 	}
 
 	private string GenerateCsFunctionDelegate( string className, Function function )
@@ -261,22 +292,32 @@ internal class HeaderParser : BaseParser
 		//
 		// Write C header file
 		//
-		using ( IWriter writer = new ConsoleWriter( $"{className}.generated.h" ) )
+		var headerDir = System.IO.Path.GetDirectoryName( Path );
+		var destHeaderPath = $"{headerDir}\\generated\\" + System.IO.Path.GetFileNameWithoutExtension( Path ) + ".generated.h";
+		using ( IWriter writer = new FileWriter( destHeaderPath ) )
 		{
+			writer.WriteLine( "#pragma once" );
+			writer.WriteLine( $"#include \"..\\{className}.h\"" );
+			writer.WriteLine();
+
 			foreach ( var function in classFunctions )
 			{
 				if ( function.Flags.Contains( "ignore" ) )
 					continue;
 
 				writer.WriteLine( $"{GenerateCWrapperHeader( className, function )}" );
+				writer.WriteLine();
 			}
 		}
 
 		//
 		// Write c# file
 		//
-		using ( IWriter writer = new ConsoleWriter( $"{className}.generated.cs" ) )
+		var destCsPath = BaseDir + $"Mocha.Serializer\\Glue\\{System.IO.Path.GetFileNameWithoutExtension( Path )}.generated.cs";
+		using ( IWriter writer = new FileWriter( destCsPath ) )
 		{
+			writer.WriteLine( $"using System.Runtime.InteropServices;" );
+			writer.WriteLine();
 			writer.WriteLine( $"public class {className}" );
 			writer.WriteLine( $"{{" );
 			writer.WriteLine( $"    private IntPtr instance;" );

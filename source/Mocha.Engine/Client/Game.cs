@@ -19,7 +19,7 @@ internal class Game
 			Log.Trace( "Loaded RenderDoc" );
 		}
 
-		using ( var _ = new Stopwatch( "Game init" ) )
+		// using ( var _ = new Stopwatch( "Game init" ) )
 		{
 			Log.Trace( "Game init" );
 			renderer = new();
