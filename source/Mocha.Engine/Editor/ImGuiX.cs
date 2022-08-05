@@ -90,7 +90,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Red );
 			ImGui.Button( $"X##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_x", ref x );
@@ -101,7 +101,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Green );
 			ImGui.Button( $"Y##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_y", ref y );
@@ -112,7 +112,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Blue );
 			ImGui.Button( $"Z##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_z", ref z );

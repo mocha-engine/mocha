@@ -3,6 +3,7 @@
 public class FileWriter : IWriter
 {
 	private StreamWriter streamWriter;
+	private string path;
 
 	public FileWriter( string filePath )
 	{
@@ -11,6 +12,7 @@ public class FileWriter : IWriter
 		if ( File.Exists( filePath ) )
 			File.Delete( filePath );
 
+		path = filePath;
 		streamWriter = new( filePath );
 	}
 
