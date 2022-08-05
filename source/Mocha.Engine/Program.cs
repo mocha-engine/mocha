@@ -12,7 +12,7 @@ public class Program
 		try
 		{
 			SetupFunctionPointers( args );
-			FilesystemTest();
+			// FilesystemTest();
 			WindowTest();
 		}
 		catch ( SEHException sex )
