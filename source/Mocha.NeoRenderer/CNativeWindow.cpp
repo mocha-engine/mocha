@@ -1,4 +1,6 @@
 #include "CNativeWindow.h"
+#include <spdlog/spdlog.h>
+#include <SDL2/SDL_image.h>
 
 #if WINDOWS
 #include <SDL2/sdl_syswm.h>
@@ -6,9 +8,11 @@
 #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
 #endif
 
-void CNativeWindow::Create(const char* title, int width, int height)
+CNativeWindow::CNativeWindow(std::string title, int width, int height)
 {
-	sdl_window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	sdl_window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+	SDL_Surface* icon = IMG_Load("..\\content\\logo.ico");
+	SDL_SetWindowIcon(sdl_window, icon);
 
 #if WINDOWS
 	SDL_SysWMinfo wmInfo;
@@ -41,4 +45,3 @@ SDL_Window* CNativeWindow::GetWindowPointer()
 {
 	return sdl_window;
 }
-

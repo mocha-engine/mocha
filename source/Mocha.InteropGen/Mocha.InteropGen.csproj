@@ -9,6 +9,15 @@
 		<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
 	</PropertyGroup>
 
+	<ItemGroup>
+		<None Update="Templates\Cpp\CppHeader.template">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Templates\Cs\CsClass.template">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<Exec Command="$(SolutionDir)Mocha.InteropGen\bin\$(Configuration)\net6.0\Mocha.InteropGen.exe $(SolutionDir)" />
 	</Target>

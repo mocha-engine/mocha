@@ -72,7 +72,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)..\build\$(PlatformTarget)\$(Configuration)</OutDir>
+    <OutDir>$(SolutionDir)..\build\</OutDir>
     <TargetName>Mocha</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -81,6 +81,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,11 +140,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="CFileSystem.cpp" />
     <ClCompile Include="CLogger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CFileSystem.h" />
     <ClInclude Include="CLogger.h" />
     <ClInclude Include="CNetCoreHost.h" />
     <ClInclude Include="coreclr_delegates.h" />

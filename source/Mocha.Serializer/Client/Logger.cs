@@ -4,7 +4,7 @@ namespace Mocha.Common;
 
 public class Logger
 {
-	public CLogger NativeLogger { get; set; }
+	public Glue.CLogger NativeLogger { get; set; }
 
 	public enum Level
 	{
