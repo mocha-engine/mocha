@@ -22,4 +22,6 @@ public struct UnmanagedArgs
     public IntPtr __CNativeWindow_CreateMethodPtr;
     public IntPtr __CNativeWindow_RunMethodPtr;
     public IntPtr __CNativeWindow_GetWindowPointerMethodPtr;
+    public IntPtr __CNativeWindow_GetWindowHandleMethodPtr;
+    public IntPtr __CNativeWindow_GetWindowSizeMethodPtr;
 }
