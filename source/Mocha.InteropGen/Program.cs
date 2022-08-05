@@ -13,6 +13,10 @@ public class Program
 		Console.WriteLine( $"\t Processing header {headerPath}" );
 
 		var fileContents = File.ReadAllText( headerPath );
+
+		if ( !fileContents.Contains( "//@InteropGen" ) )
+			return; // Fast early bail
+
 		var headerParser = new HeaderParser( baseDir, headerPath, fileContents );
 
 		var classes = headerParser.ParseFile();

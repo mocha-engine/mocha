@@ -27,6 +27,14 @@ public struct VariableType
 			{
 				return "string";
 			}
+			else if ( NativeType == "bool" )
+			{
+				return "bool";
+			}
+			else if ( NativeType == "int" )
+			{
+				return "int";
+			}
 			else if ( NativeType.EndsWith( "*" ) )
 			{
 				return "IntPtr";
@@ -37,7 +45,7 @@ public struct VariableType
 			}
 			else
 			{
-				return NativeType;
+				return "IntPtr";
 			}
 		}
 	}
