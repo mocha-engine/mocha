@@ -12,6 +12,7 @@
 		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<OutputPath>$(SolutionDir)..\build</OutputPath>
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -43,10 +44,6 @@
 
 	<ItemGroup>
 		<None Remove="mocha.ico" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Content Include="logo.ico" />
 	</ItemGroup>
 
 	<ItemGroup>

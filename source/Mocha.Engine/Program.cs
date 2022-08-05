@@ -11,23 +11,36 @@ public class Program
 	{
 		try
 		{
-			var unmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
-			var window = new CNativeWindow( unmanagedArgs );
-			Log.NativeLogger = new CLogger( unmanagedArgs );
-
-			Log.Info( "Info" );
-			Log.Warning( "Warning" );
-			Log.Error( "Error" );
-			Log.Trace( "Trace" );
-
-			window.Create( "Test Window :3", 1280, 720 );
-			Log.Trace( window.GetWindowPointer() );
-
-			window.Run();
+			SetupFunctionPointers( args );
+			FilesystemTest();
+			WindowTest();
+		}
+		catch ( SEHException sex )
+		{
+			Console.WriteLine( $"Unhandled native exception:\n{sex}" );
 		}
 		catch ( Exception ex )
 		{
-			Console.WriteLine( $"Caught unhandled exception:\n{ex}" );
+			Console.WriteLine( $"Unhandled .NET exception:\n{ex}" );
 		}
+	}
+
+	private static void WindowTest()
+	{
+		var window = new Window();
+		window.Run();
+	}
+
+	private static void FilesystemTest()
+	{
+		var fs = new FileSystem();
+		var text = fs.ReadAllText( "materials/dev/dev_floor.mat" );
+		Log.Info( text );
+	}
+
+	private static void SetupFunctionPointers( IntPtr args )
+	{
+		Common.Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
+		Log.NativeLogger = new Glue.CLogger();
 	}
 }

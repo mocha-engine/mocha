@@ -1,17 +1,14 @@
 #pragma once
-
-//@InteropGen generate struct
-struct LoggerArgs
-{
-	const char* str;
-};
+#include <string>
 
 //@InteropGen generate class
 class CLogger
 {
 public:
-	void Info(const char* str);
-	void Warning(const char* str);
-	void Error(const char* str);
-	void Trace(const char* str);
+	CLogger();
+
+	void Info(std::string str);
+	void Warning(std::string str);
+	void Error(std::string str);
+	void Trace(std::string str);
 };
