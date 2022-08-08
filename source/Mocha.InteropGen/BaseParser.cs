@@ -27,6 +27,17 @@ class BaseParser
 		return string.Join( "", Input.Skip( Position ).Take( str.Length ) ).StartsWith( str );
 	}
 
+	protected bool StartsWithIgnoreWhitespace( string str )
+	{
+		var strComp = string.Join( "", Input.Skip( Position ).Take( str.Length + 16 ) )
+			.Replace( "\r\n", "" )
+			.Replace( "\n", "" )
+			.Replace( "\t", "" )
+			.Replace( " ", "" );
+
+		return strComp.StartsWith( str );
+	}
+
 	protected bool EndOfFile()
 	{
 		return Position >= Input.Length;
