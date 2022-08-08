@@ -38,12 +38,12 @@ void CEngine::Run()
 
 	// clang-format off
 	main_fn mainFunction = (main_fn)net_core_host.FindFunction(
-		STR("Mocha.Engine.Program, Editor"),
+		STR("Mocha.Editor.Program, Editor"),
 		STR("HostedMain")
 	);
 	
 	mManagedRenderFunction = (imgui_render_fn)net_core_host.FindFunction(
-		STR("Mocha.Engine.Program, Editor"),
+		STR("Mocha.Editor.Program, Editor"),
 		STR("Render")
 	);
 	// clang-format on
