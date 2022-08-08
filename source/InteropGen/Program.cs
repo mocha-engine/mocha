@@ -46,14 +46,14 @@ public class Program
 		GeneratedPaths = new();
 		Functions = new();
 
-		var destCsDir = $"{args[0]}\\Mocha.Serializer\\Glue\\";
-		var destHeaderDir = $"{args[0]}\\Mocha.Hostess\\generated\\";
+		var destCsDir = $"{args[0]}\\Common\\Glue\\";
+		var destHeaderDir = $"{args[0]}\\Engine\\generated\\";
 
 		Directory.Delete( destHeaderDir, true );
 		Directory.Delete( destCsDir, true );
 
-		CsStructWriter = new FileWriter( $"{args[0]}\\Mocha.Serializer\\Glue\\UnmanagedArgs.cs" );
-		CppStructWriter = new FileWriter( $"{args[0]}\\Mocha.Hostess\\generated\\UnmanagedArgs.generated.h" );
+		CsStructWriter = new FileWriter( $"{args[0]}\\Common\\Glue\\UnmanagedArgs.cs" );
+		CppStructWriter = new FileWriter( $"{args[0]}\\Engine\\generated\\UnmanagedArgs.generated.h" );
 
 		CppStructWriter.WriteLine( "#ifndef __GENERATED_UNMANAGED_ARGS_H" );
 		CppStructWriter.WriteLine( "#define __GENERATED_UNMANAGED_ARGS_H" );
@@ -90,7 +90,7 @@ public class Program
 		CppStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		CppStructWriter.Dispose();
 
-		using ( var cppListWriter = new FileWriter( $"{args[0]}\\Mocha.Hostess\\generated\\InteropList.generated.h" ) )
+		using ( var cppListWriter = new FileWriter( $"{args[0]}\\Engine\\generated\\InteropList.generated.h" ) )
 		{
 			cppListWriter.WriteLine( "#ifndef __GENERATED_INTEROPLIST_H" );
 			cppListWriter.WriteLine( "#define __GENERATED_INTEROPLIST_H" );
