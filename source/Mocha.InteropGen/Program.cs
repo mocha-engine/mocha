@@ -46,10 +46,17 @@ public class Program
 		GeneratedPaths = new();
 		Functions = new();
 
+		var destCsDir = $"{args[0]}\\Mocha.Serializer\\Glue\\";
+		var destHeaderDir = $"{args[0]}\\Mocha.Hostess\\generated\\";
+
+		Directory.Delete( destHeaderDir, true );
+		Directory.Delete( destCsDir, true );
+
 		CsStructWriter = new FileWriter( $"{args[0]}\\Mocha.Serializer\\Glue\\UnmanagedArgs.cs" );
 		CppStructWriter = new FileWriter( $"{args[0]}\\Mocha.Hostess\\generated\\UnmanagedArgs.generated.h" );
 
-		CppStructWriter.WriteLine( "#pragma once" );
+		CppStructWriter.WriteLine( "#ifndef __GENERATED_UNMANAGED_ARGS_H" );
+		CppStructWriter.WriteLine( "#define __GENERATED_UNMANAGED_ARGS_H" );
 		CppStructWriter.WriteLine( "#include \"InteropList.generated.h\"" );
 		CppStructWriter.WriteLine();
 		CppStructWriter.WriteLine( "struct UnmanagedArgs" );
@@ -69,26 +76,33 @@ public class Program
 		CppStructWriter.WriteLine( $"}};" );
 		CppStructWriter.WriteLine();
 
-		CppStructWriter.WriteLine( "UnmanagedArgs args" );
+		CppStructWriter.WriteLine( "inline UnmanagedArgs args" );
 		CppStructWriter.WriteLine( $"{{" );
 
 		foreach ( var function in Functions )
 		{
-			CppStructWriter.WriteLine( $"    (void*)__{function.ClassName}_{function.Type.Name}," );
+			CppStructWriter.WriteLine( $"    (void*)__{function.Class.Name}_{function.Type.Name}," );
 		}
 
 		CppStructWriter.WriteLine( $"}};" );
 
+		CppStructWriter.WriteLine();
+		CppStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
+		CppStructWriter.Dispose();
+
 		using ( var cppListWriter = new FileWriter( $"{args[0]}\\Mocha.Hostess\\generated\\InteropList.generated.h" ) )
 		{
-			cppListWriter.WriteLine( "#pragma once" );
+			cppListWriter.WriteLine( "#ifndef __GENERATED_INTEROPLIST_H" );
+			cppListWriter.WriteLine( "#define __GENERATED_INTEROPLIST_H" );
+			cppListWriter.WriteLine();
 
 			foreach ( var generatedPath in GeneratedPaths )
 			{
 				cppListWriter.WriteLine( $"#include \"{generatedPath}\"" );
 			}
-		}
 
-		CppStructWriter.Dispose();
+			cppListWriter.WriteLine();
+			cppListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
+		}
 	}
 }

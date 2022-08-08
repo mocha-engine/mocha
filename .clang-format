@@ -1,0 +1,33 @@
+﻿---
+BasedOnStyle: Microsoft
+AccessModifierOffset: '-4'
+AlignAfterOpenBracket: DontAlign
+AlignEscapedNewlines: Left
+AllowShortFunctionsOnASingleLine: Inline
+AllowShortIfStatementsOnASingleLine: Never
+AlwaysBreakAfterReturnType: None
+AlwaysBreakTemplateDeclarations: 'Yes'
+BreakBeforeBraces: Custom
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: AfterColon
+ColumnLimit: '128'
+ConstructorInitializerIndentWidth: '4'
+ContinuationIndentWidth: '4'
+DisableFormat: 'false'
+IncludeBlocks: Regroup
+IndentWidth: '4'
+Language: Cpp
+MaxEmptyLinesToKeep: '1'
+NamespaceIndentation: All
+PointerAlignment: Left
+SpaceBeforeParens: ControlStatements
+SpacesBeforeTrailingComments: '1'
+SpacesInCStyleCastParentheses: 'true'
+SpacesInContainerLiterals: 'true'
+SpacesInParentheses: 'true'
+SpacesInSquareBrackets: 'false'
+Standard: Auto
+TabWidth: '4'
+UseTab: ForIndentation
+
+...

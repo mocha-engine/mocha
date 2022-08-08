@@ -41,11 +41,12 @@ internal partial class HeaderParser : BaseParser
 		return false;
 	}
 
-	private string ReadClassName()
+	private string ReadClassName( out bool isNamespace )
 	{
-		Assert( StartsWith( "class " ) );
-		ConsumeWhile( x => char.IsLetter( x ) );
+		Assert( StartsWith( "class " ) || StartsWith( "namespace " ) );
+		isNamespace = StartsWith( "namespace " );
 
+		ConsumeWhile( x => char.IsLetter( x ) );
 		ConsumeWhitespace();
 
 		return ConsumeWhile( x => x != '{' && !char.IsWhiteSpace( x ) );
@@ -55,7 +56,12 @@ internal partial class HeaderParser : BaseParser
 	{
 		ConsumeWhitespace();
 
-		var preamble = ConsumeWhile( x => x != '(' && x != ';' );
+		if ( StartsWith( "inline" ) || StartsWith( "static" ) )
+			ConsumeWhile( x => x != ' ' );
+
+		ConsumeWhitespace();
+
+		var preamble = ConsumeWhile( x => x != '(' && x != ';' ).Replace( "\r\n", "" ).Replace( "\n", "" );
 		bool isFunction = NextChar() == '(';
 
 		if ( !isFunction )
@@ -98,13 +104,12 @@ internal partial class HeaderParser : BaseParser
 			if ( nextChar == ',' )
 			{
 				AddParameter();
-
 				ConsumeChar();
 				ConsumeWhitespace();
 			}
-			else if ( StartsWith( ");" ) )
+			else if ( StartsWithIgnoreWhitespace( ");" ) || StartsWithIgnoreWhitespace( "){" ) )
 			{
-				ConsumeChar();
+				ConsumeWhitespace();
 				AddParameter();
 				break;
 			}
@@ -114,7 +119,18 @@ internal partial class HeaderParser : BaseParser
 			}
 		} while ( true );
 
-		Assert( ConsumeChar() == ';' );
+		ConsumeChar();
+		ConsumeWhitespace();
+
+		var consumedChar = ConsumeChar();
+		Assert( consumedChar == ';' || consumedChar == '{' );
+
+		if ( consumedChar == '{' )
+		{
+			var str = ConsumeWhile( x => x != '}' );
+			ConsumeChar();
+		}
+
 		ConsumeWhitespace();
 
 		return new Function
@@ -168,7 +184,8 @@ internal partial class HeaderParser : BaseParser
 					functionCopy.Type = type;
 				}
 
-				values.Add( functionCopy );
+				if ( !flags.Contains( "ignore" ) )
+					values.Add( functionCopy );
 			}
 
 			flags = new();
@@ -183,7 +200,7 @@ internal partial class HeaderParser : BaseParser
 	{
 		ConsumeWhitespace();
 
-		var className = ReadClassName();
+		var className = ReadClassName( out var isNamespace );
 
 		ConsumeWhitespace();
 
@@ -195,6 +212,7 @@ internal partial class HeaderParser : BaseParser
 
 		return new Class
 		{
+			IsStatic = isNamespace,
 			Name = className,
 			Functions = classFunctions
 		};
