@@ -371,3 +371,4 @@ content/models/rainier
 *.generated.h
 *.generated.cs
 build/
+*.dxbc
