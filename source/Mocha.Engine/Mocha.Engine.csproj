@@ -43,7 +43,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Remove="mocha.ico" />
+		<Page Include="assimp.dll" />
+		<Page Include="SDL2.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Page>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -60,16 +63,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="assimp.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="cimgui.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="libveldrid-spirv.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="SDL2.dll">
+		<None Update="ImGui.NET.dll">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 		<None Update="Settings.settings">

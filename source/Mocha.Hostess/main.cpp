@@ -1,24 +1,48 @@
-#include "CNetCoreHost.h"
+#include "CEngine.h"
+#include "Globals.h"
+#include "renderdoc_app.h"
 #include "spdlog/spdlog.h"
 
-int main()
+#include <SDL2/SDL.h>
+
+CImgui* g_Imgui = nullptr;
+CEngine* g_Engine = nullptr;
+bool g_EngineIsRunning = true;
+
+void InitRenderdoc()
 {
-	spdlog::set_level(spdlog::level::trace);
+	RENDERDOC_API_1_2_0* rdoc_api = NULL;
 
-	char_t host_path[MAX_PATH];
-	auto size = GetCurrentDirectory(MAX_PATH, host_path);
-	assert(size != 0);
+	auto renderdocDll = LoadLibrary( L"renderdoc.dll" );
+	if ( renderdocDll == nullptr )
+	{
+		spdlog::error( "Failed to load RenderDoc DLL - Error: %#x", GetLastError() );
+		return;
+	}
 
-	string_t root_path = host_path;
-	string_t engine_dir = root_path + STR("\\");
+	auto renderdocFunc = ( pRENDERDOC_GetAPI )GetProcAddress( renderdocDll, "RENDERDOC_GetAPI" );
+	if ( renderdocFunc == nullptr )
+	{
+		spdlog::error( "Failed to find RENDERDOC_GetAPI() from RenderDoc DLL handle." );
+		return;
+	}
 
-	CNetCoreHost net_core_host;
-	net_core_host.CallFunction(
-		engine_dir + STR("Mocha.Engine.runtimeconfig.json"),
-		engine_dir + STR("Mocha.Engine.dll"),
-		STR("Mocha.Engine.Program, Mocha.Engine"),
-		STR("HostedMain")
-	);
+	int ret = renderdocFunc( eRENDERDOC_API_Version_1_2_0, ( void** )&rdoc_api );
+	rdoc_api->MaskOverlayBits( eRENDERDOC_Overlay_None, 0 );
+	rdoc_api->MaskOverlayBits( eRENDERDOC_Overlay_FrameRate, 0 );
+	assert( ret == 1 );
+}
+
+#undef main
+int main( int argc, char* argv[] )
+{
+	InitRenderdoc();
+
+	spdlog::set_level( spdlog::level::trace );
+
+	g_Engine = new CEngine();
+	g_Engine->Run();
+	g_Engine->~CEngine();
 
 	return 0;
 }

@@ -22,6 +22,17 @@ public struct UnmanagedArgs
     public IntPtr __CNativeWindow_CreateMethodPtr;
     public IntPtr __CNativeWindow_RunMethodPtr;
     public IntPtr __CNativeWindow_GetWindowPointerMethodPtr;
-    public IntPtr __CNativeWindow_GetWindowHandleMethodPtr;
     public IntPtr __CNativeWindow_GetWindowSizeMethodPtr;
+    public IntPtr __CNativeWindow_GetWindowHandleMethodPtr;
+    public IntPtr __EditorUI_EndMethodPtr;
+    public IntPtr __EditorUI_SeparatorMethodPtr;
+    public IntPtr __EditorUI_TextMethodPtr;
+    public IntPtr __EditorUI_TextBoldMethodPtr;
+    public IntPtr __EditorUI_TextSubheadingMethodPtr;
+    public IntPtr __EditorUI_TextHeadingMethodPtr;
+    public IntPtr __EditorUI_TextMonospaceMethodPtr;
+    public IntPtr __EditorUI_TextLightMethodPtr;
+    public IntPtr __EditorUI_ButtonMethodPtr;
+    public IntPtr __EditorUI_BeginMethodPtr;
+    public IntPtr __EditorUI_ShowDemoWindowMethodPtr;
 }

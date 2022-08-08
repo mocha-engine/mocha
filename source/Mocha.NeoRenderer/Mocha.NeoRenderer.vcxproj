@@ -146,13 +146,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Assert.h" />
+    <ClInclude Include="CImgui.h" />
     <ClInclude Include="CNativeWindow.h" />
     <ClInclude Include="CRenderer.h" />
+    <ClInclude Include="imgui_impl_dx12.h" />
+    <ClInclude Include="imgui_impl_sdl.h" />
     <ClInclude Include="Uint2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CImgui.cpp" />
     <ClCompile Include="CNativeWindow.cpp" />
     <ClCompile Include="CRenderer.cpp" />
+    <ClCompile Include="imgui_impl_dx12.cpp" />
+    <ClCompile Include="imgui_impl_sdl.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\logo.ico">
