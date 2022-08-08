@@ -3,7 +3,7 @@ global using Mocha.Engine.Editor;
 global using Mocha.Renderer;
 global using System.ComponentModel;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 public static class Global
 {

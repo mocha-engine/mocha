@@ -1,6 +1,6 @@
 ﻿using Veldrid;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Category( "World" ), Icon( FontAwesome.Sun ), Title( "Sun" )]
 public class Sun : Entity
