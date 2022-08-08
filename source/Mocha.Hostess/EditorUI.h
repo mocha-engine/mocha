@@ -1,4 +1,5 @@
 #pragma once
+#include "CImgui.h"
 #include "Globals.h"
 
 #include <imgui.h>
