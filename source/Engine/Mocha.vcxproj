@@ -24,7 +24,8 @@
     <ClInclude Include="CFileSystem.h" />
     <ClInclude Include="CImgui.h" />
     <ClInclude Include="CLogger.h" />
-    <ClInclude Include="CNativeWindow.h" />
+    <ClInclude Include="CEditor.h" />
+    <ClInclude Include="CWindow.h" />
     <ClInclude Include="CNetCoreHost.h" />
     <ClInclude Include="coreclr_delegates.h" />
     <ClInclude Include="CRenderer.h" />
@@ -41,7 +42,8 @@
     <ClCompile Include="CFileSystem.cpp" />
     <ClCompile Include="CImgui.cpp" />
     <ClCompile Include="CLogger.cpp" />
-    <ClCompile Include="CNativeWindow.cpp" />
+    <ClCompile Include="CEditor.cpp" />
+    <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
     <ClCompile Include="CRenderer.cpp" />
     <ClCompile Include="imgui_impl_dx12.cpp" />

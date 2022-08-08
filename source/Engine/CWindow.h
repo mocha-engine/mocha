@@ -6,15 +6,14 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-//@InteropGen generate class
-class CNativeWindow
+class CWindow
 {
 private:
 	SDL_Window* mSdlWindow;
 	Uint2 mWindowSize;
 
 public:
-	CNativeWindow( std::string title, int width, int height );
+	CWindow( std::string title, int width, int height );
 
 	void Run( std::function<void()> renderFunction );
 

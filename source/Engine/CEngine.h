@@ -1,21 +1,19 @@
 #pragma once
-#include "generated/UnmanagedArgs.generated.h";
+#include <coreclr_delegates.h>
+#include <memory>
 
-typedef void ( *imgui_render_fn )( void );
-typedef void( CORECLR_DELEGATE_CALLTYPE* main_fn )( UnmanagedArgs* );
-
-class CNativeWindow;
+class CWindow;
 class CImgui;
 class CRenderer;
+class CEditor;
 
 class CEngine
 {
 private:
-	std::unique_ptr<CNativeWindow> mWindow;
+	std::unique_ptr<CWindow> mWindow;
 	std::unique_ptr<CImgui> mImgui;
 	std::unique_ptr<CRenderer> mRenderer;
-
-	imgui_render_fn mManagedRenderFunction;
+	std::unique_ptr<CEditor> mEditor;
 
 	void Render();
 
@@ -25,7 +23,7 @@ public:
 
 	void Run();
 
-	CNativeWindow* GetWindow();
+	CWindow* GetWindow();
 	CImgui* GetImgui();
 	CRenderer* GetRenderer();
 };

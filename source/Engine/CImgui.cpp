@@ -1,7 +1,7 @@
 #include "CImgui.h"
 
-#include "CNativeWindow.h"
 #include "CRenderer.h"
+#include "CWindow.h"
 #include "FontAwesome.h"
 
 #include <string>
@@ -22,7 +22,7 @@ ImFont* AddFont( ImGuiIO& io, std::string fontPath, float fontSize )
 	return font;
 }
 
-CImgui::CImgui( CNativeWindow* window, CRenderer* renderer )
+CImgui::CImgui( CWindow* window, CRenderer* renderer )
 {
 	ImGui::CreateContext();
 
@@ -139,11 +139,18 @@ void CImgui::NewFrame()
 	ImGui_ImplSDL2_NewFrame( mWindow->GetWindowPointer() );
 	ImGui::NewFrame();
 
-	ImGui::DockSpaceOverViewport();
+	ImGui::DockSpaceOverViewport(
+	    ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_AutoHideTabBar );
 }
 
 void CImgui::Render( ID3D12GraphicsCommandList* commandList )
 {
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData( ImGui::GetDrawData(), commandList );
+}
+
+void CImgui::Resize( Uint2 newSize )
+{
+	auto& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2( newSize.x, newSize.y );
 }
