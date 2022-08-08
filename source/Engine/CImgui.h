@@ -7,7 +7,7 @@
 
 class CNativeWindow;
 class CRenderer;
-struct ID3D12CommandList;
+struct ID3D12GraphicsCommandList;
 
 class CImgui
 {

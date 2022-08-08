@@ -3,27 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Renderer", "Mocha\Mocha.Renderer.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Renderer", "Renderer\Renderer.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Tests", "Mocha.Tests\Mocha.Tests.csproj", "{96BBB7AC-AC1F-4430-8039-21D03E4903AD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Tests", "Tests\Tests.csproj", "{96BBB7AC-AC1F-4430-8039-21D03E4903AD}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.AssetCompiler", "Mocha.AssetCompiler\Mocha.AssetCompiler.csproj", "{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssetCompiler", "AssetCompiler\AssetCompiler.csproj", "{06D1B36D-62C6-4687-A21B-7D1C36AC0D4F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Common", "Mocha.Serializer\Mocha.Common.csproj", "{05117E76-6DE2-4B04-BF23-93621AF84576}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common", "Common\Common.csproj", "{05117E76-6DE2-4B04-BF23-93621AF84576}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.Engine", "Mocha.Engine\Mocha.Engine.csproj", "{86D9A27F-6F46-4F60-BD58-94DF366704EB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Editor", "Editor\Editor.csproj", "{86D9A27F-6F46-4F60-BD58-94DF366704EB}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
@@ -34,13 +34,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{2F5C46
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{8B26F9DF-F299-4E41-99D6-802674CD6B03}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mocha", "Mocha.Hostess\Mocha.Hostess.vcxproj", "{15316C0B-5D5C-4F76-B00F-DCD2FD3E5401}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mocha", "Engine\Mocha.vcxproj", "{15316C0B-5D5C-4F76-B00F-DCD2FD3E5401}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 		{86D9A27F-6F46-4F60-BD58-94DF366704EB} = {86D9A27F-6F46-4F60-BD58-94DF366704EB}
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mocha.InteropGen", "Mocha.InteropGen\Mocha.InteropGen.csproj", "{6A9167C6-40D1-4D1A-B105-318837AE4C91}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "InteropGen", "InteropGen\InteropGen.csproj", "{6A9167C6-40D1-4D1A-B105-318837AE4C91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Native", "Native", "{1AD4BECA-66C4-497E-9095-413CF6A1D32A}"
 EndProject
