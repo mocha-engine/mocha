@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : Entity

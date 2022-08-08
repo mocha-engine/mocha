@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Category( "Player" ), Icon( FontAwesome.User )]
 public class Player : ModelEntity

@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class Entity : IEntity

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
 public class Camera : Entity

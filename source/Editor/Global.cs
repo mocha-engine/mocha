@@ -1,7 +1,7 @@
 ﻿global using Mocha.Common;
 global using Mocha.Renderer;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 public static class Global
 {
