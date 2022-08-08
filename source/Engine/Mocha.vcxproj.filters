@@ -36,7 +36,7 @@
     <ClInclude Include="CLogger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CNativeWindow.h">
+    <ClInclude Include="CWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CNetCoreHost.h">
@@ -72,6 +72,9 @@
     <ClInclude Include="Assert.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="CEditor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CEngine.cpp">
@@ -86,7 +89,7 @@
     <ClCompile Include="CLogger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CNativeWindow.cpp">
+    <ClCompile Include="CWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CNetCoreHost.cpp">
@@ -103,6 +106,9 @@
     </ClCompile>
     <ClCompile Include="imgui_impl_sdl.cpp">
       <Filter>Source Files\ImGUI</Filter>
+    </ClCompile>
+    <ClCompile Include="CEditor.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

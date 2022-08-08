@@ -1,18 +1,19 @@
 #pragma once
+#include "Uint2.h"
 #include "imgui.h"
 #include "imgui_impl_dx12.h"
 #include "imgui_impl_sdl.h"
 
 #include <string>
 
-class CNativeWindow;
+class CWindow;
 class CRenderer;
 struct ID3D12GraphicsCommandList;
 
 class CImgui
 {
 private:
-	CNativeWindow* mWindow;
+	CWindow* mWindow;
 	CRenderer* mRenderer;
 
 public:
@@ -22,8 +23,10 @@ public:
 	ImFont* mHeadingFont;
 	ImFont* mSubheadingFont;
 
-	CImgui( CNativeWindow* window, CRenderer* renderer );
+	CImgui( CWindow* window, CRenderer* renderer );
 	~CImgui();
+
 	void NewFrame();
 	void Render( ID3D12GraphicsCommandList* commandList );
+	void Resize( Uint2 newSize );
 };
