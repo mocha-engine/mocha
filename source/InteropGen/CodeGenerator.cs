@@ -94,7 +94,7 @@ public class CodeGenerator
 		//
 		// Write c# file
 		//
-		var destCsPath = baseDir + $"Mocha.Serializer\\Glue\\{@class.Name}.generated.cs";
+		var destCsPath = baseDir + $"Common\\Glue\\{@class.Name}.generated.cs";
 		using ( IWriter writer = new FileWriter( destCsPath ) )
 		{
 			StringBuilder functionDecls = new();

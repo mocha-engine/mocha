@@ -50,8 +50,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Mocha.Serializer\Mocha.Common.csproj" />
-		<ProjectReference Include="..\Mocha\Mocha.Renderer.csproj" />
+		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Renderer\Renderer.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

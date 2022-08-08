@@ -34,16 +34,16 @@ void CEngine::Run()
 	string_t root_path = host_path;
 	string_t engine_dir = root_path + STR( "\\" );
 
-	CNetCoreHost net_core_host( engine_dir + STR( "Mocha.Engine.runtimeconfig.json" ), engine_dir + STR( "Mocha.Engine.dll" ) );
+	CNetCoreHost net_core_host( engine_dir + STR( "Editor.runtimeconfig.json" ), engine_dir + STR( "Editor.dll" ) );
 
 	// clang-format off
 	main_fn mainFunction = (main_fn)net_core_host.FindFunction(
-		STR("Mocha.Engine.Program, Mocha.Engine"),
+		STR("Mocha.Engine.Program, Editor"),
 		STR("HostedMain")
 	);
 	
 	mManagedRenderFunction = (imgui_render_fn)net_core_host.FindFunction(
-		STR("Mocha.Engine.Program, Mocha.Engine"),
+		STR("Mocha.Engine.Program, Editor"),
 		STR("Render")
 	);
 	// clang-format on
