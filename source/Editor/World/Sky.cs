@@ -1,8 +1,11 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
+
+namespace Mocha.Editor;
 
 [Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : Entity
 {
+	[HideInInspector]
 	public SkySceneObject SceneObject { get; set; }
 	private Material Material { get; set; }
 
@@ -28,20 +31,13 @@ public class Sky : Entity
 	{
 		Material = new()
 		{
-			Shader = new ShaderBuilder().FromPath( "core/shaders/atmosphere.mshdr" ).Build(),
+			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/atmosphere.mshdr" ).Build(),
 			UniformBufferType = typeof( SkyUniformBuffer )
 		};
 
-		SceneObject = new SkySceneObject()
+		SceneObject = new SkySceneObject( this )
 		{
-			model = Primitives.Cube.GenerateModel( Material )
+			models = new() { Primitives.Cube.GenerateModel( Material ) }
 		};
-	}
-
-	public override void Update()
-	{
-		base.Update();
-
-		SceneObject.Transform = Transform.WithPosition( Vector3.Zero );
 	}
 }

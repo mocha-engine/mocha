@@ -1,7 +1,7 @@
 ﻿using Mocha.Common.World;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class Entity : IEntity

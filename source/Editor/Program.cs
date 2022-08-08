@@ -1,10 +1,11 @@
-﻿global using static Mocha.Engine.Global;
+﻿global using static Mocha.Editor.Global;
+global using Matrix4x4 = System.Numerics.Matrix4x4;
 global using Vector4 = System.Numerics.Vector4;
 global using EditorUI = Mocha.Glue.EditorUI;
 
 using System.Runtime.InteropServices;
 
-namespace Mocha.Engine;
+namespace Mocha.Editor;
 
 public class Program
 {

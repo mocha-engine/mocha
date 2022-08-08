@@ -1,24 +1,18 @@
-﻿namespace Mocha.Engine;
+﻿using System.ComponentModel;
+
+namespace Mocha.Editor;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : Entity
 {
+	[HideInInspector]
 	public SceneObject SceneObject { get; set; }
-
-	public bool Visible { get; set; } = true;
 
 	public ModelEntity( string modelPath )
 	{
-		SceneObject = new ModelSceneObject()
+		SceneObject = new ModelSceneObject( this )
 		{
-			model = new Model( modelPath )
+			models = Primitives.MochaModel.GenerateModels( modelPath )
 		};
-	}
-
-	public override void Update()
-	{
-		base.Update();
-
-		SceneObject.Transform = Transform;
 	}
 }
