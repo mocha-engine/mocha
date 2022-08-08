@@ -22,12 +22,12 @@ typedef void ( *render_callback_fn )( ID3D12GraphicsCommandList* );
 
 #include <memory>
 
-class CNativeWindow;
+class CWindow;
 
 class CRenderer
 {
 private:
-	void InitAPI( CNativeWindow* window );
+	void InitAPI( CWindow* window );
 	void DestroyAPI();
 	void InitResources();
 	void DestroyResources();
@@ -42,7 +42,7 @@ private:
 	static const UINT backbufferCount = 2;
 
 	unsigned mWidth, mHeight;
-	CNativeWindow* mWindow;
+	CWindow* mWindow;
 
 	// Initialization
 	IDXGIFactory4* mFactory;
@@ -78,7 +78,7 @@ private:
 	UINT64 mFenceValue;
 
 public:
-	CRenderer( CNativeWindow* window );
+	CRenderer( CWindow* window );
 	~CRenderer();
 
 	void BeginFrame();

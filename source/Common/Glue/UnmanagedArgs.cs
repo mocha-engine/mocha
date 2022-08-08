@@ -19,11 +19,6 @@ public struct UnmanagedArgs
     public IntPtr __CLogger_WarningMethodPtr;
     public IntPtr __CLogger_ErrorMethodPtr;
     public IntPtr __CLogger_TraceMethodPtr;
-    public IntPtr __CNativeWindow_CreateMethodPtr;
-    public IntPtr __CNativeWindow_RunMethodPtr;
-    public IntPtr __CNativeWindow_GetWindowPointerMethodPtr;
-    public IntPtr __CNativeWindow_GetWindowSizeMethodPtr;
-    public IntPtr __CNativeWindow_GetWindowHandleMethodPtr;
     public IntPtr __EditorUI_EndMethodPtr;
     public IntPtr __EditorUI_SeparatorMethodPtr;
     public IntPtr __EditorUI_TextMethodPtr;
@@ -32,7 +27,15 @@ public struct UnmanagedArgs
     public IntPtr __EditorUI_TextHeadingMethodPtr;
     public IntPtr __EditorUI_TextMonospaceMethodPtr;
     public IntPtr __EditorUI_TextLightMethodPtr;
+    public IntPtr __EditorUI_TitleMethodPtr;
     public IntPtr __EditorUI_ButtonMethodPtr;
     public IntPtr __EditorUI_BeginMethodPtr;
     public IntPtr __EditorUI_ShowDemoWindowMethodPtr;
+    public IntPtr __EditorUI_BeginMainMenuBarMethodPtr;
+    public IntPtr __EditorUI_EndMainMenuBarMethodPtr;
+    public IntPtr __EditorUI_SetCursorPosXRelativeMethodPtr;
+    public IntPtr __EditorUI_SetCursorPosYRelativeMethodPtr;
+    public IntPtr __EditorUI_BeginMenuMethodPtr;
+    public IntPtr __EditorUI_EndMenuMethodPtr;
+    public IntPtr __EditorUI_MenuItemMethodPtr;
 }

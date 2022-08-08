@@ -1,14 +1,14 @@
 #include "CRenderer.h"
 
 #include "Assert.h"
-#include "CNativeWindow.h"
+#include "CWindow.h"
 
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
 
-CRenderer::CRenderer( CNativeWindow* window )
+CRenderer::CRenderer( CWindow* window )
 {
 	spdlog::info( "Renderer init" );
 	mWindow = window;
@@ -58,7 +58,7 @@ CRenderer::~CRenderer()
 	DestroyAPI();
 }
 
-void CRenderer::InitAPI( CNativeWindow* window )
+void CRenderer::InitAPI( CWindow* window )
 {
 	UINT dxgiFactoryFlags = 0;
 #if defined( _DEBUG )

@@ -1,4 +1,4 @@
-#include "CNativeWindow.h"
+#include "CWindow.h"
 
 #include "CEngine.h"
 #include "CImgui.h"
@@ -12,7 +12,7 @@
 
 #include <spdlog/spdlog.h>
 
-CNativeWindow::CNativeWindow( std::string title, int width, int height )
+CWindow::CWindow( std::string title, int width, int height )
 {
 	mSdlWindow =
 	    SDL_CreateWindow( title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
@@ -25,7 +25,7 @@ CNativeWindow::CNativeWindow( std::string title, int width, int height )
 	DwmSetWindowAttribute( hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof( value ) );
 }
 
-void CNativeWindow::Run( std::function<void()> renderFunction )
+void CWindow::Run( std::function<void()> renderFunction )
 {
 	while ( g_EngineIsRunning )
 	{
@@ -48,6 +48,7 @@ void CNativeWindow::Run( std::function<void()> renderFunction )
 					Uint2 newSize = { windowEvent.data1, windowEvent.data2 };
 
 					g_Engine->GetRenderer()->Resize( newSize );
+					g_Imgui->Resize( newSize );
 				}
 			}
 		}
@@ -56,12 +57,12 @@ void CNativeWindow::Run( std::function<void()> renderFunction )
 	}
 }
 
-SDL_Window* CNativeWindow::GetWindowPointer()
+SDL_Window* CWindow::GetWindowPointer()
 {
 	return mSdlWindow;
 }
 
-HWND CNativeWindow::GetWindowHandle()
+HWND CWindow::GetWindowHandle()
 {
 	SDL_SysWMinfo wmInfo;
 	SDL_VERSION( &wmInfo.version );
@@ -71,7 +72,7 @@ HWND CNativeWindow::GetWindowHandle()
 	return hwnd;
 }
 
-Uint2 CNativeWindow::GetWindowSize()
+Uint2 CWindow::GetWindowSize()
 {
 	return mWindowSize;
 }

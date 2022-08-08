@@ -79,9 +79,15 @@ public class Program
 		CppStructWriter.WriteLine( "inline UnmanagedArgs args" );
 		CppStructWriter.WriteLine( $"{{" );
 
-		foreach ( var function in Functions )
+		for ( int i = 0; i < Functions.Count; i++ )
 		{
-			CppStructWriter.WriteLine( $"    (void*)__{function.Class.Name}_{function.Type.Name}," );
+			Function function = Functions[i];
+			CppStructWriter.Write( $"    (void*)__{function.Class.Name}_{function.Type.Name}" );
+
+			if ( i < Functions.Count - 1 )
+				CppStructWriter.WriteLine( "," );
+			else
+				CppStructWriter.WriteLine();
 		}
 
 		CppStructWriter.WriteLine( $"}};" );

@@ -1,11 +1,13 @@
 #include "CEngine.h"
 
+#include "CEditor.h"
 #include "CImgui.h"
+#include "CWindow.h"
 #include "Globals.h"
 
 CEngine::CEngine()
 {
-	mWindow = std::make_unique<CNativeWindow>( "Mocha", 1280, 720 );
+	mWindow = std::make_unique<CWindow>( "Mocha", 1280, 720 );
 	mRenderer = std::make_unique<CRenderer>( mWindow.get() );
 
 	mImgui = std::make_unique<CImgui>( mWindow.get(), mRenderer.get() );
@@ -19,7 +21,7 @@ void CEngine::Render()
 	auto cl = mRenderer->GetCommandList();
 	mImgui->NewFrame();
 
-	mManagedRenderFunction();
+	mEditor->Render();
 
 	mImgui->Render( cl );
 	mRenderer->EndFrame();
@@ -27,32 +29,11 @@ void CEngine::Render()
 
 void CEngine::Run()
 {
-	char_t host_path[MAX_PATH];
-	auto size = GetCurrentDirectory( MAX_PATH, host_path );
-	assert( size != 0 );
-
-	string_t root_path = host_path;
-	string_t engine_dir = root_path + STR( "\\" );
-
-	CNetCoreHost net_core_host( engine_dir + STR( "Editor.runtimeconfig.json" ), engine_dir + STR( "Editor.dll" ) );
-
-	// clang-format off
-	main_fn mainFunction = (main_fn)net_core_host.FindFunction(
-		STR("Mocha.Editor.Program, Editor"),
-		STR("HostedMain")
-	);
-	
-	mManagedRenderFunction = (imgui_render_fn)net_core_host.FindFunction(
-		STR("Mocha.Editor.Program, Editor"),
-		STR("Render")
-	);
-	// clang-format on
-
-	mainFunction( &args );
+	mEditor = std::make_unique<CEditor>();
 	mWindow->Run( [&]() { Render(); } );
 }
 
-CNativeWindow* CEngine::GetWindow()
+CWindow* CEngine::GetWindow()
 {
 	return mWindow.get();
 }
