@@ -10,6 +10,13 @@
   "ListAllProjects": false,
 
   "MultiProjectConfigurations": {
+    "Mocha Release x64": {
+      "Projects": {
+        "Mocha": {}
+      },
+      "SolutionConfiguration": "Release",
+      "SolutionPlatform": "x64"
+    },
     "Mocha x64": {
       "Projects": {
         "Mocha": {}
