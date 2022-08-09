@@ -155,6 +155,8 @@ public class CodeGenerator
 					functionBodies.AppendLine( $"\t\treturn {accessor}_{function.Type.Name}( {methodCallArgs} ).ToInt32();" );
 				else if ( function.Type.CSharpType == "long" )
 					functionBodies.AppendLine( $"\t\treturn {accessor}_{function.Type.Name}( {methodCallArgs} ).ToInt64();" );
+				else if ( function.Type.CSharpType == "float" )
+					functionBodies.AppendLine( $"\t\tfloat f = 0;\r\nMarshal.Copy( {accessor}_{function.Type.Name}( {methodCallArgs} ), new[] {{ f }}, 0, 1 );\r\nreturn f;" );
 				else if ( function.Type.CSharpType == "string" )
 					functionBodies.AppendLine( $"\t\treturn InteropUtils.GetString( {accessor}_{function.Type.Name}( {methodCallArgs} ) );" );
 				else

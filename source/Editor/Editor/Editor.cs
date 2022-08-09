@@ -26,7 +26,7 @@ partial class Editor
 			if ( EditorUI.BeginMenu( displayInfo.Category ) )
 			{
 				var enabled = window.isVisible;
-				bool active = EditorUI.MenuItem( displayInfo.TextIcon, displayInfo.Name );
+				bool active = EditorUI.MenuItemEx( displayInfo.TextIcon, displayInfo.Name, enabled );
 
 				if ( active )
 					window.isVisible = !window.isVisible;
@@ -34,79 +34,6 @@ partial class Editor
 				EditorUI.EndMenu();
 			}
 		}
-
-		//
-		// Buttons
-		//
-		//{
-		//	ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
-		//	ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
-
-		//	// Draw play, pause in center
-		//	var center = ImGui.GetMainViewport().WorkSize.X / 2.0f;
-		//	center -= 40f; // Approx.
-		//	ImGui.SetCursorPosX( center );
-		//	ImGui.SetCursorPosY( 8 );
-
-		//	void DrawButtonUnderline()
-		//	{
-		//		var drawList = ImGui.GetWindowDrawList();
-		//		var buttonCol = ImGui.GetColorU32( Colors.Blue );
-
-		//		var p0 = ImGui.GetCursorPos() + new System.Numerics.Vector2( 0, 32 );
-		//		var p1 = p0 + new System.Numerics.Vector2( 32, 4 );
-		//		drawList.AddRectFilled( p0, p1, buttonCol, 4f );
-		//	}
-
-		//	//
-		//	// Play button
-		//	//
-		//	{
-		//		if ( World.Current.State == World.States.Playing )
-		//		{
-		//			DrawButtonUnderline();
-		//		}
-
-		//		if ( ImGui.Button( FontAwesome.Play, new System.Numerics.Vector2( 0, 32 ) ) )
-		//			World.Current.State = World.States.Playing;
-		//	}
-
-		//	//
-		//	// Pause button
-		//	//
-		//	{
-		//		if ( World.Current.State == World.States.Paused )
-		//		{
-		//			DrawButtonUnderline();
-		//		}
-
-		//		if ( ImGui.Button( FontAwesome.Pause, new System.Numerics.Vector2( 0, 32 ) ) )
-		//			World.Current.State = World.States.Paused;
-		//	}
-
-		//	//
-		//	// Restart button
-		//	//
-		//	{
-		//		if ( ImGui.Button( FontAwesome.Rotate, new System.Numerics.Vector2( 0, 32 ) ) )
-		//			World.Current.ResetWorld();
-		//	}
-
-		//	// Draw on right
-		//	var right = ImGui.GetMainViewport().WorkSize.X;
-		//	right -= 42f;
-		//	ImGui.SetCursorPosX( right );
-		//	ImGui.SetCursorPosY( 8 );
-
-		//	if ( ImGui.Button( FontAwesome.MagnifyingGlass, new System.Numerics.Vector2( 0, 32 ) ) )
-		//	{
-		//		quickSwitcherVisible = !quickSwitcherVisible;
-		//		quickSwitcherInput = "";
-		//	}
-
-		//	ImGui.PopStyleVar();
-		//	ImGui.PopStyleColor();
-		//}
 
 		EditorUI.EndMainMenuBar();
 	}

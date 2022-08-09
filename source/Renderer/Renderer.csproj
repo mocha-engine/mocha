@@ -48,7 +48,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\AssetCompiler\AssetCompiler.csproj" />
 		<ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
 
