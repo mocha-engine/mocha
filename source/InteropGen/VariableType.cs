@@ -39,6 +39,10 @@ public struct VariableType
 			{
 				return "void";
 			}
+			else if ( NativeType == "float" )
+			{
+				return "float";
+			}
 			else if ( NativeType.EndsWith( "*" ) )
 			{
 				return "IntPtr";

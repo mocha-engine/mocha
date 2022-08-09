@@ -67,6 +67,13 @@ namespace EditorUI
 	};
 
 	inline bool Button( std::string text ) { return ImGui::Button( text.c_str() ); };
+	inline bool ButtonEx( std::string text, int w, int h ) { return ImGui::Button( text.c_str(), ImVec2( w, h ) ); };
+
+	inline void PushStyleVar( int styleVar, float value ) { ImGui::PushStyleVar( styleVar, value ); };
+	inline void PushStyleVarEx( int styleVar, float x, float y ) { ImGui::PushStyleVar( styleVar, ImVec2( x, y ) ); };
+
+	inline void PopStyleVar() { ImGui::PopStyleVar(); };
+	inline void PopStyleVars( int count ) { ImGui::PopStyleVar( count ); };
 
 	inline bool Begin( std::string name ) { return ImGui::Begin( name.c_str() ); };
 
@@ -74,8 +81,8 @@ namespace EditorUI
 
 	inline void BeginMainMenuBar()
 	{
-		ImGui::PushStyleVar( ImGuiStyleVar_WindowPadding, ImVec2( 0, 16 ) );
-		ImGui::PushStyleColor( ImGuiCol_WindowBg, ImVec4( 0, 0, 0, 1 ) );
+		ImGui::PushStyleVar( ImGuiStyleVar_FramePadding, ImVec2( 0, 16 ) );
+		ImGui::PushStyleColor( ImGuiCol_MenuBarBg, ImVec4( 0, 0, 0, 1 ) );
 		ImGui::BeginMainMenuBar();
 	};
 
@@ -86,9 +93,14 @@ namespace EditorUI
 		ImGui::PopStyleVar();
 	};
 
-	inline void SetCursorPosXRelative( int relPos ) { ImGui::SetCursorPosX( ImGui::GetCursorPosX() + relPos ); };
+	inline void SetCursorPosX( float x ) { ImGui::SetCursorPosX( x ); };
+	inline void SetCursorPosXRelative( float relPos ) { ImGui::SetCursorPosX( ImGui::GetCursorPosX() + relPos ); };
 
-	inline void SetCursorPosYRelative( int relPos ) { ImGui::SetCursorPosY( ImGui::GetCursorPosY() + relPos ); };
+	inline void SetCursorPosY( float y ) { ImGui::SetCursorPosY( y ); };
+	inline void SetCursorPosYRelative( float relPos ) { ImGui::SetCursorPosY( ImGui::GetCursorPosY() + relPos ); };
+
+	inline float GetViewportSizeX() { return ImGui::GetMainViewport()->WorkSize.x; }
+	inline float GetViewportSizeY() { return ImGui::GetMainViewport()->WorkSize.y; }
 
 	inline bool BeginMenu( std::string name )
 	{
@@ -100,9 +112,10 @@ namespace EditorUI
 
 	inline void EndMenu() { ImGui::EndMenu(); };
 
-	inline bool MenuItem( std::string icon, std::string name )
+	inline bool MenuItemEx( std::string icon, std::string name, bool enabled )
 	{
 		SetCursorPosYRelative( -4 );
+
 		auto drawList = ImGui::GetForegroundDrawList();
 		auto windowPos = ImGui::GetWindowPos();
 		auto windowSize = ImGui::GetWindowSize();
@@ -120,9 +133,9 @@ namespace EditorUI
 		p0.x += windowPos.x;
 		p0.y += windowPos.y - 2;
 
-		auto p1 = p0;
-		p1.x += padding.x + size.x;
-		p1.y += padding.x + size.y + 4;
+		auto p1 = ImVec2( p0 );
+		p1.x += size.x;
+		p1.y += size.y + 4;
 
 		auto col = ImGui::GetColorU32( ImVec4( 0, 0, 0, 0.1f ) );
 
@@ -139,12 +152,14 @@ namespace EditorUI
 		SetCursorPosYRelative( 4 );
 		ImGui::Text( name.c_str() );
 
+		// TODO: Checkmark
+
 		if ( result )
-		{
 			ImGui::CloseCurrentPopup();
-		}
 
 		return result;
-	};
+	}
+
+	inline bool MenuItem( std::string icon, std::string name ) { return MenuItemEx( icon, name, false ); };
 
 } // namespace EditorUI
