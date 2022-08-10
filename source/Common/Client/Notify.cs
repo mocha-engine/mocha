@@ -12,6 +12,7 @@ public static class Notify
 		{
 			this.Title = title;
 			this.Text = text;
+			this.Lifetime = 0;
 		}
 	}
 
