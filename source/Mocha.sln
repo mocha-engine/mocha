@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32112.339
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Engine", "Renderer\Engine.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Engine", "Engine\Engine.csproj", "{B8C94B77-D94F-48BA-B2E9-9CF0752C2189}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 	EndProjectSection
@@ -27,7 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{CB07C6D5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Engine", "Engine", "{2F5C4610-1254-4D33-A1A6-5B38197346EE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mocha", "Engine\Mocha.vcxproj", "{15316C0B-5D5C-4F76-B00F-DCD2FD3E5401}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Mocha", "Mocha\Mocha.vcxproj", "{15316C0B-5D5C-4F76-B00F-DCD2FD3E5401}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6A9167C6-40D1-4D1A-B105-318837AE4C91} = {6A9167C6-40D1-4D1A-B105-318837AE4C91}
 		{86D9A27F-6F46-4F60-BD58-94DF366704EB} = {86D9A27F-6F46-4F60-BD58-94DF366704EB}
