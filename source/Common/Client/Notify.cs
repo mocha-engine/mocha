@@ -12,7 +12,6 @@ public static class Notify
 		{
 			this.Title = title;
 			this.Text = text;
-			this.Lifetime = 0;
 		}
 	}
 
@@ -21,8 +20,6 @@ public static class Notify
 	public static void AddNotification( string title, string text, string? icon = null )
 	{
 		var mergedTitle = (icon == null) ? title : $"{icon} {title}";
-
-		Log.Trace( $"{title}: {text}" );
 
 		Notifications.Add( new Notification( mergedTitle, text ) );
 	}
