@@ -89,30 +89,30 @@ public static class Program
 		return false;
 	}
 
-	private static void QueueFile( ref List<string> queue, string fileName )
+	private static void QueueFile( ref List<string> queue, string path )
 	{
-		var fileExtension = Path.GetExtension( fileName );
+		var fileExtension = Path.GetExtension( path );
 
 		if ( GetCompiler( fileExtension, out var _ ) )
 		{
-			queue.Add( fileName );
+			queue.Add( path );
 		}
 		else
 		{
-			Console.WriteLine( $"[SKIP]\t'{fileExtension}' for path '{fileName}'..." );
+			Log.UnknownType( path );
 		}
 	}
 
-	private static void CompileFile( string fileName )
+	private static void CompileFile( string path )
 	{
-		var fileExtension = Path.GetExtension( fileName );
+		var fileExtension = Path.GetExtension( path );
 
 		// TODO: Check if we have an original asset & if it needs recompiling
 
 		if ( GetCompiler( fileExtension, out var compiler ) )
 		{
-			var destFile = compiler.CompileFile( fileName );
-			Console.WriteLine( $"[OK]\t\t{destFile}" );
+			var destFile = compiler.CompileFile( path );
+			Log.Compiled( destFile );
 		}
 	}
 }

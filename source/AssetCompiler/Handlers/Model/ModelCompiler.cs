@@ -1,12 +1,15 @@
-﻿namespace Mocha.AssetCompiler;
+﻿using System.Text.Json;
 
-[Handles( new[] { ".fbx", ".obj", ".gltf" } )]
+namespace Mocha.AssetCompiler;
+
+[Handles( new[] { ".mmdl" } )]
 public class ModelCompiler : BaseCompiler
 {
 	public override string CompileFile( string path )
 	{
-		var destFileName = Path.ChangeExtension( path, "mmdl" );
-		Console.WriteLine( $"[MODEL]\t{path}" );
+		Log.Processing( "Model", path );
+
+		var destFileName = Path.ChangeExtension( path, "mmdl_c" );
 
 		using var fileStream = new FileStream( destFileName, FileMode.Create );
 		using var binaryWriter = new BinaryWriter( fileStream );
@@ -16,10 +19,14 @@ public class ModelCompiler : BaseCompiler
 		//
 		// File header
 		//
-		binaryWriter.Write( 1 ); // Version major
+		binaryWriter.Write( 2 ); // Version major
 		binaryWriter.Write( 0 ); // Version minor
 
-		var meshes = Primitives.Assimp.GenerateModels( path );
+		// Load json
+		var fileData = File.ReadAllText( path );
+		var modelData = JsonSerializer.Deserialize<ModelInfo>( fileData );
+
+		var meshes = Primitives.Assimp.GenerateModels( Directory.GetCurrentDirectory(), modelData );
 
 		binaryWriter.Write( 0 ); // Pad
 		binaryWriter.Write( meshes.Count ); // Mesh count
@@ -47,7 +54,7 @@ public class ModelCompiler : BaseCompiler
 			{
 				void WriteVector3( Vector3 a )
 				{
-					binaryWriter.Write( 0 );
+					// binaryWriter.Write( 0 );
 					binaryWriter.Write( a.X );
 					binaryWriter.Write( a.Y );
 					binaryWriter.Write( a.Z );
@@ -55,8 +62,8 @@ public class ModelCompiler : BaseCompiler
 
 				void WriteVector2( Vector2 a )
 				{
-					binaryWriter.Write( 0 );
-					binaryWriter.Write( 0 );
+					// binaryWriter.Write( 0 );
+					// binaryWriter.Write( 0 );
 					binaryWriter.Write( a.X );
 					binaryWriter.Write( a.Y );
 				}
