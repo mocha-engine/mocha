@@ -13,7 +13,6 @@
     <PackageReference Include="BCnEncoder.Net" Version="2.1.0" />
     <PackageReference Include="SixLabors.ImageSharp" Version="2.1.2" />
     <PackageReference Include="StbImageSharp" Version="2.27.8" />
-    <PackageReference Include="Veldrid" Version="4.8.0" />
   </ItemGroup>
 
   <ItemGroup>

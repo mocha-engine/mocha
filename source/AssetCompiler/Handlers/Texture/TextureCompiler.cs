@@ -14,7 +14,7 @@ public class TextureCompiler : BaseCompiler
 		BcEncoder encoder = new BcEncoder();
 
 		encoder.OutputOptions.GenerateMipMaps = true;
-		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
+		encoder.OutputOptions.Quality = CompressionQuality.Fast;
 		encoder.OutputOptions.Format = compressionFormat;
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
@@ -23,9 +23,9 @@ public class TextureCompiler : BaseCompiler
 
 	public override string CompileFile( string path )
 	{
-		Log.Processing( "Texture", path );
+		Console.WriteLine( $"[TEXTURE]\t{path}" );
 
-		var destFileName = Path.ChangeExtension( path, "mtex_c" );
+		var destFileName = Path.ChangeExtension( path, "mtex" );
 		var textureFormat = new TextureInfo();
 
 		// Load image
@@ -43,7 +43,7 @@ public class TextureCompiler : BaseCompiler
 			var computedHash = md5.ComputeHash( fileData );
 			if ( Enumerable.SequenceEqual( deserializedFile.AssetHash, computedHash ) )
 			{
-				Log.Skip( path );
+				Console.WriteLine( "Compiled ver matches existing file; skipping..." );
 
 				return destFileName;
 			}
@@ -55,25 +55,18 @@ public class TextureCompiler : BaseCompiler
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
 
-		// TODO: This is really shit
-		// Change compression format based on type
+		// Change compression format based on normal map
 		for ( int i = 0; i < textureFormat.MipCount; ++i )
 		{
 			if ( path.Contains( "Normal" ) )
 			{
-				// Normal map compression
-				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
-			}
-			else if ( path.Contains( "font" ) || path.Contains( "ui" ) )
-			{
 				// Do not compress
-				textureFormat.CompressionFormat = Veldrid.PixelFormat.R8_G8_B8_A8_UNorm;
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
+				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
+				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
 			}
 			else
 			{
-				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
+				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc3 );
 			}
 
