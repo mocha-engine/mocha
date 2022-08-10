@@ -26,7 +26,6 @@ CRenderer::CRenderer( CWindow* window )
 	mSwapchain = nullptr;
 
 	mRootSignature = nullptr;
-	mPipelineState = nullptr;
 
 	// Current Frame
 	mRtvHeap = nullptr;
@@ -341,20 +340,18 @@ void CRenderer::InitResources()
 		path = pBuf;
 		path += "\\";
 		std::wstring wpath = std::wstring( path.begin(), path.end() );
-
-		std::string vertCompiledPath = path, fragCompiledPath = path;
-		vertCompiledPath += "..\\content\\triangle.vert.dxbc";
-		fragCompiledPath += "..\\content\\triangle.frag.dxbc";
-
-		std::wstring vertPath = wpath + L"..\\content\\triangle.vert.hlsl";
-		std::wstring fragPath = wpath + L"..\\content\\triangle.frag.hlsl";
+		std::wstring shaderPath = wpath + L"..\\content\\shaders\\simple.mshdr";
 
 		try
 		{
+			D3D_SHADER_MACRO vertexMacros[] = { { "VERTEX_SHADER", "1" }, { nullptr, nullptr } };
+			D3D_SHADER_MACRO pixelMacros[] = { { "PIXEL_SHADER", "1" }, { nullptr, nullptr } };
+
 			ASSERT( D3DCompileFromFile(
-			    vertPath.c_str(), nullptr, nullptr, "main", "vs_5_0", compileFlags, 0, &vertexShader, &errors ) );
+			    shaderPath.c_str(), vertexMacros, nullptr, "Vertex", "vs_5_0", compileFlags, 0, &vertexShader, &errors ) );
+
 			ASSERT( D3DCompileFromFile(
-			    fragPath.c_str(), nullptr, nullptr, "main", "ps_5_0", compileFlags, 0, &pixelShader, &errors ) );
+			    shaderPath.c_str(), pixelMacros, nullptr, "Pixel", "ps_5_0", compileFlags, 0, &pixelShader, &errors ) );
 		}
 		catch ( std::exception e )
 		{
@@ -363,12 +360,6 @@ void CRenderer::InitResources()
 			errors->Release();
 			errors = nullptr;
 		}
-
-		std::ofstream vsOut( vertCompiledPath, std::ios::out | std::ios::binary ),
-		    fsOut( fragCompiledPath, std::ios::out | std::ios::binary );
-
-		vsOut.write( ( const char* )vertexShader->GetBufferPointer(), vertexShader->GetBufferSize() );
-		fsOut.write( ( const char* )pixelShader->GetBufferPointer(), pixelShader->GetBufferSize() );
 
 		// Define the vertex input layout.
 		D3D12_INPUT_ELEMENT_DESC inputElementDescs[] = {
@@ -414,6 +405,7 @@ void CRenderer::InitResources()
 		D3D12_BLEND_DESC blendDesc = {};
 		blendDesc.AlphaToCoverageEnable = FALSE;
 		blendDesc.IndependentBlendEnable = FALSE;
+
 		const D3D12_RENDER_TARGET_BLEND_DESC defaultRenderTargetBlendDesc = {
 		    FALSE,
 		    FALSE,
@@ -426,6 +418,7 @@ void CRenderer::InitResources()
 		    D3D12_LOGIC_OP_NOOP,
 		    D3D12_COLOR_WRITE_ENABLE_ALL,
 		};
+
 		for ( UINT i = 0; i < D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT; ++i )
 			blendDesc.RenderTarget[i] = defaultRenderTargetBlendDesc;
 
@@ -437,6 +430,7 @@ void CRenderer::InitResources()
 		psoDesc.NumRenderTargets = 1;
 		psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		psoDesc.SampleDesc.Count = 1;
+
 		try
 		{
 			ASSERT( mDevice->CreateGraphicsPipelineState( &psoDesc, IID_PPV_ARGS( &mPipelineState ) ) );
@@ -444,18 +438,6 @@ void CRenderer::InitResources()
 		catch ( std::exception e )
 		{
 			std::cout << "Failed to create Graphics Pipeline!";
-		}
-
-		if ( vertexShader )
-		{
-			vertexShader->Release();
-			vertexShader = nullptr;
-		}
-
-		if ( pixelShader )
-		{
-			pixelShader->Release();
-			pixelShader = nullptr;
 		}
 	}
 
@@ -633,6 +615,11 @@ ID3D12DescriptorHeap* CRenderer::GetSRVHeap()
 ID3D12GraphicsCommandList* CRenderer::GetCommandList()
 {
 	return mCommandList;
+}
+
+ID3D12RootSignature* CRenderer::GetRootSignature()
+{
+	return mRootSignature;
 }
 
 void CRenderer::BeginFrame()
