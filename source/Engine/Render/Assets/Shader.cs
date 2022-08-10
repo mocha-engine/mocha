@@ -12,12 +12,12 @@ public class Shader : Asset
 
 	private FileSystemWatcher watcher;
 
-	internal Shader( string path, string vertexSource, string fragmentSource )
+	internal Shader( string path, string source )
 	{
 		All.Add( this );
 		Path = path;
 
-		NativeShader = new( vertexSource, fragmentSource );
+		NativeShader = new( Path, source );
 
 		CreateWatcher();
 		Compile();
