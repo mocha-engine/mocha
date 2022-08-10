@@ -7,7 +7,7 @@ public partial class Primitives
 		public static List<Model> GenerateModels( string path )
 		{
 			using var _ = new Stopwatch( "Mocha model generation" );
-			using var fileStream = new FileStream( path, FileMode.Open, FileAccess.Read );
+			using var fileStream = FileSystem.Game.OpenRead( path );
 			using var binaryReader = new BinaryReader( fileStream );
 
 			var models = new List<Model>();
@@ -94,7 +94,7 @@ public partial class Primitives
 				path = path + $"_{typeName}.mtex";
 			}
 
-			if ( !File.Exists( path ) )
+			if ( !FileSystem.Game.Exists( path ) )
 			{
 				Log.Warning( $"No texture '{path}'" );
 				return null;

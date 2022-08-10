@@ -16,7 +16,7 @@ public class Model : Asset
 
 		All.Add( this );
 
-		Material.Shader.OnRecompile += CreateResources;
+		// Material.Shader.OnRecompile += CreateResources;
 	}
 
 	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )

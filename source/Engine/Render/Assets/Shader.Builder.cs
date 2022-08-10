@@ -16,7 +16,7 @@ public class ShaderBuilder
 	public ShaderBuilder FromMoyaiShader( string mshdrPath )
 	{
 		Path = mshdrPath;
-		var shaderText = File.ReadAllText( mshdrPath );
+		var shaderText = FileSystem.Game.ReadAllText( mshdrPath );
 
 		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
 		var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";
@@ -37,14 +37,6 @@ public class ShaderBuilder
 
 		Log.Trace( $"Compiling shader {Path}" );
 
-		try
-		{
-			return new Shader( Path );
-		}
-		catch ( Exception ex )
-		{
-			Log.Error( ex.ToString() );
-			return default;
-		}
+		return new Shader( Path );
 	}
 }

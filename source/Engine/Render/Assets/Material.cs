@@ -5,9 +5,9 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset
 {
-	public Shader Shader { get; set; } = new ShaderBuilder().FromPath( "core/shaders/pbr.mshdr" ).Build();
+	public Shader Shader { get; set; } = ShaderBuilder.Default.FromMoyaiShader( "shaders/pbr.mshdr" ).Build();
 	public Type UniformBufferType { get; set; } = typeof( GenericModelUniformBuffer );
-	public Texture? DiffuseTexture { get; set; } = TextureBuilder.MissingTexture;
+	public Texture? DiffuseTexture { get; set; } = TextureBuilder.One;
 	public Texture? AlphaTexture { get; set; } = TextureBuilder.One;
 	public Texture? NormalTexture { get; set; } = TextureBuilder.Zero;
 	public Texture? ORMTexture { get; set; } = TextureBuilder.One;
@@ -17,24 +17,23 @@ public class Material : Asset
 		All.Add( this );
 	}
 
-	public Material( string path ) : this()
+	public static Material FromMochaMaterial( string path )
 	{
 		if ( !FileSystem.Game.Exists( path ) )
 		{
-			Path = "internal:default";
-			return;
+			return new()
+			{
+				Path = "internal:default"
+			};
 		}
 
 		var fileBytes = FileSystem.Game.ReadAllBytes( path );
 		var materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
 
-		Path = path;
-		DiffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
-	}
-
-	[Obsolete( "Use ctor" )]
-	public static Material FromPath( string path )
-	{
-		return new Material( path );
+		return new()
+		{
+			Path = path,
+			DiffuseTexture = TextureBuilder.Default.FromMochaTexture( materialFormat.Data.DiffuseTexture ).Build()
+		};
 	}
 }
