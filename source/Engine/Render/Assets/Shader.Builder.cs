@@ -6,6 +6,9 @@ public class ShaderBuilder
 {
 	public static ShaderBuilder Default => new ShaderBuilder();
 
+	private string vertexSource;
+	private string fragmentSource;
+
 	public string Path { get; set; }
 
 	internal ShaderBuilder()
@@ -18,11 +21,8 @@ public class ShaderBuilder
 		Path = mshdrPath;
 		var shaderText = FileSystem.Game.ReadAllText( mshdrPath );
 
-		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
-		var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";
-
-		var vertexShaderBytes = Encoding.Default.GetBytes( vertexShaderText );
-		var fragmentShaderBytes = Encoding.Default.GetBytes( fragmentShaderText );
+		vertexSource = $"#define VERTEX\n{shaderText}";
+		fragmentSource = $"#define FRAGMENT\n{shaderText}";
 
 		return this;
 	}
@@ -35,8 +35,6 @@ public class ShaderBuilder
 			return Asset.All.OfType<Shader>().First( x => x.Path == Path );
 		}
 
-		Log.Trace( $"Compiling shader {Path}" );
-
-		return new Shader( Path );
+		return new Shader( Path, vertexSource, fragmentSource );
 	}
 }
