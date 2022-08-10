@@ -89,4 +89,5 @@ public:
 	ID3D12Device* GetDevice();
 	ID3D12DescriptorHeap* GetSRVHeap();
 	ID3D12GraphicsCommandList* GetCommandList();
+	ID3D12RootSignature* GetRootSignature();
 };

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha.Renderer;
 
 [Icon( FontAwesome.Glasses ), Title( "Shader" )]
 public class Shader : Asset
@@ -61,18 +59,17 @@ public class Shader : Asset
 		if ( !IsFileReady( Path ) )
 			return;
 
-		Log.Info( $"Compiling shader {Path}" );
-		Notify.AddNotification( $"Shader Compiling", FontAwesome.Ellipsis );
+		Notify.AddNotification( $"Shader Compiling", $"Compiling '{Path}'...", FontAwesome.Ellipsis );
 
-		if ( NativeShader.Compile() == 0 )
+		if ( NativeShader.Compile() )
 		{
-			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader {Path}", FontAwesome.FaceGrinStars );
+			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader '{Path}'", FontAwesome.FaceGrinStars );
 			CreatePipelines();
 			OnRecompile?.Invoke();
 		}
 		else
 		{
-			Notify.AddNotification( $"Shader Compilation Fail", FontAwesome.FaceSadCry );
+			Notify.AddNotification( $"Shader Compilation Fail", $"Failed to compile '{Path}'", FontAwesome.FaceSadCry );
 		}
 
 		IsDirty = false;
