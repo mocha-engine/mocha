@@ -18,6 +18,7 @@ public class Main
 		SetupFunctionPointers( args );
 
 		editor = new();
+		var world = new World();
 	}
 
 	[UnmanagedCallersOnly]

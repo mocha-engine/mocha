@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClInclude Include="Assert.h" />
     <ClInclude Include="CEngine.h" />
-    <ClInclude Include="CFileSystem.h" />
     <ClInclude Include="CImgui.h" />
     <ClInclude Include="CLogger.h" />
     <ClInclude Include="CEditor.h" />
@@ -41,7 +40,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CEngine.cpp" />
-    <ClCompile Include="CFileSystem.cpp" />
     <ClCompile Include="CImgui.cpp" />
     <ClCompile Include="CLogger.cpp" />
     <ClCompile Include="CEditor.cpp" />
