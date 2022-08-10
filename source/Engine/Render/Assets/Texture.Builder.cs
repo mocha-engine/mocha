@@ -60,7 +60,7 @@ public partial class TextureBuilder
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
-		var fileBytes = File.ReadAllBytes( path );
+		var fileBytes = FileSystem.Game.ReadAllBytes( path );
 
 		var textureFormat = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes );
 		this.width = textureFormat.Data.Width;
@@ -77,7 +77,7 @@ public partial class TextureBuilder
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
-		var fileData = File.ReadAllBytes( path );
+		var fileData = FileSystem.Game.ReadAllBytes( path );
 		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
 
 		this.data = new[] { image.Data };

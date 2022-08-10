@@ -32,13 +32,6 @@ public class World
 		SetupEntities();
 	}
 
-	private void DeleteEntities()
-	{
-		Log.Trace( $"Deleting all entities..." );
-		BaseEntity.All.ForEach( x => x.Delete() );
-		BaseEntity.All.Clear();
-	}
-
 	private void SetupEntities()
 	{
 		Log.Trace( $"Setting up entities..." );
@@ -55,17 +48,6 @@ public class World
 		{
 			Scale = Vector3.One * -100f
 		};
-
-		Player = new Player();
-	}
-
-	public void ResetWorld()
-	{
-		DeleteEntities();
-		SetupEntities();
-
-		Log.Trace( $"World reset complete." );
-		GC.Collect( 2 );
 	}
 
 	public void Update()
