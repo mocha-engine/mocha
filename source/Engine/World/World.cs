@@ -44,10 +44,7 @@ public class World
 			Rotation = Rotation.From( 27, 15, 0 )
 		};
 
-		Sky = new Sky
-		{
-			Scale = Vector3.One * -100f
-		};
+		_ = new ModelEntity( "models/player.mmdl" );
 	}
 
 	public void Update()

@@ -8,13 +8,25 @@ class CShader
 {
 private:
 	ID3DBlob* mVertexShader;
-	ID3DBlob* mFragmentShader;
+	ID3DBlob* mPixelShader;
+
+	ID3D12GraphicsCommandList* mCommandList;
+	ID3D12PipelineState* mPipelineState;
 
 	std::string mSource;
 	std::string mPath;
 
+	//@InteropGen ignore
+	void CreatePipeline();
+
 public:
 	CShader( const char* path, const char* source );
 
-	int Compile();
+	//@InteropGen ignore
+	~CShader();
+
+	bool Compile();
+
+	//@InteropGen ignore
+	ID3D12PipelineState* GetPipelineState();
 };
