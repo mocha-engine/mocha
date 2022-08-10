@@ -5,5 +5,5 @@
 	if ( FAILED( x ) )                                                            \
 	{                                                                             \
 		spdlog::error( "Assertion failed at {}:{}\n{}", __FILE__, __LINE__, #x ); \
-		__debugbreak();                                                           \
+		throw std::exception();                                                   \
 	}
