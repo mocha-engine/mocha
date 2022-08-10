@@ -23,7 +23,6 @@ public class SceneCamera : SceneObject
 		CurrentSize = newSize;
 	}
 
-	// TODO: Make it so that we can call this in ViewportTab etc. without running OOM
 	private void UpdateSize( Point2 newSize )
 	{
 		if ( newSize.X == CurrentSize.X && newSize.Y == CurrentSize.Y )
