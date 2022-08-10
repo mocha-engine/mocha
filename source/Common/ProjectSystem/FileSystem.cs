@@ -2,12 +2,7 @@
 
 public class FileSystem
 {
-
-#if DEBUG
 	public static FileSystem Game => new FileSystem( "..\\content" );
-#else
-	public static FileSystem Game => new FileSystem( "content" );
-#endif
 
 	private string BasePath { get; }
 
@@ -16,12 +11,21 @@ public class FileSystem
 		this.BasePath = Path.GetFullPath( relativePath, Directory.GetCurrentDirectory() );
 	}
 
-	private string GetAbsolutePath( string relativePath )
+	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false )
 	{
 		var path = Path.Combine( this.BasePath, relativePath ).NormalizePath();
 
-		if ( !File.Exists( path ) && !Directory.Exists( path ) )
-			Log.Error( $"File not found: {path}" );
+		switch ( Path.GetExtension( relativePath ) )
+		{
+			case ".mmdl":
+			case ".mmat":
+			case ".mtex":
+				path += "_c"; // Load compiled assets
+				break;
+		}
+
+		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound )
+			Log.Warning( $"Path not found: {path}. Continuing anyway." );
 
 		return path;
 	}
@@ -43,7 +47,7 @@ public class FileSystem
 
 	public bool Exists( string relativePath )
 	{
-		return File.Exists( GetAbsolutePath( relativePath ) );
+		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
 	}
 
 	public FileSystemWatcher CreateWatcher( string relativeDir, string filter )

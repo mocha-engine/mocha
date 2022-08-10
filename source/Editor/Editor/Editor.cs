@@ -53,8 +53,6 @@ public class Editor
 	{
 		DrawMenuBar();
 
-		EditorUI.ShowDemoWindow();
-
 		foreach ( var window in windows )
 		{
 			if ( window.isVisible )

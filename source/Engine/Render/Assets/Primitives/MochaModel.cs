@@ -42,7 +42,7 @@ public partial class Primitives
 
 					Vector3 ReadVector3()
 					{
-						binaryReader.ReadInt32();
+						// binaryReader.ReadInt32();
 						float x = binaryReader.ReadSingle();
 						float y = binaryReader.ReadSingle();
 						float z = binaryReader.ReadSingle();
@@ -51,8 +51,8 @@ public partial class Primitives
 
 					Vector2 ReadVector2()
 					{
-						binaryReader.ReadInt32();
-						binaryReader.ReadInt32();
+						// binaryReader.ReadInt32();
+						// binaryReader.ReadInt32();
 						float x = binaryReader.ReadSingle();
 						float y = binaryReader.ReadSingle();
 						return new Vector2( x, y );

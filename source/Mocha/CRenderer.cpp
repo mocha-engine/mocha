@@ -670,7 +670,7 @@ void CRenderer::BeginFrame()
 	mCommandList->SetDescriptorHeaps( 1, &mSrvHeap );
 
 	// Record commands.
-	const float clearColor[] = { .2f, .2f, .2f, 1.0f };
+	const float clearColor[] = { 0, 0, 0, 1.0f };
 	mCommandList->ClearRenderTargetView( rtvHandle, clearColor, 0, nullptr );
 }
 
