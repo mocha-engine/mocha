@@ -8,6 +8,8 @@ public struct UnmanagedArgs
     public IntPtr __CLogger_WarningMethodPtr;
     public IntPtr __CLogger_ErrorMethodPtr;
     public IntPtr __CLogger_TraceMethodPtr;
+    public IntPtr __CShader_CreateMethodPtr;
+    public IntPtr __CShader_CompileMethodPtr;
     public IntPtr __EditorUI_EndMethodPtr;
     public IntPtr __EditorUI_SeparatorMethodPtr;
     public IntPtr __EditorUI_TextMethodPtr;

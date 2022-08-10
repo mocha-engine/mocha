@@ -5,17 +5,26 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.Glasses ), Title( "Shader" )]
 public class Shader : Asset
 {
+	private Glue.CShader NativeShader { get; }
+
 	public Action OnRecompile { get; set; }
 	public bool IsDirty { get; private set; }
 
-
 	private FileSystemWatcher watcher;
 
-	internal Shader( string path )
+	internal Shader( string path, string vertexSource, string fragmentSource )
 	{
 		All.Add( this );
 		Path = path;
 
+		NativeShader = new( vertexSource, fragmentSource );
+
+		CreateWatcher();
+		Compile();
+	}
+
+	private void CreateWatcher()
+	{
 		var directoryName = System.IO.Path.GetDirectoryName( Path );
 		var fileName = System.IO.Path.GetFileName( Path );
 
@@ -47,33 +56,25 @@ public class Shader : Asset
 		}
 	}
 
-	public void Recompile()
+	public void Compile()
 	{
 		if ( !IsFileReady( Path ) )
 			return;
 
-		var shaderText = FileSystem.Game.ReadAllText( Path );
+		Log.Info( $"Compiling shader {Path}" );
+		Notify.AddNotification( $"Shader Compiling", FontAwesome.Ellipsis );
 
-		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
-		var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";
-
-		var vertexShaderBytes = Encoding.Default.GetBytes( vertexShaderText );
-		var fragmentShaderBytes = Encoding.Default.GetBytes( fragmentShaderText );
-
-		try
+		if ( NativeShader.Compile() == 0 )
 		{
-
-			CreatePipelines();
-
 			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader {Path}", FontAwesome.FaceGrinStars );
+			CreatePipelines();
+			OnRecompile?.Invoke();
 		}
-		catch ( Exception ex )
+		else
 		{
-			Log.Warning( $"Compile failed:\n{ex.Message}" );
-			Notify.AddNotification( $"Shader Compilation Fail", $"{ex.Message}", FontAwesome.FaceSadCry );
+			Notify.AddNotification( $"Shader Compilation Fail", FontAwesome.FaceSadCry );
 		}
 
 		IsDirty = false;
-		OnRecompile?.Invoke();
 	}
 }
