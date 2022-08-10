@@ -2,7 +2,7 @@
 
 namespace Mocha.Editor;
 
-partial class Editor
+public class Editor
 {
 	private List<BaseEditorWindow> windows = new();
 

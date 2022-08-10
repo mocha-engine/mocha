@@ -1,7 +1,7 @@
 ﻿using Mocha.Common.Serialization;
-using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
@@ -16,7 +16,7 @@ public class MaterialCompiler : BaseCompiler
 
 		// Load json
 		var fileData = File.ReadAllText( path );
-		var materialData = JsonConvert.DeserializeObject<MaterialInfo>( fileData );
+		var materialData = JsonSerializer.Deserialize<MaterialInfo>( fileData );
 
 		// Wrapper for file
 		var mochaFile = new MochaFile<MaterialInfo>()

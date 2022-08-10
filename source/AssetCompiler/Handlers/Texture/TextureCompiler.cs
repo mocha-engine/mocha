@@ -61,12 +61,12 @@ public class TextureCompiler : BaseCompiler
 			if ( path.Contains( "Normal" ) )
 			{
 				// Do not compress
-				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
+				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
 			}
 			else
 			{
-				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
+				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc3 );
 			}
 

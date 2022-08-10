@@ -9,11 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Veldrid" Version="4.8.0" />
-    <PackageReference Include="Veldrid.Sdl2" Version="4.8.0" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Folder Include="Glue\" />
   </ItemGroup>
 
