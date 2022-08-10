@@ -10,11 +10,11 @@ private:
 	ID3DBlob* mVertexShader;
 	ID3DBlob* mFragmentShader;
 
-	std::string mFragmentBytes;
-	std::string mVertexBytes;
+	std::string mSource;
+	std::string mPath;
 
 public:
-	CShader( const char* fragmentBytes, const char* vertexBytes );
+	CShader( const char* path, const char* source );
 
 	int Compile();
 };

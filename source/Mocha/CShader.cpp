@@ -4,10 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-CShader::CShader( const char* fragmentBytes, const char* vertexBytes )
+CShader::CShader( const char* path, const char* source )
 {
-	mVertexBytes = vertexBytes;
-	mFragmentBytes = fragmentBytes;
+	mPath = path;
+	mSource = source;
 }
 
 int CShader::Compile()
@@ -16,10 +16,13 @@ int CShader::Compile()
 
 	try
 	{
-		ASSERT( D3DCompile( mVertexBytes.c_str(), mVertexBytes.size(), nullptr, nullptr, nullptr, "main", "vs_5_0",
+		D3D_SHADER_MACRO vertexMacros[] = { { "VERTEX_SHADER", "" }, { nullptr, nullptr } };
+		D3D_SHADER_MACRO fragmentMacros[] = { { "FRAGMENT_SHADER", "" }, { nullptr, nullptr } };
+
+		ASSERT( D3DCompile( mSource.c_str(), mSource.size(), mPath.c_str(), vertexMacros, nullptr, "main", "vs_5_0",
 		    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &mVertexShader, &errors ) );
 
-		ASSERT( D3DCompile( mFragmentBytes.c_str(), mFragmentBytes.size(), nullptr, nullptr, nullptr, "main", "ps_5_0",
+		ASSERT( D3DCompile( mSource.c_str(), mSource.size(), mPath.c_str(), fragmentMacros, nullptr, "main", "ps_5_0",
 		    D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, 0, &mFragmentShader, &errors ) );
 	}
 	catch ( std::exception e )
