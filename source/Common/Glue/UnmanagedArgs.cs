@@ -3,6 +3,11 @@ using System.Runtime.InteropServices;
 [StructLayout( LayoutKind.Sequential )]
 public struct UnmanagedArgs
 {
+    public IntPtr __CDeviceBuffer_CreateMethodPtr;
+    public IntPtr __CDeviceBuffer_DeleteMethodPtr;
+    public IntPtr __CDeviceBuffer_CreateIndexBufferMethodPtr;
+    public IntPtr __CDeviceBuffer_CreateVertexBufferMethodPtr;
+    public IntPtr __CDeviceBuffer_SetDataMethodPtr;
     public IntPtr __CLogger_CreateMethodPtr;
     public IntPtr __CLogger_InfoMethodPtr;
     public IntPtr __CLogger_WarningMethodPtr;
