@@ -44,7 +44,8 @@ public class World
 			Rotation = Rotation.From( 27, 15, 0 )
 		};
 
-		_ = new ModelEntity( "models/subaru/subaru.mmdl" );
+		// _ = new ModelEntity( "models/subaru/subaru.mmdl" );
+		_ = new CubeEntity();
 	}
 
 	public void Update()
