@@ -128,8 +128,8 @@ CImgui::CImgui( CWindow* window, CRenderer* renderer )
 
 CImgui::~CImgui()
 {
-	ImGui_ImplSDL2_Shutdown();
 	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
 }
 
