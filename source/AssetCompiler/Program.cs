@@ -27,7 +27,7 @@ public static class Program
 		var attr = File.GetAttributes( path );
 
 		List<string> queue = new();
-		int threadCount = 8;
+		int threadCount = 10;
 
 		if ( attr.HasFlag( FileAttributes.Directory ) )
 		{
@@ -40,6 +40,7 @@ public static class Program
 			CompileFile( path );
 		}
 
+		var completedThreads = 0;
 		var batchSize = queue.Count / threadCount - 1;
 		var batched = queue
 			.Select( ( Value, Index ) => new { Value, Index } )
@@ -56,9 +57,18 @@ public static class Program
 				 {
 					 CompileFile( item );
 				 }
+
+				 completedThreads++;
 			 } );
 			thread.Start();
 		}
+
+		while ( completedThreads < threadCount )
+		{
+			Thread.Sleep( 500 );
+		}
+
+		Log.Results();
 	}
 
 	private static void QueueDirectory( ref List<string> queue, string directory )
