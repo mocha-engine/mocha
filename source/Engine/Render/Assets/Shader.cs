@@ -5,6 +5,8 @@ public class Shader : Asset
 {
 	private Glue.CShader NativeShader { get; }
 
+	public IntPtr NativePtr => NativeShader.NativePtr;
+
 	public Action OnRecompile { get; set; }
 	public bool IsDirty { get; private set; }
 

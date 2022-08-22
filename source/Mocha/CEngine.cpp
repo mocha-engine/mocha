@@ -17,13 +17,11 @@ CEngine::CEngine()
 void CEngine::Render()
 {
 	mRenderer->BeginFrame();
-
-	auto cl = mRenderer->GetCommandList();
 	mImgui->NewFrame();
 
-	mEditor->Render();
+	// mEditor->Render();
 
-	mImgui->Render( cl );
+	mImgui->Render();
 	mRenderer->EndFrame();
 }
 

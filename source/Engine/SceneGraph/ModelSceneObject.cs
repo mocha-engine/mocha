@@ -25,4 +25,11 @@ public class ModelSceneObject : SceneObject
 	{
 		this.models = models;
 	}
+
+	public override void Render()
+	{
+		base.Render();
+
+		models.ForEach( x => x.Render() );
+	}
 }
