@@ -13,12 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\ImGUI">
-      <UniqueIdentifier>{f2f07cee-afb7-4b2a-9d47-9e89fbf08c6f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\ImGUI">
-      <UniqueIdentifier>{d7d582e3-b673-4b4c-9351-2416206db500}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Misc">
       <UniqueIdentifier>{b6b8cf1a-9f56-4457-932d-657e5e0998ed}</UniqueIdentifier>
     </Filter>
@@ -41,12 +35,6 @@
     </ClInclude>
     <ClInclude Include="CRenderer.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_impl_dx12.h">
-      <Filter>Header Files\ImGUI</Filter>
-    </ClInclude>
-    <ClInclude Include="imgui_impl_sdl.h">
-      <Filter>Header Files\ImGUI</Filter>
     </ClInclude>
     <ClInclude Include="Globals.h">
       <Filter>Header Files</Filter>
@@ -81,6 +69,9 @@
     <ClInclude Include="CShader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CDeviceBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CEngine.cpp">
@@ -104,16 +95,13 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="imgui_impl_dx12.cpp">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClCompile>
-    <ClCompile Include="imgui_impl_sdl.cpp">
-      <Filter>Source Files\ImGUI</Filter>
-    </ClCompile>
     <ClCompile Include="CEditor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CDeviceBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

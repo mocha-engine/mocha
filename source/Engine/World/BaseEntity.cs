@@ -48,6 +48,7 @@ public class BaseEntity : IEntity
 		Name = $"{this.GetType().Name} {All.Count}";
 	}
 
+	public virtual void Render() { }
 	public virtual void Update() { }
 	public virtual void Delete()
 	{

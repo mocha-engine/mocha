@@ -1,23 +1,17 @@
 #pragma once
-#include <d3d12.h>
-#include <d3dcompiler.h>
+#include "CDeviceBuffer.h"
+#include "CEngine.h"
+#include "CRenderer.h"
+#include "Globals.h"
+
 #include <string>
 
 //@InteropGen generate class
 class CShader
 {
 private:
-	ID3DBlob* mVertexShader;
-	ID3DBlob* mPixelShader;
-
-	ID3D12GraphicsCommandList* mCommandList;
-	ID3D12PipelineState* mPipelineState;
-
 	std::string mSource;
 	std::string mPath;
-
-	//@InteropGen ignore
-	void CreatePipeline();
 
 public:
 	CShader( const char* path, const char* source );
@@ -26,7 +20,14 @@ public:
 	~CShader();
 
 	bool Compile();
-
-	//@InteropGen ignore
-	ID3D12PipelineState* GetPipelineState();
 };
+
+//@InteropGen generate class
+namespace Renderer
+{
+	// TODO: We'll do SceneObjects and such later.. this is temp
+	inline void DrawModel( CShader* shader, int indexCount, CDeviceBuffer* vertexBuffer, CDeviceBuffer* indexBuffer )
+	{
+		// TODO
+	}
+} // namespace Renderer

@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 namespace Mocha.Glue;
 public static class InteropUtils
@@ -27,7 +28,7 @@ public static class InteropUtils
 		}
 		else
 		{
-			Log.Error( $"Couldn't convert {obj} to pointer (type {obj.GetType()}" );
+			Log.Error( $"Couldn't convert {obj} to pointer (type {obj.GetType()})" );
 		}
 
 		return IntPtr.Zero;

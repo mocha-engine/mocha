@@ -4,6 +4,8 @@ namespace Mocha;
 
 public class Main
 {
+	private static World world;
+
 #if DEBUG
 	private static Editor.Editor editor;
 #endif
@@ -23,7 +25,7 @@ public class Main
 		editor = new();
 #endif
 
-		var world = new World();
+		world = new World();
 	}
 
 	[UnmanagedCallersOnly]
@@ -32,5 +34,7 @@ public class Main
 #if DEBUG
 		editor.Render();
 #endif
+
+		world.Render();
 	}
 }
