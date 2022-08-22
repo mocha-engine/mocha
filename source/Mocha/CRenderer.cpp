@@ -3,34 +3,26 @@
 #include "Assert.h"
 #include "CWindow.h"
 
+#include <bgfx/bgfx.h>
+#include <bgfx/platform.h>
+#include <bx/bx.h>
 #include <format>
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <stdio.h>
 
-CRenderer::CRenderer( CWindow* window ) {}
+CRenderer::CRenderer( CWindow* window )
+{
+	bgfx::renderFrame(); // Do not create render frame
+
+	bgfx::Init init;
+	init.platformData.nwh = window->GetWindowHandle();
+
+	int width, height;
+}
 
 CRenderer::~CRenderer() {}
-
-void CRenderer::InitAPI( CWindow* window ) {}
-
-void CRenderer::InitShaderResources() {}
-
-void CRenderer::DestroyShaderResources() {}
-
-void CRenderer::InitFramebuffer() {}
-
-void CRenderer::DestroyFramebuffer() {}
-
-void CRenderer::InitResources() {}
-
-void CRenderer::DestroyResources() {}
-
-void CRenderer::CreateCommands() {}
-
-void CRenderer::DestroyCommands() {}
-
-void CRenderer::SetupSwapchain( unsigned width, unsigned height ) {}
 
 void CRenderer::Resize( Uint2 size ) {}
 

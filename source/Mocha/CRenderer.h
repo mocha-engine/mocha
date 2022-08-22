@@ -19,18 +19,6 @@ class CWindow;
 class CRenderer
 {
 private:
-	void InitAPI( CWindow* window );
-	void DestroyAPI();
-	void InitResources();
-	void DestroyResources();
-	void CreateCommands();
-	void DestroyCommands();
-	void InitFramebuffer();
-	void DestroyFramebuffer();
-	void InitShaderResources();
-	void DestroyShaderResources();
-	void SetupSwapchain( unsigned width, unsigned height );
-
 	unsigned mWidth, mHeight;
 	CWindow* mWindow;
 
