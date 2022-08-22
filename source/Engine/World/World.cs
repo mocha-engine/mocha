@@ -53,4 +53,9 @@ public class World
 		if ( State == States.Playing )
 			BaseEntity.All.ForEach( entity => entity.Update() );
 	}
+
+	public void Render()
+	{
+		BaseEntity.All.ForEach( entity => entity.Render() );
+	}
 }

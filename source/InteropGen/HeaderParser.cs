@@ -80,6 +80,8 @@ internal partial class HeaderParser : BaseParser
 		List<VariableType> args = new();
 		string currentParameter = "";
 
+		Console.WriteLine( preamble );
+
 		ConsumeWhitespace();
 
 		char nextChar = '\0';
@@ -140,10 +142,10 @@ internal partial class HeaderParser : BaseParser
 		};
 	}
 
-	private List<Function> ReadClassFunctions( string className )
+	private List<Function> ReadClassFunctions( string className, bool isNamespace )
 	{
+		string currentAccessLevel = "private";
 		List<Function> values = new();
-
 		List<string> flags = new();
 
 		while ( NextChar() != '}' )
@@ -151,7 +153,10 @@ internal partial class HeaderParser : BaseParser
 			ConsumeWhitespace();
 
 			if ( StartsWith( "public:" ) || StartsWith( "private:" ) || StartsWith( "protected:" ) )
-				ConsumeWhile( x => x != '\n' );
+			{
+				currentAccessLevel = ConsumeWhile( x => x != ':' );
+				Assert( ConsumeChar() == ':' );
+			}
 
 			ConsumeWhitespace();
 
@@ -184,7 +189,7 @@ internal partial class HeaderParser : BaseParser
 					functionCopy.Type = type;
 				}
 
-				if ( !flags.Contains( "ignore" ) )
+				if ( !flags.Contains( "ignore" ) && (currentAccessLevel == "public" || isNamespace) )
 					values.Add( functionCopy );
 			}
 
@@ -207,7 +212,7 @@ internal partial class HeaderParser : BaseParser
 		Assert( ConsumeChar() == '{' );
 		ConsumeWhitespace();
 
-		var classFunctions = ReadClassFunctions( className );
+		var classFunctions = ReadClassFunctions( className, isNamespace );
 		Assert( ConsumeChar() == '}' );
 
 		return new Class

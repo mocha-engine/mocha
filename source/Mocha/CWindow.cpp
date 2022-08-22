@@ -3,7 +3,6 @@
 #include "CEngine.h"
 #include "CImgui.h"
 #include "Globals.h"
-#include "imgui_impl_sdl.h"
 
 #include <SDL2/SDL_image.h>
 #include <SDL2/sdl_syswm.h>
@@ -33,8 +32,6 @@ void CWindow::Run( std::function<void()> renderFunction )
 
 		while ( SDL_PollEvent( &event ) )
 		{
-			ImGui_ImplSDL2_ProcessEvent( &event );
-
 			if ( event.type == SDL_QUIT )
 			{
 				return;

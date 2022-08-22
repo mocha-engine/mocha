@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Assert.h" />
+    <ClInclude Include="CDeviceBuffer.h" />
     <ClInclude Include="CEngine.h" />
     <ClInclude Include="CImgui.h" />
     <ClInclude Include="CLogger.h" />
@@ -33,13 +34,12 @@
     <ClInclude Include="FontAwesome.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="hostfxr.h" />
-    <ClInclude Include="imgui_impl_dx12.h" />
-    <ClInclude Include="imgui_impl_sdl.h" />
     <ClInclude Include="renderdoc_app.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CDeviceBuffer.cpp" />
     <ClCompile Include="CEngine.cpp" />
     <ClCompile Include="CImgui.cpp" />
     <ClCompile Include="CLogger.cpp" />
@@ -48,8 +48,6 @@
     <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
     <ClCompile Include="CRenderer.cpp" />
-    <ClCompile Include="imgui_impl_dx12.cpp" />
-    <ClCompile Include="imgui_impl_sdl.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -172,10 +170,11 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxcompiler.lib;dwmapi.lib;dxguid.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
-      <AdditionalLibraryDirectories>dxc\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -193,8 +192,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);d3d12.lib;dxgi.lib;dxcompiler.lib;dwmapi.lib;dxguid.lib</AdditionalDependencies>
-      <AdditionalLibraryDirectories>dxc\lib\x64</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib</AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

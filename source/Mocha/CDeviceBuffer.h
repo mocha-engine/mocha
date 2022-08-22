@@ -1,5 +1,4 @@
 #pragma once
-#include <d3d12.h>
 
 enum BufferType
 {
@@ -12,14 +11,9 @@ enum BufferType
 class CDeviceBuffer
 {
 private:
-	ID3D12Resource* mDeviceBuffer;
-	void* mDeviceBufferView;
-
 	int mStride;
 	int mSize;
 	BufferType mBufferType;
-
-	void InternalCreateBuffer();
 
 public:
 	CDeviceBuffer();

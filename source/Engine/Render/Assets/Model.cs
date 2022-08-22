@@ -1,5 +1,4 @@
-﻿using System;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Mocha.Renderer;
 
@@ -11,6 +10,8 @@ public class Model : Asset
 
 	public Material Material { get; set; }
 	public bool IsIndexed { get; private set; }
+
+	private int indexCount;
 
 	public Model( string path, Material material, bool isIndexed )
 	{
@@ -60,28 +61,18 @@ public class Model : Asset
 		SetupMesh( vertices );
 
 		IndexBuffer = new();
+		indexCount = indices.Length;
 
 		int sizeInBytes = Marshal.SizeOf( typeof( uint ) ) * indices.Length;
 		IndexBuffer.CreateIndexBuffer( sizeInBytes );
-
-		// Debug: show indices in console
-		for ( int i = 0; i < indices.Length; i++ )
-		{
-			uint index = indices[i];
-			Log.Info( $"[C#] Index {i}: {index}" );
-		}
 
 		unsafe
 		{
 			fixed ( void* data = indices )
 			{
-				var ptr = (IntPtr)data;
-				IndexBuffer.SetData( ptr );
-				Log.Trace( $"[C#] Pointer: 0x{ptr.ToInt64():x}" );
+				IndexBuffer.SetData( (IntPtr)data );
 			}
 		}
-
-		// pinnedIndices.Free();
 	}
 
 	private void CreateResources()
@@ -90,5 +81,20 @@ public class Model : Asset
 
 	private void CreateUniformBuffer()
 	{
+	}
+
+	public void Render()
+	{
+		if ( !IsIndexed )
+		{
+			Log.Error( "fuck off" );
+			throw new Exception( "no" );
+		}
+
+		Glue.Renderer.DrawModel(
+			Material.Shader.NativePtr,
+			indexCount,
+			VertexBuffer.NativePtr,
+			IndexBuffer.NativePtr );
 	}
 }

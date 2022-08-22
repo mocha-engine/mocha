@@ -9,6 +9,7 @@ namespace Mocha.Glue;
 public unsafe class <#= ClassName #>
 {
 	private IntPtr instance;
+	public IntPtr NativePtr => instance;
 
 <#= FunctionDecls #>
 	
@@ -17,8 +18,7 @@ public unsafe class <#= ClassName #>
 		var args = Mocha.Common.Global.UnmanagedArgs;
 		
 <#= FunctionDefs #>
-
-<#= Ctor #>
+		<#= Ctor #>
 	}
 
 <#= FunctionBodies #>

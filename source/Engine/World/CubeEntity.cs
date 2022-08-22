@@ -13,4 +13,10 @@ public partial class CubeEntity : BaseEntity
 			models = new() { Primitives.Cube.GenerateModel( new Material() ) }
 		};
 	}
+
+	public override void Render()
+	{
+		base.Render();
+		SceneObject.Render();
+	}
 }

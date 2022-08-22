@@ -17,6 +17,7 @@ public class SceneObject
 	}
 
 	public virtual void Delete() { }
+	public virtual void Render() { }
 
 	public bool Equals( SceneObject x, SceneObject y ) => x.GetHashCode() == y.GetHashCode();
 	public int GetHashCode( [DisallowNull] SceneObject obj ) => base.GetHashCode();

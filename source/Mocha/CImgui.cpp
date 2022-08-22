@@ -24,6 +24,7 @@ ImFont* AddFont( ImGuiIO& io, std::string fontPath, float fontSize )
 
 CImgui::CImgui( CWindow* window, CRenderer* renderer )
 {
+	/*
 	ImGui::CreateContext();
 
 	auto& colors = ImGui::GetStyle().Colors;
@@ -123,34 +124,35 @@ CImgui::CImgui( CWindow* window, CRenderer* renderer )
 	    renderer->GetSRVHeap()->GetGPUDescriptorHandleForHeapStart() );
 
 	mWindow = window;
-	mRenderer = renderer;
+	mRenderer = renderer;*/
 }
 
 CImgui::~CImgui()
 {
-	ImGui_ImplDX12_Shutdown();
+	/*ImGui_ImplDX12_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
+	ImGui::DestroyContext();*/
 }
 
 void CImgui::NewFrame()
 {
-	ImGui_ImplDX12_NewFrame();
+	/*ImGui_ImplDX12_NewFrame();
 	ImGui_ImplSDL2_NewFrame( mWindow->GetWindowPointer() );
 	ImGui::NewFrame();
 
 	ImGui::DockSpaceOverViewport(
 	    ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_AutoHideTabBar );
+	*/
 }
 
-void CImgui::Render( ID3D12GraphicsCommandList* commandList )
+void CImgui::Render()
 {
-	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData( ImGui::GetDrawData(), commandList );
+	/*ImGui::Render();
+	ImGui_ImplDX12_RenderDrawData( ImGui::GetDrawData(), commandList );*/
 }
 
 void CImgui::Resize( Uint2 newSize )
 {
-	auto& io = ImGui::GetIO();
-	io.DisplaySize = ImVec2( newSize.x, newSize.y );
+	/*auto& io = ImGui::GetIO();
+	io.DisplaySize = ImVec2( newSize.x, newSize.y );*/
 }
