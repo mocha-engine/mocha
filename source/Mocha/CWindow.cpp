@@ -13,8 +13,17 @@
 
 CWindow::CWindow( std::string title, int width, int height )
 {
-	mSdlWindow =
-	    SDL_CreateWindow( title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN );
+	SDL_Init( SDL_INIT_VIDEO );
+
+	mSdlWindow = SDL_CreateWindow(
+	    title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_VULKAN );
+
+	if ( !mSdlWindow )
+	{
+		auto errorMsg = SDL_GetError();
+		spdlog::error( "Couldn't create SDL window: {}", errorMsg );
+	}
+	
 	SDL_Surface* icon = IMG_Load( "..\\content\\logo.ico" );
 	SDL_SetWindowIcon( mSdlWindow, icon );
 	SDL_SetWindowResizable( mSdlWindow, SDL_TRUE );
