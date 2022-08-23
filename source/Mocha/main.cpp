@@ -39,8 +39,9 @@ int main( int argc, char* argv[] )
 	InitRenderdoc();
 
 	spdlog::set_level( spdlog::level::trace );
-	// Set pattern to [date] [type, pad right] [message]
-	spdlog::set_pattern( "[%Y-%m-%d] %^%-8l%$ %v" );
+	
+	// Set pattern to [time] [type, pad right] [message]
+	spdlog::set_pattern( "[%H:%M:%S] %^%-8l%$ %v" );
 
 	g_Engine = new CEngine();
 	g_Engine->Run();
