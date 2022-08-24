@@ -1,11 +1,11 @@
-#include "CEngine.h"
+#include "CMochaEngine.h"
 
 #include "CEditor.h"
 #include "CImgui.h"
 #include "CWindow.h"
 #include "Globals.h"
 
-CEngine::CEngine()
+CMochaEngine::CMochaEngine()
 {
 	mWindow = std::make_unique<CWindow>( "Mocha", 1280, 720 );
 	mRenderer = std::make_unique<CRenderer>( mWindow.get() );
@@ -16,7 +16,9 @@ CEngine::CEngine()
 	g_Imgui = mImgui.get();
 }
 
-void CEngine::Render()
+CMochaEngine::~CMochaEngine() {}
+
+void CMochaEngine::Render()
 {
 	mRenderer->Render();
 
@@ -25,25 +27,8 @@ void CEngine::Render()
 	// mImgui->Render();
 }
 
-void CEngine::Run()
+void CMochaEngine::Run()
 {
 	mEditor = std::make_unique<CEditor>();
 	mWindow->Run( [&]() { Render(); } );
 }
-
-CWindow* CEngine::GetWindow()
-{
-	return mWindow.get();
-}
-
-CImgui* CEngine::GetImgui()
-{
-	return mImgui.get();
-}
-
-CRenderer* CEngine::GetRenderer()
-{
-	return mRenderer.get();
-}
-
-CEngine::~CEngine() {}
