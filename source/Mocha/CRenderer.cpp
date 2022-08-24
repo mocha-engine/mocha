@@ -76,6 +76,12 @@ void CRenderer::InitAPI()
 
 	mDevice = vkbDevice.device;
 	mPhysicalDevice = physicalDevice.physical_device;
+
+	//
+	// Grab the queue and queue family
+	//
+	mGraphicsQueue = vkbDevice.get_queue( vkb::QueueType::graphics ).value();
+	mGraphicsQueueFamily = vkbDevice.get_queue_index( vkb::QueueType::graphics ).value();
 }
 
 void CRenderer::InitSwapchain()
@@ -101,8 +107,31 @@ void CRenderer::InitSwapchain()
 	}
 }
 
+void CRenderer::InitCommands()
+{
+	VkCommandPoolCreateInfo commandPoolInfo = {};
+	commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	commandPoolInfo.pNext = nullptr;
+
+	commandPoolInfo.queueFamilyIndex = mGraphicsQueueFamily;
+	commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+	ASSERT( vkCreateCommandPool( mDevice, &commandPoolInfo, nullptr, &mCommandPool ) );
+
+	VkCommandBufferAllocateInfo commandBufferAllocateInfo = {};
+	commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	commandBufferAllocateInfo.pNext = nullptr;
+
+	commandBufferAllocateInfo.commandPool = mCommandPool;
+	commandBufferAllocateInfo.commandBufferCount = 1;
+	commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+	ASSERT( vkAllocateCommandBuffers( mDevice, &commandBufferAllocateInfo, &mCommandBuffer ) );
+}
+
 void CRenderer::Cleanup()
 {
+	vkDestroyCommandPool( mDevice, mCommandPool, nullptr );
 	vkDestroySwapchainKHR( mDevice, mSwapchain, nullptr );
 
 	for ( size_t i = 0; i < mSwapchainImageViews.size(); i++ )
