@@ -42,6 +42,15 @@ private:
 	std::vector<VkImage> mSwapchainImages;
 	std::vector<VkImageView> mSwapchainImageViews;
 
+	//
+	// Commands
+	//
+	VkQueue mGraphicsQueue;
+	uint32_t mGraphicsQueueFamily;
+	
+	VkCommandPool mCommandPool;
+	VkCommandBuffer mCommandBuffer;
+
 public:
 	CRenderer( CWindow* window );
 	~CRenderer();
@@ -53,6 +62,7 @@ public:
 
 	void InitAPI();
 	void InitSwapchain();
+	void InitCommands();
 
 	void Cleanup();
 };
