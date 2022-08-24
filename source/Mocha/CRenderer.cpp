@@ -3,7 +3,6 @@
 #include "Assert.h"
 #include "CWindow.h"
 
-#include <format>
 #include <fstream>
 #include <iostream>
 #include <spdlog/spdlog.h>
@@ -14,22 +13,20 @@ CRenderer::CRenderer( CWindow* window )
 	mWindow = window;
 
 	InitAPI();
-	InitSwapchain();
 
 	InitCommands();
-
 	InitDefaultRenderPass();
-	InitFramebuffers();
 
 	InitSyncStructures();
+
+	// Resize() will setup the swapchain and framebuffers here
+	Resize( { 1280, 720 } );
 }
 
 CRenderer::~CRenderer()
 {
 	Cleanup();
 }
-
-void CRenderer::Resize( Uint2 size ) {}
 
 void CRenderer::InitAPI()
 {
@@ -99,7 +96,7 @@ void CRenderer::InitSwapchain()
 	vkb::SwapchainBuilder swapchainBuilder{ mPhysicalDevice, mDevice, mSurface };
 	vkb::Swapchain swapchain = swapchainBuilder.use_default_format_selection()
 	                               .set_desired_present_mode( VK_PRESENT_MODE_FIFO_KHR )
-	                               .set_desired_extent( 1280, 720 )
+	                               .set_desired_extent( mSwapchainSize.x, mSwapchainSize.y )
 	                               .build()
 	                               .value();
 
@@ -138,6 +135,9 @@ void CRenderer::InitCommands()
 
 void CRenderer::InitDefaultRenderPass()
 {
+	//
+	// Create a render pass with just a single color attachment
+	//
 	VkAttachmentDescription colorAttachment = {};
 	colorAttachment.format = mSwapchainImageFormat;
 	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
@@ -174,8 +174,8 @@ void CRenderer::InitFramebuffers()
 	framebufferInfo.pNext = nullptr; // Does this seriously need to be set to nullptr here?
 
 	framebufferInfo.renderPass = mRenderPass;
-	framebufferInfo.width = 1280;
-	framebufferInfo.height = 720;
+	framebufferInfo.width = mSwapchainSize.x;
+	framebufferInfo.height = mSwapchainSize.y;
 	framebufferInfo.layers = 1;
 	framebufferInfo.attachmentCount = 1;
 
@@ -234,13 +234,48 @@ void CRenderer::Cleanup()
 	vkDestroyInstance( mInstance, nullptr );
 }
 
-void CRenderer::Render() {
+void CRenderer::Resize( Uint2 newSize )
+{
+	mSwapchainSize = newSize;
+
+	spdlog::info( "Resizing to {},{}", newSize.x, newSize.y );
+
+	//
+	// Destroy & recreate everything that uses mSwapchainSize
+	//
+
+	vkDestroySwapchainKHR( mDevice, mSwapchain, nullptr );
+
+	for ( size_t i = 0; i < mFramebuffers.size(); i++ )
+	{
+		vkDestroyFramebuffer( mDevice, mFramebuffers[i], nullptr );
+		vkDestroyImageView( mDevice, mSwapchainImageViews[i], nullptr );
+	}
+
+	InitSwapchain();
+	InitFramebuffers();
+}
+
+void CRenderer::OnNotify( Event event, void* data )
+{
+	if ( event == Event::CWINDOW_RESIZED )
+	{
+		spdlog::info( "Got CWINDOW_RESIZED" );
+
+		Uint2 newSize = *( Uint2* )data;
+		Resize( newSize );
+	}
+}
+
+void CRenderer::Render()
+{
 	ASSERT( vkWaitForFences( mDevice, 1, &mRenderFence, true, SECONDS_TO_NANOSECONDS( 1 ) ) );
 	ASSERT( vkResetFences( mDevice, 1, &mRenderFence ) );
-	
+
 	uint32_t swapchainImageIndex;
-	ASSERT( vkAcquireNextImageKHR( mDevice, mSwapchain, SECONDS_TO_NANOSECONDS( 1 ), mPresentSemaphore, nullptr, &swapchainImageIndex ) );
-	
+	ASSERT( vkAcquireNextImageKHR(
+	    mDevice, mSwapchain, SECONDS_TO_NANOSECONDS( 1 ), mPresentSemaphore, nullptr, &swapchainImageIndex ) );
+
 	ASSERT( vkResetCommandBuffer( mCommandBuffer, 0 ) );
 
 	VkCommandBuffer cmd = mCommandBuffer;
@@ -250,14 +285,14 @@ void CRenderer::Render() {
 
 	cmdBeginInfo.pInheritanceInfo = nullptr;
 	cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
-	
+
 	ASSERT( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
 
 	//================================================================================
 
 	VkClearValue clearColor;
 	clearColor.color = { { 0.0f, 1.0f, 0.0f, 1.0f } };
-	
+
 	VkRenderPassBeginInfo rpBeginInfo = {};
 	rpBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
 	rpBeginInfo.pNext = nullptr;
@@ -265,14 +300,14 @@ void CRenderer::Render() {
 	rpBeginInfo.renderPass = mRenderPass;
 	rpBeginInfo.renderArea.offset.x = 0;
 	rpBeginInfo.renderArea.offset.y = 0;
-	rpBeginInfo.renderArea.extent = { 1280, 720 };
+	rpBeginInfo.renderArea.extent = { mSwapchainSize.x, mSwapchainSize.y };
 	rpBeginInfo.framebuffer = mFramebuffers[swapchainImageIndex];
 
 	rpBeginInfo.clearValueCount = 1;
 	rpBeginInfo.pClearValues = &clearColor;
 
 	vkCmdBeginRenderPass( cmd, &rpBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
-	
+
 	vkCmdEndRenderPass( cmd );
 	ASSERT( vkEndCommandBuffer( cmd ) );
 

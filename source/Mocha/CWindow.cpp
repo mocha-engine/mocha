@@ -53,8 +53,9 @@ void CWindow::Run( std::function<void()> renderFunction )
 					SDL_WindowEvent windowEvent = event.window;
 					Uint2 newSize = { windowEvent.data1, windowEvent.data2 };
 
-					g_Engine->GetRenderer()->Resize( newSize );
-					g_Imgui->Resize( newSize );
+					g_Imgui->Resize( newSize ); // TODO: decouple
+
+					Notify( Event::CWINDOW_RESIZED, (void*)&newSize );
 				}
 			}
 		}

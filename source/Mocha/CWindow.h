@@ -6,7 +6,9 @@
 #include <SDL2/SDL.h>
 #include <string>
 
-class CWindow
+#include "Observer.h"
+
+class CWindow : public ISubject
 {
 private:
 	SDL_Window* mSdlWindow;
