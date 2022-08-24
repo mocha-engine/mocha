@@ -16,13 +16,11 @@ CEngine::CEngine()
 
 void CEngine::Render()
 {
-	mRenderer->BeginFrame();
-	mImgui->NewFrame();
+	mRenderer->Render();
 
+	// mImgui->NewFrame();
 	// mEditor->Render();
-
-	mImgui->Render();
-	mRenderer->EndFrame();
+	// mImgui->Render();
 }
 
 void CEngine::Run()
