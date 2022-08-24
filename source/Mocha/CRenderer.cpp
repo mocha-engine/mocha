@@ -20,6 +20,8 @@ CRenderer::CRenderer( CWindow* window )
 
 	InitDefaultRenderPass();
 	InitFramebuffers();
+
+	InitSyncStructures();
 }
 
 CRenderer::~CRenderer()
@@ -170,7 +172,7 @@ void CRenderer::InitFramebuffers()
 	VkFramebufferCreateInfo framebufferInfo = {};
 	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
 	framebufferInfo.pNext = nullptr; // Does this seriously need to be set to nullptr here?
-	
+
 	framebufferInfo.renderPass = mRenderPass;
 	framebufferInfo.width = 1280;
 	framebufferInfo.height = 720;
@@ -185,6 +187,25 @@ void CRenderer::InitFramebuffers()
 		framebufferInfo.pAttachments = &mSwapchainImageViews[i];
 		ASSERT( vkCreateFramebuffer( mDevice, &framebufferInfo, nullptr, &mFramebuffers[i] ) );
 	}
+}
+
+void CRenderer::InitSyncStructures()
+{
+	VkFenceCreateInfo fenceCreateInfo = {};
+	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.pNext = nullptr;
+
+	fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	ASSERT( vkCreateFence( mDevice, &fenceCreateInfo, nullptr, &mRenderFence ) );
+
+	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+	semaphoreCreateInfo.pNext = nullptr;
+	semaphoreCreateInfo.flags = 0;
+
+	ASSERT( vkCreateSemaphore( mDevice, &semaphoreCreateInfo, nullptr, &mPresentSemaphore ) );
+	ASSERT( vkCreateSemaphore( mDevice, &semaphoreCreateInfo, nullptr, &mRenderSemaphore ) );
 }
 
 void CRenderer::Cleanup()
@@ -213,6 +234,79 @@ void CRenderer::Cleanup()
 	vkDestroyInstance( mInstance, nullptr );
 }
 
-void CRenderer::BeginFrame() {}
+void CRenderer::Render() {
+	ASSERT( vkWaitForFences( mDevice, 1, &mRenderFence, true, SECONDS_TO_NANOSECONDS( 1 ) ) );
+	ASSERT( vkResetFences( mDevice, 1, &mRenderFence ) );
+	
+	uint32_t swapchainImageIndex;
+	ASSERT( vkAcquireNextImageKHR( mDevice, mSwapchain, SECONDS_TO_NANOSECONDS( 1 ), mPresentSemaphore, nullptr, &swapchainImageIndex ) );
+	
+	ASSERT( vkResetCommandBuffer( mCommandBuffer, 0 ) );
 
-void CRenderer::EndFrame() {}
+	VkCommandBuffer cmd = mCommandBuffer;
+	VkCommandBufferBeginInfo cmdBeginInfo = {};
+	cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmdBeginInfo.pNext = nullptr;
+
+	cmdBeginInfo.pInheritanceInfo = nullptr;
+	cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+	
+	ASSERT( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
+
+	//================================================================================
+
+	VkClearValue clearColor;
+	clearColor.color = { { 0.0f, 1.0f, 0.0f, 1.0f } };
+	
+	VkRenderPassBeginInfo rpBeginInfo = {};
+	rpBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+	rpBeginInfo.pNext = nullptr;
+
+	rpBeginInfo.renderPass = mRenderPass;
+	rpBeginInfo.renderArea.offset.x = 0;
+	rpBeginInfo.renderArea.offset.y = 0;
+	rpBeginInfo.renderArea.extent = { 1280, 720 };
+	rpBeginInfo.framebuffer = mFramebuffers[swapchainImageIndex];
+
+	rpBeginInfo.clearValueCount = 1;
+	rpBeginInfo.pClearValues = &clearColor;
+
+	vkCmdBeginRenderPass( cmd, &rpBeginInfo, VK_SUBPASS_CONTENTS_INLINE );
+	
+	vkCmdEndRenderPass( cmd );
+	ASSERT( vkEndCommandBuffer( cmd ) );
+
+	//================================================================================
+
+	VkSubmitInfo submitInfo = {};
+	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+	submitInfo.pNext = nullptr;
+
+	VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	submitInfo.pWaitDstStageMask = &waitStage;
+
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = &mPresentSemaphore;
+
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = &mRenderSemaphore;
+
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &cmd;
+
+	ASSERT( vkQueueSubmit( mGraphicsQueue, 1, &submitInfo, mRenderFence ) );
+
+	VkPresentInfoKHR presentInfo = {};
+	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+	presentInfo.pNext = nullptr;
+
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = &mSwapchain;
+
+	presentInfo.waitSemaphoreCount = 1;
+	presentInfo.pWaitSemaphores = &mPresentSemaphore;
+
+	presentInfo.pImageIndices = &swapchainImageIndex;
+
+	ASSERT( vkQueuePresentKHR( mGraphicsQueue, &presentInfo ) );
+}
