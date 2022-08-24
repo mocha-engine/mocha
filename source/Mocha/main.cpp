@@ -1,4 +1,4 @@
-#include "CEngine.h"
+#include "CMochaEngine.h"
 #include "Globals.h"
 #include "renderdoc_app.h"
 #include "spdlog/spdlog.h"
@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 
 CImgui* g_Imgui = nullptr;
-CEngine* g_Engine = nullptr;
+CMochaEngine* g_Engine = nullptr;
 bool g_EngineIsRunning = true;
 
 void InitRenderdoc()
@@ -43,9 +43,9 @@ int main( int argc, char* argv[] )
 	// Set pattern to [time] [type, pad right] [message]
 	spdlog::set_pattern( "[%H:%M:%S] %^%-8l%$ %v" );
 
-	g_Engine = new CEngine();
+	g_Engine = new CMochaEngine();
 	g_Engine->Run();
-	g_Engine->~CEngine();
+	g_Engine->~CMochaEngine();
 
 	return 0;
 }

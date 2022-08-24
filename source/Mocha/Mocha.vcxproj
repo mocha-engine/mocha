@@ -21,7 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Assert.h" />
     <ClInclude Include="CDeviceBuffer.h" />
-    <ClInclude Include="CEngine.h" />
+    <ClInclude Include="CMochaEngine.h" />
     <ClInclude Include="CImgui.h" />
     <ClInclude Include="CLogger.h" />
     <ClInclude Include="CEditor.h" />
@@ -34,6 +34,7 @@
     <ClInclude Include="FontAwesome.h" />
     <ClInclude Include="Globals.h" />
     <ClInclude Include="hostfxr.h" />
+    <ClInclude Include="Mocha.h" />
     <ClInclude Include="Observer.h" />
     <ClInclude Include="renderdoc_app.h" />
     <ClInclude Include="Transform.h" />
@@ -41,7 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CDeviceBuffer.cpp" />
-    <ClCompile Include="CEngine.cpp" />
+    <ClCompile Include="CMochaEngine.cpp" />
     <ClCompile Include="CImgui.cpp" />
     <ClCompile Include="CLogger.cpp" />
     <ClCompile Include="CEditor.cpp" />

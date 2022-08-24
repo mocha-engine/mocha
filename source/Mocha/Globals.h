@@ -1,9 +1,9 @@
 #pragma once
 
 class CImgui;
-class CEngine;
+class CMochaEngine;
 
-extern CEngine* g_Engine;
+extern CMochaEngine* g_Engine;
 extern CImgui* g_Imgui;
 
 extern bool g_EngineIsRunning;
