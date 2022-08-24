@@ -31,7 +31,8 @@ CRenderer::~CRenderer()
 void CRenderer::InitAPI()
 {
 	vkb::InstanceBuilder builder;
-	auto inst_ret = builder.set_app_name( "Mocha Engine Game" )
+	auto inst_ret = builder.set_app_name( "Spacewar" )
+	                    .set_engine_name( "MochaEngine" )
 	                    .request_validation_layers()
 	                    .require_api_version( 1, 1, 0 )
 	                    .use_default_debug_messenger()
