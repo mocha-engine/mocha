@@ -15,6 +15,11 @@ CRenderer::CRenderer( CWindow* window )
 
 	InitAPI();
 	InitSwapchain();
+
+	InitCommands();
+
+	InitDefaultRenderPass();
+	InitFramebuffers();
 }
 
 CRenderer::~CRenderer()
@@ -129,10 +134,71 @@ void CRenderer::InitCommands()
 	ASSERT( vkAllocateCommandBuffers( mDevice, &commandBufferAllocateInfo, &mCommandBuffer ) );
 }
 
+void CRenderer::InitDefaultRenderPass()
+{
+	VkAttachmentDescription colorAttachment = {};
+	colorAttachment.format = mSwapchainImageFormat;
+	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+	VkAttachmentReference colorAttachmentRef = {};
+	colorAttachmentRef.attachment = 0;
+	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+	VkSubpassDescription subpass = {};
+	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+	subpass.colorAttachmentCount = 1;
+	subpass.pColorAttachments = &colorAttachmentRef;
+
+	VkRenderPassCreateInfo renderPassInfo = {};
+	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+	renderPassInfo.attachmentCount = 1;
+	renderPassInfo.pAttachments = &colorAttachment;
+	renderPassInfo.subpassCount = 1;
+	renderPassInfo.pSubpasses = &subpass;
+
+	ASSERT( vkCreateRenderPass( mDevice, &renderPassInfo, nullptr, &mRenderPass ) );
+}
+
+void CRenderer::InitFramebuffers()
+{
+	VkFramebufferCreateInfo framebufferInfo = {};
+	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+	framebufferInfo.pNext = nullptr; // Does this seriously need to be set to nullptr here?
+	
+	framebufferInfo.renderPass = mRenderPass;
+	framebufferInfo.width = 1280;
+	framebufferInfo.height = 720;
+	framebufferInfo.layers = 1;
+	framebufferInfo.attachmentCount = 1;
+
+	const size_t swapchainImageCount = mSwapchainImages.size();
+	mFramebuffers = std::vector<VkFramebuffer>( swapchainImageCount );
+
+	for ( size_t i = 0; i < swapchainImageCount; i++ )
+	{
+		framebufferInfo.pAttachments = &mSwapchainImageViews[i];
+		ASSERT( vkCreateFramebuffer( mDevice, &framebufferInfo, nullptr, &mFramebuffers[i] ) );
+	}
+}
+
 void CRenderer::Cleanup()
 {
 	vkDestroyCommandPool( mDevice, mCommandPool, nullptr );
 	vkDestroySwapchainKHR( mDevice, mSwapchain, nullptr );
+
+	vkDestroyRenderPass( mDevice, mRenderPass, nullptr );
+
+	for ( size_t i = 0; i < mFramebuffers.size(); i++ )
+	{
+		vkDestroyFramebuffer( mDevice, mFramebuffers[i], nullptr );
+		vkDestroyImageView( mDevice, mSwapchainImageViews[i], nullptr );
+	}
 
 	for ( size_t i = 0; i < mSwapchainImageViews.size(); i++ )
 	{
