@@ -10,6 +10,8 @@ CEngine::CEngine()
 	mWindow = std::make_unique<CWindow>( "Mocha", 1280, 720 );
 	mRenderer = std::make_unique<CRenderer>( mWindow.get() );
 
+	mWindow->AddObserver( mRenderer.get() );
+
 	mImgui = std::make_unique<CImgui>( mWindow.get(), mRenderer.get() );
 	g_Imgui = mImgui.get();
 }
