@@ -50,6 +50,12 @@ private:
 	
 	VkCommandPool mCommandPool;
 	VkCommandBuffer mCommandBuffer;
+	
+	//
+	// Render pass
+	//
+	VkRenderPass mRenderPass;
+	std::vector<VkFramebuffer> mFramebuffers;
 
 public:
 	CRenderer( CWindow* window );
@@ -63,6 +69,8 @@ public:
 	void InitAPI();
 	void InitSwapchain();
 	void InitCommands();
+	void InitDefaultRenderPass();
+	void InitFramebuffers();
 
 	void Cleanup();
 };
