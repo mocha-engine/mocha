@@ -7,7 +7,7 @@ class CImgui;
 class CRenderer;
 class CEditor;
 
-class CEngine
+class CMochaEngine
 {
 private:
 	std::unique_ptr<CWindow> mWindow;
@@ -18,12 +18,12 @@ private:
 	void Render();
 
 public:
-	CEngine();
-	~CEngine();
+	CMochaEngine();
+	~CMochaEngine();
 
 	void Run();
 
-	CWindow* GetWindow();
-	CImgui* GetImgui();
-	CRenderer* GetRenderer();
+	inline CWindow* GetWindow() const { return mWindow.get(); }
+	inline CImgui* GetImgui() const { return mImgui.get(); }
+	inline CRenderer* GetRenderer() const { return mRenderer.get(); };
 };
