@@ -13,6 +13,8 @@ using namespace glm;
 #include <functional>
 #include <vector>
 
+#define SECONDS_TO_NANOSECONDS(x) (x * 1000000000)
+
 typedef void ( *render_callback_fn )( ID3D12GraphicsCommandList* );
 
 #include <memory>
@@ -57,12 +59,17 @@ private:
 	VkRenderPass mRenderPass;
 	std::vector<VkFramebuffer> mFramebuffers;
 
+	//
+	// Main loop / synchronization
+	//
+	VkSemaphore mPresentSemaphore, mRenderSemaphore;
+	VkFence mRenderFence;
+
 public:
 	CRenderer( CWindow* window );
 	~CRenderer();
 
-	void BeginFrame();
-	void EndFrame();
+	void Render();
 
 	void Resize( Uint2 size );
 
@@ -71,6 +78,7 @@ public:
 	void InitCommands();
 	void InitDefaultRenderPass();
 	void InitFramebuffers();
+	void InitSyncStructures();
 
 	void Cleanup();
 };
