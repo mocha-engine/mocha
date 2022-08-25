@@ -1,6 +1,5 @@
 ﻿using Mocha.Common.Serialization;
 using StbImageSharp;
-using System.Runtime.InteropServices;
 
 namespace Mocha.Renderer;
 
@@ -19,10 +18,6 @@ public partial class TextureBuilder
 
 	private bool ignoreCache;
 
-	public TextureBuilder()
-	{
-	}
-
 	public static TextureBuilder Default => new TextureBuilder();
 	public static TextureBuilder WorldTexture => new TextureBuilder();
 	public static TextureBuilder UITexture => new TextureBuilder();
@@ -36,7 +31,7 @@ public partial class TextureBuilder
 			return true;
 		}
 
-		texture = default;
+		texture = TextureBuilder.MissingTexture;
 		return false;
 	}
 

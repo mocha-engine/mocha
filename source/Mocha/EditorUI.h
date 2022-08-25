@@ -67,7 +67,10 @@ namespace EditorUI
 	};
 
 	inline bool Button( std::string text ) { return ImGui::Button( text.c_str() ); };
-	inline bool ButtonEx( std::string text, int w, int h ) { return ImGui::Button( text.c_str(), ImVec2( w, h ) ); };
+	inline bool ButtonEx( std::string text, int w, int h )
+	{
+		return ImGui::Button( text.c_str(), ImVec2( ( float )w, ( float )h ) );
+	};
 
 	inline void PushStyleVar( int styleVar, float value ) { ImGui::PushStyleVar( styleVar, value ); };
 	inline void PushStyleVarEx( int styleVar, float x, float y ) { ImGui::PushStyleVar( styleVar, ImVec2( x, y ) ); };
