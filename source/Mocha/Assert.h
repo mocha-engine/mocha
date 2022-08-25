@@ -1,6 +1,8 @@
 #pragma once
 #include <spdlog/spdlog.h>
 
+#define FAILED( x ) ( ( ( int )( x ) ) < 0 )
+
 #if _DEBUG
 #define ASSERT( x )                                                                             \
 	if ( FAILED( x ) )                                                                          \
