@@ -25,9 +25,8 @@ public:
 //@InteropGen generate class
 namespace Renderer
 {
-	// TODO: We'll do SceneObjects and such later.. this is temp
 	inline void DrawModel( CShader* shader, int indexCount, CDeviceBuffer* vertexBuffer, CDeviceBuffer* indexBuffer )
 	{
-		// TODO
+		// STUB
 	}
 } // namespace Renderer

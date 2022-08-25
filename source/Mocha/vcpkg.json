@@ -1,0 +1,14 @@
+{
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+    "name": "mocha",
+    "version": "0.0.1",
+    "dependencies": [
+      "imgui",
+      "sdl2",
+      "vk-bootstrap",
+      "nethost",
+      "glm",
+      "spdlog",
+      "sdl2-image"
+    ]
+  }

@@ -372,3 +372,4 @@ content/models/rainier
 *.generated.cs
 build/
 *.dxbc
+vcpkg_installed/
