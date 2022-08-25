@@ -6,7 +6,6 @@
 
 class CWindow;
 class CRenderer;
-struct ID3D12GraphicsCommandList;
 
 class CImgui
 {
