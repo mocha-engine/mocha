@@ -97,7 +97,7 @@ public partial class Primitives
 			if ( !FileSystem.Game.Exists( path ) )
 			{
 				Log.Warning( $"No texture '{path}'" );
-				return TextureBuilder.MissingTexture;
+				return null;
 			}
 
 			using var _ = new Stopwatch( $"{typeName}: {path} texture load" );
