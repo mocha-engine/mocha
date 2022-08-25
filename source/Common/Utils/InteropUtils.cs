@@ -34,7 +34,7 @@ public static class InteropUtils
 		return IntPtr.Zero;
 	}
 
-	internal static string GetString( IntPtr strPtr )
+	internal static string? GetString( IntPtr strPtr )
 	{
 		return Marshal.PtrToStringUTF8( strPtr );
 	}

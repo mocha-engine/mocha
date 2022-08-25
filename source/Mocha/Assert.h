@@ -3,7 +3,7 @@
 
 #if _DEBUG
 #define ASSERT( x )                                                                             \
-	if ( FAILED( x ) )                                                                          \
+	if ( x != 0 )                                                                               \
 	{                                                                                           \
 		spdlog::error( "Assertion failed at {}:{}\n{}\nError: {}", __FILE__, __LINE__, #x, x ); \
 		__debugbreak();                                                                         \
