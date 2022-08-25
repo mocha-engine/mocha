@@ -93,6 +93,9 @@
     <ClInclude Include="hostfxr.h">
       <Filter>Header Files\External</Filter>
     </ClInclude>
+    <ClInclude Include="CShaderCompiler.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMochaEngine.cpp">
@@ -123,6 +126,9 @@
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="CDeviceBuffer.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="CShaderCompiler.cpp">
       <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>

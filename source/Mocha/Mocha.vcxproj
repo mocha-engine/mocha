@@ -26,6 +26,7 @@
     <ClInclude Include="CLogger.h" />
     <ClInclude Include="CEditor.h" />
     <ClInclude Include="CShader.h" />
+    <ClInclude Include="CShaderCompiler.h" />
     <ClInclude Include="CWindow.h" />
     <ClInclude Include="CNetCoreHost.h" />
     <ClInclude Include="coreclr_delegates.h" />
@@ -47,6 +48,7 @@
     <ClCompile Include="CLogger.cpp" />
     <ClCompile Include="CEditor.cpp" />
     <ClCompile Include="CShader.cpp" />
+    <ClCompile Include="CShaderCompiler.cpp" />
     <ClCompile Include="CWindow.cpp" />
     <ClCompile Include="CNetCoreHost.cpp" />
     <ClCompile Include="CRenderer.cpp" />
@@ -174,7 +176,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib;vulkan-1.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib;vulkan-1.lib;glslang.lib</AdditionalDependencies>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.182.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -197,7 +199,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib;vulkan-1.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dwmapi.lib;vulkan-1.lib;glslang.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\VulkanSDK\1.2.182.0\Lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
