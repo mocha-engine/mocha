@@ -120,11 +120,11 @@
     <TargetName>Mocha</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)..\build\</OutDir>
+    <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)..\build\</OutDir>
+    <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
