@@ -27,7 +27,7 @@ public static class Program
 		var attr = File.GetAttributes( path );
 
 		List<string> queue = new();
-		int threadCount = 8;
+		int threadCount = 10;
 
 		if ( attr.HasFlag( FileAttributes.Directory ) )
 		{
@@ -40,7 +40,16 @@ public static class Program
 			CompileFile( path );
 		}
 
+		var completedThreads = 0;
 		var batchSize = queue.Count / threadCount - 1;
+
+		// Bail to avoid division by zero
+		if ( batchSize == 0 )
+		{
+			Log.Results();
+			return;
+		}
+
 		var batched = queue
 			.Select( ( Value, Index ) => new { Value, Index } )
 			.GroupBy( p => p.Index / batchSize )
@@ -56,9 +65,18 @@ public static class Program
 				 {
 					 CompileFile( item );
 				 }
+
+				 completedThreads++;
 			 } );
 			thread.Start();
 		}
+
+		while ( completedThreads < threadCount )
+		{
+			Thread.Sleep( 500 );
+		}
+
+		Log.Results();
 	}
 
 	private static void QueueDirectory( ref List<string> queue, string directory )
@@ -89,30 +107,30 @@ public static class Program
 		return false;
 	}
 
-	private static void QueueFile( ref List<string> queue, string fileName )
+	private static void QueueFile( ref List<string> queue, string path )
 	{
-		var fileExtension = Path.GetExtension( fileName );
+		var fileExtension = Path.GetExtension( path );
 
 		if ( GetCompiler( fileExtension, out var _ ) )
 		{
-			queue.Add( fileName );
+			queue.Add( path );
 		}
 		else
 		{
-			Console.WriteLine( $"[SKIP]\t'{fileExtension}' for path '{fileName}'..." );
+			Log.UnknownType( path );
 		}
 	}
 
-	private static void CompileFile( string fileName )
+	private static void CompileFile( string path )
 	{
-		var fileExtension = Path.GetExtension( fileName );
+		var fileExtension = Path.GetExtension( path );
 
 		// TODO: Check if we have an original asset & if it needs recompiling
 
 		if ( GetCompiler( fileExtension, out var compiler ) )
 		{
-			var destFile = compiler.CompileFile( fileName );
-			Console.WriteLine( $"[OK]\t\t{destFile}" );
+			var destFile = compiler.CompileFile( path );
+			Log.Compiled( destFile );
 		}
 	}
 }

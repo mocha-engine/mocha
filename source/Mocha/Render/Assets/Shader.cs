@@ -27,19 +27,9 @@ public class Shader : Asset
 
 		var directoryName = System.IO.Path.GetDirectoryName( Path );
 		var fileName = System.IO.Path.GetFileName( Path );
-		watcher = new FileSystemWatcher( directoryName, fileName );
-
-		watcher.NotifyFilter = NotifyFilters.Attributes
-							 | NotifyFilters.CreationTime
-							 | NotifyFilters.DirectoryName
-							 | NotifyFilters.FileName
-							 | NotifyFilters.LastAccess
-							 | NotifyFilters.LastWrite
-							 | NotifyFilters.Security
-							 | NotifyFilters.Size;
-
+		
+		watcher = FileSystem.Game.CreateWatcher( directoryName, fileName );
 		watcher.Changed += OnWatcherChanged;
-		watcher.EnableRaisingEvents = true;
 
 		this.TargetFramebuffer = targetFramebuffer;
 		this.FaceCullMode = faceCullMode;
@@ -79,7 +69,7 @@ public class Shader : Asset
 	{
 		try
 		{
-			using ( FileStream inputStream = File.Open( path, FileMode.Open, FileAccess.Read, FileShare.None ) )
+			using ( FileStream inputStream = FileSystem.Game.OpenRead( path ) )
 				return inputStream.Length > 0;
 		}
 		catch ( Exception )
@@ -93,7 +83,7 @@ public class Shader : Asset
 		if ( !IsFileReady( Path ) )
 			return;
 
-		var shaderText = File.ReadAllText( Path );
+		var shaderText = FileSystem.Game.ReadAllText( Path );
 
 		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
 		var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";

@@ -39,7 +39,7 @@ public class BaseInspector
 
 		if ( ImGui.Button( copyPathButtonText, new System.Numerics.Vector2( width, 0 ) ) )
 		{
-			ImGui.SetClipboardText( filePath.Normalize() );
+			ImGui.SetClipboardText( filePath.NormalizePath() );
 			timeSinceCopied = 0;
 		}
 	}

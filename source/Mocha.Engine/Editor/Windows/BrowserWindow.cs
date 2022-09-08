@@ -43,13 +43,13 @@ internal class BrowserWindow : BaseEditorWindow
 
 		isVisible = true;
 
-		ArchiveTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Archive.mtex" ).Build();
-		DocumentTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Document.mtex" ).Build();
-		FolderTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Folder.mtex" ).Build();
-		ImageTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Image.mtex" ).Build();
-		ModelTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Model.mtex" ).Build();
-		SoundTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Sound.mtex" ).Build();
-		MaterialTexture = TextureBuilder.UITexture.FromMochaTexture( "content/icons/Material.mtex" ).Build();
+		ArchiveTexture = TextureBuilder.UITexture.FromPath( "icons/Archive.mtex" ).Build();
+		DocumentTexture = TextureBuilder.UITexture.FromPath( "icons/Document.mtex" ).Build();
+		FolderTexture = TextureBuilder.UITexture.FromPath( "icons/Folder.mtex" ).Build();
+		ImageTexture = TextureBuilder.UITexture.FromPath( "icons/Image.mtex" ).Build();
+		ModelTexture = TextureBuilder.UITexture.FromPath( "icons/Model.mtex" ).Build();
+		SoundTexture = TextureBuilder.UITexture.FromPath( "icons/Sound.mtex" ).Build();
+		MaterialTexture = TextureBuilder.UITexture.FromPath( "icons/Material.mtex" ).Build();
 
 		fileSystemCache = new();
 		iconCache = new();
@@ -69,7 +69,8 @@ internal class BrowserWindow : BaseEditorWindow
 				else if ( file.EndsWith( "mmat" ) )
 					icon = MaterialTexture;
 
-				fileSystemCache.Add( (icon, file) );
+				var relativePath = Path.GetRelativePath( "content/", file );
+				fileSystemCache.Add( (icon, relativePath) );
 			}
 
 			foreach ( var subDir in Directory.GetDirectories( directory ) )
@@ -103,12 +104,12 @@ internal class BrowserWindow : BaseEditorWindow
 	{
 		if ( name.EndsWith( "mtex" ) )
 		{
-			var texture = TextureBuilder.UITexture.FromMochaTexture( name ).Build();
+			var texture = TextureBuilder.UITexture.FromPath( name ).Build();
 			InspectorWindow.SetSelectedObject( texture );
 		}
 		else if ( name.EndsWith( "mshdr" ) )
 		{
-			var shader = ShaderBuilder.Default.FromMoyaiShader( name ).Build();
+			var shader = ShaderBuilder.Default.FromPath( name ).Build();
 			InspectorWindow.SetSelectedObject( shader );
 		}
 		else if ( name.EndsWith( "mmdl" ) )
@@ -118,7 +119,7 @@ internal class BrowserWindow : BaseEditorWindow
 		}
 		else if ( name.EndsWith( "mmat" ) )
 		{
-			var material = Material.FromMochaMaterial( name );
+			var material = Material.FromPath( name );
 			InspectorWindow.SetSelectedObject( material );
 		}
 	}
@@ -230,7 +231,7 @@ internal class BrowserWindow : BaseEditorWindow
 				{
 					if ( iconCache.Count < maxIconsLoaded && ImGui.IsItemVisible() && item.Item1 == ImageTexture && iconsLoadedThisFrame < 1 )
 					{
-						var loadedIcon = TextureBuilder.UITexture.FromMochaTexture( name ).Build();
+						var loadedIcon = TextureBuilder.UITexture.FromPath( name ).Build();
 						item.Item1 = loadedIcon;
 						iconCache.Add( loadedIcon );
 

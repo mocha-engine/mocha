@@ -368,3 +368,4 @@ FodyWeavers.xsd
 [Ii]mgui.ini
 content/models/sponza
 content/models/rainier
+*.*_c

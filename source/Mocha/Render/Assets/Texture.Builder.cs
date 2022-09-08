@@ -99,12 +99,12 @@ public partial class TextureBuilder
 		return this;
 	}
 
-	public TextureBuilder FromMochaTexture( string path )
+	public TextureBuilder FromPath( string path )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )
 			return new TextureBuilder() { path = path };
 
-		var fileBytes = File.ReadAllBytes( path );
+		var fileBytes = FileSystem.Game.ReadAllBytes( path );
 
 		var textureFormat = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes );
 		this.width = textureFormat.Data.Width;
@@ -112,22 +112,6 @@ public partial class TextureBuilder
 		this.data = textureFormat.Data.MipData;
 		this.compressionFormat = textureFormat.Data.CompressionFormat;
 		this.mipCount = textureFormat.Data.MipCount;
-		this.path = path;
-
-		return this;
-	}
-
-	public TextureBuilder FromPath( string path, bool flipY = false )
-	{
-		if ( TryGetExistingTexture( path, out _ ) )
-			return new TextureBuilder() { path = path };
-
-		var fileData = File.ReadAllBytes( path );
-		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		this.data = new[] { image.Data };
-		this.width = (uint)image.Width;
-		this.height = (uint)image.Height;
 		this.path = path;
 
 		return this;

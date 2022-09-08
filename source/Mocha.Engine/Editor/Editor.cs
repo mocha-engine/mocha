@@ -39,7 +39,7 @@ internal partial class Editor
 			.OfType<BaseEditorWindow>()
 		);
 
-		Logo = TextureBuilder.UITexture.FromPath( "content/logo.png" ).Build();
+		Logo = TextureBuilder.UITexture.FromPath( "logo.mtex" ).Build();
 	}
 
 	private static void AddIconFont( ImGuiIOPtr io, float fontSize )

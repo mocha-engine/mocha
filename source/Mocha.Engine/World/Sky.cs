@@ -31,7 +31,7 @@ public class Sky : Entity
 	{
 		Material = new()
 		{
-			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/atmosphere.mshdr" ).Build(),
+			Shader = ShaderBuilder.Default.FromPath( "shaders/atmosphere.mshdr" ).Build(),
 			UniformBufferType = typeof( SkyUniformBuffer )
 		};
 

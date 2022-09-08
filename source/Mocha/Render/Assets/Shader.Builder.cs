@@ -20,18 +20,10 @@ public class ShaderBuilder
 
 	}
 
-	private ShaderDescription CreateShaderDescription( string path, ShaderStages shaderStage )
-	{
-		var shaderBytes = File.ReadAllBytes( path );
-		var shaderDescription = new ShaderDescription( shaderStage, shaderBytes, "main" );
-
-		return shaderDescription;
-	}
-
-	public ShaderBuilder FromMoyaiShader( string mshdrPath )
+	public ShaderBuilder FromPath( string mshdrPath )
 	{
 		Path = mshdrPath;
-		var shaderText = File.ReadAllText( mshdrPath );
+		var shaderText = FileSystem.Game.ReadAllText( mshdrPath );
 
 		var vertexShaderText = $"#version 450\n#define VERTEX\n{shaderText}";
 		var fragmentShaderText = $"#version 450\n#define FRAGMENT\n{shaderText}";

@@ -6,14 +6,16 @@ partial class Primitives
 {
 	public static class Assimp
 	{
-		public static List<Model> GenerateModels( string path )
+		public static List<Model> GenerateModels( string basePath, ModelInfo modelInfo )
 		{
 			var models = new List<Model>();
 			var context = new AssimpContext();
 			var logStream = new LogStream( ( msg, _ ) => Console.WriteLine( msg ) );
-			var directory = Path.GetDirectoryName( path );
 
-			var scene = context.ImportFile( path,
+			var sourcePath = Path.Join( basePath, modelInfo.Model ).NormalizePath();
+			var directory = Path.GetDirectoryName( sourcePath );
+
+			var scene = context.ImportFile( sourcePath,
 				PostProcessSteps.Triangulate
 				| PostProcessSteps.PreTransformVertices
 				| PostProcessSteps.RemoveRedundantMaterials
@@ -26,26 +28,26 @@ partial class Primitives
 				| PostProcessSteps.FlipWindingOrder
 				| PostProcessSteps.FlipUVs );
 
-			ProcessNode( ref models, scene.RootNode, scene, directory );
+			ProcessNode( ref models, scene.RootNode, scene, modelInfo );
 
 			return models;
 		}
 
-		private static void ProcessNode( ref List<Model> models, Node node, global::Assimp.Scene scene, string? directory )
+		private static void ProcessNode( ref List<Model> models, Node node, Scene scene, ModelInfo modelInfo )
 		{
 			for ( int i = 0; i < node.MeshCount; ++i )
 			{
 				var mesh = scene.Meshes[node.MeshIndices[i]];
-				models.Add( ProcessMesh( mesh, scene, node.Transform, directory ) );
+				models.Add( ProcessMesh( mesh, scene, node.Transform, modelInfo ) );
 			}
 
 			foreach ( var child in node.Children )
 			{
-				ProcessNode( ref models, child, scene, directory );
+				ProcessNode( ref models, child, scene, modelInfo );
 			}
 		}
 
-		private static Model ProcessMesh( global::Assimp.Mesh mesh, global::Assimp.Scene scene, global::Assimp.Matrix4x4 transform, string? directory )
+		private static Model ProcessMesh( Mesh mesh, Scene scene, Matrix4x4 transform, ModelInfo modelInfo )
 		{
 			List<VertexInfo> vertices = new List<VertexInfo>();
 			List<uint> indices = new List<uint>();
@@ -86,30 +88,12 @@ partial class Primitives
 				}
 			}
 
-			string material = "";
+			string material = "internal:missing";
 
 			if ( mesh.MaterialIndex >= 0 )
-			{
-				var assimpMaterial = scene.Materials[mesh.MaterialIndex];
-
-				material = GetMaterialTexture( assimpMaterial, TextureType.Diffuse, "texture_diffuse", directory );
-				material = Path.ChangeExtension( material, "mmat" );
-				material = material.Replace( "textures", "materials" ); // HACK
-			}
+				material = modelInfo.Materials[mesh.MaterialIndex];
 
 			return new Model( vertices.ToArray(), indices.ToArray(), material );
-		}
-
-		private static string GetMaterialTexture( global::Assimp.Material material, global::Assimp.TextureType textureType, string typeName, string? directory )
-		{
-			if ( material.GetMaterialTexture( textureType, 0, out var textureSlot ) )
-			{
-				return textureSlot.FilePath;
-			}
-			else
-			{
-				return "internal:missing";
-			}
 		}
 	}
 }

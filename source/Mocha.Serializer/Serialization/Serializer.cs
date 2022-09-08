@@ -17,15 +17,9 @@ public static class Serializer
 
 	public static byte[] Serialize<T>( T obj )
 	{
-		using var stream = new MemoryStream();
-		using var deflate = new DeflateStream( stream, CompressionLevel.Fastest );
-
 		var serialized = JsonSerializer.SerializeToUtf8Bytes( obj, CreateSerializerOptions() );
-
-		deflate.Write( serialized );
-		deflate.Close();
-
-		return stream.ToArray();
+		
+		return Compress( serialized );
 	}
 
 	public static T? Deserialize<T>( byte[] serialized )
@@ -39,5 +33,29 @@ public static class Serializer
 		}
 
 		return JsonSerializer.Deserialize<T>( outputStream.ToArray(), CreateSerializerOptions() );
+	}
+
+	public static byte[] Compress( byte[] uncompressedData )
+	{
+		using var stream = new MemoryStream();
+		using var deflate = new DeflateStream( stream, CompressionLevel.Fastest );
+
+		deflate.Write( uncompressedData );
+		deflate.Close();
+
+		return stream.ToArray();
+	}
+
+	public static byte[] Decompress( byte[] compressedData )
+	{
+		using var outputStream = new MemoryStream();
+
+		using ( var compressStream = new MemoryStream( compressedData ) )
+		{
+			using var deflateStream = new DeflateStream( compressStream, CompressionMode.Decompress );
+			deflateStream.CopyTo( outputStream );
+		}
+
+		return outputStream.ToArray();
 	}
 }
