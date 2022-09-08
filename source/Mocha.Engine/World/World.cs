@@ -56,7 +56,7 @@ public class World
 			Scale = Vector3.One * -100f
 		};
 
-		_ = new BarrierEntity();
+		// _ = new BarrierEntity();
 		Player = new Player();
 	}
 

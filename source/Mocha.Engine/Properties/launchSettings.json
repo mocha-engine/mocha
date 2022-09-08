@@ -2,7 +2,7 @@
   "profiles": {
     "Mocha.Engine": {
       "commandName": "Project",
-      "workingDirectory": "F:\\Projects\\Mocha"
+      "workingDirectory": "$(SolutionDir)\\.."
     }
   }
 }

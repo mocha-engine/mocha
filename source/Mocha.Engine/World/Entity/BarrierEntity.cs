@@ -7,7 +7,7 @@ public class BarrierEntity : ModelEntity
 {
 	public float Offset { get; set; }
 
-	public BarrierEntity() : base( "content/models/barrier.mmdl" )
+	public BarrierEntity() : base( "models/barrier.mmdl" )
 	{
 		Rotation = Rotation.From( 0, 0, 90 );
 		Scale = new Vector3( 0.025f );

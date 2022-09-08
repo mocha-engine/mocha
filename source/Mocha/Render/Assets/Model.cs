@@ -26,7 +26,7 @@ public class Model : Asset
 	{
 		DepthOnlyMaterial = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromMoyaiShader( "content/shaders/depthonly.mshdr" )
+			Shader = ShaderBuilder.Default.FromPath( "shaders/depthonly.mshdr" )
 										  .WithFaceCullMode( FaceCullMode.None )
 										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
 										  .Build(),
@@ -91,7 +91,7 @@ public class Model : Asset
 			Material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
 			Material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
 			Material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
-			Device.Aniso4xSampler,
+			Device.PointSampler,
 			uniformBuffer );
 
 		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );

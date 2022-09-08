@@ -1,22 +1,22 @@
 ﻿using Mocha.Common.Serialization;
-using Newtonsoft.Json;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".mat" } )]
+[Handles( new[] { ".mmat" } )]
 public class MaterialCompiler : BaseCompiler
 {
 	public override string CompileFile( string path )
 	{
-		Console.WriteLine( $"[MATERIAL]\t{path}" );
+		Log.Processing( "Material", path );
 
-		var destFileName = Path.ChangeExtension( path, extension: "mmat" );
+		var destFileName = Path.ChangeExtension( path, "mmat_c" );
 
 		// Load json
 		var fileData = File.ReadAllText( path );
-		var materialData = JsonConvert.DeserializeObject<MaterialInfo>( fileData );
+		var materialData = JsonSerializer.Deserialize<MaterialInfo>( fileData );
 
 		// Wrapper for file
 		var mochaFile = new MochaFile<MaterialInfo>()

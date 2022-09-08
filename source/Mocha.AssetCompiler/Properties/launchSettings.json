@@ -2,8 +2,8 @@
   "profiles": {
     "Mocha.AssetCompiler": {
       "commandName": "Project",
-      "commandLineArgs": "content",
-      "workingDirectory": "F:\\Projects\\Mocha\\"
+      "commandLineArgs": ".",
+      "workingDirectory": "F:\\Projects\\Mocha\\Content\\"
     }
   }
 }

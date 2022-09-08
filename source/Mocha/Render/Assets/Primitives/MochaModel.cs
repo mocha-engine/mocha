@@ -1,4 +1,6 @@
-﻿namespace Mocha.Renderer;
+﻿using Mocha.Common.Serialization;
+
+namespace Mocha.Renderer;
 
 public partial class Primitives
 {
@@ -7,7 +9,7 @@ public partial class Primitives
 		public static List<Model> GenerateModels( string path )
 		{
 			using var _ = new Stopwatch( "Mocha model generation" );
-			using var fileStream = new FileStream( path, FileMode.Open, FileAccess.Read );
+			using var fileStream = FileSystem.Game.OpenRead( path );
 			using var binaryReader = new BinaryReader( fileStream );
 
 			var models = new List<Model>();
@@ -17,23 +19,32 @@ public partial class Primitives
 			var verMajor = binaryReader.ReadInt32();
 			var verMinor = binaryReader.ReadInt32();
 
+			if ( verMajor != 4 && verMinor != 0 )
+				throw new Exception( $"Unsupported MMDL file version {verMajor}.{verMinor}" );
+
 			Log.Trace( $"Mocha model {verMajor}.{verMinor}" );
 
 			binaryReader.ReadInt32(); // Pad
-
 			var meshCount = binaryReader.ReadInt32();
 
 			Log.Trace( $"{meshCount} meshes" );
 
+			//
+			// Decompress the rest of the file
+			//
+			var compressedData = binaryReader.ReadBytes( (int)(fileStream.Length - fileStream.Position) );
+			var decompressedData = Serializer.Decompress( compressedData );
+
+			var decompressedStream = new MemoryStream( decompressedData );
+			var decompressedBinaryReader = new BinaryReader( decompressedStream );
+
 			for ( int i = 0; i < meshCount; i++ )
 			{
-				binaryReader.ReadChars( 4 ); // MTRL
+				decompressedBinaryReader.ReadChars( 4 ); // MTRL
+				var materialPath = decompressedBinaryReader.ReadString();
 
-				var materialPath = binaryReader.ReadString();
-
-				binaryReader.ReadChars( 4 ); // VRTX
-
-				var vertexCount = binaryReader.ReadInt32();
+				decompressedBinaryReader.ReadChars( 4 ); // VRTX
+				var vertexCount = decompressedBinaryReader.ReadInt32();
 				var vertices = new List<Vertex>();
 
 				for ( int j = 0; j < vertexCount; j++ )
@@ -42,19 +53,19 @@ public partial class Primitives
 
 					Vector3 ReadVector3()
 					{
-						binaryReader.ReadInt32();
-						float x = binaryReader.ReadSingle();
-						float y = binaryReader.ReadSingle();
-						float z = binaryReader.ReadSingle();
+						// binaryReader.ReadInt32();
+						float x = decompressedBinaryReader.ReadSingle();
+						float y = decompressedBinaryReader.ReadSingle();
+						float z = decompressedBinaryReader.ReadSingle();
 						return new Vector3( x, y, z );
 					}
 
 					Vector2 ReadVector2()
 					{
-						binaryReader.ReadInt32();
-						binaryReader.ReadInt32();
-						float x = binaryReader.ReadSingle();
-						float y = binaryReader.ReadSingle();
+						// binaryReader.ReadInt32();
+						// binaryReader.ReadInt32();
+						float x = decompressedBinaryReader.ReadSingle();
+						float y = decompressedBinaryReader.ReadSingle();
 						return new Vector2( x, y );
 					}
 
@@ -67,44 +78,22 @@ public partial class Primitives
 					vertices.Add( vertex );
 				}
 
-				binaryReader.ReadChars( 4 ); // INDX
+				decompressedBinaryReader.ReadChars( 4 ); // INDX
 
-				var indexCount = binaryReader.ReadInt32();
+				var indexCount = decompressedBinaryReader.ReadInt32();
 				var indices = new List<uint>();
 
 				for ( int j = 0; j < indexCount; j++ )
 				{
-					indices.Add( binaryReader.ReadUInt32() );
+					indices.Add( decompressedBinaryReader.ReadUInt32() );
 				}
 
 				// TODO make all paths relative
-				var material = Material.FromMochaMaterial( materialPath );
+				var material = Material.FromPath( materialPath );
 				models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
 			}
 
 			return models;
-		}
-
-		private static Texture LoadMaterialTexture( string typeName, string path )
-		{
-			if ( !path.StartsWith( "internal:" ) )
-			{
-				path = path.Replace( "_BaseColor", "" );
-				path = path.Remove( path.LastIndexOf( "." ) );
-				path = path + $"_{typeName}.mtex";
-			}
-
-			if ( !File.Exists( path ) )
-			{
-				Log.Warning( $"No texture '{path}'" );
-				return null;
-			}
-
-			using var _ = new Stopwatch( $"{typeName}: {path} texture load" );
-			return Texture.Builder
-				.FromMochaTexture( path )
-				.WithType( typeName )
-				.Build();
 		}
 	}
 }

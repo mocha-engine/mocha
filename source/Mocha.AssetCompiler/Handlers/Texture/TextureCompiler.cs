@@ -23,9 +23,9 @@ public class TextureCompiler : BaseCompiler
 
 	public override string CompileFile( string path )
 	{
-		Console.WriteLine( $"[TEXTURE]\t{path}" );
+		Log.Processing( "Texture", path );
 
-		var destFileName = Path.ChangeExtension( path, "mtex" );
+		var destFileName = Path.ChangeExtension( path, "mtex_c" );
 		var textureFormat = new TextureInfo();
 
 		// Load image
@@ -43,7 +43,7 @@ public class TextureCompiler : BaseCompiler
 			var computedHash = md5.ComputeHash( fileData );
 			if ( Enumerable.SequenceEqual( deserializedFile.AssetHash, computedHash ) )
 			{
-				Console.WriteLine( "Compiled ver matches existing file; skipping..." );
+				Log.Skip( path );
 
 				return destFileName;
 			}
