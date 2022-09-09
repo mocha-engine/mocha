@@ -1,4 +1,5 @@
-﻿using Veldrid.StartupUtilities;
+﻿using Mocha.Common.World;
+using Veldrid.StartupUtilities;
 
 namespace Mocha.Renderer;
 
@@ -63,12 +64,19 @@ public class RendererInstance
 		while ( window.SdlWindow.Exists )
 		{
 			Update();
-			PreRender();
 
+			PreRender();
 			world.Sun.CalcViewProjMatrix();
 
 			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
-			RenderPass( Renderer.RenderPass.Main, world.Camera.ViewMatrix * world.Camera.ProjMatrix, world.Camera.Framebuffer );
+
+			// Build the camera right before we render, makes sure we're
+			// in the right spot with as little latency as possible
+			{
+				var worldCameraSetup = BuildCamera();
+				worldCameraSetup.BuildMatrices( out var viewMatrix, out var projMatrix );
+				RenderPass( Renderer.RenderPass.Main, viewMatrix * projMatrix, world.Camera.Framebuffer );
+			}
 
 			PostRender();
 		}
@@ -84,6 +92,14 @@ public class RendererInstance
 		}
 
 		commandList.Begin();
+	}
+
+	private CameraSetup BuildCamera()
+	{
+		var cameraSetup = new CameraSetup();
+		SceneWorld.Current.Camera.BuildCamera( ref cameraSetup );
+
+		return cameraSetup;
 	}
 
 	private void PostRender()

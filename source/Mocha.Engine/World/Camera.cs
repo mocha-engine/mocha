@@ -5,34 +5,25 @@ namespace Mocha.Engine;
 [Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
 public class Camera : Entity
 {
-	[HideInInspector]
-	public SceneCamera SceneCamera { get; set; }
+	[HideInInspector] private SceneCamera SceneCamera { get; set; }
 
-	private float FieldOfView
-	{
-		get => SceneCamera.FieldOfView;
-		set => SceneCamera.FieldOfView = value;
-	}
-
-	[HideInInspector]
-	public Matrix4x4 ProjMatrix => SceneCamera.ProjMatrix;
-
-	[HideInInspector]
-	public Matrix4x4 ViewMatrix => SceneCamera.ViewMatrix;
+	public float FieldOfView { get; set; } = 60;
 
 	public Camera()
 	{
 		SceneCamera = new( this );
 	}
 
-	public override void Update()
+	public override void BuildCamera( ref CameraSetup cameraSetup )
 	{
-		base.Update();
+		base.BuildCamera( ref cameraSetup );
 
-		// Apply fov
-		FieldOfView = 50f;
+		cameraSetup.Position = Position;
+		cameraSetup.Rotation = Rotation;
 
-		// Run view/proj matrix calculations
-		SceneCamera.CalcViewProjMatrix();
+		cameraSetup.FieldOfView = FieldOfView;
+
+		cameraSetup.ZNear = 0.1f;
+		cameraSetup.ZFar = 1000f;
 	}
 }

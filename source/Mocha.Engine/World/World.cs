@@ -71,7 +71,10 @@ public class World
 
 	public void Update()
 	{
-		if ( State == States.Playing )
-			Entity.All.ForEach( entity => entity.Update() );
+		foreach ( var entity in Entity.All )
+		{
+			if ( State == States.Playing || entity is Camera )
+				entity.Update();
+		}
 	}
 }
