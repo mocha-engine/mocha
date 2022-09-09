@@ -19,8 +19,7 @@ public class SkySceneObject : ModelSceneObject
 		var uniformBuffer = new SkyUniformBuffer
 		{
 			g_mModel = ModelMatrix,
-			g_mView = SceneWorld.Current.Camera.ViewMatrix,
-			g_mProj = SceneWorld.Current.Camera.ProjMatrix,
+			g_mViewProj = viewProjMatrix,
 			g_vLightPos = SceneWorld.Current.Sun.Transform.Position,
 			g_flTime = Time.Now,
 			g_vLightColor = SceneWorld.Current.Sun.Color.ToVector4(),

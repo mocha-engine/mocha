@@ -72,4 +72,8 @@ public class Entity : IEntity
 	{
 		newParent.parentId = newParent.Id;
 	}
+
+	public virtual void BuildCamera( ref CameraSetup cameraSetup )
+	{
+	}
 }

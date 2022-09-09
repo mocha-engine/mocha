@@ -11,8 +11,7 @@ public struct SkyUniformBuffer
 	 */
 
 	public Matrix4x4 g_mModel; // 64
-	public Matrix4x4 g_mView; // 64
-	public Matrix4x4 g_mProj; // 64
+	public Matrix4x4 g_mViewProj; // 64
 
 	public System.Numerics.Vector3 g_vLightPos; // 12
 	public float g_flTime; // 4

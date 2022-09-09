@@ -6,5 +6,6 @@ public interface IEntity
 	public bool Visible { get; set; }
 	public Transform Transform { get; set; }
 
+	void BuildCamera( ref CameraSetup cameraSetup );
 	void Delete();
 }
