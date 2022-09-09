@@ -76,7 +76,8 @@ internal class OutlinerTab : BaseEditorWindow
 						ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
 						ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
 
-						ImGui.SmallButton( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash );
+						if ( ImGui.SmallButton( $"{(entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash)}##{entity.Id}" ) )
+							entity.Visible = !entity.Visible;
 
 						ImGui.PopStyleColor();
 						ImGui.PopStyleVar();
