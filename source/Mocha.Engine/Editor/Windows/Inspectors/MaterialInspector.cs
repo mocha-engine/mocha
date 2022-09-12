@@ -42,11 +42,10 @@ public class MaterialInspector : BaseInspector
 			"This is a material."
 		);
 
-		ImGuiX.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		DrawButtons( material.Path );
 		ImGuiX.Separator();
 
 		ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) );
-
 		ImGuiX.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
 
 		if ( ImGui.BeginTable( $"##material_slots", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
@@ -68,7 +67,6 @@ public class MaterialInspector : BaseInspector
 		ImGui.EndListBox();
 
 		ImGuiX.Separator();
-
-		DrawButtons( material.Path );
+		ImGuiX.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

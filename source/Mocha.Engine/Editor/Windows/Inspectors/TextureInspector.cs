@@ -20,9 +20,6 @@ public class TextureInspector : BaseInspector
 			"This is a texture."
 		);
 
-		ImGuiX.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
-		ImGuiX.Separator();
-
 		var items = new[]
 		{
 			( "Full Path", $"{texture.Path.NormalizePath()}" ),
@@ -33,5 +30,8 @@ public class TextureInspector : BaseInspector
 		};
 
 		DrawProperties( $"{FontAwesome.Image} Texture", items, texture.Path );
+
+		ImGuiX.Separator();
+		ImGuiX.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

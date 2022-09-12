@@ -88,5 +88,6 @@ partial class Editor
 		style.TabRounding = 4;
 		style.WindowTitleAlign = new( 0.5f, 0.5f );
 		style.WindowMenuButtonPosition = ImGuiDir.None;
+		style.AntiAliasedLinesUseTex = false;
 	}
 }

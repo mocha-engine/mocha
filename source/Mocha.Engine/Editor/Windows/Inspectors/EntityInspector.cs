@@ -106,11 +106,20 @@ public class EntityInspector : BaseInspector
 			var windowWidth = ImGui.GetWindowSize().X;
 
 			var startPos = ImGui.GetCursorPos();
-			ImGui.SetCursorPos( new System.Numerics.Vector2( windowWidth - 56, 6 ) );
 
-			if ( ImGui.Button( entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash, new System.Numerics.Vector2( 0, 56 ) ) )
+			if ( entity is ModelEntity modelEntity )
 			{
-				entity.Visible = !entity.Visible;
+				ImGui.SetCursorPos( new System.Numerics.Vector2( windowWidth - 112, 6 ) );
+				if ( ImGui.Button( modelEntity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash, new System.Numerics.Vector2( 0, 56 ) ) )
+				{
+					modelEntity.Visible = !modelEntity.Visible;
+				}
+			}
+
+			ImGui.SetCursorPos( new System.Numerics.Vector2( windowWidth - 56, 6 ) );
+			if ( ImGui.Button( FontAwesome.Trash, new System.Numerics.Vector2( 0, 56 ) ) )
+			{
+				entity.Delete();
 			}
 
 			ImGui.SetCursorPos( startPos );

@@ -54,10 +54,9 @@ internal class OutlinerTab : BaseEditorWindow
 
 				ImGuiX.TextBold( $"{icon} {group.Key?.Category ?? "Uncategorised"}" );
 
-				if ( ImGui.BeginTable( $"##table_entities", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+				if ( ImGui.BeginTable( $"##table_entities", 1, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 				{
 					ImGui.TableSetupColumn( "Entity", ImGuiTableColumnFlags.WidthStretch, 1f );
-					ImGui.TableSetupColumn( "Visibility", ImGuiTableColumnFlags.WidthFixed, 32 );
 
 					foreach ( var entity in group )
 					{
@@ -70,17 +69,6 @@ internal class OutlinerTab : BaseEditorWindow
 						{
 							SelectItem( str );
 						}
-
-						ImGui.TableNextColumn();
-
-						ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new System.Numerics.Vector2( 4, 0 ) );
-						ImGui.PushStyleColor( ImGuiCol.Button, System.Numerics.Vector4.Zero );
-
-						if ( ImGui.SmallButton( $"{(entity.Visible ? FontAwesome.Eye : FontAwesome.EyeSlash)}##{entity.Id}" ) )
-							entity.Visible = !entity.Visible;
-
-						ImGui.PopStyleColor();
-						ImGui.PopStyleVar();
 					}
 
 					ImGui.EndTable();

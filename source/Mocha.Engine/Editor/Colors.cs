@@ -8,4 +8,8 @@ static class Colors
 	public static System.Numerics.Vector4 Green => MathX.GetColor( "#98C379" );
 	public static System.Numerics.Vector4 Blue => MathX.GetColor( "#62AEEF" );
 	public static System.Numerics.Vector4 Orange => MathX.GetColor( "#E5C07B" );
+
+	public static System.Numerics.Vector4 Gray => MathX.GetColor( "#11FFFFFF" );
+
+	public static System.Numerics.Vector4 Transparent => MathX.GetColor( "#00000000" );
 }
