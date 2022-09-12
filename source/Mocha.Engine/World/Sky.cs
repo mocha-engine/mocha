@@ -35,9 +35,16 @@ public class Sky : Entity
 			UniformBufferType = typeof( SkyUniformBuffer )
 		};
 
-		SceneObject = new SkySceneObject( this )
+		SceneObject = new SkySceneObject()
 		{
 			models = new() { Primitives.Cube.GenerateModel( Material ) }
 		};
+	}
+
+	public override void Update()
+	{
+		base.Update();
+		
+		SceneObject.Transform = Transform.WithPosition( Vector3.Zero );
 	}
 }

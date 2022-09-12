@@ -4,7 +4,7 @@ public class SceneWorld
 {
 	public static SceneWorld Current { get; private set; }
 
-	public SceneCamera Camera => SceneObject.All.OfType<SceneCamera>().FirstOrDefault();
+	public SceneCamera Camera { get; set; } = new SceneCamera();
 	public SceneLight Sun => SceneObject.All.OfType<SceneLight>().FirstOrDefault();
 
 	public SceneWorld()
@@ -16,7 +16,7 @@ public class SceneWorld
 	{
 		SceneObject.All.ForEach( sceneObject =>
 		{
-			if ( sceneObject.Entity.Visible )
+			if ( sceneObject.IsVisible )
 				sceneObject.Render( viewProjMatrix, renderPass, commandList );
 		} );
 	}

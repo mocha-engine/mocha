@@ -1,6 +1,4 @@
-﻿using Mocha.Common.World;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha.Renderer;
 
 public class SceneCamera : SceneObject
 {
@@ -11,7 +9,7 @@ public class SceneCamera : SceneObject
 
 	private Point2 CurrentSize { get; set; }
 
-	public SceneCamera( IEntity entity ) : base( entity )
+	public SceneCamera()
 	{
 		UpdateSize( Window.Current.Size );
 	}
@@ -36,14 +34,14 @@ public class SceneCamera : SceneObject
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsDepthAttachment()
 			.IgnoreCache()
-			.WithName( $"SceneCamera {Entity.Id} depth" )
+			.WithName( $"SceneCamera depth" )
 			.Build();
 
 		ColorTexture = Texture.Builder
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsColorAttachment()
 			.IgnoreCache()
-			.WithName( $"SceneCamera {Entity.Id} color" )
+			.WithName( $"SceneCamera color" )
 			.Build();
 
 		var framebufferDescription = new FramebufferDescription( DepthTexture.VeldridTexture, ColorTexture.VeldridTexture );
@@ -53,11 +51,9 @@ public class SceneCamera : SceneObject
 
 		CurrentSize = newSize;
 	}
-
+	
 	public void BuildCamera( ref CameraSetup cameraSetup )
 	{
 		cameraSetup.AspectRatio = (float)CurrentSize.X / (float)CurrentSize.Y;
-
-		Entity.BuildCamera( ref cameraSetup );
 	}
 }
