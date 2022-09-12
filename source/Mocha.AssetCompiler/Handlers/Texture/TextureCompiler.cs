@@ -14,7 +14,7 @@ public class TextureCompiler : BaseCompiler
 		BcEncoder encoder = new BcEncoder();
 
 		encoder.OutputOptions.GenerateMipMaps = true;
-		encoder.OutputOptions.Quality = CompressionQuality.Fast;
+		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
 		encoder.OutputOptions.Format = compressionFormat;
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
@@ -55,6 +55,7 @@ public class TextureCompiler : BaseCompiler
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
 
+		// TODO: This is really shit
 		// Change compression format based on normal map
 		for ( int i = 0; i < textureFormat.MipCount; ++i )
 		{
