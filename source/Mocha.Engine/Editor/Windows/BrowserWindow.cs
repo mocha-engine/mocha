@@ -1,5 +1,4 @@
 ﻿using ImGuiNET;
-using System.ComponentModel;
 
 namespace Mocha.Engine;
 
@@ -14,19 +13,19 @@ internal class BrowserWindow : BaseEditorWindow
 	private Texture ImageTexture { get; }
 	private Texture ModelTexture { get; }
 	private Texture SoundTexture { get; }
+	private Texture ShaderTexture { get; }
 	private Texture MaterialTexture { get; }
 
-	private int selectedIndex;
-
 	public List<(Texture, string)> fileSystemCache;
-
 	private List<Texture> iconCache;
 
 	private int maxIconsLoaded = 32;
-
 	private int iconsLoadedThisFrame = 0;
 
-	private float iconSize => 64;
+	private int selectedIndex;
+	private string assetSearchText = "";
+
+	private float iconSize => 96f;
 
 	enum SortModes
 	{
@@ -50,26 +49,49 @@ internal class BrowserWindow : BaseEditorWindow
 		ModelTexture = TextureBuilder.UITexture.FromPath( "icons/Model.mtex" ).Build();
 		SoundTexture = TextureBuilder.UITexture.FromPath( "icons/Sound.mtex" ).Build();
 		MaterialTexture = TextureBuilder.UITexture.FromPath( "icons/Material.mtex" ).Build();
+		ShaderTexture = TextureBuilder.UITexture.FromPath( "icons/Shader.mtex" ).Build();
 
+		CacheEverything();
+	}
+
+	private void CacheEverything()
+	{
 		fileSystemCache = new();
 		iconCache = new();
 
 		void CacheDirectory( string directory )
 		{
-			foreach ( var file in Directory.GetFiles( directory ) )
+			foreach ( var fileName in Directory.GetFiles( directory ) )
 			{
+				var sourceFileName = fileName;
+				var isCompiled = false;
 				var icon = DocumentTexture;
 
-				if ( file.EndsWith( "mtex" ) )
+				if ( fileName.EndsWith( "_c" ) )
+				{
+					isCompiled = true;
+					sourceFileName = fileName[..^2];
+				}
+
+				if ( sourceFileName.EndsWith( "mtex" ) )
 					icon = ImageTexture;
-				else if ( file.EndsWith( "mmdl" ) )
+				else if ( sourceFileName.EndsWith( "mmdl" ) )
 					icon = ModelTexture;
-				else if ( file.EndsWith( "mshdr" ) )
-					icon = DocumentTexture;
-				else if ( file.EndsWith( "mmat" ) )
+				else if ( sourceFileName.EndsWith( "mshdr" ) )
+					icon = ShaderTexture;
+				else if ( sourceFileName.EndsWith( "mmat" ) )
 					icon = MaterialTexture;
 
-				var relativePath = Path.GetRelativePath( "content/", file );
+				var relativePath = Path.GetRelativePath( "content/", fileName );
+
+				// Is this a compiled file with a source file present?
+				if ( isCompiled && File.Exists( sourceFileName ) )
+					continue;
+
+				// Is this a mocha file?
+				if ( !sourceFileName.Split( "." )[1].StartsWith( "m" ) )
+					continue;
+
 				fileSystemCache.Add( (icon, relativePath) );
 			}
 
@@ -102,6 +124,9 @@ internal class BrowserWindow : BaseEditorWindow
 
 	public void SelectItem( string name )
 	{
+		if ( name.EndsWith( "_c", StringComparison.InvariantCultureIgnoreCase ) )
+			name = name[..^2];
+
 		if ( name.EndsWith( "mtex" ) )
 		{
 			var texture = TextureBuilder.UITexture.FromPath( name ).Build();
@@ -124,7 +149,98 @@ internal class BrowserWindow : BaseEditorWindow
 		}
 	}
 
-	string assetSearchText = "";
+	private bool DrawIcon( float x, float y, Texture icon, string name, bool selected )
+	{
+		var drawList = ImGui.GetWindowDrawList();
+		var startPos = new System.Numerics.Vector2( x, y );
+
+		var windowPos = ImGui.GetWindowPos();
+		var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
+
+		if ( selected )
+		{
+			drawList.AddRectFilled(
+				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
+				ImGui.GetColorU32( Colors.Blue * 0.75f ),
+				4f );
+
+			drawList.AddRect(
+				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
+				ImGui.GetColorU32( Colors.Blue ),
+				4f,
+				ImDrawFlags.None,
+				2f );
+		}
+		else
+		{
+			drawList.AddRectFilled(
+				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
+				ImGui.GetColorU32( Colors.Gray * 0.75f ),
+				4f );
+		}
+
+		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 0, 8 ) );
+		ImGuiX.Image( icon, new Vector2( iconSize, iconSize ) );
+
+		ImGui.SetCursorPos( startPos );
+		if ( ImGui.InvisibleButton( $"##{name}", new System.Numerics.Vector2( iconSize, iconSize + 24 ) ) )
+		{
+			return true;
+		}
+
+		var fileName = Path.GetFileName( name );
+		var textSize = ImGui.CalcTextSize( fileName, iconSize );
+
+		var textPos = (iconSize - textSize.X) / 2.0f;
+		if ( textSize.Y > 16 )
+			textPos = 0.0f;
+
+		var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize + 24 - textSize.Y );
+		ImGui.SetCursorPos( textStartPos );
+
+		void DrawShadowText( int x, int y )
+		{
+			ImGui.SetCursorPos( textStartPos );
+			ImGuiX.SetCursorPosXRelative( x );
+			ImGuiX.SetCursorPosYRelative( y );
+			ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
+			ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+			ImGui.TextWrapped( fileName );
+			ImGui.PopStyleColor();
+		}
+
+		DrawShadowText( 1, 1 );
+		DrawShadowText( -1, 1 );
+		DrawShadowText( 1, -1 );
+		DrawShadowText( -1, -1 );
+
+		ImGui.SetCursorPos( textStartPos );
+		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+		ImGui.TextWrapped( fileName );
+		ImGui.PopTextWrapPos();
+
+		{
+			ImGui.PushStyleColor( ImGuiCol.Text, Colors.Green );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 20, 0 ) );
+			ImGui.Text( FontAwesome.Check );
+			ImGui.PopStyleColor();
+
+			ImGui.PushStyleColor( ImGuiCol.Text, Colors.Orange );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 36, 0 ) );
+			ImGui.Text( FontAwesome.Star );
+			ImGui.PopStyleColor();
+
+			ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 52, 0 ) );
+			ImGui.Text( FontAwesome.Download );
+			ImGui.PopStyleColor();
+		}
+
+		return false;
+	}
 
 	public override void Draw()
 	{
@@ -138,173 +254,148 @@ internal class BrowserWindow : BaseEditorWindow
 				iconCache.Remove( icon );
 		}
 
+		ImGui.PushStyleColor( ImGuiCol.ChildBg, Colors.Transparent );
+
+		if ( ImGui.BeginChild( "sidebar", new System.Numerics.Vector2( 200, -1 ) ) )
 		{
-			var sortString = sortMode switch
+			var specialSources = new[]
 			{
-				SortModes.DateAscending => $"{FontAwesome.ArrowUp} Date",
-				SortModes.DateDescending => $"{FontAwesome.ArrowDown} Date",
-				SortModes.Alphabetical => $"Name",
-				_ => "Unsorted"
+				$"{FontAwesome.ClockRotateLeft} Recent",
+				$"{FontAwesome.Star} Favourites",
 			};
 
-			if ( ImGui.Button( sortString, new System.Numerics.Vector2( 128, 26 ) ) )
+			var localSources = new[]
 			{
-				sortMode++;
-				sortMode = (SortModes)((int)sortMode % 3);
+				$"{FontAwesome.FolderOpen} test project",
+				$"{FontAwesome.MugHot} Mocha Core"
+			};
 
-				Sort();
-			}
+			var onlineSources = new[]
+			{
+				$"{FontAwesome.Cubes} AmbientCG"
+			};
 
-			ImGui.SameLine();
-			ImGui.Button( $"{FontAwesome.File}" );
-			ImGui.SameLine();
-			ImGui.Button( $"{FontAwesome.WandSparkles}" );
+			ImGui.BeginListBox( "##sources", new System.Numerics.Vector2( -1, -1 ) );
 
-			ImGui.SameLine();
-
-			ImGui.SetNextItemWidth( -52 );
-			ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
-
-			ImGui.SameLine();
-			ImGui.Button( $"{FontAwesome.Gear}" );
+			ImGuiX.TextSubheading( $"{FontAwesome.FaceGrinStars} Special" );
+			foreach ( var source in specialSources )
+				ImGuiX.TextLight( source );
 
 			ImGuiX.Separator();
-		}
 
-		{
-			ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) );
+			ImGuiX.TextSubheading( $"{FontAwesome.Folder} Local" );
+			foreach ( var source in localSources )
+				ImGuiX.TextLight( source );
 
-			var windowSize = ImGui.GetWindowSize();
-			var windowPos = ImGui.GetWindowPos();
+			ImGuiX.Separator();
 
-			Vector2 margin = new( iconSize / 4f );
-
-			float startX = 16;
-
-			var availableSpace = windowSize.X;
-			availableSpace += margin.X / 2.0f;
-
-			var remainingSpace = availableSpace % (iconSize + margin.X);
-			startX = remainingSpace / 2.0f;
-
-			float x = startX;
-			float y = margin.Y;
-
-			for ( int i = 0; i < fileSystemCache.Count; i++ )
-			{
-				var item = fileSystemCache[i];
-				Texture icon = item.Item1;
-				string name = item.Item2;
-
-				if ( !string.IsNullOrEmpty( assetSearchText ) )
-				{
-					bool foundAll = true;
-					var inputs = assetSearchText.Split( " " );
-
-					foreach ( var input in inputs )
-						if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
-							foundAll = false;
-
-					if ( !foundAll )
-						continue;
-				}
-
-
-				var startPos = new System.Numerics.Vector2( x, y );
-
-				if ( selectedIndex == i )
-				{
-					var drawList = ImGui.GetWindowDrawList();
-					var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
-
-					drawList.AddRectFilled(
-						windowPos + startPos - new System.Numerics.Vector2( 4, 4 ) - scrollPos,
-						windowPos + startPos + new System.Numerics.Vector2( iconSize + 4, iconSize + 20 ) - scrollPos,
-						ImGui.GetColorU32( Colors.Blue * 0.75f ),
-						4f );
-				}
-
-				ImGui.SetCursorPos( startPos );
-				ImGuiX.Image( icon, new Vector2( iconSize, iconSize ) );
-
-				if ( name.EndsWith( ".mtex" ) )
-				{
-					if ( iconCache.Count < maxIconsLoaded && ImGui.IsItemVisible() && item.Item1 == ImageTexture && iconsLoadedThisFrame < 1 )
-					{
-						var loadedIcon = TextureBuilder.UITexture.FromPath( name ).Build();
-						item.Item1 = loadedIcon;
-						iconCache.Add( loadedIcon );
-
-						fileSystemCache[i] = item;
-						iconsLoadedThisFrame++;
-					}
-
-					if ( !ImGui.IsItemVisible() && selectedIndex != i )
-					{
-						if ( iconCache.Contains( item.Item1 ) )
-						{
-							item.Item1.Delete();
-							item.Item1 = ImageTexture;
-							fileSystemCache[i] = item;
-
-							iconCache.Remove( item.Item1 );
-						}
-					}
-				}
-
-				ImGui.SetCursorPos( startPos );
-				if ( ImGui.InvisibleButton( $"##{name}", new System.Numerics.Vector2( iconSize, iconSize + 24 ) ) )
-				{
-					selectedIndex = i;
-
-					SelectItem( name );
-				}
-
-				var fileName = Path.GetFileName( name );
-				var fileExtension = Path.GetExtension( name );
-				var fileNameWithoutExtension = Path.GetFileNameWithoutExtension( name );
-
-				var textSize = ImGui.CalcTextSize( fileName, iconSize );
-
-				var textPos = (iconSize - textSize.X) / 2.0f;
-				if ( textSize.Y > 16 )
-					textPos = 0.0f;
-
-				var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize + 16 - textSize.Y );
-				ImGui.SetCursorPos( textStartPos );
-
-				void DrawShadowText( int x, int y )
-				{
-					ImGui.SetCursorPos( textStartPos );
-					ImGuiX.SetCursorPosXRelative( x );
-					ImGuiX.SetCursorPosYRelative( y );
-					ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
-					ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
-					ImGui.TextWrapped( fileName );
-					ImGui.PopStyleColor();
-				}
-
-				DrawShadowText( 1, 1 );
-				DrawShadowText( -1, -1 );
-				DrawShadowText( 1, -1 );
-				DrawShadowText( -1, -1 );
-
-				ImGui.SetCursorPos( textStartPos );
-				ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
-				ImGui.TextWrapped( fileName );
-
-				ImGui.PopTextWrapPos();
-
-				x += iconSize + margin.X;
-				if ( x + iconSize + 16 > windowSize.X )
-				{
-					x = startX;
-					y += iconSize + margin.Y + 24;
-				}
-			}
+			ImGuiX.TextSubheading( $"{FontAwesome.Globe} Online" );
+			foreach ( var source in onlineSources )
+				ImGuiX.TextLight( source );
 
 			ImGui.EndListBox();
+			ImGui.EndChild();
 		}
+
+		ImGui.SameLine();
+
+		if ( ImGui.BeginChild( "main", new System.Numerics.Vector2( -1, -1 ) ) )
+		{
+			{
+				var sortString = sortMode switch
+				{
+					SortModes.DateAscending => $"{FontAwesome.CalendarPlus}",
+					SortModes.DateDescending => $"{FontAwesome.CalendarMinus}",
+					SortModes.Alphabetical => $"{FontAwesome.ArrowDownAZ}",
+					_ => "Unsorted"
+				};
+
+				if ( ImGui.Button( $"{sortString}" ) )
+				{
+					sortMode++;
+					sortMode = (SortModes)((int)sortMode % 3);
+
+					Sort();
+				}
+
+				ImGui.SameLine();
+
+				ImGui.SetNextItemWidth( -274 );
+				ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
+
+				ImGui.SameLine();
+				ImGui.Button( $"{FontAwesome.ChevronDown} Asset" );
+				ImGui.SameLine();
+				ImGui.Button( $"{FontAwesome.ChevronDown} Filter" );
+				ImGui.SameLine();
+				if ( ImGui.Button( $"{FontAwesome.Repeat}" ) )
+				{
+					CacheEverything();
+				}
+
+				ImGui.SameLine();
+				ImGui.Button( $"{FontAwesome.Gear}" );
+			}
+
+			{
+				ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) );
+
+				var windowSize = ImGui.GetWindowSize();
+				var windowPos = ImGui.GetWindowPos();
+
+				Vector2 margin = new( iconSize / 4f );
+
+				float startX = 16;
+
+				var availableSpace = windowSize.X;
+				availableSpace += margin.X / 2.0f;
+
+				var remainingSpace = availableSpace % (iconSize + margin.X);
+				startX = remainingSpace / 2.0f;
+
+				float x = startX;
+				float y = margin.Y;
+
+				for ( int i = 0; i < fileSystemCache.Count; i++ )
+				{
+					var item = fileSystemCache[i];
+					var icon = item.Item1;
+					var name = item.Item2;
+
+					if ( !string.IsNullOrEmpty( assetSearchText ) )
+					{
+						bool foundAll = true;
+						var inputs = assetSearchText.Split( " " );
+
+						foreach ( var input in inputs )
+							if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
+								foundAll = false;
+
+						if ( !foundAll )
+							continue;
+					}
+
+					if ( DrawIcon( x, y, icon, name, i == selectedIndex ) )
+					{
+						SelectItem( name );
+						selectedIndex = i;
+					}
+
+					x += iconSize + margin.X;
+					if ( x + iconSize + 16 > windowSize.X )
+					{
+						x = startX;
+						y += iconSize + margin.Y + 24;
+					}
+				}
+
+				ImGui.EndListBox();
+			}
+
+			ImGui.EndChild();
+		}
+
+		ImGui.PopStyleColor();
 
 		ImGui.End();
 	}

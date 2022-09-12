@@ -13,31 +13,29 @@ public class BaseInspector
 
 	protected virtual void DrawProperties( string title, (string, string)[] items, string filePath )
 	{
-		ImGui.BeginListBox( "##inspector_table", new( -1, items.Length * 32 ) );
+		DrawButtons( filePath );
+		ImGuiX.Separator();
+
+		ImGui.BeginListBox( "##inspector_table", new( -1, 42 + items.Length * 24 ) );
 
 		ImGuiX.TextBold( title );
 		DrawTable( items );
 
 		ImGui.EndListBox();
-
-		ImGuiX.Separator();
-		DrawButtons( filePath );
 	}
 
 	protected void DrawButtons( string filePath )
 	{
-		float width = (ImGui.GetWindowWidth() - 20f) * 0.5f;
-
-		if ( ImGui.Button( $"{FontAwesome.Folder} Open in Explorer", new System.Numerics.Vector2( width, 0 ) ) )
+		if ( ImGui.Button( $"{FontAwesome.Folder}" ) )
 		{
 			Process.Start( "explorer.exe", $"/select,{Path.GetFullPath( filePath )}" );
 		}
 
 		ImGui.SameLine();
 
-		var copyPathButtonText = (timeSinceCopied < 3) ? $"{FontAwesome.FaceSmileBeam} Copied!" : $"{FontAwesome.Clipboard} Copy Path";
+		var copyPathButtonText = (timeSinceCopied < 3) ? $"{FontAwesome.ClipboardCheck}" : $"{FontAwesome.Clipboard}";
 
-		if ( ImGui.Button( copyPathButtonText, new System.Numerics.Vector2( width, 0 ) ) )
+		if ( ImGui.Button( copyPathButtonText ) )
 		{
 			ImGui.SetClipboardText( filePath.NormalizePath() );
 			timeSinceCopied = 0;

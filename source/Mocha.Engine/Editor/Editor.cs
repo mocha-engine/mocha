@@ -117,7 +117,7 @@ internal partial class Editor
 	{
 		var io = ImGui.GetIO();
 
-		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
+		io.ConfigFlags |= ImGuiConfigFlags.DockingEnable | ImGuiConfigFlags.ViewportsEnable | ImGuiConfigFlags.IsSRGB | ImGuiConfigFlags.ViewportsEnable;
 		io.ConfigDockingWithShift = true;
 
 		ImGui.LoadIniSettingsFromDisk( ImGui.GetIO().IniFilename ); // https://github.com/mellinoe/veldrid/issues/410
@@ -268,14 +268,6 @@ internal partial class Editor
 
 				if ( ImGui.Button( FontAwesome.Pause, new System.Numerics.Vector2( 0, 32 ) ) )
 					World.Current.State = World.States.Paused;
-			}
-
-			//
-			// Restart button
-			//
-			{
-				if ( ImGui.Button( FontAwesome.Rotate, new System.Numerics.Vector2( 0, 32 ) ) )
-					World.Current.ResetWorld();
 			}
 
 			// Draw on right

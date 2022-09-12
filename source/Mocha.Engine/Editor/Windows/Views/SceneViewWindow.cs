@@ -63,8 +63,6 @@ internal class SceneViewWindow : BaseEditorWindow
 			FontAwesome.Cubes,
 		} );
 
-		ImGui.Text( "TODO" );
-
 		ImGui.End();
 	}
 }

@@ -196,7 +196,7 @@ internal static class ImGuiX
 		TextSubheading( text );
 		TextLight( subtext );
 
-		Separator();
+		ImGui.Dummy( new System.Numerics.Vector2( 0, 4 ) );
 	}
 
 	public static void SetCursorPosXRelative( float relativePos )
