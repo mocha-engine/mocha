@@ -6,14 +6,13 @@ namespace Mocha.Renderer;
 
 public class SceneObject
 {
-	public IEntity Entity { get; set; }
-	public Transform Transform => Entity.Transform;
+	public Transform Transform { get; set; }
 	public static List<SceneObject> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<SceneObject>().ToList();
+	public bool IsVisible { get; set; } = true;
 
-	public SceneObject( IEntity entity )
+	public SceneObject()
 	{
 		All.Add( this );
-		Entity = entity;
 	}
 
 	public virtual void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList ) { }

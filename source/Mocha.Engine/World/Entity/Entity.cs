@@ -1,17 +1,17 @@
 ﻿using Mocha.Common.World;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Mocha.Engine;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class Entity : IEntity
 {
-	public static List<Entity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<Entity>().ToList();
+	public static IReadOnlyList<Entity> All => EntityPool.Entities.OfType<Entity>().ToList().AsReadOnly();
 
 	private Transform transform;
 
-	Transform IEntity.Transform
+	[HideInInspector]
+	public Transform Transform
 	{
 		get => transform;
 		set => transform = value;
@@ -43,15 +43,17 @@ public class Entity : IEntity
 
 	public Entity()
 	{
-		Id = All.Count; // TODO: Pooling
-		All.Add( this );
-		Name = $"{this.GetType().Name} {All.Count}";
+		Id = EntityPool.RegisterEntity( this );
+		Name = $"{this.GetType().Name} {Id}";
 	}
 
 	public virtual void Update() { }
-	public virtual void Delete()
+	public virtual void Delete( bool immediate = true )
 	{
-		Log.Trace( "TODO: Manage entity objects manually" );
+		EntityPool.DeleteEntity( this );
+
+		if ( immediate )
+			GC.Collect();
 	}
 
 	public bool Equals( Entity x, Entity y ) => x.GetHashCode() == y.GetHashCode();
@@ -64,9 +66,6 @@ public class Entity : IEntity
 
 	[HideInInspector]
 	public List<Entity> Children => Entity.All.Where( x => x.parentId == Id ).ToList();
-
-	[HideInInspector]
-	public bool Visible { get; set; } = true;
 
 	public void SetParent( Entity newParent )
 	{

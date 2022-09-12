@@ -32,13 +32,6 @@ public class World
 		SetupEntities();
 	}
 
-	private void DeleteEntities()
-	{
-		Log.Trace( $"Deleting all entities..." );
-		Entity.All.ForEach( x => x.Delete() );
-		Entity.All.Clear();
-	}
-
 	private void SetupEntities()
 	{
 		Log.Trace( $"Setting up entities..." );
@@ -60,15 +53,6 @@ public class World
 		Player = new Player();
 	}
 
-	public void ResetWorld()
-	{
-		DeleteEntities();
-		SetupEntities();
-
-		Log.Trace( $"World reset complete." );
-		GC.Collect( 2 );
-	}
-
 	public void Update()
 	{
 		foreach ( var entity in Entity.All )
@@ -76,5 +60,10 @@ public class World
 			if ( State == States.Playing || entity is Camera )
 				entity.Update();
 		}
+	}
+
+	public Entity FindActiveCamera()
+	{
+		return Entity.All.OfType<Camera>().First();
 	}
 }

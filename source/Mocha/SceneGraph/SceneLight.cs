@@ -15,7 +15,7 @@ public class SceneLight : SceneObject
 	internal Matrix4x4 ViewMatrix { get; set; }
 	internal Matrix4x4 ProjMatrix { get; set; }
 
-	public SceneLight( IEntity entity ) : base( entity )
+	public SceneLight()
 	{
 		uint res = 8192;
 

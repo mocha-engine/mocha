@@ -23,6 +23,13 @@ public class Sun : Entity
 
 	public Sun()
 	{
-		SceneLight = new( this );
+		SceneLight = new();
+	}
+
+	public override void Update()
+	{
+		base.Update();
+
+		SceneLight.Transform = Transform;
 	}
 }

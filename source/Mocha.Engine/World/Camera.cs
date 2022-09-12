@@ -1,18 +1,9 @@
-﻿using System.ComponentModel;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 [Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
 public class Camera : Entity
 {
-	[HideInInspector] private SceneCamera SceneCamera { get; set; }
-
 	public float FieldOfView { get; set; } = 60;
-
-	public Camera()
-	{
-		SceneCamera = new( this );
-	}
 
 	public override void BuildCamera( ref CameraSetup cameraSetup )
 	{

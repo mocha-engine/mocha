@@ -97,7 +97,13 @@ public class RendererInstance
 	private CameraSetup BuildCamera()
 	{
 		var cameraSetup = new CameraSetup();
-		SceneWorld.Current.Camera.BuildCamera( ref cameraSetup );
+
+		world.Camera.BuildCamera( ref cameraSetup );
+
+		foreach ( var entity in EntityPool.Entities )
+		{
+			entity.BuildCamera( ref cameraSetup );
+		}
 
 		return cameraSetup;
 	}
