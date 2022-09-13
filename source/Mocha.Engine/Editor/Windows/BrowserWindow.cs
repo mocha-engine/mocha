@@ -408,16 +408,16 @@ internal class BrowserWindow : BaseEditorWindow
 
 				Vector2 margin = new( 24, 0 );
 
-				float startX = 16;
+				float startPos = 16;
 
-				var availableSpace = windowSize.X;
-				availableSpace += margin.X / 2.0f;
-
+				var availableSpace = windowSize.X - startPos;
 				var remainingSpace = availableSpace % (iconSize.X + margin.X);
-				startX = remainingSpace / 2.0f;
 
-				float x = startX;
-				float y = margin.Y + 16;
+				int count = (int)windowSize.X / (int)(iconSize.X + margin.X);
+				margin.X += (remainingSpace / count);
+
+				float x = startPos;
+				float y = startPos;
 
 				for ( int i = 0; i < fileSystemCache.Count; i++ )
 				{
@@ -445,9 +445,9 @@ internal class BrowserWindow : BaseEditorWindow
 					}
 
 					x += iconSize.X + margin.X;
-					if ( x + iconSize.X + 16 > windowSize.X )
+					if ( x + iconSize.X > windowSize.X )
 					{
-						x = startX;
+						x = startPos;
 						y += iconSize.Y + margin.Y + 24;
 					}
 
