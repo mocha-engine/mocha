@@ -5,7 +5,7 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset
 {
-	public Shader Shader { get; set; } = ShaderBuilder.Default.FromPath( "shaders/pbr.mshdr" ).Build();
+	public Shader Shader { get; set; } = ShaderBuilder.Default.FromPath( "core/shaders/pbr.mshdr" ).Build();
 	public Type UniformBufferType { get; set; } = typeof( GenericModelUniformBuffer );
 	public Texture? DiffuseTexture { get; set; } = TextureBuilder.MissingTexture;
 	public Texture? AlphaTexture { get; set; } = TextureBuilder.One;

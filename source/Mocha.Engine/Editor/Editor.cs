@@ -39,7 +39,7 @@ internal partial class Editor
 			.OfType<BaseEditorWindow>()
 		);
 
-		Logo = TextureBuilder.UITexture.FromPath( "logo.mtex" ).Build();
+		Logo = TextureBuilder.UITexture.FromPath( "core/logo.mtex" ).Build();
 	}
 
 	private static void AddIconFont( ImGuiIOPtr io, float fontSize )
@@ -54,8 +54,8 @@ internal partial class Editor
 
 			fixed ( ushort* rangePtr = iconRanges )
 			{
-				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-solid-900.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
-				io.Fonts.AddFontFromFileTTF( "content/fonts/fa-regular-400.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
+				io.Fonts.AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
+				io.Fonts.AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", fontSize, iconConfig, (IntPtr)rangePtr );
 			}
 		}
 	}
@@ -66,16 +66,16 @@ internal partial class Editor
 
 		io.Fonts.Clear();
 
-		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Regular.ttf", 14f );
+		SansSerifFont = io.Fonts.AddFontFromFileTTF( "content/core/fonts/Inter-Regular.ttf", 14f );
 		AddIconFont( io, 12f );
 
-		BoldFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 14f );
+		BoldFont = io.Fonts.AddFontFromFileTTF( "content/core/fonts/Inter-Bold.ttf", 14f );
 		AddIconFont( io, 12f );
 
-		SubheadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Medium.ttf", 20f );
+		SubheadingFont = io.Fonts.AddFontFromFileTTF( "content/core/fonts/Inter-Medium.ttf", 20f );
 		AddIconFont( io, 16f );
 
-		HeadingFont = io.Fonts.AddFontFromFileTTF( "content/fonts/Inter-Bold.ttf", 24f );
+		HeadingFont = io.Fonts.AddFontFromFileTTF( "content/core/fonts/Inter-Bold.ttf", 24f );
 		AddIconFont( io, 20f );
 
 		MonospaceFont = io.Fonts.AddFontDefault();

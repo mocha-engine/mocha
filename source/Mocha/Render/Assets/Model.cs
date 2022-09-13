@@ -26,7 +26,7 @@ public class Model : Asset
 	{
 		DepthOnlyMaterial = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "shaders/depthonly.mshdr" )
+			Shader = ShaderBuilder.Default.FromPath( "core/shaders/depthonly.mshdr" )
 										  .WithFaceCullMode( FaceCullMode.None )
 										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
 										  .Build(),

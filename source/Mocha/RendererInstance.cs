@@ -51,7 +51,7 @@ public class RendererInstance
 	{
 		gbufferCombineMaterial = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "shaders/combine.mshdr" )
+			Shader = ShaderBuilder.Default.FromPath( "core/shaders/combine.mshdr" )
 											.WithFramebuffer( Device.SwapchainFramebuffer )
 											.WithFaceCullMode( FaceCullMode.None )
 											.Build(),

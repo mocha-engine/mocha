@@ -42,14 +42,14 @@ internal class BrowserWindow : BaseEditorWindow
 
 		isVisible = true;
 
-		ArchiveTexture = TextureBuilder.UITexture.FromPath( "icons/Archive.mtex" ).Build();
-		DocumentTexture = TextureBuilder.UITexture.FromPath( "icons/Document.mtex" ).Build();
-		FolderTexture = TextureBuilder.UITexture.FromPath( "icons/Folder.mtex" ).Build();
-		ImageTexture = TextureBuilder.UITexture.FromPath( "icons/Image.mtex" ).Build();
-		ModelTexture = TextureBuilder.UITexture.FromPath( "icons/Model.mtex" ).Build();
-		SoundTexture = TextureBuilder.UITexture.FromPath( "icons/Sound.mtex" ).Build();
-		MaterialTexture = TextureBuilder.UITexture.FromPath( "icons/Material.mtex" ).Build();
-		ShaderTexture = TextureBuilder.UITexture.FromPath( "icons/Shader.mtex" ).Build();
+		ArchiveTexture = TextureBuilder.UITexture.FromPath( "core/icons/Archive.mtex" ).Build();
+		DocumentTexture = TextureBuilder.UITexture.FromPath( "core/icons/Document.mtex" ).Build();
+		FolderTexture = TextureBuilder.UITexture.FromPath( "core/icons/Folder.mtex" ).Build();
+		ImageTexture = TextureBuilder.UITexture.FromPath( "core/icons/Image.mtex" ).Build();
+		ModelTexture = TextureBuilder.UITexture.FromPath( "core/icons/Model.mtex" ).Build();
+		SoundTexture = TextureBuilder.UITexture.FromPath( "core/icons/Sound.mtex" ).Build();
+		MaterialTexture = TextureBuilder.UITexture.FromPath( "core/icons/Material.mtex" ).Build();
+		ShaderTexture = TextureBuilder.UITexture.FromPath( "core/icons/Shader.mtex" ).Build();
 
 		CacheEverything();
 	}
