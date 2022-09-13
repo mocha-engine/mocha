@@ -47,6 +47,8 @@ internal class BrowserWindow : BaseEditorWindow
 					sourceFileName = fileName[..^2];
 				}
 
+				var relativePath = FileSystem.Game.GetRelativePath( fileName );
+
 				// Is this a compiled file with a source file present?
 				if ( isCompiled && File.Exists( sourceFileName ) )
 					continue;
@@ -55,7 +57,7 @@ internal class BrowserWindow : BaseEditorWindow
 				if ( !sourceFileName.Split( "." )[1].StartsWith( "m" ) )
 					continue;
 
-				fileSystemCache.Add( sourceFileName );
+				fileSystemCache.Add( relativePath );
 			}
 
 			foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )

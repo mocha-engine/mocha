@@ -83,4 +83,9 @@ public class FileSystem
 	{
 		return Directory.GetDirectories( GetAbsolutePath( directory ) );
 	}
+
+	public string GetRelativePath( string fileName )
+	{
+		return Path.GetRelativePath( BasePath, fileName );
+	}
 }
