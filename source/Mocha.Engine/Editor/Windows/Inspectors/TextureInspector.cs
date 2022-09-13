@@ -13,7 +13,7 @@ public class TextureInspector : BaseInspector
 
 	public override void Draw()
 	{
-		var windowWidth = ImGui.GetWindowWidth();
+		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
 		ImGuiX.Title(
 			$"{FontAwesome.Image} {Path.GetFileName( texture.Path.NormalizePath() )}",
@@ -32,6 +32,8 @@ public class TextureInspector : BaseInspector
 		DrawProperties( $"{FontAwesome.Image} Texture", items, texture.Path );
 
 		ImGuiX.Separator();
+
+		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
 		ImGuiX.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

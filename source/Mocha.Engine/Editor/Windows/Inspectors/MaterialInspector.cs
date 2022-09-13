@@ -35,7 +35,7 @@ public class MaterialInspector : BaseInspector
 
 	public override void Draw()
 	{
-		var windowWidth = ImGui.GetWindowWidth();
+		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
 		ImGuiX.Title(
 			$"{FontAwesome.FaceGrinStars} {Path.GetFileName( material.Path )}",
@@ -66,7 +66,7 @@ public class MaterialInspector : BaseInspector
 
 		ImGui.EndListBox();
 
-		ImGuiX.Separator();
-		ImGuiX.Image( material.DiffuseTexture ?? TextureBuilder.MissingTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
+		ImGuiX.Image( material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

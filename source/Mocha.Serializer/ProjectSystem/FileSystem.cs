@@ -68,4 +68,19 @@ public class FileSystem
 
 		return watcher;
 	}
+
+	public string GetFullPath( string filePath )
+	{
+		return Path.Combine( BasePath, filePath );
+	}
+
+	public IEnumerable<string> GetFiles( string directory )
+	{
+		return Directory.GetFiles( GetAbsolutePath( directory ) );
+	}
+
+	public IEnumerable<string> GetDirectories( string directory )
+	{
+		return Directory.GetDirectories( GetAbsolutePath( directory ) );
+	}
 }
