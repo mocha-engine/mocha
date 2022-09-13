@@ -25,7 +25,7 @@ internal class BrowserWindow : BaseEditorWindow
 	private int selectedIndex;
 	private string assetSearchText = "";
 
-	private float iconSize => 96f;
+	private Vector2 iconSize => new( 100f, 150f );
 
 	enum SortModes
 	{
@@ -61,7 +61,7 @@ internal class BrowserWindow : BaseEditorWindow
 
 		void CacheDirectory( string directory )
 		{
-			foreach ( var fileName in Directory.GetFiles( directory ) )
+			foreach ( var fileName in FileSystem.Game.GetFiles( directory ) )
 			{
 				var sourceFileName = fileName;
 				var isCompiled = false;
@@ -74,13 +74,17 @@ internal class BrowserWindow : BaseEditorWindow
 				}
 
 				if ( sourceFileName.EndsWith( "mtex" ) )
-					icon = ImageTexture;
+				{
+					icon = Texture.Builder.FromPath( fileName ).Build();
+				}
 				else if ( sourceFileName.EndsWith( "mmdl" ) )
 					icon = ModelTexture;
 				else if ( sourceFileName.EndsWith( "mshdr" ) )
 					icon = ShaderTexture;
 				else if ( sourceFileName.EndsWith( "mmat" ) )
-					icon = MaterialTexture;
+				{
+					icon = Material.FromPath( fileName ).DiffuseTexture;
+				}
 
 				var relativePath = Path.GetRelativePath( "content/", fileName );
 
@@ -95,13 +99,13 @@ internal class BrowserWindow : BaseEditorWindow
 				fileSystemCache.Add( (icon, relativePath) );
 			}
 
-			foreach ( var subDir in Directory.GetDirectories( directory ) )
+			foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
 			{
 				CacheDirectory( subDir );
 			}
 		}
 
-		CacheDirectory( "content/" );
+		CacheDirectory( "" );
 
 		Sort();
 	}
@@ -149,6 +153,31 @@ internal class BrowserWindow : BaseEditorWindow
 		}
 	}
 
+	public System.Numerics.Vector4 GetColor( string name )
+	{
+		if ( name.EndsWith( "_c", StringComparison.InvariantCultureIgnoreCase ) )
+			name = name[..^2];
+
+		if ( name.EndsWith( "mtex" ) )
+		{
+			return MathX.GetColor( "#5292fa" );
+		}
+		else if ( name.EndsWith( "mshdr" ) )
+		{
+			return MathX.GetColor( "#ffc710" );
+		}
+		else if ( name.EndsWith( "mmdl" ) )
+		{
+			return MathX.GetColor( "#1ee3a5" );
+		}
+		else if ( name.EndsWith( "mmat" ) )
+		{
+			return MathX.GetColor( "#f7b239" );
+		}
+
+		return new System.Numerics.Vector4( 1, 0, 1, 1 );
+	}
+
 	private bool DrawIcon( float x, float y, Texture icon, string name, bool selected )
 	{
 		var drawList = ImGui.GetWindowDrawList();
@@ -157,48 +186,55 @@ internal class BrowserWindow : BaseEditorWindow
 		var windowPos = ImGui.GetWindowPos();
 		var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
 
+		{
+			drawList.AddRectFilled(
+				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( GetColor( name ) * 0.4f ),
+				4f );
+
+			drawList.AddRectFilled(
+				windowPos + startPos + new System.Numerics.Vector2( -8, iconSize.Y + 4 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( GetColor( name ) * 0.75f ),
+				4f,
+				ImDrawFlags.RoundCornersBottom );
+		}
+
+		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 2, 24 ) );
+		ImGuiX.Image( icon, new Vector2( 96f, 96f ) );
+
 		if ( selected )
 		{
 			drawList.AddRectFilled(
 				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
-				ImGui.GetColorU32( Colors.Blue * 0.75f ),
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( Colors.Blue * 0.5f ),
 				4f );
 
 			drawList.AddRect(
-				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
+				windowPos + startPos - new System.Numerics.Vector2( 10, 10 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 10, iconSize.Y + 10 ) - scrollPos,
 				ImGui.GetColorU32( Colors.Blue ),
 				4f,
 				ImDrawFlags.None,
 				2f );
 		}
-		else
-		{
-			drawList.AddRectFilled(
-				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize + 8, iconSize + 32 ) - scrollPos,
-				ImGui.GetColorU32( Colors.Gray * 0.75f ),
-				4f );
-		}
-
-		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 0, 8 ) );
-		ImGuiX.Image( icon, new Vector2( iconSize, iconSize ) );
 
 		ImGui.SetCursorPos( startPos );
-		if ( ImGui.InvisibleButton( $"##{name}", new System.Numerics.Vector2( iconSize, iconSize + 24 ) ) )
+		if ( ImGui.InvisibleButton( $"##{name}", iconSize ) )
 		{
 			return true;
 		}
 
-		var fileName = Path.GetFileName( name );
-		var textSize = ImGui.CalcTextSize( fileName, iconSize );
+		var fileName = Path.GetFileNameWithoutExtension( name );
+		var textSize = ImGui.CalcTextSize( fileName, iconSize.X );
 
-		var textPos = (iconSize - textSize.X) / 2.0f;
+		var textPos = (iconSize.X - textSize.X) / 2.0f;
 		if ( textSize.Y > 16 )
 			textPos = 0.0f;
 
-		var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize + 24 - textSize.Y );
+		var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize.Y - textSize.Y - 4 );
 		ImGui.SetCursorPos( textStartPos );
 
 		void DrawShadowText( int x, int y )
@@ -207,7 +243,7 @@ internal class BrowserWindow : BaseEditorWindow
 			ImGuiX.SetCursorPosXRelative( x );
 			ImGuiX.SetCursorPosYRelative( y );
 			ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
-			ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+			ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize.X );
 			ImGui.TextWrapped( fileName );
 			ImGui.PopStyleColor();
 		}
@@ -218,25 +254,52 @@ internal class BrowserWindow : BaseEditorWindow
 		DrawShadowText( -1, -1 );
 
 		ImGui.SetCursorPos( textStartPos );
-		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize );
+		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize.X );
 		ImGui.TextWrapped( fileName );
 		ImGui.PopTextWrapPos();
 
 		{
+			ImGui.PushStyleColor( ImGuiCol.Text, GetColor( name ) );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( -4, 0 ) );
+			if ( name.EndsWith( "mmdl" ) )
+				ImGui.Text( FontAwesome.Cube );
+			else if ( name.EndsWith( "mtex" ) || name.EndsWith( "mtex_c" ) )
+				ImGui.Text( FontAwesome.Image );
+			else if ( name.EndsWith( "mshdr" ) )
+				ImGui.Text( FontAwesome.Glasses );
+			else if ( name.EndsWith( "mmat" ) )
+				ImGui.Text( FontAwesome.Circle );
+			ImGui.PopStyleColor();
+
+			float xOff = 20;
+
 			ImGui.PushStyleColor( ImGuiCol.Text, Colors.Green );
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 20, 0 ) );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
 			ImGui.Text( FontAwesome.Check );
 			ImGui.PopStyleColor();
 
-			ImGui.PushStyleColor( ImGuiCol.Text, Colors.Orange );
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 36, 0 ) );
-			ImGui.Text( FontAwesome.Star );
-			ImGui.PopStyleColor();
+			if ( ImGui.IsItemHovered() )
+				ImGui.SetTooltip( "Compiled & up-to-date" );
 
-			ImGui.PushStyleColor( ImGuiCol.Text, Colors.LightText );
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize - 52, 0 ) );
-			ImGui.Text( FontAwesome.Download );
-			ImGui.PopStyleColor();
+			xOff += 16;
+
+			if ( name.Contains( "subaru" ) )
+			{
+				ImGui.PushStyleColor( ImGuiCol.Text, Colors.Orange );
+				ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
+				ImGui.Text( FontAwesome.Star );
+				ImGui.PopStyleColor();
+				xOff += 16;
+
+				if ( ImGui.IsItemHovered() )
+					ImGui.SetTooltip( "Favourited" );
+			}
+
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
+			ImGui.Text( FontAwesome.HardDrive );
+
+			if ( ImGui.IsItemHovered() )
+				ImGui.SetTooltip( "Local Asset" );
 		}
 
 		return false;
@@ -343,18 +406,18 @@ internal class BrowserWindow : BaseEditorWindow
 				var windowSize = ImGui.GetWindowSize();
 				var windowPos = ImGui.GetWindowPos();
 
-				Vector2 margin = new( iconSize / 4f );
+				Vector2 margin = new( 24, 0 );
 
 				float startX = 16;
 
 				var availableSpace = windowSize.X;
 				availableSpace += margin.X / 2.0f;
 
-				var remainingSpace = availableSpace % (iconSize + margin.X);
+				var remainingSpace = availableSpace % (iconSize.X + margin.X);
 				startX = remainingSpace / 2.0f;
 
 				float x = startX;
-				float y = margin.Y;
+				float y = margin.Y + 16;
 
 				for ( int i = 0; i < fileSystemCache.Count; i++ )
 				{
@@ -381,12 +444,14 @@ internal class BrowserWindow : BaseEditorWindow
 						selectedIndex = i;
 					}
 
-					x += iconSize + margin.X;
-					if ( x + iconSize + 16 > windowSize.X )
+					x += iconSize.X + margin.X;
+					if ( x + iconSize.X + 16 > windowSize.X )
 					{
 						x = startX;
-						y += iconSize + margin.Y + 24;
+						y += iconSize.Y + margin.Y + 24;
 					}
+
+					ImGui.Dummy( new System.Numerics.Vector2( -1, iconSize.Y ) );
 				}
 
 				ImGui.EndListBox();
