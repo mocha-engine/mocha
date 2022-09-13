@@ -329,7 +329,7 @@ internal partial class Editor
 
 		foreach ( var asset in BrowserWindow.Instance.fileSystemCache )
 		{
-			switcherItems.Add( ("Asset", asset.Item2.NormalizePath()) );
+			switcherItems.Add( ("Asset", asset.NormalizePath()) );
 		}
 
 		if ( ImGui.Begin( "Quick Switcher", windowFlags ) )
