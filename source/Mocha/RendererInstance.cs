@@ -65,11 +65,6 @@ public class RendererInstance
 		{
 			Update();
 
-			PreRender();
-			world.Sun.CalcViewProjMatrix();
-
-			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
-
 			// Build the camera right before we render, makes sure we're
 			// in the right spot with as little latency as possible
 			{
@@ -77,6 +72,11 @@ public class RendererInstance
 				worldCameraSetup.BuildMatrices( out var viewMatrix, out var projMatrix );
 				RenderPass( Renderer.RenderPass.Main, viewMatrix * projMatrix, world.Camera.Framebuffer );
 			}
+
+			PreRender();
+			world.Sun.CalcViewProjMatrix();
+
+			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
 
 			PostRender();
 		}
