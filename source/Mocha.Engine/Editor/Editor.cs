@@ -48,7 +48,7 @@ internal partial class Editor
 		{
 			var iconConfig = ImGuiNative.ImFontConfig_ImFontConfig();
 			iconConfig->MergeMode = 1;
-			iconConfig->GlyphMinAdvanceX = fontSize * 2.0f;
+			iconConfig->GlyphMinAdvanceX = fontSize + 4f;
 
 			var iconRanges = new ushort[] { FontAwesome.IconMin, FontAwesome.IconMax, 0 };
 
