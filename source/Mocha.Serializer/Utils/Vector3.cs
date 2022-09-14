@@ -34,7 +34,7 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public static readonly Vector3 Down = -Up;
 
-	public static readonly Vector3 Right = new( 0f, 10f, 0f );
+	public static readonly Vector3 Right = new( 0f, 1f, 0f );
 
 	public static readonly Vector3 Left = -Right;
 
