@@ -36,8 +36,6 @@ public class World
 	{
 		Log.Trace( $"Setting up entities..." );
 
-		Camera = new Camera();
-
 		Sun = new Sun()
 		{
 			Position = new( 20, 25, 80 ),
@@ -46,11 +44,11 @@ public class World
 
 		Sky = new Sky
 		{
-			Scale = Vector3.One * -100f
+			Scale = Vector3.One * -10000f
 		};
 
-		// _ = new BarrierEntity();
 		Player = new Player();
+		Camera = new Camera() { Player = Player };
 	}
 
 	public void Update()

@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 [Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : Entity
