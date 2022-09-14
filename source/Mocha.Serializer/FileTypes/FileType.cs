@@ -30,7 +30,7 @@ public struct FileType
 		new FileType( "Model", "mmdl", "core/icons/model.mtex", FontAwesome.Cube, MathX.GetColor( "#1ee3a5" ) );
 
 	public static FileType Default =>
-		new FileType( "Unknown", "*", "core/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#333333" ) );
+		new FileType( "Unknown", "*", "core/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#ffffff" ) );
 
 	public static FileType[] All
 	{
