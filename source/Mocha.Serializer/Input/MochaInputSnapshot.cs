@@ -1,4 +1,6 @@
-﻿using Veldrid.Sdl2;
+﻿using System.Collections;
+using System.Linq;
+using Veldrid.Sdl2;
 
 namespace Mocha.Common;
 
@@ -36,7 +38,28 @@ public class MochaInputSnapshot : InputSnapshot
 
 		foreach ( var property in this.GetType().GetProperties() )
 		{
-			str += $"{property.Name}: {property.GetValue( this )}\n";
+			var val = property.GetValue( this );
+
+			if ( val is IList list )
+			{
+				str += $"{property.Name}: ";
+
+				int i = 0;
+				foreach ( var item in list )
+				{
+					str += item + ", ";
+					i++;
+
+					if ( i > 16 ) // List too long
+						break;
+				}
+
+				str += "\n";
+			}
+			else
+			{
+				str += $"{property.Name}: {property.GetValue( this )}\n";
+			}
 		}
 
 		return str;
