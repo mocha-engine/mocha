@@ -1,4 +1,6 @@
-﻿namespace Mocha.Common;
+﻿using SharpDX.Direct3D11;
+
+namespace Mocha.Common;
 
 public partial struct Rotation : IEquatable<Rotation>
 {
@@ -108,9 +110,9 @@ public partial struct Rotation : IEquatable<Rotation>
 
 	public static Vector3 operator *( Rotation r, Vector3 v )
 	{
-		float x = r.X * 2F;
-		float y = r.Y * 2F;
-		float z = r.Z * 2F;
+		float x = r.X * 2f;
+		float y = r.Y * 2f;
+		float z = r.Z * 2f;
 
 		float xx = r.X * x;
 		float yy = r.Y * y;
@@ -125,9 +127,9 @@ public partial struct Rotation : IEquatable<Rotation>
 		float wz = r.W * z;
 
 		Vector3 result = new(
-			(1F - (yy + zz)) * v.X + (xy - wz) * v.Y + (xz + wy) * v.Z,
-			(xy + wz) * v.X + (1F - (xx + zz)) * v.Y + (yz - wx) * v.Z,
-			(xz - wy) * v.X + (yz + wx) * v.Y + (1F - (xx + yy)) * v.Z
+			(1f - (yy + zz)) * v.X + (xy - wz) * v.Y + (xz + wy) * v.Z,
+			(xy + wz) * v.X + (1f - (xx + zz)) * v.Y + (yz - wx) * v.Z,
+			(xz - wy) * v.X + (yz + wx) * v.Y + (1f - (xx + yy)) * v.Z
 		);
 
 		return result;
@@ -155,49 +157,18 @@ public partial struct Rotation : IEquatable<Rotation>
 
 	public static Rotation LookAt( Vector3 forward, Vector3? _up = null )
 	{
+		// Init vectors
 		var up = _up ?? Vector3.Up;
-
-		// Normalize vectors
-		forward = forward.Normal;
-		up = up.Normal;
-
-		float f = forward.Dot( up );
-		up = (up - forward * f).Normal;
-
-		var normal = forward.Cross( up ).Normal;
-		var invNormal = -normal;
-
-		float num = forward.X + invNormal.Y + up.Z;
+		forward = Vector3.OrthoNormalize( forward, up );
+		var right = Vector3.Cross( up, forward );
 
 		Rotation rot = new();
-		if ( num >= 0f )
-		{
-			rot.X = invNormal.Z - up.Y;
-			rot.Y = up.X - forward.Z;
-			rot.Z = forward.Y - invNormal.X;
-			rot.W = num + 1f;
-		}
-		else if ( forward.X > invNormal.Y && forward.X > up.Z )
-		{
-			rot.X = forward.X - invNormal.Y - up.Z + 1f;
-			rot.Y = invNormal.X + forward.Y;
-			rot.Z = up.X + forward.Z;
-			rot.W = invNormal.Z - up.Y;
-		}
-		else if ( invNormal.Y > up.Z )
-		{
-			rot.X = forward.Y + invNormal.X;
-			rot.Y = invNormal.Y - up.Z - forward.X + 1f;
-			rot.Z = up.Y + invNormal.Z;
-			rot.W = up.X - forward.Z;
-		}
-		else
-		{
-			rot.X = forward.Z + up.X;
-			rot.Y = invNormal.Z + up.Y;
-			rot.Z = up.Z - forward.X - invNormal.Y + 1f;
-			rot.W = forward.Y - invNormal.X;
-		}
+		rot.W = MathF.Sqrt( 1.0f + right.X + up.Y + forward.Z ) * 0.5f;
+
+		float recip = 1.0f / (4.0f * rot.W);
+		rot.X = (up.Z - forward.Y) * recip;
+		rot.Y = (forward.X - right.Z) * recip;
+		rot.Z = (right.Y - up.X) * recip;
 
 		return rot;
 	}
