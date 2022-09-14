@@ -5,8 +5,6 @@ namespace Mocha.Engine;
 [Category( "Player" ), Icon( FontAwesome.User )]
 public class Player : ModelEntity
 {
-	private float velocity;
-
 	public Player() : base( "game/models/subaru/subaru.mmdl" )
 	{
 		Scale = new Vector3( 0.025f );
@@ -18,24 +16,8 @@ public class Player : ModelEntity
 	{
 		base.Update();
 
-		if ( Input.Pressed( InputButton.Jump ) )
-		{
-			velocity = 15f;
-			Rotation = Rotation.From( 0, 0, Rotation.ToEulerAngles().Z - 45f );
-		}
-
-		velocity = velocity.LerpTo( -15f, Time.Delta );
-		Position += Vector3.Up * velocity * Time.Delta;
-
-		if ( Position.Z < -16 )
-			Position = new( 32, 0, 0 );
-
-		if ( Position.Z > 16 )
-			Position = new( 32, 0, 0 );
-
-		float roll = Time.Delta * 90f + Rotation.ToEulerAngles().Z;
-		roll = roll.LerpTo( 90.0f, Time.Delta * 10f );
-
-		Rotation = Rotation.From( 0, 0, roll );
+		Position = Vector3.Zero;
+		Rotation = Rotation.From( 0, 90, 90 ) 
+			* Rotation.From( ( 180 * Time.Now ) % 360f, 0, 0 );
 	}
 }
