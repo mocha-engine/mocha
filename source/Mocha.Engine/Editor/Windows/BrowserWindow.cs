@@ -11,7 +11,10 @@ internal class BrowserWindow : BaseEditorWindow
 	private int selectedIndex;
 	private string assetSearchText = "";
 
-	private Vector2 iconSize => new( 100f, 150f );
+	private Vector2 baseIconSize => new( 100f, 150f );
+	private Vector2 iconSize;
+
+	private List<FileType> assetFilter = new();
 
 	private enum SortModes
 	{
@@ -145,8 +148,9 @@ internal class BrowserWindow : BaseEditorWindow
 				ImDrawFlags.RoundCornersBottom );
 		}
 
-		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 2, 24 ) );
-		ImGuiX.Image( icon, new Vector2( 96f, 96f ) );
+		Vector2 center = ( iconSize - 96f ) / 2.0f;
+		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( center.X, 24 ) );
+		ImGuiX.Image( icon, new Vector2( 96f ) );
 
 		if ( selected )
 		{
@@ -180,22 +184,6 @@ internal class BrowserWindow : BaseEditorWindow
 		var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize.Y - textSize.Y - 4 );
 		ImGui.SetCursorPos( textStartPos );
 
-		void DrawShadowText( int x, int y )
-		{
-			ImGui.SetCursorPos( textStartPos );
-			ImGuiX.SetCursorPosXRelative( x );
-			ImGuiX.SetCursorPosYRelative( y );
-			ImGui.PushStyleColor( ImGuiCol.Text, new System.Numerics.Vector4( 0, 0, 0, 1 ) );
-			ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize.X );
-			ImGui.TextWrapped( fileName );
-			ImGui.PopStyleColor();
-		}
-
-		DrawShadowText( 1, 1 );
-		DrawShadowText( -1, 1 );
-		DrawShadowText( 1, -1 );
-		DrawShadowText( -1, -1 );
-
 		ImGui.SetCursorPos( textStartPos );
 		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize.X );
 		ImGui.TextWrapped( fileName );
@@ -203,18 +191,11 @@ internal class BrowserWindow : BaseEditorWindow
 
 		{
 			ImGui.PushStyleColor( ImGuiCol.Text, fileType.Color );
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( -4, 0 ) );
-			if ( name.EndsWith( "mmdl" ) )
-				ImGui.Text( FontAwesome.Cube );
-			else if ( name.EndsWith( "mtex" ) || name.EndsWith( "mtex_c" ) )
-				ImGui.Text( FontAwesome.Image );
-			else if ( name.EndsWith( "mshdr" ) )
-				ImGui.Text( FontAwesome.Glasses );
-			else if ( name.EndsWith( "mmat" ) )
-				ImGui.Text( FontAwesome.Circle );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 4, 0 ) );
+			ImGui.Text( fileType.IconSm );
 			ImGui.PopStyleColor();
 
-			float xOff = 20;
+			float xOff = 16;
 
 			ImGui.PushStyleColor( ImGuiCol.Text, Colors.Green );
 			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
@@ -246,6 +227,142 @@ internal class BrowserWindow : BaseEditorWindow
 		}
 
 		return false;
+	}
+
+	private void DrawAssetPopup()
+	{
+		ImGui.PushStyleVar( ImGuiStyleVar.PopupBorderSize, 2 );
+
+		if ( ImGui.BeginPopup( "asset_popup", ImGuiWindowFlags.NoMove ) )
+		{
+			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Gray );
+
+			if ( ImGui.BeginTable( "##asset_list_buttons", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+			{
+				ImGui.TableSetupColumn( "a", ImGuiTableColumnFlags.WidthStretch, 1f );
+				ImGui.TableSetupColumn( "b", ImGuiTableColumnFlags.WidthStretch, 1f );
+
+				ImGui.TableNextColumn();
+
+				if ( ImGui.Button( "All", new System.Numerics.Vector2( -1, 0 ) ) )
+				{
+					assetFilter.Clear();
+					assetFilter.AddRange( FileType.All );
+				}
+
+				ImGui.TableNextColumn();
+
+				if ( ImGui.Button( "None", new System.Numerics.Vector2( -1, 0 ) ) )
+				{
+					assetFilter.Clear();
+				}
+
+				ImGui.EndTable();
+			}
+
+			if ( ImGui.BeginTable( "##asset_list_table", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+			{
+				ImGui.TableSetupColumn( "asset_toggles", ImGuiTableColumnFlags.WidthFixed, 0f );
+				ImGui.TableSetupColumn( "asset_name", ImGuiTableColumnFlags.WidthStretch, 1f );
+				ImGui.TableSetupColumn( "asset_solo", ImGuiTableColumnFlags.WidthFixed, 75f );
+
+				foreach ( var fileType in FileType.All )
+				{
+					ImGui.TableNextRow();
+					ImGui.TableNextColumn();
+
+					bool selected = assetFilter.Contains( fileType );
+					if ( ImGui.Checkbox( $"##{fileType.Name}_selected", ref selected ) )
+					{
+						if ( selected )
+							assetFilter.Add( fileType );
+						else
+							assetFilter.Remove( fileType );
+					}
+
+					ImGui.TableNextColumn();
+					ImGui.PushStyleColor( ImGuiCol.Text, fileType.Color );
+					ImGui.Text( $"{fileType.IconSm.PadRight( 2 )} {fileType.Name.PadRight( 32 )}" );
+					ImGui.PopStyleColor();
+
+					ImGui.TableNextColumn();
+
+					if ( ImGui.Button( $"Solo##{fileType.Name}_solo", new System.Numerics.Vector2( -1, 0 ) ) )
+					{
+						assetFilter.Clear();
+						assetFilter.Add( fileType );
+					}
+				}
+
+				ImGui.EndTable();
+			}
+
+			ImGui.PopStyleColor();
+
+			ImGui.EndPopup();
+		}
+
+		ImGui.PopStyleVar();
+	}
+
+	private void DrawFilterPopup()
+	{
+		ImGui.PushStyleVar( ImGuiStyleVar.PopupBorderSize, 2 );
+
+		if ( ImGui.BeginPopup( "filter_popup", ImGuiWindowFlags.NoMove ) )
+		{
+			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Gray );
+
+			if ( ImGui.BeginTable( "##filter_list_buttons", 1, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+			{
+				ImGui.TableSetupColumn( "a", ImGuiTableColumnFlags.WidthStretch, 1f );
+				ImGui.TableNextColumn();
+
+				if ( ImGui.Button( "Clear", new System.Numerics.Vector2( -1, 0 ) ) )
+				{
+				}
+
+				ImGui.EndTable();
+			}
+
+			if ( ImGui.BeginTable( "##filter_list_table", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+			{
+				ImGui.TableSetupColumn( "filter_toggles", ImGuiTableColumnFlags.WidthFixed, 0f );
+				ImGui.TableSetupColumn( "filter_name", ImGuiTableColumnFlags.WidthStretch, 1f );
+
+
+				var entries = new (System.Numerics.Vector4 Color, string Text)[]
+				{
+					( Colors.Orange, $"{FontAwesome.Star} {"Favourites",-32 }"),
+					( Colors.Green, $"{FontAwesome.Check} {"Compiled Assets",-32 }"),
+					( Vector4.One, $"{FontAwesome.HardDrive} {"Local Assets",-32 }"),
+					( Vector4.One, $"{FontAwesome.Download} {"Downloaded Assets",-32 }"),
+					( Vector4.One, $"{FontAwesome.Globe} {"Remote Assets",-32 }"),
+				};
+
+				foreach ( var entry in entries )
+				{
+					ImGui.TableNextRow();
+					ImGui.TableNextColumn();
+
+					bool selected = true;
+					ImGui.Checkbox( $"##favourites_only_selected", ref selected );
+
+					ImGui.TableNextColumn();
+					ImGui.PushStyleColor( ImGuiCol.Text, entry.Color );
+					ImGui.Text( entry.Text );
+					ImGui.PopStyleColor();
+				}
+
+				ImGui.EndTable();
+			}
+
+			ImGui.PopStyleColor();
+
+			ImGui.EndPopup();
+		}
+
+		ImGui.PopStyleVar();
 	}
 
 	public override void Draw()
@@ -317,13 +434,23 @@ internal class BrowserWindow : BaseEditorWindow
 
 				ImGui.SameLine();
 
-				ImGui.SetNextItemWidth( -274 );
+				ImGui.SetNextItemWidth( -243 );
 				ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
 
 				ImGui.SameLine();
-				ImGui.Button( $"{FontAwesome.ChevronDown} Asset" );
+
+				string suffix = (assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
+				if ( ImGui.Button( $"{FontAwesome.File} Asset{suffix}" ) )
+				{
+					ImGui.OpenPopup( "asset_popup" );
+				}
+
 				ImGui.SameLine();
-				ImGui.Button( $"{FontAwesome.ChevronDown} Filter" );
+				if ( ImGui.Button( $"{FontAwesome.Filter} Filter" ) )
+				{
+					ImGui.OpenPopup( "filter_popup" );
+				}
+
 				ImGui.SameLine();
 				if ( ImGui.Button( $"{FontAwesome.Repeat}" ) )
 				{
@@ -333,6 +460,12 @@ internal class BrowserWindow : BaseEditorWindow
 				ImGui.SameLine();
 				ImGui.Button( $"{FontAwesome.Gear}" );
 			}
+
+			ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 380, 30 ) );
+			DrawAssetPopup();
+
+			ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 290, 30 ) );
+			DrawFilterPopup();
 
 			{
 				ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) );
@@ -344,11 +477,13 @@ internal class BrowserWindow : BaseEditorWindow
 
 				float startPos = 16;
 
-				var availableSpace = windowSize.X - startPos;
-				var remainingSpace = availableSpace % (iconSize.X + margin.X);
+				var availableSpace = windowSize.X - startPos - 4f;
+				var remainingSpace = availableSpace % (baseIconSize.X + margin.X);
 
-				int count = (int)windowSize.X / (int)(iconSize.X + margin.X);
-				margin.X += (remainingSpace / count);
+				int count = (int)windowSize.X / (int)(baseIconSize.X + margin.X);
+
+				iconSize = baseIconSize;
+				iconSize.X += (remainingSpace / count);
 
 				float x = startPos;
 				float y = startPos;
@@ -367,6 +502,13 @@ internal class BrowserWindow : BaseEditorWindow
 								foundAll = false;
 
 						if ( !foundAll )
+							continue;
+					}
+
+					if ( assetFilter.Count > 0 )
+					{
+						var fileType = FileType.GetFileTypeForExtension( Path.GetExtension( name ) ) ?? FileType.Default;
+						if ( !assetFilter.Contains( fileType ) )
 							continue;
 					}
 
