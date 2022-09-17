@@ -15,7 +15,7 @@ public class World
 		Playing,
 		Paused
 	}
-
+	
 	public States State { get; set; } = States.Playing;
 
 	public World()

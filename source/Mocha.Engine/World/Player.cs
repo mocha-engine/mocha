@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 [Category( "Player" ), Icon( FontAwesome.User )]
 public class Player : ModelEntity
@@ -17,7 +15,6 @@ public class Player : ModelEntity
 		base.Update();
 
 		Position = Vector3.Zero;
-		Rotation = Rotation.From( 0, 90, 90 ) 
-			* Rotation.From( ( 180 * Time.Now ) % 360f, 0, 0 );
+		Rotation = Rotation.From( 0, 90, 90 );
 	}
 }
