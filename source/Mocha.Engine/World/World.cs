@@ -16,11 +16,7 @@ public class World
 		Paused
 	}
 
-#if DEBUG
-	public States State { get; set; } = States.Paused;
-#else
 	public States State { get; set; } = States.Playing;
-#endif
 
 	public World()
 	{

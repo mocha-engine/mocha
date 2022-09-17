@@ -11,7 +11,6 @@ public class RendererInstance
 	private DateTime lastFrame;
 
 	private CommandList commandList;
-	private ImGuiRenderer imguiRenderer;
 
 	private Material gbufferCombineMaterial;
 	private Model fullscreenQuad;
@@ -38,11 +37,6 @@ public class RendererInstance
 		Device.SwapBuffers();
 
 		commandList = Device.ResourceFactory.CreateCommandList();
-
-		imguiRenderer = new( Device,
-			  Device.SwapchainFramebuffer.OutputDescription,
-			  window.SdlWindow.Width,
-			  window.SdlWindow.Height );
 
 		world = new();
 	}
@@ -121,19 +115,10 @@ public class RendererInstance
 		fullscreenQuad.Draw( Renderer.RenderPass.Combine, new EmptyUniformBuffer(), commandList );
 		commandList.PopDebugGroup();
 
-		RenderImGui();
-
 		commandList.End();
 
 		Device.SubmitCommands( commandList );
 		Device.SwapBuffers();
-	}
-
-	private void RenderImGui()
-	{
-		commandList.PushDebugGroup( "ImGUI" );
-		imguiRenderer?.Render( Device, commandList );
-		commandList.PopDebugGroup();
 	}
 
 	private void RenderPass( RenderPass renderPass, Matrix4x4 viewProjMatrix, Framebuffer framebuffer )
@@ -162,7 +147,6 @@ public class RendererInstance
 
 		PreUpdate?.Invoke();
 		OnUpdate?.Invoke();
-		imguiRenderer.Update( Time.Delta, Input.Snapshot );
 		PostUpdate?.Invoke();
 	}
 
@@ -184,15 +168,9 @@ public class RendererInstance
 		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
-	public IntPtr GetImGuiBinding( Texture texture )
-	{
-		return imguiRenderer.GetOrCreateImGuiBinding( Device.ResourceFactory, texture.VeldridTextureView );
-	}
-
 	[Event.Window.Resized]
 	public void OnWindowResized( Point2 newSize )
 	{
-		imguiRenderer.WindowResized( newSize.X, newSize.Y );
 		Device.MainSwapchain.Resize( (uint)newSize.X, (uint)newSize.Y );
 	}
 }
