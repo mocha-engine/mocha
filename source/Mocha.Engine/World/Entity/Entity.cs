@@ -10,7 +10,6 @@ public class Entity : IEntity
 
 	private Transform transform;
 
-	[HideInInspector]
 	public Transform Transform
 	{
 		get => transform;
@@ -35,10 +34,8 @@ public class Entity : IEntity
 		set => transform.Rotation = value;
 	}
 
-	[HideInInspector]
 	public string Name { get; set; }
 
-	[HideInInspector]
 	public int Id { get; set; }
 
 	public Entity()
@@ -61,10 +58,8 @@ public class Entity : IEntity
 
 	private int parentId;
 
-	[HideInInspector]
 	public Entity Parent => Entity.All.First( x => x.Id == parentId );
 
-	[HideInInspector]
 	public List<Entity> Children => Entity.All.Where( x => x.parentId == Id ).ToList();
 
 	public void SetParent( Entity newParent )

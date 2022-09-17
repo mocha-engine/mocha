@@ -3,10 +3,8 @@
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : Entity
 {
-	[HideInInspector]
 	public SceneObject SceneObject { get; set; }
 
-	[HideInInspector]
 	public bool Visible { get; set; } = true;
 
 	public ModelEntity( string modelPath )

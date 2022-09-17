@@ -6,7 +6,6 @@ namespace Mocha.Engine;
 [Category( "World" ), Icon( FontAwesome.Sun ), Title( "Sun" )]
 public class Sun : Entity
 {
-	[HideInInspector]
 	public SceneLight SceneLight { get; set; }
 
 	public float Intensity

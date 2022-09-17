@@ -7,10 +7,6 @@ internal class Game
 {
 	private RendererInstance renderer;
 
-#if DEBUG
-	private Editor editor;
-#endif
-
 	internal Game()
 	{
 		if ( Veldrid.RenderDoc.Load( out var renderDoc ) )
@@ -23,19 +19,12 @@ internal class Game
 		{
 			Log.Trace( "Game init" );
 			renderer = new();
-#if DEBUG
-			editor = new( renderer );
-#endif
 			var world = new World();
 
 			// Must be called before everything else
 			renderer.PreUpdate += Input.Update;
 
 			renderer.OnUpdate += world.Update;
-#if DEBUG
-			// Must be called after everything else
-			renderer.PostUpdate += editor.Update;
-#endif
 		}
 
 		renderer.Run();

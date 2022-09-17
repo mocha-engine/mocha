@@ -3,7 +3,6 @@
 [Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : Entity
 {
-	[HideInInspector]
 	public SkySceneObject SceneObject { get; set; }
 	private Material Material { get; set; }
 
