@@ -11,9 +11,10 @@ public class ShaderInspector : BaseInspector
 
 	public override void Draw()
 	{
-		ImGuiX.Title(
-			$"{FontAwesome.Glasses} {Path.GetFileName( texture.Path.NormalizePath() )}",
-			"This is a shader."
+		ImGuiX.InspectorTitle(
+			$"{Path.GetFileName( texture.Path.NormalizePath() )}",
+			"This is a shader.",
+			FileType.Shader
 		);
 
 		var items = new[]

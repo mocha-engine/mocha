@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using Mocha.Common;
 
 namespace Mocha.Engine;
 
@@ -90,7 +91,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Red );
 			ImGui.Button( $"X##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_x", ref x );
@@ -101,7 +102,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Green );
 			ImGui.Button( $"Y##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_y", ref y );
@@ -112,7 +113,7 @@ internal static class ImGuiX
 			ImGui.PushStyleColor( ImGuiCol.Button, Colors.Blue );
 			ImGui.Button( $"Z##{v}", new( buttonWidth, 0 ) );
 			ImGui.SameLine();
-			ImGui.PopStyleColor( );
+			ImGui.PopStyleColor();
 
 			ImGui.SetNextItemWidth( dragFloatWidth );
 			ImGui.DragFloat( $"##{v}_z", ref z );
@@ -191,7 +192,62 @@ internal static class ImGuiX
 		ImGui.PopFont();
 	}
 
-	public static void Title( string text, string subtext )
+	public static void InspectorTitle( string text, string subtext, FileType fileType )
+	{
+		var colorA = fileType.Color * 0.75f;
+		var colorB = fileType.Color * 0.75f;
+		colorB.W = 0.0f;
+
+		var windowPos = ImGui.GetWindowPos();
+		var windowWidth = ImGui.GetWindowWidth();
+
+		var min = windowPos;
+		var max = windowPos + new System.Numerics.Vector2( windowWidth, 72 );
+
+		var drawList = ImGui.GetWindowDrawList();
+
+		drawList.AddRectFilledMultiColor(
+			min,
+			max,
+			ImGui.GetColorU32( colorA ),
+			ImGui.GetColorU32( colorB ),
+			ImGui.GetColorU32( colorB ),
+			ImGui.GetColorU32( colorA )
+		);
+
+		min = windowPos + new System.Numerics.Vector2( 0, 72 );
+		max = max + new System.Numerics.Vector2( 0, 32 );
+
+		drawList.AddRectFilledMultiColor(
+			min,
+			max,
+			ImGui.GetColorU32( colorA * 1.25f ),
+			ImGui.GetColorU32( colorB * 1.25f ),
+			ImGui.GetColorU32( colorB * 1.25f ),
+			ImGui.GetColorU32( colorA * 1.25f )
+		);
+
+		var cursorPos = ImGui.GetCursorPos();
+		SetCursorPosXRelative( 4 );
+		SetCursorPosYRelative( 4 );
+		Image( Texture.Builder.FromPath( fileType.IconLg ).Build(), new( 96 / 2.0f ) );
+
+		ImGui.SetCursorPos( cursorPos );
+		SetCursorPosXRelative( 96 / 2.0f );
+		SetCursorPosXRelative( 8 );
+
+		if ( ImGui.BeginChild( $"title##{text}{subtext}", new System.Numerics.Vector2( 0, 63 ), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground ) )
+		{
+			TextSubheading( text );
+
+			ImGui.Dummy( new System.Numerics.Vector2( 0, 0 ) );
+			ImGui.Text( subtext );
+
+			ImGui.EndChild();
+		}
+	}
+
+	public static void Title( string text, string subtext, Vector4? _color = null, bool drawSubpanel = false )
 	{
 		TextSubheading( text );
 		TextLight( subtext );
@@ -279,5 +335,59 @@ internal static class ImGuiX
 	public static void EndMenu()
 	{
 		ImGui.EndMenu();
+	}
+
+	public static bool GradientButton( string text )
+	{
+		//
+		// This is so unbelievably shit, and so unbelievably
+		// hacky, that I think I'm going to write my own GUI
+		// solution that actually does support gradients
+		// properly because I can't deal with this anymore.
+		//
+
+		var cursorPos = ImGui.GetCursorPos();
+		ImGui.PushStyleColor( ImGuiCol.Button, Vector4.Zero );
+		bool res = ImGui.Button( text );
+		ImGui.PopStyleColor();
+
+		var min = ImGui.GetItemRectMin();
+		var max = ImGui.GetItemRectMax();
+
+		var drawList = ImGui.GetWindowDrawList();
+
+		drawList.AddRectFilledMultiColor(
+			min,
+			max,
+			ImGui.GetColorU32( MathX.GetColor( "#727272" ) ),
+			ImGui.GetColorU32( MathX.GetColor( "#727272" ) ),
+			ImGui.GetColorU32( MathX.GetColor( "#333333" ) ),
+			ImGui.GetColorU32( MathX.GetColor( "#333333" ) )
+		);
+
+		drawList.AddRect(
+			min - new System.Numerics.Vector2( 2 ),
+			max + new System.Numerics.Vector2( 2 ),
+			ImGui.GetColorU32( ImGuiCol.WindowBg ),
+			6,
+			ImDrawFlags.None,
+			3 // rounding - 1px
+		);
+
+		drawList.AddRect(
+			min - new System.Numerics.Vector2( 0 ),
+			max + new System.Numerics.Vector2( 1 ),
+			ImGui.GetColorU32( Colors.DarkGray ),
+			4,
+			ImDrawFlags.None,
+			1
+		);
+
+		ImGui.SetCursorPos( cursorPos );
+		ImGui.PushStyleColor( ImGuiCol.Button, Vector4.Zero );
+		ImGui.Button( text );
+		ImGui.PopStyleColor();
+
+		return res;
 	}
 }

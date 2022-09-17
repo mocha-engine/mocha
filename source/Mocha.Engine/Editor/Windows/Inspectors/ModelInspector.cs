@@ -11,9 +11,10 @@ public class ModelInspector : BaseInspector
 
 	public override void Draw()
 	{
-		ImGuiX.Title(
-			$"{FontAwesome.Cube} {Path.GetFileName( model.Path.NormalizePath() )}",
-			"This is a model."
+		ImGuiX.InspectorTitle(
+			$"{Path.GetFileName( model.Path.NormalizePath() )}",
+			"This is a model.",
+			FileType.Model
 		);
 
 		var items = new[]

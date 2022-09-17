@@ -13,23 +13,11 @@ internal class SceneViewWindow : BaseEditorWindow
 
 	private void DrawWidgetBar( string[] icons )
 	{
-		var drawList = ImGui.GetWindowDrawList();
-		var windowPos = ImGui.GetWindowPos();
-
-		var padding = new System.Numerics.Vector2( 16, 16 );
-
-		var p0 = windowPos + ImGui.GetCursorPos() - (padding * 0.5f);
-		var p1 = p0 + ImGui.CalcTextSize( String.Join( "     ", icons ) ) + (padding);
-		var col = ImGui.GetColorU32( ImGuiCol.WindowBg );
-		drawList.AddRectFilled( p0, p1, col, 5f );
-
-		var p2 = p0 + ImGui.CalcTextSize( icons[0] ) + padding;
-		var col1 = ImGui.GetColorU32( ImGuiCol.Button );
-		drawList.AddRectFilled( p0, p2, col1, 4f );
-
-		ImGui.Text( String.Join( "     ", icons ) );
-		ImGui.SameLine();
-		ImGui.Dummy( padding );
+		foreach ( var icon in icons )
+		{
+			ImGuiX.GradientButton( icon );
+			ImGui.SameLine();
+		}
 	}
 
 	public override void Draw()
@@ -49,6 +37,7 @@ internal class SceneViewWindow : BaseEditorWindow
 			FontAwesome.Maximize
 		} );
 
+		ImGui.Dummy( new System.Numerics.Vector2( 8, 0 ) );
 		ImGui.SameLine();
 
 		DrawWidgetBar( new[] {
@@ -56,6 +45,7 @@ internal class SceneViewWindow : BaseEditorWindow
 			"  1  "
 		} );
 
+		ImGui.Dummy( new System.Numerics.Vector2( 8, 0 ) );
 		ImGui.SameLine();
 
 		DrawWidgetBar( new[] {
