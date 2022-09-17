@@ -26,6 +26,8 @@ public class BaseInspector
 
 	protected void DrawButtons( string filePath )
 	{
+		ImGui.PushStyleColor( ImGuiCol.Button, Colors.Transparent );
+
 		if ( ImGui.Button( $"{FontAwesome.Folder}" ) )
 		{
 			var args = $"/select,\"{FileSystem.Game.GetFullPath( filePath )}\"";
@@ -41,6 +43,8 @@ public class BaseInspector
 			ImGui.SetClipboardText( filePath.NormalizePath() );
 			timeSinceCopied = 0;
 		}
+
+		ImGui.PopStyleColor();
 	}
 
 	protected void DrawTable( (string, string)[] items )

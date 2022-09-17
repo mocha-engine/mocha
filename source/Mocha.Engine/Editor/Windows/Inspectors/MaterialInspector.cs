@@ -37,9 +37,10 @@ public class MaterialInspector : BaseInspector
 	{
 		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
-		ImGuiX.Title(
-			$"{FontAwesome.FaceGrinStars} {Path.GetFileName( material.Path )}",
-			"This is a material."
+		ImGuiX.InspectorTitle(
+			$"{Path.GetFileName( material.Path )}",
+			"This is a material.",
+			FileType.Material
 		);
 
 		DrawButtons( material.Path );

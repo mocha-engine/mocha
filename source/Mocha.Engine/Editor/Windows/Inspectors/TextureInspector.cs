@@ -15,9 +15,10 @@ public class TextureInspector : BaseInspector
 	{
 		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
-		ImGuiX.Title(
-			$"{FontAwesome.Image} {Path.GetFileName( texture.Path.NormalizePath() )}",
-			"This is a texture."
+		ImGuiX.InspectorTitle(
+			$"{Path.GetFileName( texture.Path.NormalizePath() )}",
+			"This is a texture.",
+			FileType.Texture
 		);
 
 		var items = new[]

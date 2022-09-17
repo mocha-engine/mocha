@@ -1,4 +1,5 @@
 ﻿using ImGuiNET;
+using System.ComponentModel.DataAnnotations;
 
 namespace Mocha.Engine;
 
@@ -134,11 +135,23 @@ internal class BrowserWindow : BaseEditorWindow
 		var icon = Texture.Builder.FromPath( fileType.IconLg ).Build();
 
 		{
-			drawList.AddRectFilled(
+			drawList.AddRectFilledMultiColor(
 				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
 				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( fileType.Color * 0.6f ),
+				ImGui.GetColorU32( fileType.Color * 0.6f ),
 				ImGui.GetColorU32( fileType.Color * 0.4f ),
-				4f );
+				ImGui.GetColorU32( fileType.Color * 0.4f )
+			);
+
+			drawList.AddRect(
+				windowPos + startPos - new System.Numerics.Vector2( 10, 10 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 10, iconSize.Y + 10 ) - scrollPos,
+				ImGui.GetColorU32( ImGuiCol.FrameBg ),
+				4,
+				ImDrawFlags.None,
+				3 // rounding - 1px
+			);
 
 			drawList.AddRectFilled(
 				windowPos + startPos + new System.Numerics.Vector2( -8, iconSize.Y + 4 ) - scrollPos,
@@ -149,20 +162,18 @@ internal class BrowserWindow : BaseEditorWindow
 		}
 
 		Vector2 center = ( iconSize - 96f ) / 2.0f;
+
+		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( center.X, 24 + 2 ) );
+		ImGuiX.Image( icon, new Vector2( 96f ), new System.Numerics.Vector4( 0, 0, 0, 0.1f ) );
+
 		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( center.X, 24 ) );
 		ImGuiX.Image( icon, new Vector2( 96f ) );
 
 		if ( selected )
 		{
-			drawList.AddRectFilled(
-				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
-				ImGui.GetColorU32( Colors.Blue * 0.5f ),
-				4f );
-
 			drawList.AddRect(
-				windowPos + startPos - new System.Numerics.Vector2( 10, 10 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 10, iconSize.Y + 10 ) - scrollPos,
+				windowPos + startPos - new System.Numerics.Vector2( 12, 12 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 12, iconSize.Y + 12 ) - scrollPos,
 				ImGui.GetColorU32( Colors.Blue ),
 				4f,
 				ImDrawFlags.None,
@@ -424,7 +435,7 @@ internal class BrowserWindow : BaseEditorWindow
 					_ => "Unsorted"
 				};
 
-				if ( ImGui.Button( $"{sortString}" ) )
+				if ( ImGuiX.GradientButton( $"{sortString}" ) )
 				{
 					sortMode++;
 					sortMode = (SortModes)((int)sortMode % 3);
@@ -440,25 +451,25 @@ internal class BrowserWindow : BaseEditorWindow
 				ImGui.SameLine();
 
 				string suffix = (assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
-				if ( ImGui.Button( $"{FontAwesome.File} Asset{suffix}" ) )
+				if ( ImGuiX.GradientButton( $"{FontAwesome.File} Asset{suffix}" ) )
 				{
 					ImGui.OpenPopup( "asset_popup" );
 				}
 
 				ImGui.SameLine();
-				if ( ImGui.Button( $"{FontAwesome.Filter} Filter" ) )
+				if ( ImGuiX.GradientButton( $"{FontAwesome.Filter} Filter" ) )
 				{
 					ImGui.OpenPopup( "filter_popup" );
 				}
 
 				ImGui.SameLine();
-				if ( ImGui.Button( $"{FontAwesome.Repeat}" ) )
+				if ( ImGuiX.GradientButton( $"{FontAwesome.Repeat}" ) )
 				{
 					CacheEverything();
 				}
 
 				ImGui.SameLine();
-				ImGui.Button( $"{FontAwesome.Gear}" );
+				ImGuiX.GradientButton( $"{FontAwesome.Gear}" );
 			}
 
 			ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 380, 30 ) );
