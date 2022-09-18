@@ -1,0 +1,76 @@
+/*
+ * ui.mshdr
+ * Author: Alex
+ * 
+ * Copyright (c) 2022 Alex Guthrie
+ */
+
+#pragma optionNV (unroll all)
+//
+// Common
+//
+#define PI 3.14159
+
+//
+// Uniforms
+//
+layout( set = 0, binding = 0 ) uniform ObjectUniformBuffer {
+    vec3 vColor;
+} g_oUbo;
+
+struct VS_OUT {
+    vec2 vTexCoords;
+    vec3 vPositionPS;
+};
+
+// ==========================================================================================================================
+
+//
+// Vertex
+//
+#ifdef VERTEX
+
+//
+// Layout
+//
+layout( location = 0 ) in vec3 g_vPosition;
+layout( location = 1 ) in vec2 g_vTexCoords;
+
+//
+// Out
+//
+layout( location = 0 ) out VS_OUT vs_out;
+
+void main() {
+    vs_out.vTexCoords = g_vTexCoords;
+    vs_out.vPositionPS = g_vPosition;
+   
+    vec4 pos = vec4( g_vPosition, 1.0 );
+    gl_Position = pos;
+}
+
+#endif
+
+// ==========================================================================================================================
+
+//
+// Fragment
+//
+#ifdef FRAGMENT
+
+//
+// In
+//
+layout( location = 0 ) in VS_OUT fs_in;
+
+//
+// Out
+//
+layout( location = 0 ) out vec4 fragColor;
+
+void main() 
+{
+    fragColor = vec4( 1, 0, 1, 1 );
+}
+#endif
+// ==========================================================================================================================

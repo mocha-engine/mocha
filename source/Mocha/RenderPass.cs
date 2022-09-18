@@ -5,5 +5,6 @@ public enum RenderPass
 {
 	Main,
 	ShadowMap,
-	Combine
+	Combine,
+	Ui
 }

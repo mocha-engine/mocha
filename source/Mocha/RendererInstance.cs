@@ -18,7 +18,8 @@ public class RendererInstance
 	public Action PreUpdate;
 	public Action OnUpdate;
 	public Action PostUpdate;
-	public Action OnRender;
+
+	public Action<CommandList> RenderOverlays;
 
 	public RendererInstance()
 	{
@@ -68,9 +69,14 @@ public class RendererInstance
 			}
 
 			PreRender();
-			world.Sun.CalcViewProjMatrix();
 
-			RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
+			//
+			// Render world
+			//
+			{
+				world.Sun.CalcViewProjMatrix();
+				RenderPass( Renderer.RenderPass.ShadowMap, world.Sun.ViewMatrix * world.Sun.ProjMatrix, world.Sun.ShadowBuffer );
+			}
 
 			PostRender();
 		}
@@ -113,6 +119,10 @@ public class RendererInstance
 
 		commandList.PushDebugGroup( "GBuffer Combine" );
 		fullscreenQuad.Draw( Renderer.RenderPass.Combine, new EmptyUniformBuffer(), commandList );
+		commandList.PopDebugGroup();
+
+		commandList.PushDebugGroup( "UI Render" );
+		RenderOverlays?.Invoke( commandList );
 		commandList.PopDebugGroup();
 
 		commandList.End();

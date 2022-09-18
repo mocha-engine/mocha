@@ -41,6 +41,8 @@ public class Shader : Asset
 	{
 		Pipeline.Delete();
 
+		// TODO: Use shader reflection for this
+
 		Pipeline = RenderPipeline.Factory
 			.WithShader( this )
 			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
