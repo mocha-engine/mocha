@@ -6,6 +6,7 @@
 internal class Game
 {
 	private RendererInstance renderer;
+	private Editor editor;
 
 	internal Game()
 	{
@@ -19,12 +20,19 @@ internal class Game
 		{
 			Log.Trace( "Game init" );
 			renderer = new();
+			editor = new();
+
 			var world = new World();
 
 			// Must be called before everything else
 			renderer.PreUpdate += Input.Update;
 
 			renderer.OnUpdate += world.Update;
+
+			// Must be called after everything else
+			renderer.PostUpdate += editor.Update;
+
+			renderer.RenderOverlays += editor.Render;
 		}
 
 		renderer.Run();

@@ -13,7 +13,7 @@ public static partial class Input
 		Unlocked
 	}
 
-	public static MouseModes MouseMode { get; set; }
+	public static MouseModes MouseMode { get; set; } = MouseModes.Unlocked;
 
 	public static MochaInputSnapshot Snapshot { get; private set; }
 

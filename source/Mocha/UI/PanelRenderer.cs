@@ -1,59 +1,54 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Mocha.Renderer;
+namespace Mocha.Renderer.UI;
 
-[Icon( FontAwesome.Cube ), Title( "Model" )]
-public class Model : Asset
+[Icon( FontAwesome.Square ), Title( "UI" )]
+public class PanelRenderer : Asset
 {
 	private DeviceBuffer uniformBuffer;
 
-	public DeviceBuffer TBNBuffer { get; private set; }
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
 
 	public Material Material { get; set; }
-	private Material DepthOnlyMaterial { get; set; }
 
 	private ResourceSet objectResourceSet;
-	private ResourceSet lightingResourceSet;
 
 	public bool IsIndexed { get; private set; }
 
 	private uint indexCount;
 	private uint vertexCount;
 
-	public Model( string path, Material material, bool isIndexed )
+	public PanelRenderer()
 	{
-		DepthOnlyMaterial = new Material()
+		Path = "internal:ui_panel";
+		IsIndexed = true;
+
+		Material = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "core/shaders/depthonly.mshdr" )
-										  .WithFaceCullMode( FaceCullMode.None )
-										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
-										  .Build(),
-			UniformBufferType = typeof( GenericModelUniformBuffer )
+			UniformBufferType = typeof( EmptyUniformBuffer ),
+			Shader = ShaderBuilder.Default.FromPath( "core/shaders/ui/ui.mshdr" ).WithFramebuffer( Device.SwapchainFramebuffer ).Build()
 		};
 
-		Path = path;
-		Material = material;
-		IsIndexed = isIndexed;
+		var vertices = new Vertex[] {
+			new Vertex { Position = new ( 0, 0, 0 ) },
+			new Vertex { Position = new ( 0, 1, 0 ) },
+			new Vertex { Position = new ( 1, 0, 0 ) },
+			new Vertex { Position = new ( 1, 1, 0 ) },
+		};
 
-		All.Add( this );
+		var indices = new uint[]
+		{
+			0, 1, 2,
+			3, 2, 1
+		};
 
-		Material.Shader.OnRecompile += CreateResources;
-	}
-
-	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
-	{
 		SetupMesh( vertices, indices );
 		CreateUniformBuffer();
 		CreateResources();
-	}
 
-	public Model( string path, Vertex[] vertices, Material material ) : this( path, material, false )
-	{
-		SetupMesh( vertices );
-		CreateUniformBuffer();
-		CreateResources();
+		All.Add( this );
+		Material.Shader.OnRecompile += CreateResources;
 	}
 
 	private void SetupMesh( Vertex[] vertices )
@@ -95,29 +90,6 @@ public class Model : Asset
 			uniformBuffer );
 
 		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
-
-		var shadowSamplerDescription = new SamplerDescription(
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-
-			SamplerFilter.Anisotropic,
-			null,
-			16,
-			0,
-			uint.MaxValue,
-			0,
-			SamplerBorderColor.OpaqueBlack
-		);
-
-		var shadowSampler = Device.ResourceFactory.CreateSampler( shadowSamplerDescription );
-
-		var lightingResourceSetDescription = new ResourceSetDescription(
-			Material.Shader.Pipeline.ResourceLayouts[1],
-			SceneWorld.Current.Sun.DepthTexture.VeldridTexture,
-			shadowSampler );
-
-		lightingResourceSet = Device.ResourceFactory.CreateResourceSet( lightingResourceSetDescription );
 	}
 
 	private void CreateUniformBuffer()
@@ -128,7 +100,7 @@ public class Model : Asset
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 	}
 
-	public void Draw<T>( RenderPass renderPass, T uniformBufferContents, CommandList commandList ) where T : struct
+	public void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : struct
 	{
 		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
 		{
@@ -136,22 +108,13 @@ public class Model : Asset
 				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
 		}
 
-		RenderPipeline renderPipeline = renderPass switch
-		{
-			RenderPass.Main => Material.Shader.Pipeline,
-			RenderPass.ShadowMap => DepthOnlyMaterial.Shader.Pipeline,
-			RenderPass.Combine => Material.Shader.Pipeline,
-			RenderPass.Ui => Material.Shader.Pipeline,
-
-			_ => throw new NotImplementedException(),
-		};
+		RenderPipeline renderPipeline = Material.Shader.Pipeline;
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
 		commandList.SetPipeline( renderPipeline.Pipeline );
 
 		commandList.SetGraphicsResourceSet( 0, objectResourceSet );
-		commandList.SetGraphicsResourceSet( 1, lightingResourceSet );
 
 		if ( IsIndexed )
 		{
