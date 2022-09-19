@@ -18,6 +18,14 @@ internal class Editor
 
 	internal void Render( CommandList commandList )
 	{
-		panelRenderer.Draw( new EmptyUniformBuffer(), commandList );
+		panelRenderer.NewFrame();
+
+		panelRenderer.AddRectangle( new Common.Rectangle( 16, 16, 512, 128 ),
+			new Vector3( 0.15f, 0.15f, 0.15f ) );
+
+		panelRenderer.AddRectangle( new Common.Rectangle( 16, 512, 128, 128 ),
+			new Vector3( 0.15f, 0.15f, 0.5f ) );
+
+		panelRenderer.Draw( commandList );
 	}
 }

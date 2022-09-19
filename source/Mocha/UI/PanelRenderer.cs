@@ -9,41 +9,49 @@ public class PanelRenderer : Asset
 
 	public DeviceBuffer VertexBuffer { get; private set; }
 	public DeviceBuffer IndexBuffer { get; private set; }
-
 	public Material Material { get; set; }
 
 	private ResourceSet objectResourceSet;
-
-	public bool IsIndexed { get; private set; }
-
 	private uint indexCount;
 	private uint vertexCount;
+
+	private Vertex[] RectVertices => new Vertex[] {
+		new Vertex { Position = new ( 0, 0, 0 ) },
+		new Vertex { Position = new ( 0, 1, 0 ) },
+		new Vertex { Position = new ( 1, 0, 0 ) },
+		new Vertex { Position = new ( 1, 1, 0 ) },
+	};
+
+	private uint[] RectIndices => new uint[] {
+		2, 1, 0,
+		1, 2, 3
+	};
+
+	private int RectCount = 0;
+	private List<Vertex> Vertices = new();
+
+	[StructLayout( LayoutKind.Sequential )]
+	public struct UIUniformBuffer
+	{
+		/*
+		 * These fields are padded so that they're
+		 * aligned (as blocks) to multiples of 16.
+		 */
+
+		public Vector3 vColor;
+		public float flTime;
+	}
 
 	public PanelRenderer()
 	{
 		Path = "internal:ui_panel";
-		IsIndexed = true;
 
 		Material = new Material()
 		{
-			UniformBufferType = typeof( EmptyUniformBuffer ),
+			UniformBufferType = typeof( UIUniformBuffer ),
 			Shader = ShaderBuilder.Default.FromPath( "core/shaders/ui/ui.mshdr" ).WithFramebuffer( Device.SwapchainFramebuffer ).Build()
 		};
 
-		var vertices = new Vertex[] {
-			new Vertex { Position = new ( 0, 0, 0 ) },
-			new Vertex { Position = new ( 0, 1, 0 ) },
-			new Vertex { Position = new ( 1, 0, 0 ) },
-			new Vertex { Position = new ( 1, 1, 0 ) },
-		};
-
-		var indices = new uint[]
-		{
-			0, 1, 2,
-			3, 2, 1
-		};
-
-		SetupMesh( vertices, indices );
 		CreateUniformBuffer();
 		CreateResources();
 
@@ -51,31 +59,39 @@ public class PanelRenderer : Asset
 		Material.Shader.OnRecompile += CreateResources;
 	}
 
-	private void SetupMesh( Vertex[] vertices )
+	private void UpdateIndexBuffer( uint[] indices )
 	{
-		var factory = Device.ResourceFactory;
-		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
-		vertexCount = (uint)vertices.Length;
-
-		VertexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( vertexCount * vertexStructSize, Veldrid.BufferUsage.VertexBuffer )
-		);
-
-		Device.UpdateBuffer( VertexBuffer, 0, vertices );
-	}
-
-	private void SetupMesh( Vertex[] vertices, uint[] indices )
-	{
-		SetupMesh( vertices );
-
-		var factory = Device.ResourceFactory;
 		indexCount = (uint)indices.Length;
+		var targetSize = indexCount * sizeof( uint );
 
-		IndexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( indexCount * sizeof( uint ), Veldrid.BufferUsage.IndexBuffer )
-		);
+		if ( IndexBuffer == null || IndexBuffer.SizeInBytes != targetSize )
+		{
+			IndexBuffer?.Dispose();
+
+			IndexBuffer = Device.ResourceFactory.CreateBuffer(
+				new Veldrid.BufferDescription( targetSize, Veldrid.BufferUsage.IndexBuffer )
+			);
+		}
 
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
+	}
+
+	private void UpdateVertexBuffer( Vertex[] vertices )
+	{
+		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
+		vertexCount = (uint)vertices.Length;
+		var targetSize = vertexCount * vertexStructSize;
+
+		if ( VertexBuffer == null || VertexBuffer.SizeInBytes != targetSize )
+		{
+			VertexBuffer?.Dispose();
+
+			VertexBuffer = Device.ResourceFactory.CreateBuffer(
+				new Veldrid.BufferDescription( targetSize, Veldrid.BufferUsage.VertexBuffer )
+			);
+		}
+
+		Device.UpdateBuffer( VertexBuffer, 0, vertices );
 	}
 
 	private void CreateResources()
@@ -100,15 +116,54 @@ public class PanelRenderer : Asset
 				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
 	}
 
-	public void Draw<T>( T uniformBufferContents, CommandList commandList ) where T : struct
+	public void NewFrame()
 	{
-		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
+		Vertices.Clear();
+		RectCount = 0;
+	}
+
+	public void AddRectangle( Common.Rectangle rect, Vector3 color )
+	{
+		var ndcRect = rect / (Vector2)Screen.Size;
+		var vertices = RectVertices.Select( x =>
 		{
-			throw new Exception( $"Tried to set unmatching uniform buffer object" +
-				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
+			var position = x.Position;
+			position.X = (x.Position.X * ndcRect.Size.X) + ndcRect.Position.X;
+			position.Y = (x.Position.Y * ndcRect.Size.Y) + ndcRect.Position.Y;
+
+			var tx = x;
+			position.X -= 1.0f;
+			position.Y = 1.0f - position.Y;
+			tx.Position = position;
+
+			return tx;
+		} ).ToArray();
+
+		Vertices.AddRange( vertices );
+		RectCount++;
+	}
+
+	public void Draw( CommandList commandList )
+	{
+		{
+			UpdateVertexBuffer( Vertices.ToArray() );
+			var generatedIndices = new List<uint>();
+
+			for ( int i = 0; i < RectCount; ++i )
+			{
+				generatedIndices.AddRange( RectIndices.Select( x => (uint)(x + i * 4) ).ToArray() );
+			}
+
+			UpdateIndexBuffer( generatedIndices.ToArray() );
 		}
 
 		RenderPipeline renderPipeline = Material.Shader.Pipeline;
+
+		var uniformBufferContents = new UIUniformBuffer()
+		{
+			vColor = new Vector3( 0.15f, 0f, 0.15f ),
+			flTime = Time.Now
+		};
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );
 		commandList.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
@@ -116,21 +171,14 @@ public class PanelRenderer : Asset
 
 		commandList.SetGraphicsResourceSet( 0, objectResourceSet );
 
-		if ( IsIndexed )
-		{
-			commandList.SetIndexBuffer( IndexBuffer, IndexFormat.UInt32 );
+		commandList.SetIndexBuffer( IndexBuffer, IndexFormat.UInt32 );
 
-			commandList.DrawIndexed(
-				indexCount: indexCount,
-				instanceCount: 1,
-				indexStart: 0,
-				vertexOffset: 0,
-				instanceStart: 0
-			);
-		}
-		else
-		{
-			commandList.Draw( vertexCount );
-		}
+		commandList.DrawIndexed(
+			indexCount: indexCount,
+			instanceCount: 1,
+			indexStart: 0,
+			vertexOffset: 0,
+			instanceStart: 0
+		);
 	}
 }
