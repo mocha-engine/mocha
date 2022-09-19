@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using Veldrid;
 
 namespace Mocha.Renderer.UI;
 
@@ -15,11 +16,11 @@ public class PanelRenderer : Asset
 	private uint indexCount;
 	private uint vertexCount;
 
-	private Vertex[] RectVertices => new Vertex[] {
-		new Vertex { Position = new ( 0, 0, 0 ) },
-		new Vertex { Position = new ( 0, 1, 0 ) },
-		new Vertex { Position = new ( 1, 0, 0 ) },
-		new Vertex { Position = new ( 1, 1, 0 ) },
+	private UIVertex[] RectVertices => new UIVertex[] {
+		new UIVertex { Position = new ( 0, 0, 0 ) },
+		new UIVertex { Position = new ( 0, 1, 0 ) },
+		new UIVertex { Position = new ( 1, 0, 0 ) },
+		new UIVertex { Position = new ( 1, 1, 0 ) },
 	};
 
 	private uint[] RectIndices => new uint[] {
@@ -28,7 +29,7 @@ public class PanelRenderer : Asset
 	};
 
 	private int RectCount = 0;
-	private List<Vertex> Vertices = new();
+	private List<UIVertex> Vertices = new();
 
 	[StructLayout( LayoutKind.Sequential )]
 	public struct UIUniformBuffer
@@ -38,18 +39,49 @@ public class PanelRenderer : Asset
 		 * aligned (as blocks) to multiples of 16.
 		 */
 
-		public Vector3 vColor;
 		public float flTime;
 	}
+
+	[StructLayout( LayoutKind.Sequential )]
+	public struct UIVertex
+	{
+		public Vector3 Position { get; set; }
+		public Vector3 Color { get; set; }
+
+		public static VertexElementDescription[] VertexElementDescriptions = new[]
+		{
+			new VertexElementDescription( "position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+			new VertexElementDescription( "color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+		};
+	}
+
 
 	public PanelRenderer()
 	{
 		Path = "internal:ui_panel";
 
+		var pipeline = RenderPipeline.Factory
+			.WithVertexElementDescriptions( UIVertex.VertexElementDescriptions )
+
+			.AddObjectResource( "g_tDiffuse", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tAlpha", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_tORM", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddObjectResource( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+			.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
+
+			.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+			.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment );
+
+		var shader = ShaderBuilder.Default.FromPath( "core/shaders/ui/ui.mshdr" )
+			.WithFramebuffer( Device.SwapchainFramebuffer )
+			.WithCustomPipeline( pipeline )
+			.Build();
+
 		Material = new Material()
 		{
 			UniformBufferType = typeof( UIUniformBuffer ),
-			Shader = ShaderBuilder.Default.FromPath( "core/shaders/ui/ui.mshdr" ).WithFramebuffer( Device.SwapchainFramebuffer ).Build()
+			Shader = shader
 		};
 
 		CreateUniformBuffer();
@@ -76,7 +108,7 @@ public class PanelRenderer : Asset
 		Device.UpdateBuffer( IndexBuffer, 0, indices );
 	}
 
-	private void UpdateVertexBuffer( Vertex[] vertices )
+	private void UpdateVertexBuffer( UIVertex[] vertices )
 	{
 		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
 		vertexCount = (uint)vertices.Length;
@@ -132,9 +164,13 @@ public class PanelRenderer : Asset
 			position.Y = (x.Position.Y * ndcRect.Size.Y) + ndcRect.Position.Y;
 
 			var tx = x;
+			position *= 2.0f;
 			position.X -= 1.0f;
 			position.Y = 1.0f - position.Y;
+
+
 			tx.Position = position;
+			tx.Color = color;
 
 			return tx;
 		} ).ToArray();
@@ -143,25 +179,27 @@ public class PanelRenderer : Asset
 		RectCount++;
 	}
 
+	private void UpdateBuffers()
+	{
+		UpdateVertexBuffer( Vertices.ToArray() );
+		var generatedIndices = new List<uint>();
+
+		for ( int i = 0; i < RectCount; ++i )
+		{
+			generatedIndices.AddRange( RectIndices.Select( x => (uint)(x + i * 4) ).ToArray() );
+		}
+
+		UpdateIndexBuffer( generatedIndices.ToArray() );
+	}
+
 	public void Draw( CommandList commandList )
 	{
-		{
-			UpdateVertexBuffer( Vertices.ToArray() );
-			var generatedIndices = new List<uint>();
-
-			for ( int i = 0; i < RectCount; ++i )
-			{
-				generatedIndices.AddRange( RectIndices.Select( x => (uint)(x + i * 4) ).ToArray() );
-			}
-
-			UpdateIndexBuffer( generatedIndices.ToArray() );
-		}
+		UpdateBuffers();
 
 		RenderPipeline renderPipeline = Material.Shader.Pipeline;
 
 		var uniformBufferContents = new UIUniformBuffer()
 		{
-			vColor = new Vector3( 0.15f, 0f, 0.15f ),
 			flTime = Time.Now
 		};
 

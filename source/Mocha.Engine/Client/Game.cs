@@ -30,7 +30,7 @@ internal class Game
 			renderer.OnUpdate += world.Update;
 
 			// Must be called after everything else
-			renderer.PostUpdate += editor.Update;
+			// renderer.PostUpdate += editor.Update;
 
 			renderer.RenderOverlays += editor.Render;
 		}

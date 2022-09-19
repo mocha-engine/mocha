@@ -82,9 +82,9 @@ public struct Vector2 : IEquatable<Vector2>
 
 	public static bool operator !=( Vector2 left, Vector2 right ) => !(left == right);
 
-	public static implicit operator Vector2( int v )
+	public static implicit operator Vector2( float v )
 	{
-		throw new NotImplementedException();
+		return new Vector2( v );
 	}
 
 	public static explicit operator Vector2( Point2 v )

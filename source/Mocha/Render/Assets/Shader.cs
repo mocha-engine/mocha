@@ -23,8 +23,6 @@ public class Shader : Asset
 		ShaderProgram = shaderProgram;
 		Path = path;
 
-		Log.Trace( $"shader ctor {Path}" );
-
 		var directoryName = System.IO.Path.GetDirectoryName( Path );
 		var fileName = System.IO.Path.GetFileName( Path );
 		
@@ -33,33 +31,6 @@ public class Shader : Asset
 
 		this.TargetFramebuffer = targetFramebuffer;
 		this.FaceCullMode = faceCullMode;
-
-		CreatePipelines();
-	}
-
-	private void CreatePipelines()
-	{
-		Pipeline.Delete();
-
-		// TODO: Use shader reflection for this
-
-		Pipeline = RenderPipeline.Factory
-			.WithShader( this )
-			.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
-			.WithFramebuffer( TargetFramebuffer )
-			.WithFaceCullMode( FaceCullMode )
-
-			.AddObjectResource( "g_tDiffuse", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddObjectResource( "g_tAlpha", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddObjectResource( "g_tNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddObjectResource( "g_tORM", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddObjectResource( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
-			.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
-
-			.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-			.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment )
-
-			.Build();
 	}
 
 	private void OnWatcherChanged( object sender, FileSystemEventArgs e )
@@ -113,8 +84,6 @@ public class Shader : Asset
 			vertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			ShaderProgram = Device.ResourceFactory.CreateFromSpirv( vertexShaderDescription, fragmentShaderDescription );
-
-			CreatePipelines();
 
 			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader {Path}", FontAwesome.FaceGrinStars );
 		}
