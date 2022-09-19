@@ -177,13 +177,13 @@ public static partial class Input
 
 		if ( MouseMode == MouseModes.Unlocked )
 		{
-			Snapshot.Forward = 0;
-			Snapshot.Left = 0;
-			Snapshot.Up = 0;
+			//Snapshot.Forward = 0;
+			//Snapshot.Left = 0;
+			//Snapshot.Up = 0;
 
-			Snapshot.MouseDelta = Vector2.Zero;
-			Snapshot.MouseLeft = false;
-			Snapshot.MouseRight = false;
+			//Snapshot.MouseDelta = Vector2.Zero;
+			//Snapshot.MouseLeft = false;
+			//Snapshot.MouseRight = false;
 		}
 	}
 

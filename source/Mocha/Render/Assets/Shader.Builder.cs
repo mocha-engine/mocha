@@ -11,13 +11,15 @@ public class ShaderBuilder
 	private Framebuffer targetFramebuffer = SceneWorld.Current.Camera.Framebuffer;
 	private FaceCullMode faceCullMode = FaceCullMode.Back;
 
+	private bool UseCustomPipeline;
+	private PipelineFactory PipelineFactory;
+
 	public static ShaderBuilder Default => new ShaderBuilder();
 
 	public string Path { get; set; }
 
 	internal ShaderBuilder()
 	{
-
 	}
 
 	public ShaderBuilder FromPath( string mshdrPath )
@@ -49,6 +51,14 @@ public class ShaderBuilder
 		return this;
 	}
 
+	public ShaderBuilder WithCustomPipeline( PipelineFactory factory )
+	{
+		UseCustomPipeline = true;
+		PipelineFactory = factory;
+
+		return this;
+	}
+
 	public Shader Build()
 	{
 		if ( Asset.All.OfType<Shader>().Any( x => x.Path == Path ) )
@@ -75,7 +85,36 @@ public class ShaderBuilder
 			VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
-			return new Shader( Path, targetFramebuffer, faceCullMode, shaderProgram );
+			var shader = new Shader( Path, targetFramebuffer, faceCullMode, shaderProgram );
+
+			var pipelineFactory = ( PipelineFactory ?? new() )
+				.WithShader( shader )
+				.WithFramebuffer( targetFramebuffer )
+				.WithFaceCullMode( faceCullMode );
+
+			if ( !UseCustomPipeline )
+			{
+				// TODO: Use shader reflection for this
+				pipelineFactory
+					.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
+
+					.AddObjectResource( "g_tDiffuse", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+					.AddObjectResource( "g_tAlpha", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+					.AddObjectResource( "g_tNormal", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+					.AddObjectResource( "g_tORM", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+					.AddObjectResource( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+					.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
+
+					.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
+					.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment )
+
+					.Build();
+
+			}
+
+			shader.Pipeline = pipelineFactory.Build();
+
+			return shader;
 		}
 		catch ( Exception ex )
 		{
