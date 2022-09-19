@@ -87,6 +87,11 @@ public struct Vector2 : IEquatable<Vector2>
 		throw new NotImplementedException();
 	}
 
+	public static explicit operator Vector2( Point2 v )
+	{
+		return new Vector2( v.X, v.Y );
+	}
+
 	public override bool Equals( object? obj )
 	{
 		if ( obj is Vector2 vec )
