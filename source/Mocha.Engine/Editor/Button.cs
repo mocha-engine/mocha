@@ -15,7 +15,7 @@ internal class Button : Panel
 
 	public Button( string text, Rectangle rect ) : base( rect )
 	{
-		label = new( text, rect );
+		label = new( text, rect, 12f );
 	}
 
 	internal override void Render( ref PanelRenderer panelRenderer )
@@ -61,7 +61,7 @@ internal class Button : Panel
 		label.rect.X = rect.X + ((rect.Width - Label.MeasureText( label.Text, label.FontSize ).X) / 2.0f);
 		label.rect.Y = rect.Y + label.FontSize / 3.0f;
 
-		rect.Width = ( Label.MeasureText( label.Text, label.FontSize ).X + 25f ).Clamp( 100f, float.MaxValue );
+		rect.Width = ( Label.MeasureText( label.Text, label.FontSize ).X + 25f ).Clamp( 75f, float.MaxValue );
 		label.Render( ref panelRenderer );
 	}
 }

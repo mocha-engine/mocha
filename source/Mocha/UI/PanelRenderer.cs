@@ -42,7 +42,7 @@ public class PanelRenderer : Asset
 		 * aligned (as blocks) to multiples of 16.
 		 */
 
-		public float flTime;
+		public Vector4 vSdfRange;
 	}
 
 	[StructLayout( LayoutKind.Sequential )]
@@ -61,7 +61,6 @@ public class PanelRenderer : Asset
 			new VertexElementDescription( "screenPxRange", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1 ),
 		};
 	}
-
 
 	public PanelRenderer( Texture atlasTexture )
 	{
@@ -233,7 +232,7 @@ public class PanelRenderer : Asset
 
 		var uniformBufferContents = new UIUniformBuffer()
 		{
-			flTime = Time.Now
+			vSdfRange = new Vector4( 0.1f, 0.0f, 0.1f, 0.1f )
 		};
 
 		commandList.SetVertexBuffer( 0, VertexBuffer );

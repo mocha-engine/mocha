@@ -58,7 +58,9 @@ internal class Label : Panel
 			{
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
-				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
+				float heightMul = Editor.Atlas.Height / Editor.FontSubAtlasRect.Height;
+
+				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height * heightMul );
 				glyphSize *= FontSize * 6;
 
 				var glyphPos = new Rectangle( new Vector2( rect.X + x, rect.Y + FontSize ), glyphSize );

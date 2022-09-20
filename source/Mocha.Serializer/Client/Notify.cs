@@ -24,6 +24,8 @@ public static class Notify
 	{
 		var mergedTitle = (icon == null) ? title : $"{icon} {title}";
 
+		Log.Trace( $"{title}: {text}" );
+
 		Notifications.Add( new Notification( mergedTitle, text ) );
 	}
 }
