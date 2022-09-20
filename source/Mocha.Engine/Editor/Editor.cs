@@ -59,27 +59,53 @@ internal class Editor
 
 	private void AddLabel( string text, float fontSize )
 	{
-		layoutY += fontSize * 1.5f;
-		panels.Add( new Label( text, new Rectangle( 16, layoutY, -1, -1 ), fontSize ) );
+		panels.Add( new Label( text, new Rectangle( cursor, -1 ), fontSize ) );
+		cursor.Y += fontSize * 1.5f;
 	}
 
-	float layoutY;
+	private void AddSeparator()
+	{
+		cursor.Y += 8;
+
+		var panel = new Panel( new Rectangle( cursor.X, cursor.Y, Screen.Size.X - 32, 2 ) );
+		panel.color = new Vector4( 0.2f, 0.2f, 0.2f, 1 );
+
+		panels.Add( panel );
+
+		cursor.Y += 8;
+	}
+
+	private void AddButton( string text )
+	{
+		cursor.Y += 16f;
+		panels.Add( new Button( text, new Rectangle( cursor.X, cursor.Y, 128f, 32f ) ) );
+		cursor.Y += 24f;
+	}
+
+	Vector2 cursor = new();
 
 	[Event.Hotload]
 	public void CreateUI()
 	{
-		layoutY = 0;
+		cursor = new( 16, 16 );
+
 		panels.Clear();
 
-		AddLabel( "Title", 64 );
-		AddLabel( "This is a subtitle", 32 );
+		AddLabel( "Title", 28 );
+		AddLabel( "This is a subtitle", 18 );
 
-		layoutY += 14;
+		AddSeparator();
 
 		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
 		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
 		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
 		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
+
+		AddSeparator();
+		
+		AddButton( "OK" );
+		AddButton( "Cancel" );
+		AddButton( "click for free iphone" );
 
 		Log.Trace( "CreateUI" );
 	}
@@ -87,7 +113,7 @@ internal class Editor
 	internal Editor()
 	{
 		Event.Register( this );
-		
+
 		Atlas = CreateAtlas();
 		panelRenderer = new( Atlas );
 		FontData = FileSystem.Game.Deserialize<FontData>( "core/fonts/baked/qaz.json" );
@@ -98,7 +124,7 @@ internal class Editor
 	internal void Render( Veldrid.CommandList commandList )
 	{
 		panelRenderer.NewFrame();
-		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), new Vector3( 0.15f ) );
+		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), Colors.Gray );
 
 		foreach ( var panel in panels.ToArray() )
 		{
@@ -108,7 +134,7 @@ internal class Editor
 				panels.Remove( panel );
 		}
 
-		panelRenderer.AddRectangle( new Rectangle( Input.MousePosition, 24f ), new Vector3( 0.5f ) );
+		panelRenderer.AddRectangle( new Rectangle( Input.MousePosition, 24f ), new Vector4( 0.5f ) );
 		panelRenderer.Draw( commandList );
 	}
 }

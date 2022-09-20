@@ -53,4 +53,14 @@ public struct Rectangle
 	{
 		return $"{X}, {Y} -> {Width}, {Height}";
 	}
+
+	public Rectangle Expand( float v )
+	{
+		return new Rectangle( this.X - v, this.Y - v, this.Width + v*2, this.Height + v*2 );
+	}
+
+	public Rectangle Shrink( float v )
+	{
+		return new Rectangle( this.X + v, this.Y + v, this.Width - v*2, this.Height - v*2 );
+	}
 }

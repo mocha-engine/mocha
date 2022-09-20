@@ -47,7 +47,7 @@ internal class Label : Panel
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
 				glyphSize *= FontSize * 6;
 
-				var glyphPos = new Rectangle( new Vector2( rect.X + x, rect.Y ), glyphSize );
+				var glyphPos = new Rectangle( new Vector2( rect.X + x, rect.Y + FontSize ), glyphSize );
 				glyphPos.X += (float)glyph.PlaneBounds.Left * FontSize;
 				glyphPos.Y -= (float)glyph.PlaneBounds.Top * FontSize;
 

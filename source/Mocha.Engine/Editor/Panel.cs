@@ -4,7 +4,7 @@ namespace Mocha.Engine;
 
 internal class Panel
 {
-	protected Vector3 color = new Vector3( 1, 1, 1 );
+	public Vector4 color = new Vector4( 1, 1, 1, 1 );
 	public Common.Rectangle rect;
 
 	internal Panel( Common.Rectangle rect )
@@ -14,16 +14,6 @@ internal class Panel
 
 	internal virtual void Render( ref PanelRenderer panelRenderer )
 	{
-		var col = color;
-
-		if ( rect.Contains( Input.MousePosition ) )
-		{
-			col *= 3f;
-
-			if ( Input.MouseLeft )
-				col *= 0.1f;
-		}
-
-		panelRenderer.AddRectangle( rect, col );
+		panelRenderer.AddRectangle( rect, color );
 	}
 }

@@ -22,9 +22,11 @@ layout( set = 0, binding = 2 ) uniform ObjectUniformBuffer {
 } g_oUbo;
 
 struct VS_OUT {
+    vec3 vPositionWS;
     vec3 vPositionPS;
     vec2 vTexCoords;
-    vec3 vColor;
+    vec4 vColor;
+    float flScreenPxRange;
 };
 
 // ==========================================================================================================================
@@ -39,7 +41,8 @@ struct VS_OUT {
 //
 layout( location = 0 ) in vec3 g_vPosition;
 layout( location = 1 ) in vec2 g_vTexCoords;
-layout( location = 2 ) in vec3 g_vColor;
+layout( location = 2 ) in vec4 g_vColor;
+layout( location = 3 ) in float g_flScreenPxRange;
 
 //
 // Out
@@ -49,9 +52,11 @@ layout( location = 0 ) out VS_OUT vs_out;
 void main() {
     vec4 pos = vec4( g_vPosition.xy, 0.0, 1.0 );
 
+    vs_out.vPositionWS = g_vPosition;
     vs_out.vPositionPS = pos.xyz;
     vs_out.vTexCoords = g_vTexCoords;
     vs_out.vColor = g_vColor;
+    vs_out.flScreenPxRange = g_flScreenPxRange;
    
     gl_Position = pos;
 }
@@ -89,16 +94,13 @@ void main()
     float b = texSample.b;
     
     float median = max(min(r, g), min(max(r, g), b));
-    float signed_dist = median - 0.5;
-    float d = fwidth(signed_dist);
-    float opacity = smoothstep(-d, d, signed_dist);
+    float signed_dist = fs_in.flScreenPxRange * ( median - 0.5 );
+    float opacity = clamp( signed_dist + 0.5, 0.0, 1.0 );
 
-    fragColor = vec4( fs_in.vColor, opacity );
+    if ( fs_in.flScreenPxRange <= 0.01 )
+        opacity = 1;
 
-    // if ( mod( g_oUbo.flTime, 2 ) == 0 )
-    // {
-    //     fragColor = vec4( fs_in.vTexCoords, 1, 1 );
-    // }
+    fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
 }
 #endif
 // ==========================================================================================================================
