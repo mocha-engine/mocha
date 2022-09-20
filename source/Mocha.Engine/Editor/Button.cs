@@ -1,4 +1,5 @@
 ﻿using Mocha.Renderer.UI;
+using System.Diagnostics.Metrics;
 
 namespace Mocha.Engine;
 
@@ -57,6 +58,10 @@ internal class Button : Panel
 			);
 		}
 
+		label.rect.X = rect.X + ((rect.Width - Label.MeasureText( label.Text, label.FontSize ).X) / 2.0f);
+		label.rect.Y = rect.Y + label.FontSize / 3.0f;
+
+		rect.Width = ( Label.MeasureText( label.Text, label.FontSize ).X + 25f ).Clamp( 100f, float.MaxValue );
 		label.Render( ref panelRenderer );
 	}
 }

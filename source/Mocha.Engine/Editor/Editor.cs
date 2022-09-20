@@ -91,6 +91,7 @@ internal class Editor
 
 		panels.Clear();
 
+		AddLabel( "Qaz Sans", 80 );
 		AddLabel( "Title", 28 );
 		AddLabel( "This is a subtitle", 18 );
 

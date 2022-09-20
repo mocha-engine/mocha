@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Net.Http.Headers;
+using System.Runtime.InteropServices;
 using Veldrid;
 
 namespace Mocha.Renderer.UI;
@@ -6,6 +7,8 @@ namespace Mocha.Renderer.UI;
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public class PanelRenderer : Asset
 {
+	private bool isDirty = false;
+
 	private DeviceBuffer uniformBuffer;
 
 	public DeviceBuffer VertexBuffer { get; private set; }
@@ -149,44 +152,10 @@ public class PanelRenderer : Asset
 		RectCount = 0;
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	private void InternalAddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
 	{
 		var ndcRect = rect / (Vector2)Screen.Size;
 		var vertices = RectVertices.Select( ( x, i ) =>
-		{
-			var position = x.Position;
-			position.X = (x.Position.X * ndcRect.Size.X) + ndcRect.Position.X;
-			position.Y = (x.Position.Y * ndcRect.Size.Y) + ndcRect.Position.Y;
-
-			var tx = x;
-			position *= 2.0f;
-			position.X -= 1.0f;
-			position.Y = 1.0f - position.Y;
-
-			tx.Position = position;
-			tx.Color = i switch
-			{
-				0 => colorA,
-				1 => colorB,
-				2 => colorC,
-				3 => colorD,
-				_ => Vector4.Zero,
-			};
-			
-			tx.TexCoords = new Vector2( 0, 0 );
-
-			return tx;
-		} ).ToArray();
-
-		Vertices.AddRange( vertices );
-		RectCount++;
-	}
-
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
-	{
-		var ndcRect = rect / (Vector2)Screen.Size;
-
-		var vertices = RectVertices.Select( x =>
 		{
 			var position = x.Position;
 			position.X = (x.Position.X * ndcRect.Size.X) + ndcRect.Position.X;
@@ -196,46 +165,47 @@ public class PanelRenderer : Asset
 			texCoords.X = (x.TexCoords.X * ndcTexRect.Size.X) + ndcTexRect.Position.X;
 			texCoords.Y = (x.TexCoords.Y * ndcTexRect.Size.Y) + ndcTexRect.Position.Y;
 
+			var screenPxRange = (rect.Size.Length / 28f);
+			screenPxRange *= 3.0f;
+
 			var tx = x;
 			position *= 2.0f;
 			position.X -= 1.0f;
 			position.Y = 1.0f - position.Y;
 
 			tx.Position = position;
-			tx.Color = color;
 			tx.TexCoords = texCoords;
-			tx.ScreenPxRange = 1.25f;
+			tx.ScreenPxRange = texCoords.Length > 0 ? screenPxRange : 0f;
+			tx.Color = i switch
+			{
+				0 => colorA,
+				1 => colorB,
+				2 => colorC,
+				3 => colorD,
+				_ => Vector4.Zero,
+			};
 
 			return tx;
 		} ).ToArray();
 
 		Vertices.AddRange( vertices );
 		RectCount++;
+		isDirty = true;
+	}
+
+	public void AddRectangle( Common.Rectangle rect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	{
+		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), colorA, colorB, colorC, colorD );
+	}
+
+	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
+	{
+		InternalAddRectangle( rect, ndcTexRect, color, color, color, color );
 	}
 
 	public void AddRectangle( Common.Rectangle rect, Vector4 color )
 	{
-		var ndcRect = rect / (Vector2)Screen.Size;
-		var vertices = RectVertices.Select( x =>
-		{
-			var position = x.Position;
-			position.X = (x.Position.X * ndcRect.Size.X) + ndcRect.Position.X;
-			position.Y = (x.Position.Y * ndcRect.Size.Y) + ndcRect.Position.Y;
-
-			var tx = x;
-			position *= 2.0f;
-			position.X -= 1.0f;
-			position.Y = 1.0f - position.Y;
-
-			tx.Position = position;
-			tx.Color = color;
-			tx.TexCoords = new Vector2( 0, 0 );
-
-			return tx;
-		} ).ToArray();
-
-		Vertices.AddRange( vertices );
-		RectCount++;
+		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), color, color, color, color );
 	}
 
 	private void UpdateBuffers()
@@ -249,11 +219,15 @@ public class PanelRenderer : Asset
 		}
 
 		UpdateIndexBuffer( generatedIndices.ToArray() );
+		isDirty = false;
 	}
 
 	public void Draw( CommandList commandList )
 	{
-		UpdateBuffers();
+		if ( isDirty )
+		{
+			UpdateBuffers();
+		}
 
 		RenderPipeline renderPipeline = Material.Shader.Pipeline;
 
