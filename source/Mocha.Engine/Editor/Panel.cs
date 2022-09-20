@@ -4,7 +4,7 @@ namespace Mocha.Engine;
 
 internal class Panel
 {
-	protected Vector3 color = new Vector3( 0.5f, 1.0f, 0.5f );
+	protected Vector3 color = new Vector3( 1, 1, 1 );
 	public Common.Rectangle rect;
 
 	internal Panel( Common.Rectangle rect )

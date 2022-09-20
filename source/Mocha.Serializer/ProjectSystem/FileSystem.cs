@@ -1,4 +1,6 @@
-﻿namespace Mocha.Common;
+﻿using System.Text.Json;
+
+namespace Mocha.Common;
 
 public class FileSystem
 {
@@ -84,8 +86,14 @@ public class FileSystem
 		return Directory.GetDirectories( GetAbsolutePath( directory ) );
 	}
 
-	public string GetRelativePath( string fileName )
+	public string GetRelativePath( string filePath )
 	{
-		return Path.GetRelativePath( BasePath, fileName );
+		return Path.GetRelativePath( BasePath, filePath );
+	}
+
+	public T? Deserialize<T>( string filePath )
+	{
+		var text = ReadAllText( filePath );
+		return JsonSerializer.Deserialize<T>( text );
 	}
 }

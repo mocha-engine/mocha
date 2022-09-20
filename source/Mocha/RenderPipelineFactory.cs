@@ -60,7 +60,7 @@ public class PipelineFactory
 
 		for ( int i = 0; i < framebuffer.ColorTargets.Count; i++ )
 		{
-			blendState.AttachmentStates[i] = BlendAttachmentDescription.OverrideBlend;
+			blendState.AttachmentStates[i] = BlendAttachmentDescription.AlphaBlend;
 		}
 
 		var vertexLayoutDescription = new VertexLayoutDescription( vertexElementDescriptions );

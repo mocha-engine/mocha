@@ -151,6 +151,13 @@ public partial class TextureBuilder
 		return this;
 	}
 
+	public TextureBuilder WithNoMips()
+	{
+		this.mipCount = 1;
+
+		return this;
+	}
+
 	public TextureBuilder AsColorAttachment()
 	{
 		this.textureUsage |= TextureUsage.RenderTarget;
