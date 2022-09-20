@@ -95,7 +95,7 @@ public class ShaderBuilder
 			if ( !UseCustomPipeline )
 			{
 				// TODO: Use shader reflection for this
-				pipelineFactory
+				pipelineFactory = pipelineFactory
 					.WithVertexElementDescriptions( Vertex.VertexElementDescriptions )
 
 					.AddObjectResource( "g_tDiffuse", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
@@ -106,9 +106,7 @@ public class ShaderBuilder
 					.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex )
 
 					.AddLightingResource( "g_tShadowMap", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
-					.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment )
-
-					.Build();
+					.AddLightingResource( "g_sShadowSampler", ResourceKind.Sampler, ShaderStages.Fragment );
 
 			}
 
