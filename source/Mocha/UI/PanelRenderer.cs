@@ -47,13 +47,15 @@ public class PanelRenderer : Asset
 	{
 		public Vector3 Position { get; set; }
 		public Vector2 TexCoords { get; set; }
-		public Vector3 Color { get; set; }
+		public Vector4 Color { get; set; }
+		public float ScreenPxRange { get; set; }
 
 		public static VertexElementDescription[] VertexElementDescriptions = new[]
 		{
 			new VertexElementDescription( "position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
 			new VertexElementDescription( "texCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
-			new VertexElementDescription( "color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
+			new VertexElementDescription( "color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4 ),
+			new VertexElementDescription( "screenPxRange", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1 ),
 		};
 	}
 
@@ -147,7 +149,40 @@ public class PanelRenderer : Asset
 		RectCount = 0;
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector3 color )
+	public void AddRectangle( Common.Rectangle rect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	{
+		var ndcRect = rect / (Vector2)Screen.Size;
+		var vertices = RectVertices.Select( ( x, i ) =>
+		{
+			var position = x.Position;
+			position.X = (x.Position.X * ndcRect.Size.X) + ndcRect.Position.X;
+			position.Y = (x.Position.Y * ndcRect.Size.Y) + ndcRect.Position.Y;
+
+			var tx = x;
+			position *= 2.0f;
+			position.X -= 1.0f;
+			position.Y = 1.0f - position.Y;
+
+			tx.Position = position;
+			tx.Color = i switch
+			{
+				0 => colorA,
+				1 => colorB,
+				2 => colorC,
+				3 => colorD,
+				_ => Vector4.Zero,
+			};
+			
+			tx.TexCoords = new Vector2( 0, 0 );
+
+			return tx;
+		} ).ToArray();
+
+		Vertices.AddRange( vertices );
+		RectCount++;
+	}
+
+	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
 	{
 		var ndcRect = rect / (Vector2)Screen.Size;
 
@@ -169,6 +204,7 @@ public class PanelRenderer : Asset
 			tx.Position = position;
 			tx.Color = color;
 			tx.TexCoords = texCoords;
+			tx.ScreenPxRange = 1.25f;
 
 			return tx;
 		} ).ToArray();
@@ -177,7 +213,7 @@ public class PanelRenderer : Asset
 		RectCount++;
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Vector3 color )
+	public void AddRectangle( Common.Rectangle rect, Vector4 color )
 	{
 		var ndcRect = rect / (Vector2)Screen.Size;
 		var vertices = RectVertices.Select( x =>

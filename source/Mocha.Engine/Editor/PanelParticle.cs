@@ -6,7 +6,7 @@ internal class PanelParticle : Panel
 {
 	private Vector2 velocity;
 
-	public PanelParticle( Vector2 velocity, Vector3 color, Rectangle rect ) : base( rect )
+	public PanelParticle( Vector2 velocity, Vector4 color, Rectangle rect ) : base( rect )
 	{
 		this.velocity = velocity;
 		this.color = color;
