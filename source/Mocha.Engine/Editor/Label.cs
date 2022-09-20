@@ -7,6 +7,20 @@ internal class Label : Panel
 	public string Text { get; set; }
 	public float FontSize { get; set; } = 16f;
 
+	[Obsolete( "Bad place for this" )]
+	public static Vector2 MeasureText( string text, float fontSize )
+	{
+		float x = 0;
+
+		foreach ( var c in text )
+		{
+			var glyph = Editor.FontData.Glyphs.First( x => x.Unicode == c );
+			x += (float)glyph.Advance * fontSize;
+		}
+
+		return new Vector2( x, 0 );
+	}
+
 	internal Label( string text, Common.Rectangle rect, float fontSize = 16f ) : base( rect )
 	{
 		FontSize = fontSize;
