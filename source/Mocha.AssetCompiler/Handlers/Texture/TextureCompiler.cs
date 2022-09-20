@@ -56,14 +56,20 @@ public class TextureCompiler : BaseCompiler
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
 
 		// TODO: This is really shit
-		// Change compression format based on normal map
+		// Change compression format based on type
 		for ( int i = 0; i < textureFormat.MipCount; ++i )
 		{
 			if ( path.Contains( "Normal" ) )
 			{
-				// Do not compress
+				// Normal map compression
 				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
+			}
+			else if ( path.Contains( "font" ) )
+			{
+				// Do not compress
+				textureFormat.CompressionFormat = Veldrid.PixelFormat.R8_G8_B8_A8_UNorm;
+				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
 			}
 			else
 			{

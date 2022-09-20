@@ -4,10 +4,10 @@ partial class Event
 {
 	public class Game
 	{
-		public class LoadAttribute : EventAttribute
+		public class HotloadAttribute : EventAttribute
 		{
 			public const string Name = "Event.Game.Load";
-			public LoadAttribute() : base( Name ) { }
+			public HotloadAttribute() : base( Name ) { }
 		}
 	}
 }
