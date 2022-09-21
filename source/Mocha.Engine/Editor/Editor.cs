@@ -1,107 +1,120 @@
 ﻿using Mocha.Common.Serialization;
 using Mocha.Renderer.UI;
-using System.ComponentModel.DataAnnotations;
 
 namespace Mocha.Engine;
 
 internal class Editor
 {
-	internal static Texture Atlas { get; set; }
+	internal static Texture AtlasTexture { get; set; }
 	internal static FontData FontData { get; set; }
+	
+	internal static Sprite FontSprite { get; set; }
+	internal static Sprite WhiteSprite { get; set; }
+	internal static Sprite SDFSprite { get; set; }
 
 	private PanelRenderer panelRenderer;
 	private List<Panel> panels = new();
 
-	internal static Rectangle FontSubAtlasRect { get; set; }
-	internal static Rectangle WhiteAreaSubAtlasRect { get; set; }
-
-	internal static Rectangle SdfAreaNdcCoords { get; set; }
-
-	private Texture CreateAtlas()
+	private void BuildAtlas()
 	{
-		var fontTexture = TextureBuilder.UITexture.FromPath( "core/fonts/baked/qaz.mtex" ).WithNoMips().Build();
+		AtlasTexture?.Delete();
+		AtlasBuilder atlasBuilder = new();
 
-		//
-		// We want a small quadrant that is just white so that
-		// we can use one texture for all UI stuff
-		//
-		Point2 whiteArea = new Point2( fontTexture.Width, 32 );
-		Point2 targetTextureArea = new Point2( fontTexture.Width, fontTexture.Height + whiteArea.Y );
-
-		var targetTextureData = new byte[targetTextureArea.X * targetTextureArea.Y * 4];
-
-		void SetPixel( Point2 pos, Vector4 data )
-		{
-			int x = pos.X * 4;
-			int y = pos.Y * 4;
-
-			targetTextureData[x + (y * targetTextureArea.X)] = (byte)(data.X * 255);
-			targetTextureData[x + (y * targetTextureArea.X) + 1] = (byte)(data.Y * 255);
-			targetTextureData[x + (y * targetTextureArea.X) + 2] = (byte)(data.Z * 255);
-			targetTextureData[x + (y * targetTextureArea.X) + 3] = (byte)(data.W * 255);
-		}
-
-		for ( int x = 0; x < whiteArea.X; x++ )
-		{
-			for ( int y = 0; y < whiteArea.Y; y++ )
-			{
-				SetPixel( new( x, y ), Vector4.One );
-			}
-		}
-
-		float RectSDF( Vector2 p, Vector2 b, float r )
-		{
-			Vector2 absP = new Vector2( MathF.Abs( p.X ), MathF.Abs( p.Y ) );
-			Vector2 aSubP = (absP - b);
-			if ( aSubP.X < 0.0f )
-				aSubP.X = 0.0f;
-			if ( aSubP.Y < 0.0f )
-				aSubP.Y = 0.0f;
-
-			return aSubP.Length - r;
-		}
-
-		for ( int x = 32; x < 64; x++ )
-		{
-			for ( int y = 0; y < 32; y++ )
-			{
-				// Rounded box SDF:
-				// return length(max(abs(CenterPosition)-Size+Radius,0.0))-Radius;
-
-				Vector2 v = new Vector2( x, y );
-				Vector2 origin = new Vector2( 48, 16 );
-				Vector2 size = new Vector2( 32, 32 );
-				float radius = 0.05f;
-
-				v -= origin;
-
-				float d = RectSDF( v, size / 32.0f, radius );
-				d /= 28.0f;
-				d = 1.0f - d;
-
-				SetPixel( new( x, y ), new Vector4( d, d, d, 1 ) );
-			}
-		}
-
-		var targetTexture = TextureBuilder.UITexture.FromEmpty( (uint)targetTextureArea.X, (uint)targetTextureArea.Y ).Build();
-
-		targetTexture.Update( targetTextureData, 0, 0, whiteArea.X, whiteArea.Y );
-
-		// Really roundabout way of loading raw texture data just so that we can put it in a texture again
-		// TODO: Make all this much better.. it sucks.
 		var fileBytes = FileSystem.Game.ReadAllBytes( "core/fonts/baked/qaz.mtex" );
-		var fontTextureBytes = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data.MipData[0];
-		targetTexture.Update( fontTextureBytes, 0, whiteArea.Y, fontTexture.Width, fontTexture.Height );
+		var fontTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data;
 
 		//
-		// Save off sub-atlas rectangles so that we can use them in other calculations later
+		// Resize the atlas to fit everything we need
 		//
-		WhiteAreaSubAtlasRect = new Rectangle( 0, 0, whiteArea.X, whiteArea.Y );
-		FontSubAtlasRect = new Rectangle( 0, 0, fontTexture.Width, fontTexture.Height );
+		WhiteSprite = atlasBuilder.AddSprite( new Point2( 32, 32 ) );
+		SDFSprite = atlasBuilder.AddSprite( new Point2( 32, 32 ) );
+		FontSprite = atlasBuilder.AddSprite( new Point2( (int)fontTextureInfo.Width, (int)fontTextureInfo.Height ) );
 
-		SdfAreaNdcCoords = new Rectangle( 32f, 0f, 32f, 32f ) / targetTexture.Size;
+		//
+		// Set sprite data
+		//
 
-		return targetTexture;
+		// White box
+		{
+			var whiteSpriteData = new Vector4[32 * 32];
+			Array.Fill( whiteSpriteData, Vector4.One );
+			WhiteSprite.SetData( whiteSpriteData );
+		}
+
+		// Rounded rectangle SDF
+		{
+			// TODO
+			var sdfSpriteData = new Vector4[32 * 32];
+
+			float RectSDF( Vector2 p, Vector2 b, float r )
+			{
+				return (p.Length) - r;
+
+				Vector2 absP = new Vector2( MathF.Abs( p.X ), MathF.Abs( p.Y ) );
+				Vector2 aSubP = (absP - b);
+				if ( aSubP.X < 0.0f )
+					aSubP.X = 0.0f;
+				if ( aSubP.Y < 0.0f )
+					aSubP.Y = 0.0f;
+
+				return aSubP.Length - r;
+			}
+
+			for ( int x = 0; x < 32; x++ )
+			{
+				for ( int y = 0; y < 32; y++ )
+				{
+					// Rounded box SDF:
+					// return length(max(abs(CenterPosition)-Size+Radius,0.0))-Radius;
+
+					Vector2 v = new Vector2( x, y );
+					Vector2 center = new Vector2( 16, 16 );
+					Vector2 size = new Vector2( 32, 32 );
+					float radius = 16f;
+
+					v -= center;
+
+					float d = RectSDF( v, size / 32f, radius );
+					d /= 32f;
+
+					sdfSpriteData[x + (y * 32)] = new Vector4( d, d, d, 1 );
+				}
+			}
+
+			SDFSprite.SetData( sdfSpriteData );
+		}
+
+		// Font data
+		{
+			var fontSpriteData = new Vector4[fontTextureInfo.Width * fontTextureInfo.Height];
+
+			for ( int i = 0; i < fontTextureInfo.MipData[0].Length; i += 4 )
+			{
+				float x = fontTextureInfo.MipData[0][i] / 255f;
+				float y = fontTextureInfo.MipData[0][i + 1] / 255f;
+				float z = fontTextureInfo.MipData[0][i + 2] / 255f;
+				float w = fontTextureInfo.MipData[0][i + 3] / 255f;
+
+				fontSpriteData[i / 4] = new Vector4( x, y, z, w );
+			}
+
+			FontSprite.SetData( fontSpriteData );
+		}
+
+		//
+		// Build final texture
+		//
+		AtlasTexture = atlasBuilder.Build();
+	}
+
+	private void AddRoundedPanel( Vector2 size )
+	{
+		cursor.Y += 8;
+
+		var panel = new RoundedPanel( new Rectangle( cursor.X, cursor.Y, size.X, size.Y ), 8f );
+		panels.Add( panel );
+
+		cursor.Y += size.Y + 8;
 	}
 
 	private void AddLabel( string text, float fontSize )
@@ -112,21 +125,21 @@ internal class Editor
 
 	private void AddSeparator()
 	{
-		cursor.Y += 8;
+		cursor.Y += 16f;
 
 		var panel = new Panel( new Rectangle( cursor.X, cursor.Y, Screen.Size.X - 32, 2 ) );
 		panel.color = new Vector4( 0.2f, 0.2f, 0.2f, 1 );
 
 		panels.Add( panel );
 
-		cursor.Y += 8;
+		cursor.Y += 16f;
 	}
 
 	private void AddButton( string text )
 	{
-		cursor.Y += 16f;
+		cursor.Y += 8f;
 		panels.Add( new Button( text, new Rectangle( cursor.X, cursor.Y, 128f, 23f ) ) );
-		cursor.Y += 16f;
+		cursor.Y += 24f;
 	}
 
 	Vector2 cursor = new();
@@ -134,9 +147,9 @@ internal class Editor
 	[Event.Hotload]
 	public void CreateUI()
 	{
-		Atlas?.Delete();
-		Atlas = CreateAtlas();
-		panelRenderer = new( Atlas );
+		BuildAtlas();
+
+		panelRenderer = new( AtlasTexture );
 
 		cursor = new( 16, 16 );
 
@@ -159,6 +172,12 @@ internal class Editor
 		AddButton( "OK" );
 		AddButton( "Cancel" );
 		AddButton( "click for free iphone" );
+
+		AddSeparator();
+
+		AddRoundedPanel( new( 128, 64 ) );
+		AddRoundedPanel( new( 512, 32 ) );
+		AddRoundedPanel( new( 64, 64 ) );
 
 		Log.Trace( "CreateUI" );
 	}
@@ -184,9 +203,6 @@ internal class Editor
 				panels.Remove( panel );
 		}
 
-		panelRenderer.AddRectangle( new Rectangle( Screen.Size.X - Atlas.Width * 2 - 16, 16, Atlas.Width * 2, Atlas.Height * 2 ), Colors.DarkGray );
-		panelRenderer.AddRectangle( new Rectangle( Screen.Size.X - Atlas.Width * 2 - 16, 16, Atlas.Width * 2, Atlas.Height * 2 ), new Rectangle( 0, 0, 1, 1 ), Vector4.One );
-		// panelRenderer.AddRectangle( new Rectangle( Input.MousePosition, 24f ), new Vector4( 0.5f ) );
 		panelRenderer.Draw( commandList );
 	}
 }

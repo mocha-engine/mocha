@@ -26,6 +26,8 @@ struct VS_OUT {
     vec2 vTexCoords;
     vec4 vColor;
     float flScreenPxRange;
+    vec2 vPanelPos;
+    vec2 vPanelSize;
 };
 
 // ==========================================================================================================================
@@ -42,6 +44,8 @@ layout( location = 0 ) in vec3 g_vPosition;
 layout( location = 1 ) in vec2 g_vTexCoords;
 layout( location = 2 ) in vec4 g_vColor;
 layout( location = 3 ) in float g_flScreenPxRange;
+layout( location = 4 ) in vec2 g_vPanelPos;
+layout( location = 5 ) in vec2 g_vPanelSize;
 
 #define g_flRounding 32
 
@@ -58,6 +62,8 @@ void main() {
     vs_out.vTexCoords = g_vTexCoords;
     vs_out.vColor = g_vColor;
     vs_out.flScreenPxRange = g_flScreenPxRange;
+    vs_out.vPanelPos = g_vPanelPos;
+    vs_out.vPanelSize = g_vPanelSize;
    
     gl_Position = pos;
 }
@@ -88,6 +94,11 @@ vec3 GetTextureSample( texture2D tex )
 
 void main() 
 {
+    vec2 normalizedPanelPos = fs_in.vPanelPos / fs_in.vPanelSize;
+    normalizedPanelPos *= vec2( 0.15686275, 0.13559322 );
+    normalizedPanelPos += vec2( 0.15686275, 0 );
+
+    // vec3 texSample = texture( sampler2D( g_tAtlas, g_sSampler ), normalizedPanelPos ).xyz;
     vec3 texSample = GetTextureSample( g_tAtlas );
 
     float r = texSample.r;
@@ -101,7 +112,9 @@ void main()
     if ( fs_in.flScreenPxRange <= 0.01 )
         opacity = 1;
 
+
     fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
+    // fragColor = vec4( sdfSample, 1 );
     // fragColor = vec4( texSample, 1 );
 }
 #endif

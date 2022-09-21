@@ -40,7 +40,7 @@ internal class Label : Panel
 
 		var glyphRect = new Rectangle( mins, maxs );
 
-		glyphRect /= Editor.Atlas.Size;
+		glyphRect /= Editor.AtlasTexture.Size;
 		glyphRect.Y = 1.0f - glyphRect.Y;
 
 		return glyphRect;
@@ -58,7 +58,7 @@ internal class Label : Panel
 			{
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
-				float heightMul = Editor.Atlas.Height / Editor.FontSubAtlasRect.Height;
+				float heightMul = Editor.AtlasTexture.Height / Editor.FontSprite.Rect.Height;
 
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height * heightMul );
 				glyphSize *= FontSize * 6;
