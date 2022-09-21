@@ -1,7 +1,7 @@
 ﻿using Mocha.Common.Serialization;
 using Mocha.Renderer.UI;
 
-namespace Mocha.Engine;
+namespace Mocha.Engine.Editor;
 
 internal class Editor
 {

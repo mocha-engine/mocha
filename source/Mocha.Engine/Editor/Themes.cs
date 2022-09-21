@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine;
+﻿namespace Mocha.Engine.Editor;
 
 public interface ITheme
 {
