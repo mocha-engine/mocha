@@ -23,12 +23,12 @@ internal class Label : Panel
 
 	internal Label( string text, Common.Rectangle rect, float fontSize = 16f ) : base( rect )
 	{
-		color = ITheme.Current.TextColor;
+		Color = ITheme.Current.TextColor;
 		FontSize = fontSize;
 		Text = text;
 	}
 
-	private Rectangle FontBoundsToAtlasRect( Glyph glyph, Bounds bounds )
+	private Rectangle FontBoundsToAtlasRect( Font.Glyph glyph, Font.Bounds bounds )
 	{
 		Vector2 min = new Vector2( glyph.AtlasBounds.Left,
 								  glyph.AtlasBounds.Top );
@@ -64,14 +64,14 @@ internal class Label : Panel
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height * heightMul );
 				glyphSize *= FontSize * 6;
 
-				var glyphPos = new Rectangle( new Vector2( rect.X + x, rect.Y + FontSize ), glyphSize );
+				var glyphPos = new Rectangle( new Vector2( Bounds.X + x, Bounds.Y + FontSize ), glyphSize );
 				glyphPos.X += (float)glyph.PlaneBounds.Left * FontSize;
 				glyphPos.Y -= (float)glyph.PlaneBounds.Top * FontSize;
 
 				panelRenderer.AddRectangle(
 					glyphPos,
 					glyphRect,
-					color
+					Color
 				);
 			}
 

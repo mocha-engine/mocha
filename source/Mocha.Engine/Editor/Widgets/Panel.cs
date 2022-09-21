@@ -2,18 +2,16 @@
 
 namespace Mocha.Engine.Editor;
 
-internal class Panel
+internal class Panel : Widget
 {
-	public Vector4 color = new Vector4( 1, 1, 1, 1 );
-	public Common.Rectangle rect;
+	public Vector4 Color { get; set; } = new Vector4( 1, 1, 1, 1 );
 
-	internal Panel( Common.Rectangle rect )
+	internal Panel( Common.Rectangle rect ) : base( rect )
 	{
-		this.rect = rect;
 	}
 
 	internal virtual void Render( ref PanelRenderer panelRenderer )
 	{
-		panelRenderer.AddRectangle( rect, color );
+		panelRenderer.AddRectangle( Bounds, Color );
 	}
 }

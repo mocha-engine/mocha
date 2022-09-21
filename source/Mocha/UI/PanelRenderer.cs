@@ -200,75 +200,75 @@ public class PanelRenderer : Asset
 		isDirty = true;
 	}
 
-	public void AddRoundedRectangle( Common.Rectangle rect, float radius, Vector4 color )
+	public void AddRoundedRectangle( Common.Rectangle bounds, float radius, Vector4 color )
 	{
 		void DrawSegment( Common.Rectangle offset, Vector2 corner, Vector2? _scale = null )
 		{
 			var scale = _scale ?? new Vector2( 1f, 1f );
 
-			var ndcRect = new Common.Rectangle( 32, 0, 32, 32 );
-			ndcRect += corner * ndcRect.Size * 0.5f;
-			ndcRect /= atlasTexture.Size;
+			var clipBounds = new Common.Rectangle( 32, 0, 32, 32 );
+			clipBounds += corner * clipBounds.Size * 0.5f;
+			clipBounds /= atlasTexture.Size;
 
-			ndcRect.Width /= 2.0f;
-			ndcRect.Height /= 2.0f;
+			clipBounds.Width /= 2.0f;
+			clipBounds.Height /= 2.0f;
 
-			ndcRect.Width *= scale.X;
-			ndcRect.Height *= scale.Y;
+			clipBounds.Width *= scale.X;
+			clipBounds.Height *= scale.Y;
 
-			var topLeftRect = rect;
+			var topLeftRect = bounds;
 			topLeftRect.Width = offset.Width;
 			topLeftRect.Height = offset.Height;
 
 			topLeftRect.X += offset.X;
 			topLeftRect.Y += offset.Y;
 
-			AddRectangle( topLeftRect, ndcRect, 4f, color );
+			AddRectangle( topLeftRect, clipBounds, 4f, color );
 		}
 
-		var max = rect.Size - radius;
+		var max = bounds.Size - radius;
 
 		var halfRadius = 0;
 
 		// Top left
-		DrawSegment( 
+		DrawSegment(
 			  new Common.Rectangle( -halfRadius, -halfRadius, radius, radius ),
 			  new Vector2( 0, 0 )
 		);
 
 		// Bottom left
-		DrawSegment( 
+		DrawSegment(
 			  new Common.Rectangle( -halfRadius, max.Y + halfRadius, radius, radius ),
 			  new Vector2( 0, 1 )
 		);
 
 		// Top right
-		DrawSegment( 
+		DrawSegment(
 			  new Common.Rectangle( max.X + halfRadius, -halfRadius, radius, radius ),
 			  new Vector2( 1, 0 )
 		);
 
 		// Bottom right
-		DrawSegment( 
+		DrawSegment(
 			  new Common.Rectangle( max.X + halfRadius, max.Y + halfRadius, radius, radius ),
 			  new Vector2( 1, 1 )
 		);
 
 		// Center
-		var centerRect = rect;
+		var centerRect = bounds;
 		centerRect.X += radius;
 		centerRect.Width -= radius * 2.0f;
 		AddRectangle( centerRect, color );
 
 		// Middle left
-		var middleLeftRect = rect;
+		var middleLeftRect = bounds;
 		middleLeftRect.Width = radius;
 		middleLeftRect.Y += radius;
 		middleLeftRect.Height -= radius * 2.0f;
 		AddRectangle( middleLeftRect, color );
 
 		// Middle Right
-		var middleRightRect = rect;
+		var middleRightRect = bounds;
 		middleRightRect.X = max.X + 16f;
 		middleRightRect.Width = radius;
 		middleRightRect.Y += radius;
@@ -276,27 +276,27 @@ public class PanelRenderer : Asset
 		AddRectangle( middleRightRect, color );
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 color )
+	public void AddRectangle( Common.Rectangle bounds, Common.Rectangle uvBounds, float screenPxRange, Vector4 color )
 	{
-		InternalAddRectangle( rect, ndcTexRect, screenPxRange, color, color, color, color );
+		InternalAddRectangle( bounds, uvBounds, screenPxRange, color, color, color, color );
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	public void AddRectangle( Common.Rectangle bounds, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
 	{
-		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), 0, colorA, colorB, colorC, colorD );
+		InternalAddRectangle( bounds, new Common.Rectangle( 0, 0, 0, 0 ), 0, colorA, colorB, colorC, colorD );
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
+	public void AddRectangle( Common.Rectangle bounds, Common.Rectangle uvBounds, Vector4 color )
 	{
-		var screenPxRange = (rect.Size.Length / 28f);
+		var screenPxRange = (bounds.Size.Length / 28f);
 		screenPxRange *= 2.5f;
 
-		InternalAddRectangle( rect, ndcTexRect, screenPxRange, color, color, color, color );
+		InternalAddRectangle( bounds, uvBounds, screenPxRange, color, color, color, color );
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Vector4 color )
+	public void AddRectangle( Common.Rectangle bounds, Vector4 color )
 	{
-		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color );
+		InternalAddRectangle( bounds, new Common.Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color );
 	}
 
 	private void UpdateBuffers()
