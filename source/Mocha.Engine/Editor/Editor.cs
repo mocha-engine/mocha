@@ -7,7 +7,7 @@ internal class Editor
 {
 	internal static Texture AtlasTexture { get; set; }
 	internal static FontData FontData { get; set; }
-	
+
 	internal static Sprite FontSprite { get; set; }
 	internal static Sprite WhiteSprite { get; set; }
 	internal static Sprite SDFSprite { get; set; }
@@ -15,12 +15,14 @@ internal class Editor
 	private PanelRenderer panelRenderer;
 	private List<Panel> panels = new();
 
+	private string font = "qaz";
+
 	private void BuildAtlas()
 	{
 		AtlasTexture?.Delete();
 		AtlasBuilder atlasBuilder = new();
 
-		var fileBytes = FileSystem.Game.ReadAllBytes( "core/fonts/baked/qaz.mtex" );
+		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/baked/{font}.mtex" );
 		var fontTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data;
 
 		//
@@ -128,17 +130,22 @@ internal class Editor
 		cursor.Y += 16f;
 
 		var panel = new Panel( new Rectangle( cursor.X, cursor.Y, Screen.Size.X - 32, 2 ) );
-		panel.color = new Vector4( 0.2f, 0.2f, 0.2f, 1 );
+		panel.color = ITheme.Current.Border;
 
 		panels.Add( panel );
 
 		cursor.Y += 16f;
 	}
 
-	private void AddButton( string text )
+	private void AddButton( string text, Action? onClick = null )
 	{
 		cursor.Y += 8f;
-		panels.Add( new Button( text, new Rectangle( cursor.X, cursor.Y, 128f, 23f ) ) );
+
+		var b = new Button( text, new Rectangle( cursor.X, cursor.Y, 128f, 23f ) );
+		b.onClick += onClick;
+
+		panels.Add( b );
+
 		cursor.Y += 24f;
 	}
 
@@ -159,12 +166,24 @@ internal class Editor
 		AddLabel( "Title", 28 );
 		AddLabel( "This is a subtitle", 18 );
 
+		AddButton( "Switch Theme", () =>
+		{
+			if ( ITheme.Current is DarkTheme )
+				ITheme.Current = new LightTheme();
+			else
+				ITheme.Current = new DarkTheme();
+
+			Window.Current.SetDarkMode( ITheme.Current is DarkTheme );
+
+			CreateUI();
+		} );
+
 		AddSeparator();
 
-		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
-		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
-		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
-		AddLabel( "Lorem ipsum dolor sit amet.", 14 );
+		AddLabel( "(12) The quick brown fox jumps over the lazy dog.", 12 * 1.333f );
+		AddLabel( "(18) The quick brown fox jumps over the lazy dog.", 18 * 1.333f );
+		AddLabel( "(24) The quick brown fox jumps over the lazy dog.", 24 * 1.333f );
+		AddLabel( "(36) The quick brown fox jumps over the lazy dog.", 36 * 1.333f );
 
 		AddSeparator();
 
@@ -176,7 +195,7 @@ internal class Editor
 		AddSeparator();
 
 		AddRoundedPanel( new( 128, 64 ) );
-		AddRoundedPanel( new( 512, 32 ) );
+		AddRoundedPanel( new( 256, 32 ) );
 		AddRoundedPanel( new( 64, 64 ) );
 
 		Log.Trace( "CreateUI" );
@@ -187,13 +206,13 @@ internal class Editor
 		Event.Register( this );
 
 		CreateUI();
-		FontData = FileSystem.Game.Deserialize<FontData>( "core/fonts/baked/qaz.json" );
+		FontData = FileSystem.Game.Deserialize<FontData>( $"core/fonts/baked/{font}.json" );
 	}
 
 	internal void Render( Veldrid.CommandList commandList )
 	{
 		panelRenderer.NewFrame();
-		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), Colors.Gray );
+		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor );
 
 		foreach ( var panel in panels.ToArray() )
 		{

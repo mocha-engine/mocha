@@ -23,6 +23,7 @@ internal class Label : Panel
 
 	internal Label( string text, Common.Rectangle rect, float fontSize = 16f ) : base( rect )
 	{
+		color = ITheme.Current.TextColor;
 		FontSize = fontSize;
 		Text = text;
 	}

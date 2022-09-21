@@ -25,17 +25,22 @@ public class Window
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
-		SetDarkModeTitlebar();
+		SetDarkMode( true );
 
 		Screen.UpdateFrom( Size );
+	}
+
+	public void SetDarkMode( bool darkMode )
+	{
+		SetDarkModeTitlebar( darkMode );
 	}
 
 	[DllImport( "dwmapi.dll" )]
 	public static extern int DwmSetWindowAttribute( IntPtr hwnd, int dwAttribute, ref int pvAttribute, int cbAttribute );
 
-	private void SetDarkModeTitlebar()
+	private void SetDarkModeTitlebar( bool darkMode )
 	{
-		var value = 1;
+		var value = darkMode ? 1 : 0;
 		const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
 		DwmSetWindowAttribute( SdlWindow.Handle, DWMWA_USE_IMMERSIVE_DARK_MODE, ref value, Marshal.SizeOf( typeof( int ) ) );
 	}
