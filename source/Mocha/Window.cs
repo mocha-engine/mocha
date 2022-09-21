@@ -24,7 +24,7 @@ public class Window
 			WindowInitialState = WindowState.Maximized
 		};
 
-		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
+		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );		
 		SetDarkMode( true );
 
 		Screen.UpdateFrom( Size );

@@ -1,5 +1,7 @@
 ﻿using Mocha.Common.Serialization;
 using Mocha.Renderer.UI;
+using Veldrid.OpenGLBinding;
+using static Mocha.Engine.Editor.Font;
 
 namespace Mocha.Engine.Editor;
 
@@ -12,17 +14,19 @@ internal class EditorInstance
 	internal static Sprite WhiteSprite { get; set; }
 	internal static Sprite SDFSprite { get; set; }
 
-	private PanelRenderer panelRenderer;
-	private List<Panel> panels = new();
+	private VerticalLayout Layout { get; set; }
 
-	private string font = "qaz";
+	private PanelRenderer panelRenderer;
+
+	private const string Font = "qaz";
+	private const string Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed pharetra lorem. Aliquam eget tristique turpis, eget tristique mi. Nullam et ex vitae mauris dapibus luctus nec vel nisl. Nam venenatis vel orci a sagittis.";
 
 	private void BuildAtlas()
 	{
 		AtlasTexture?.Delete();
 		AtlasBuilder atlasBuilder = new();
 
-		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/baked/{font}.mtex" );
+		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/baked/{Font}.mtex" );
 		var fontTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data;
 
 		//
@@ -109,113 +113,91 @@ internal class EditorInstance
 		AtlasTexture = atlasBuilder.Build();
 	}
 
-	private void AddRoundedPanel( Vector2 size )
-	{
-		cursor.Y += 8;
-
-		var panel = new RoundedPanel( new Rectangle( cursor.X, cursor.Y, size.X, size.Y ), 8f );
-		panels.Add( panel );
-
-		cursor.Y += size.Y + 8;
-	}
-
-	private void AddLabel( string text, float fontSize )
-	{
-		panels.Add( new Label( text, new Rectangle( cursor, -1 ), fontSize ) );
-		cursor.Y += fontSize * 1.5f;
-	}
-
-	private void AddSeparator()
-	{
-		cursor.Y += 16f;
-
-		var panel = new Panel( new Rectangle( cursor.X, cursor.Y, Screen.Size.X - 32, 2 ) );
-		panel.Color = ITheme.Current.Border;
-
-		panels.Add( panel );
-
-		cursor.Y += 16f;
-	}
-
-	private void AddButton( string text, Action? onClick = null )
-	{
-		cursor.Y += 8f;
-
-		var b = new Button( text, new Rectangle( cursor.X, cursor.Y, 128f, 23f ) );
-		b.onClick += onClick;
-
-		panels.Add( b );
-
-		cursor.Y += 24f;
-	}
-
-	Vector2 cursor = new();
-
 	[Event.Hotload]
 	public void CreateUI()
 	{
-		BuildAtlas();
+		//
+		// Clean up existing widgets & panels
+		//
+		Clear();
 
-		panelRenderer = new( AtlasTexture );
+		//
+		// Everything has to go inside a layout otherwise it won't be rendered
+		//
+		Layout = new VerticalLayout();
+		Layout.Spacing = 4;
+		Layout.Margin = 16;
 
-		cursor = new( 16, 16 );
+		//
+		// Text rendering
+		//
+		Layout.AddWidget( new Label( "The quick brown fox", 64 ) );
+		Layout.AddWidget( new Label( "This is a test", 32 ) );
+		Layout.AddWidget( new Label( Lipsum, 12 ) );
 
-		panels.Clear();
+		Layout.AddSpacing( 8f );
 
-		AddLabel( "Qaz Sans", 80 );
-		AddLabel( "Title", 28 );
-		AddLabel( "This is a subtitle", 18 );
+		//
+		// Theme switcher (dropdown)
+		//
+		var dropdown = new Dropdown( "Dark Theme" );
+		dropdown.AddOption( "Dark Theme" );
+		dropdown.AddOption( "Light Theme" );
+		dropdown.OnSelected += SwitchTheme;
+		Layout.AddWidget( dropdown );
 
-		AddButton( "Switch Theme", () =>
-		{
-			if ( ITheme.Current is DarkTheme )
-				ITheme.Current = new LightTheme();
-			else
-				ITheme.Current = new DarkTheme();
-
-			Window.Current.SetDarkMode( ITheme.Current is DarkTheme );
-
-			CreateUI();
-		} );
-
-		AddSeparator();
-
-		AddLabel( "(12) The quick brown fox jumps over the lazy dog.", 12 * 1.333f );
-		AddLabel( "(18) The quick brown fox jumps over the lazy dog.", 18 * 1.333f );
-		AddLabel( "(24) The quick brown fox jumps over the lazy dog.", 24 * 1.333f );
-		AddLabel( "(36) The quick brown fox jumps over the lazy dog.", 36 * 1.333f );
-
-		AddSeparator();
-
-		AddButton( "Click me" );
-		AddButton( "OK" );
-		AddButton( "Cancel" );
-		AddButton( "click for free iphone" );
-
-		AddSeparator();
-
-		AddRoundedPanel( new( 128, 64 ) );
-		AddRoundedPanel( new( 256, 32 ) );
-		AddRoundedPanel( new( 64, 64 ) );
-
-		Log.Trace( "CreateUI" );
+		//
+		// Different button lengths (sizing test)
+		//
+		Layout.AddWidget( new Button( "Another awesome button" ) );
+		Layout.AddWidget( new Button( "I like big butts" ) );
+		Layout.AddWidget( new Button( "OK" ) );
+		Layout.AddWidget( new Button( "A" ) );
+		Layout.AddWidget( new Button( "QWERTY" ) );
+		Layout.AddWidget( new Button( "I am a really long button with some really long text inside it" ) );
 	}
 
 	internal EditorInstance()
 	{
 		Event.Register( this );
+		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{Font}.json" );
 
 		CreateUI();
-		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{font}.json" );
 	}
 
 	internal void Render( Veldrid.CommandList commandList )
 	{
 		panelRenderer.NewFrame();
-		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor );
 
-		panels.ForEach( x => x.Render( ref panelRenderer ) );
+		panelRenderer.AddRectangle( new Rectangle( 0, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor );
+
+		foreach ( var layout in VerticalLayout.All.ToArray() )
+		{
+			layout.Render( panelRenderer );
+		}
 
 		panelRenderer.Draw( commandList );
+	}
+
+	internal void SwitchTheme( int newSelection )
+	{
+		Log.Trace( newSelection );
+
+		if ( newSelection == 0 )
+			ITheme.Current = new DarkTheme();
+		else
+			ITheme.Current = new LightTheme();
+
+		Window.Current.SetDarkMode( ITheme.Current is DarkTheme );
+	}
+
+	internal void Clear()
+	{
+		// Rebuild atlas (TODO: This should be automatic / transparent)
+		BuildAtlas();
+		panelRenderer = new( AtlasTexture );
+
+		Layout?.Delete();
+		Layout = null;
 	}
 }

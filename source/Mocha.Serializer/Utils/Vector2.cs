@@ -120,4 +120,10 @@ public struct Vector2 : IEquatable<Vector2>
 	public override int GetHashCode() => HashCode.Combine( internalVector );
 
 	public override string ToString() => internalVector.ToString();
+
+	public void Deconstruct( out float X_, out float Y_ )
+	{
+		X_ = X;
+		Y_ = Y;
+	}
 }

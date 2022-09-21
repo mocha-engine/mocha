@@ -8,8 +8,17 @@ public struct Rectangle
 	public float Width { get; set; }
 	public float Height { get; set; }
 
-	public Vector2 Position => new Vector2( X, Y );
-	public Vector2 Size => new Vector2( Width, Height );
+	public Vector2 Position
+	{
+		get => new Vector2( X, Y );
+		set => (X, Y) = value;
+	}
+
+	public Vector2 Size
+	{
+		get => new Vector2( Width, Height );
+		set => (Width, Height) = value;
+	}
 
 	public Rectangle( Vector2 position, Vector2 size )
 	{
@@ -51,7 +60,7 @@ public struct Rectangle
 
 	public override string ToString()
 	{
-		return $"{X}, {Y} -> {Width}, {Height}";
+		return $"Position: {X}, {Y} | Size: {Width}, {Height}";
 	}
 
 	public Rectangle Expand( float v )

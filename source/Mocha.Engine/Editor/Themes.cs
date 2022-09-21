@@ -13,15 +13,15 @@ public interface ITheme
 
 public class DarkTheme : ITheme
 {
-	public Vector4 BackgroundColor => MathX.GetColor( "#333333" );
+	public Vector4 BackgroundColor => MathX.GetColor( "#1c1917" );
 
 	public Vector4 TextColor => MathX.GetColor( "#ffffff" );
 
-	public Vector4 ButtonBgA => MathX.GetColor( "#5c5c5c" );
+	public Vector4 ButtonBgA => MathX.GetColor( "#44403c" );
 
-	public Vector4 ButtonBgB => MathX.GetColor( "#3d3d3d" );
+	public Vector4 ButtonBgB => MathX.GetColor( "#292524" );
 
-	public Vector4 Border => MathX.GetColor( "#2f2f2f" );
+	public Vector4 Border => MathX.GetColor( "#050506" );
 }
 
 public class LightTheme : ITheme

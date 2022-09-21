@@ -2,10 +2,11 @@
 
 namespace Mocha.Engine.Editor;
 
-internal class Button : Panel
+internal class Button : Widget
 {
 	private Label label;
-	public Action onClick;
+	public Action OnClick;
+	public Vector2 TextAnchor = new Vector2( 0.5f, 0.5f );
 
 	public string Text
 	{
@@ -13,9 +14,12 @@ internal class Button : Panel
 		set => label.Text = value;
 	}
 
-	public Button( string text, Rectangle bounds ) : base( bounds )
+	public Button( string text, Action? onClick = null )
 	{
-		label = new( text, bounds, 12f );
+		label = new( text, 12f );
+
+		if ( onClick != null )
+			OnClick += onClick;
 	}
 
 	bool mouseWasDown = false;
@@ -29,11 +33,11 @@ internal class Button : Panel
 
 		if ( Bounds.Contains( Input.MousePosition ) )
 		{
-			panelRenderer.AddRectangle( Bounds.Expand( 1f ), Colors.Blue );
+			panelRenderer.AddRectangle( Bounds, Colors.Blue );
 
 			if ( Input.MouseLeft )
 			{
-				panelRenderer.AddRectangle( Bounds,
+				panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
 					colorB * 1.25f,
 					colorA * 1.25f,
 					colorB * 1.25f,
@@ -44,7 +48,7 @@ internal class Button : Panel
 			}
 			else
 			{
-				panelRenderer.AddRectangle( Bounds,
+				panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
 					colorA,
 					colorB,
 					colorA,
@@ -53,7 +57,7 @@ internal class Button : Panel
 
 				if ( mouseWasDown )
 				{
-					onClick?.Invoke();
+					OnClick?.Invoke();
 				}
 
 				mouseWasDown = false;
@@ -61,9 +65,9 @@ internal class Button : Panel
 		}
 		else
 		{
-			panelRenderer.AddRectangle( Bounds.Expand( 1f ), border );
+			panelRenderer.AddRectangle( Bounds, border );
 
-			panelRenderer.AddRectangle( Bounds,
+			panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
 				colorA,
 				colorB,
 				colorA,
@@ -71,10 +75,18 @@ internal class Button : Panel
 			);
 		}
 
-		label.Bounds.X = Bounds.X + ((Bounds.Width - Label.MeasureText( label.Text, label.FontSize ).X) / 2.0f);
-		label.Bounds.Y = Bounds.Y + label.FontSize / 3.0f;
+		var labelBounds = label.Bounds;
+		labelBounds.X = Bounds.X + ((Bounds.Width - 24f - Label.MeasureText( label.Text, label.FontSize ).X) * TextAnchor.X);
+		labelBounds.X += 12f;
+		labelBounds.Y = Bounds.Y + label.FontSize / 3.0f;
 
-		Bounds.Width = (Label.MeasureText( label.Text, label.FontSize ).X + 25f).Clamp( 75f, float.MaxValue );
+		label.Bounds = labelBounds;
 		label.Render( ref panelRenderer );
+	}
+
+	internal override Vector2 GetDesiredSize()
+	{
+		var size = new Vector2( (Label.MeasureText( label.Text, label.FontSize ).X + 24f).Clamp( 75f, float.MaxValue ), 24 );
+		return size;
 	}
 }

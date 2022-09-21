@@ -2,7 +2,7 @@
 
 namespace Mocha.Engine.Editor;
 
-internal class Label : Panel
+internal class Label : Widget
 {
 	public string Text { get; set; }
 	public float FontSize { get; set; } = 16f;
@@ -18,12 +18,11 @@ internal class Label : Panel
 			x += (float)glyph.Advance * fontSize;
 		}
 
-		return new Vector2( x, 0 );
+		return new Vector2( x, fontSize * 1.25f );
 	}
 
-	internal Label( string text, Common.Rectangle rect, float fontSize = 16f ) : base( rect )
+	internal Label( string text, float fontSize = 16f )
 	{
-		Color = ITheme.Current.TextColor;
 		FontSize = fontSize;
 		Text = text;
 	}
@@ -71,11 +70,16 @@ internal class Label : Panel
 				panelRenderer.AddRectangle(
 					glyphPos,
 					glyphRect,
-					Color
+					ITheme.Current.TextColor
 				);
 			}
 
 			x += (float)glyph.Advance * FontSize;
 		}
+	}
+
+	internal override Vector2 GetDesiredSize()
+	{
+		return MeasureText( Text, FontSize );
 	}
 }

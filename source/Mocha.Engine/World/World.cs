@@ -38,10 +38,10 @@ public class World
             Rotation = Rotation.From(27, 15, 0)
         };
 
-        Sky = new Sky
-        {
-            Scale = Vector3.One * -10000f
-        };
+        //Sky = new Sky
+        //{
+        //    Scale = Vector3.One * -10000f
+        //};
 
         Player = new Player();
         Camera = new Camera() { Player = Player };

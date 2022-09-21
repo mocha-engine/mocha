@@ -168,11 +168,10 @@ public class RendererInstance
 			PreferDepthRangeZeroToOne = true,
 			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
 			SwapchainSrgbFormat = false,
-			SyncToVerticalBlank = false
+			SyncToVerticalBlank = true
 		};
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options );
-		Device.SyncToVerticalBlank = true;
 
 		var windowTitle = $"Mocha | {Device.BackendType}";
 		Window.Current.SdlWindow.Title = windowTitle;

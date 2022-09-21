@@ -6,8 +6,9 @@ internal class Panel : Widget
 {
 	public Vector4 Color { get; set; } = new Vector4( 1, 1, 1, 1 );
 
-	internal Panel( Common.Rectangle rect ) : base( rect )
+	internal Panel( Vector2 size )
 	{
+		Bounds = new Rectangle( 0, size );
 	}
 
 	internal virtual void Render( ref PanelRenderer panelRenderer )
