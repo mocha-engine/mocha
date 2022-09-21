@@ -15,9 +15,9 @@ internal class RoundedPanel : Panel
 	{
 		var scale = _scale ?? new Vector2( 1f, 1f );
 
-		var ndcRect = Editor.SDFSprite.Rect;
+		var ndcRect = EditorInstance.SDFSprite.Rect;
 		ndcRect += corner * ndcRect.Size * 0.5f;
-		ndcRect /= Editor.AtlasTexture.Size;
+		ndcRect /= EditorInstance.AtlasTexture.Size;
 
 		ndcRect.Width /= 2.0f;
 		ndcRect.Height /= 2.0f;

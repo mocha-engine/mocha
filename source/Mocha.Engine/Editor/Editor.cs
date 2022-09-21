@@ -3,7 +3,7 @@ using Mocha.Renderer.UI;
 
 namespace Mocha.Engine.Editor;
 
-internal class Editor
+internal class EditorInstance
 {
 	internal static Texture AtlasTexture { get; set; }
 	internal static FontData FontData { get; set; }
@@ -201,7 +201,7 @@ internal class Editor
 		Log.Trace( "CreateUI" );
 	}
 
-	internal Editor()
+	internal EditorInstance()
 	{
 		Event.Register( this );
 
