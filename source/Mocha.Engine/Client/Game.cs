@@ -6,7 +6,7 @@
 internal class Game
 {
 	private RendererInstance renderer;
-	private Editor editor;
+	private Editor.Editor editor;
 
 	internal Game()
 	{

@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-namespace Mocha.Engine;
+namespace Mocha.Engine.Editor;
+
 public class Atlas
 {
 	[JsonPropertyName( "type" )]
