@@ -1,4 +1,5 @@
-﻿using System.Net.Http.Headers;
+﻿using SharpDX.D3DCompiler;
+using System.Net.Http.Headers;
 using System.Runtime.InteropServices;
 using Veldrid;
 
@@ -20,10 +21,10 @@ public class PanelRenderer : Asset
 	private uint vertexCount;
 
 	private UIVertex[] RectVertices => new UIVertex[] {
-		new UIVertex { Position = new ( 0, 0, 0 ), TexCoords = new( 0, 0 ) },
-		new UIVertex { Position = new ( 0, 1, 0 ), TexCoords = new( 0, 1 ) },
-		new UIVertex { Position = new ( 1, 0, 0 ), TexCoords = new( 1, 0 ) },
-		new UIVertex { Position = new ( 1, 1, 0 ), TexCoords = new( 1, 1 ) },
+		new UIVertex { Position = new ( 0, 0, 0 ), TexCoords = new( 0, 0 ), PanelPos = new( 0, 0 ) },
+		new UIVertex { Position = new ( 0, 1, 0 ), TexCoords = new( 0, 1 ), PanelPos = new( 0, 1 ) },
+		new UIVertex { Position = new ( 1, 0, 0 ), TexCoords = new( 1, 0 ), PanelPos = new( 1, 0 ) },
+		new UIVertex { Position = new ( 1, 1, 0 ), TexCoords = new( 1, 1 ), PanelPos = new( 1, 1 ) },
 	};
 
 	private uint[] RectIndices => new uint[] {
@@ -33,6 +34,8 @@ public class PanelRenderer : Asset
 
 	private int RectCount = 0;
 	private List<UIVertex> Vertices = new();
+
+	private Texture atlasTexture;
 
 	[StructLayout( LayoutKind.Sequential )]
 	public struct UIUniformBuffer
@@ -52,6 +55,8 @@ public class PanelRenderer : Asset
 		public Vector2 TexCoords { get; set; }
 		public Vector4 Color { get; set; }
 		public float ScreenPxRange { get; set; }
+		public Vector2 PanelPos { get; set; }
+		public Vector2 PanelSize { get; set; }
 
 		public static VertexElementDescription[] VertexElementDescriptions = new[]
 		{
@@ -59,6 +64,8 @@ public class PanelRenderer : Asset
 			new VertexElementDescription( "texCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
 			new VertexElementDescription( "color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4 ),
 			new VertexElementDescription( "screenPxRange", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1 ),
+			new VertexElementDescription( "panelPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
+			new VertexElementDescription( "panelSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
 		};
 	}
 
@@ -89,6 +96,8 @@ public class PanelRenderer : Asset
 
 		All.Add( this );
 		Material.Shader.OnRecompile += CreateResources;
+
+		this.atlasTexture = atlasTexture;
 	}
 
 	private void UpdateIndexBuffer( uint[] indices )
@@ -151,7 +160,7 @@ public class PanelRenderer : Asset
 		RectCount = 0;
 	}
 
-	private void InternalAddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	private void InternalAddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
 	{
 		var ndcRect = rect / (Vector2)Screen.Size;
 		var vertices = RectVertices.Select( ( x, i ) =>
@@ -164,9 +173,6 @@ public class PanelRenderer : Asset
 			texCoords.X = (x.TexCoords.X * ndcTexRect.Size.X) + ndcTexRect.Position.X;
 			texCoords.Y = (x.TexCoords.Y * ndcTexRect.Size.Y) + ndcTexRect.Position.Y;
 
-			var screenPxRange = (rect.Size.Length / 28f);
-			screenPxRange *= 3.0f;
-
 			var tx = x;
 			position *= 2.0f;
 			position.X -= 1.0f;
@@ -174,7 +180,9 @@ public class PanelRenderer : Asset
 
 			tx.Position = position;
 			tx.TexCoords = texCoords;
-			tx.ScreenPxRange = texCoords.Length > 0 ? screenPxRange : 0f;
+			tx.ScreenPxRange = screenPxRange;
+			tx.PanelPos *= rect.Size;
+			tx.PanelSize = rect.Size;
 			tx.Color = i switch
 			{
 				0 => colorA,
@@ -192,19 +200,103 @@ public class PanelRenderer : Asset
 		isDirty = true;
 	}
 
+	public void AddRoundedRectangle( Common.Rectangle rect, float radius, Vector4 color )
+	{
+		void DrawSegment( Common.Rectangle offset, Vector2 corner, Vector2? _scale = null )
+		{
+			var scale = _scale ?? new Vector2( 1f, 1f );
+
+			var ndcRect = new Common.Rectangle( 32, 0, 32, 32 );
+			ndcRect += corner * ndcRect.Size * 0.5f;
+			ndcRect /= atlasTexture.Size;
+
+			ndcRect.Width /= 2.0f;
+			ndcRect.Height /= 2.0f;
+
+			ndcRect.Width *= scale.X;
+			ndcRect.Height *= scale.Y;
+
+			var topLeftRect = rect;
+			topLeftRect.Width = offset.Width;
+			topLeftRect.Height = offset.Height;
+
+			topLeftRect.X += offset.X;
+			topLeftRect.Y += offset.Y;
+
+			AddRectangle( topLeftRect, ndcRect, 4f, color );
+		}
+
+		var max = rect.Size - radius;
+
+		var halfRadius = 0;
+
+		// Top left
+		DrawSegment( 
+			  new Common.Rectangle( -halfRadius, -halfRadius, radius, radius ),
+			  new Vector2( 0, 0 )
+		);
+
+		// Bottom left
+		DrawSegment( 
+			  new Common.Rectangle( -halfRadius, max.Y + halfRadius, radius, radius ),
+			  new Vector2( 0, 1 )
+		);
+
+		// Top right
+		DrawSegment( 
+			  new Common.Rectangle( max.X + halfRadius, -halfRadius, radius, radius ),
+			  new Vector2( 1, 0 )
+		);
+
+		// Bottom right
+		DrawSegment( 
+			  new Common.Rectangle( max.X + halfRadius, max.Y + halfRadius, radius, radius ),
+			  new Vector2( 1, 1 )
+		);
+
+		// Center
+		var centerRect = rect;
+		centerRect.X += radius;
+		centerRect.Width -= radius * 2.0f;
+		AddRectangle( centerRect, color );
+
+		// Middle left
+		var middleLeftRect = rect;
+		middleLeftRect.Width = radius;
+		middleLeftRect.Y += radius;
+		middleLeftRect.Height -= radius * 2.0f;
+		AddRectangle( middleLeftRect, color );
+
+		// Middle Right
+		var middleRightRect = rect;
+		middleRightRect.X = max.X + 16f;
+		middleRightRect.Width = radius;
+		middleRightRect.Y += radius;
+		middleRightRect.Height -= radius * 2.0f;
+		AddRectangle( middleRightRect, color );
+	}
+
+	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 color )
+	{
+		InternalAddRectangle( rect, ndcTexRect, screenPxRange, color, color, color, color );
+	}
+
 	public void AddRectangle( Common.Rectangle rect, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
 	{
-		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), colorA, colorB, colorC, colorD );
+		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), 0, colorA, colorB, colorC, colorD );
 	}
 
 	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
 	{
-		InternalAddRectangle( rect, ndcTexRect, color, color, color, color );
+		var screenPxRange = (rect.Size.Length / 28f);
+		screenPxRange *= 3.0f;
+
+		InternalAddRectangle( rect, ndcTexRect, screenPxRange, color, color, color, color );
 	}
 
 	public void AddRectangle( Common.Rectangle rect, Vector4 color )
 	{
-		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), color, color, color, color );
+		InternalAddRectangle( rect, new Common.Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color );
 	}
 
 	private void UpdateBuffers()

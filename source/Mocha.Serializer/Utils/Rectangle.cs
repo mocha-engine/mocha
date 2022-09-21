@@ -41,7 +41,7 @@ public struct Rectangle
 
 	public bool Contains( Vector2 v )
 	{
-		if ( v.X > this.X && v.Y > this.Y
+		if ( v.X >= this.X && v.Y >= this.Y
 			&& v.X < this.X + this.Width
 			 && v.Y < this.Y + this.Height )
 			return true;

@@ -25,36 +25,33 @@ internal class Button : Panel
 
 		if ( rect.Contains( Input.MousePosition ) )
 		{
-			panelRenderer.AddRectangle( rect.Expand( 1f ), Colors.Blue );
+			panelRenderer.AddRoundedRectangle( rect.Expand( 1f ),
+				4f,
+				Colors.Blue
+			);
 
 			if ( Input.MouseLeft )
 			{
-				panelRenderer.AddRectangle( rect,
-					colorB * 1.25f,
-					colorA * 1.25f,
-					colorB * 1.25f,
-					colorA * 1.25f
+				panelRenderer.AddRoundedRectangle( rect,
+					4f,
+					colorB * 1.25f
 				);
 			}
 			else
 			{
-				panelRenderer.AddRectangle( rect,
-					colorA,
-					colorB,
-					colorA,
+				panelRenderer.AddRoundedRectangle( rect,
+					4f,
 					colorB
 				);
 			}
 		}
 		else
 		{
-			panelRenderer.AddRectangle( rect.Expand( 1f ), Colors.Black );
+			panelRenderer.AddRoundedRectangle( rect.Expand( 1f ), 4f, colorB );
 
-			panelRenderer.AddRectangle( rect,
-				colorA,
-				colorB,
-				colorA,
-				colorB
+			panelRenderer.AddRoundedRectangle( rect,
+				4f,
+				colorA
 			);
 		}
 
