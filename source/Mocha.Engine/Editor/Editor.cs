@@ -130,7 +130,7 @@ internal class EditorInstance
 		cursor.Y += 16f;
 
 		var panel = new Panel( new Rectangle( cursor.X, cursor.Y, Screen.Size.X - 32, 2 ) );
-		panel.color = ITheme.Current.Border;
+		panel.Color = ITheme.Current.Border;
 
 		panels.Add( panel );
 
@@ -214,13 +214,7 @@ internal class EditorInstance
 		panelRenderer.NewFrame();
 		panelRenderer.AddRectangle( new Rectangle( 0f, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor );
 
-		foreach ( var panel in panels.ToArray() )
-		{
-			panel.Render( ref panelRenderer );
-
-			if ( panel.rect.Y > Screen.Size.Y )
-				panels.Remove( panel );
-		}
+		panels.ForEach( x => x.Render( ref panelRenderer ) );
 
 		panelRenderer.Draw( commandList );
 	}

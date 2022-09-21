@@ -13,9 +13,9 @@ internal class Button : Panel
 		set => label.Text = value;
 	}
 
-	public Button( string text, Rectangle rect ) : base( rect )
+	public Button( string text, Rectangle bounds ) : base( bounds )
 	{
-		label = new( text, rect, 12f );
+		label = new( text, bounds, 12f );
 	}
 
 	bool mouseWasDown = false;
@@ -27,13 +27,13 @@ internal class Button : Panel
 
 		Vector4 border = ITheme.Current.Border;
 
-		if ( rect.Contains( Input.MousePosition ) )
+		if ( Bounds.Contains( Input.MousePosition ) )
 		{
-			panelRenderer.AddRectangle( rect.Expand( 1f ), Colors.Blue );
+			panelRenderer.AddRectangle( Bounds.Expand( 1f ), Colors.Blue );
 
 			if ( Input.MouseLeft )
 			{
-				panelRenderer.AddRectangle( rect,
+				panelRenderer.AddRectangle( Bounds,
 					colorB * 1.25f,
 					colorA * 1.25f,
 					colorB * 1.25f,
@@ -44,7 +44,7 @@ internal class Button : Panel
 			}
 			else
 			{
-				panelRenderer.AddRectangle( rect,
+				panelRenderer.AddRectangle( Bounds,
 					colorA,
 					colorB,
 					colorA,
@@ -61,9 +61,9 @@ internal class Button : Panel
 		}
 		else
 		{
-			panelRenderer.AddRectangle( rect.Expand( 1f ), border );
+			panelRenderer.AddRectangle( Bounds.Expand( 1f ), border );
 
-			panelRenderer.AddRectangle( rect,
+			panelRenderer.AddRectangle( Bounds,
 				colorA,
 				colorB,
 				colorA,
@@ -71,10 +71,10 @@ internal class Button : Panel
 			);
 		}
 
-		label.rect.X = rect.X + ((rect.Width - Label.MeasureText( label.Text, label.FontSize ).X) / 2.0f);
-		label.rect.Y = rect.Y + label.FontSize / 3.0f;
+		label.Bounds.X = Bounds.X + ((Bounds.Width - Label.MeasureText( label.Text, label.FontSize ).X) / 2.0f);
+		label.Bounds.Y = Bounds.Y + label.FontSize / 3.0f;
 
-		rect.Width = ( Label.MeasureText( label.Text, label.FontSize ).X + 25f ).Clamp( 75f, float.MaxValue );
+		Bounds.Width = (Label.MeasureText( label.Text, label.FontSize ).X + 25f).Clamp( 75f, float.MaxValue );
 		label.Render( ref panelRenderer );
 	}
 }

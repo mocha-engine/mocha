@@ -6,7 +6,7 @@ internal class RoundedPanel : Panel
 {
 	public float Radius { get; set; } = 16f;
 
-	public RoundedPanel( Rectangle rect, float radius = 16f ) : base( rect )
+	public RoundedPanel( Rectangle bounds, float radius = 16f ) : base( bounds )
 	{
 		Radius = radius;
 	}
@@ -25,14 +25,14 @@ internal class RoundedPanel : Panel
 		ndcRect.Width *= scale.X;
 		ndcRect.Height *= scale.Y;
 
-		var topLeftRect = rect;
+		var topLeftRect = Bounds;
 		topLeftRect.Width = offset.Width;
 		topLeftRect.Height = offset.Height;
 
 		topLeftRect.X += offset.X;
 		topLeftRect.Y += offset.Y;
 
-		panelRenderer.AddRectangle( topLeftRect, ndcRect, -1, color );
+		panelRenderer.AddRectangle( topLeftRect, ndcRect, -1, Color );
 	}
 
 	internal override void Render( ref PanelRenderer panelRenderer )
@@ -79,6 +79,6 @@ internal class RoundedPanel : Panel
 		//middleLeftRect.Width -= 5f;
 		//panelRenderer.AddRectangle( middleLeftRect, color );
 
-		panelRenderer.AddRoundedRectangle( rect, Radius, color );
+		panelRenderer.AddRoundedRectangle( Bounds, Radius, Color );
 	}
 }
