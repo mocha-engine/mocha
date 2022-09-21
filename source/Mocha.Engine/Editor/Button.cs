@@ -1,11 +1,11 @@
 ﻿using Mocha.Renderer.UI;
-using System.Diagnostics.Metrics;
 
 namespace Mocha.Engine;
 
 internal class Button : Panel
 {
 	private Label label;
+	public Action onClick;
 
 	public string Text
 	{
@@ -18,40 +18,56 @@ internal class Button : Panel
 		label = new( text, rect, 12f );
 	}
 
+	bool mouseWasDown = false;
+
 	internal override void Render( ref PanelRenderer panelRenderer )
 	{
-		Vector4 colorA = Colors.Gray * 0.75f;
-		Vector4 colorB = Colors.DarkGray * 0.75f;
+		Vector4 colorA = ITheme.Current.ButtonBgA;
+		Vector4 colorB = ITheme.Current.ButtonBgB;
+
+		Vector4 border = ITheme.Current.Border;
 
 		if ( rect.Contains( Input.MousePosition ) )
 		{
-			panelRenderer.AddRoundedRectangle( rect.Expand( 1f ),
-				4f,
-				Colors.Blue
-			);
+			panelRenderer.AddRectangle( rect.Expand( 1f ), Colors.Blue );
 
 			if ( Input.MouseLeft )
 			{
-				panelRenderer.AddRoundedRectangle( rect,
-					4f,
-					colorB * 1.25f
+				panelRenderer.AddRectangle( rect,
+					colorB * 1.25f,
+					colorA * 1.25f,
+					colorB * 1.25f,
+					colorA * 1.25f
 				);
+
+				mouseWasDown = true;
 			}
 			else
 			{
-				panelRenderer.AddRoundedRectangle( rect,
-					4f,
+				panelRenderer.AddRectangle( rect,
+					colorA,
+					colorB,
+					colorA,
 					colorB
 				);
+
+				if ( mouseWasDown )
+				{
+					onClick?.Invoke();
+				}
+
+				mouseWasDown = false;
 			}
 		}
 		else
 		{
-			panelRenderer.AddRoundedRectangle( rect.Expand( 1f ), 4f, colorB );
+			panelRenderer.AddRectangle( rect.Expand( 1f ), border );
 
-			panelRenderer.AddRoundedRectangle( rect,
-				4f,
-				colorA
+			panelRenderer.AddRectangle( rect,
+				colorA,
+				colorB,
+				colorA,
+				colorB
 			);
 		}
 

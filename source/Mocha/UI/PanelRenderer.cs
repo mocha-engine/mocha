@@ -289,7 +289,7 @@ public class PanelRenderer : Asset
 	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, Vector4 color )
 	{
 		var screenPxRange = (rect.Size.Length / 28f);
-		screenPxRange *= 3.0f;
+		screenPxRange *= 2.5f;
 
 		InternalAddRectangle( rect, ndcTexRect, screenPxRange, color, color, color, color );
 	}
