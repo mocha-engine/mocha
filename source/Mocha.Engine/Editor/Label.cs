@@ -14,7 +14,7 @@ internal class Label : Panel
 
 		foreach ( var c in text )
 		{
-			var glyph = Editor.FontData.Glyphs.First( x => x.Unicode == c );
+			var glyph = EditorInstance.FontData.Glyphs.First( x => x.Unicode == c );
 			x += (float)glyph.Advance * fontSize;
 		}
 
@@ -41,7 +41,7 @@ internal class Label : Panel
 
 		var glyphRect = new Rectangle( mins, maxs );
 
-		glyphRect /= Editor.AtlasTexture.Size;
+		glyphRect /= EditorInstance.AtlasTexture.Size;
 		glyphRect.Y = 1.0f - glyphRect.Y;
 
 		return glyphRect;
@@ -53,13 +53,13 @@ internal class Label : Panel
 
 		foreach ( var c in Text )
 		{
-			var glyph = Editor.FontData.Glyphs.First( x => x.Unicode == (int)c );
+			var glyph = EditorInstance.FontData.Glyphs.First( x => x.Unicode == (int)c );
 
 			if ( glyph.AtlasBounds != null )
 			{
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
-				float heightMul = Editor.AtlasTexture.Height / Editor.FontSprite.Rect.Height;
+				float heightMul = EditorInstance.AtlasTexture.Height / EditorInstance.FontSprite.Rect.Height;
 
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height * heightMul );
 				glyphSize *= FontSize * 6;
