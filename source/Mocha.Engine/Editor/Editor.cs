@@ -6,7 +6,7 @@ namespace Mocha.Engine.Editor;
 internal class EditorInstance
 {
 	internal static Texture AtlasTexture { get; set; }
-	internal static FontData FontData { get; set; }
+	internal static Font.Data FontData { get; set; }
 
 	internal static Sprite FontSprite { get; set; }
 	internal static Sprite WhiteSprite { get; set; }
@@ -206,7 +206,7 @@ internal class EditorInstance
 		Event.Register( this );
 
 		CreateUI();
-		FontData = FileSystem.Game.Deserialize<FontData>( $"core/fonts/baked/{font}.json" );
+		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{font}.json" );
 	}
 
 	internal void Render( Veldrid.CommandList commandList )
