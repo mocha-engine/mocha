@@ -288,8 +288,8 @@ public class PanelRenderer : Asset
 
 	public void AddRectangle( Common.Rectangle bounds, Common.Rectangle uvBounds, Vector4 color )
 	{
-		var screenPxRange = (bounds.Size.Length / 28f);
-		screenPxRange *= 2.5f;
+		var screenPxRange = (bounds.Size.Y / 32.5f);
+		screenPxRange *= 4f;
 
 		InternalAddRectangle( bounds, uvBounds, screenPxRange, color, color, color, color );
 	}
@@ -318,6 +318,11 @@ public class PanelRenderer : Asset
 		if ( isDirty )
 		{
 			UpdateBuffers();
+		}
+
+		if ( VertexBuffer == null || IndexBuffer == null )
+		{
+			return;
 		}
 
 		RenderPipeline renderPipeline = Material.Shader.Pipeline;
