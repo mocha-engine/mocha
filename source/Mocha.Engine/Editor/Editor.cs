@@ -14,7 +14,7 @@ internal class EditorInstance
 	internal static Sprite WhiteSprite { get; set; }
 	internal static Sprite SDFSprite { get; set; }
 
-	private VerticalLayout Layout { get; set; }
+	private VerticalLayout RootLayout { get; set; }
 
 	private PanelRenderer panelRenderer;
 
@@ -122,39 +122,52 @@ internal class EditorInstance
 		Clear();
 
 		//
-		// Everything has to go inside a layout otherwise it won't be rendered
+		// Everything has to go inside a layout otherwise they'll go in funky places
 		//
-		Layout = new VerticalLayout();
-		Layout.Spacing = 4;
-		Layout.Margin = 16;
+		RootLayout = new VerticalLayout();
+		RootLayout.Spacing = 2;
+		RootLayout.Margin = 16;
+		RootLayout.Size = (Vector2)Screen.Size - 32f;
 
 		//
 		// Text rendering
 		//
-		Layout.AddWidget( new Label( "The quick brown fox", 64 ) );
-		Layout.AddWidget( new Label( "This is a test", 32 ) );
-		Layout.AddWidget( new Label( Lipsum, 12 ) );
+		RootLayout.Add( new Label( "The quick brown fox", 64 ) );
+		RootLayout.Add( new Label( "This is a test", 32 ) );
+		RootLayout.Add( new Label( Lipsum, 12 ) );
 
-		Layout.AddSpacing( 8f );
+		RootLayout.AddSpacing( 4f );
 
 		//
 		// Theme switcher (dropdown)
 		//
-		var dropdown = new Dropdown( "Dark Theme" );
-		dropdown.AddOption( "Dark Theme" );
-		dropdown.AddOption( "Light Theme" );
-		dropdown.OnSelected += SwitchTheme;
-		Layout.AddWidget( dropdown );
+		var themeSwitcher = new Dropdown( "Dark Theme" );
+		themeSwitcher.AddOption( "Dark Theme" );
+		themeSwitcher.AddOption( "Light Theme" );
+		themeSwitcher.OnSelected += SwitchTheme;
+		RootLayout.Add( themeSwitcher );
 
 		//
 		// Different button lengths (sizing test)
 		//
-		Layout.AddWidget( new Button( "Another awesome button" ) );
-		Layout.AddWidget( new Button( "I like big butts" ) );
-		Layout.AddWidget( new Button( "OK" ) );
-		Layout.AddWidget( new Button( "A" ) );
-		Layout.AddWidget( new Button( "QWERTY" ) );
-		Layout.AddWidget( new Button( "I am a really long button with some really long text inside it" ) );
+		RootLayout.Add( new Button( "Another awesome button" ) );
+		RootLayout.Add( new Button( "I like big butts" ) );
+		RootLayout.Add( new Button( "OK" ) );
+		RootLayout.Add( new Button( "A" ) );
+		RootLayout.Add( new Button( "QWERTY" ) );
+		RootLayout.Add( new Button( "I am a really long button with some really long text inside it" ) );
+		RootLayout.Add( new Button( "Stretch" ), true );
+
+		//
+		// Test dropdown
+		//
+		var dropdown = new Dropdown( "Hello" );
+		dropdown.AddOption( "Hello" );
+		dropdown.AddOption( "World" );
+		dropdown.AddOption( "This is a test" );
+		dropdown.AddOption( "I am a really long dropdown entry" );
+		dropdown.AddOption( "Poo" );
+		RootLayout.Add( dropdown );
 	}
 
 	internal EditorInstance()
@@ -168,12 +181,30 @@ internal class EditorInstance
 	internal void Render( Veldrid.CommandList commandList )
 	{
 		panelRenderer.NewFrame();
-
 		panelRenderer.AddRectangle( new Rectangle( 0, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor );
 
-		foreach ( var layout in VerticalLayout.All.ToArray() )
+		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
+		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
+
+		foreach ( var widget in widgets )
 		{
-			layout.Render( panelRenderer );
+			widget.InputFlags = PanelInputFlags.None;
+		}
+
+		if ( mouseOverWidgets.Any() )
+		{
+			var focusedWidget = mouseOverWidgets.Last();
+			focusedWidget.InputFlags |= PanelInputFlags.MouseOver;
+
+			if ( Input.MouseLeft )
+			{
+				focusedWidget.InputFlags |= PanelInputFlags.MouseDown;
+			}
+		}
+
+		foreach ( var widget in widgets )
+		{
+			widget.Render( ref panelRenderer );
 		}
 
 		panelRenderer.Draw( commandList );
@@ -197,7 +228,22 @@ internal class EditorInstance
 		BuildAtlas();
 		panelRenderer = new( AtlasTexture );
 
-		Layout?.Delete();
-		Layout = null;
+		RootLayout?.Delete();
+		RootLayout = null;
+
+		Widget.All.ToList().ForEach( x => x.Delete() );
+		Widget.All.Clear();
+	}
+
+	[Event.Hotload]
+	public void OnHotload()
+	{
+		CreateUI();
+	}
+
+	[Event.Window.Resized]
+	public void OnResize( Point2 _ )
+	{
+		CreateUI();
 	}
 }

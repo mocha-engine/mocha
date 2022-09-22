@@ -21,7 +21,7 @@ internal class Label : Widget
 		return new Vector2( x, fontSize * 1.25f );
 	}
 
-	internal Label( string text, float fontSize = 16f )
+	internal Label( string text, float fontSize = 16f ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;

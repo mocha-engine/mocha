@@ -14,9 +14,10 @@ internal class Button : Widget
 		set => label.Text = value;
 	}
 
-	public Button( string text, Action? onClick = null )
+	public Button( string text, Action? onClick = null ) : base()
 	{
 		label = new( text, 12f );
+		label.Parent = this;
 
 		if ( onClick != null )
 			OnClick += onClick;
@@ -31,11 +32,11 @@ internal class Button : Widget
 
 		Vector4 border = ITheme.Current.Border;
 
-		if ( Bounds.Contains( Input.MousePosition ) )
+		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
 		{
 			panelRenderer.AddRectangle( Bounds, Colors.Blue );
 
-			if ( Input.MouseLeft )
+			if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
 			{
 				panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
 					colorB * 1.25f,
@@ -79,9 +80,7 @@ internal class Button : Widget
 		labelBounds.X = Bounds.X + ((Bounds.Width - 24f - Label.MeasureText( label.Text, label.FontSize ).X) * TextAnchor.X);
 		labelBounds.X += 12f;
 		labelBounds.Y = Bounds.Y + label.FontSize / 3.0f;
-
 		label.Bounds = labelBounds;
-		label.Render( ref panelRenderer );
 	}
 
 	internal override Vector2 GetDesiredSize()
