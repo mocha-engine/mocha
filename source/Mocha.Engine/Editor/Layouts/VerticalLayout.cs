@@ -1,12 +1,10 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 internal class VerticalLayout
 {
 	public static List<VerticalLayout> All { get; } = new();
 
-	private List<( bool Stretch, Widget Widget )> Widgets { get; } = new();
+	private List<(bool Stretch, Widget Widget)> Widgets { get; } = new();
 	public bool Visible { get; set; } = true;
 	public float Spacing { get; set; } = 0;
 	public Vector2 Margin
@@ -17,7 +15,18 @@ internal class VerticalLayout
 
 	private Vector2 cursor = 0;
 	private Vector2 offset = 0;
-	public Vector2 CalculatedSize { get; private set; }
+	private Vector2 calculatedSize;
+	public Vector2 Size { get; set; } = new( -1, -1 );
+	public Vector2 CalculatedSize
+	{
+		get
+		{
+			if ( Size.Length > 0 )
+				return Size;
+
+			return calculatedSize;
+		}
+	}
 
 	public VerticalLayout()
 	{
@@ -31,22 +40,26 @@ internal class VerticalLayout
 
 	public void Delete()
 	{
+		Widgets.ForEach( x => x.Widget.Delete() );
 		All.Remove( this );
 	}
 
-	public void AddWidget<T>( T widget, bool stretch = false ) where T : Widget
+	public void Add<T>( T widget, bool stretch = false ) where T : Widget
 	{
 		var desiredSize = widget.GetDesiredSize();
 		widget.Bounds = new Rectangle( cursor + offset, desiredSize );
-		Widgets.Add( ( stretch, widget ) );
+		Widgets.Add( (stretch, widget) );
 
 		cursor = cursor.WithY( cursor.Y + desiredSize.Y + Spacing );
 
-		if ( desiredSize.X > CalculatedSize.X )
-			CalculatedSize = CalculatedSize.WithX( desiredSize.X );
+		//
+		// Update auto-calculated size
+		//
+		if ( desiredSize.X > calculatedSize.X )
+			calculatedSize = calculatedSize.WithX( desiredSize.X );
 
-		if ( cursor.Y > CalculatedSize.Y )
-			CalculatedSize = CalculatedSize.WithY( cursor.Y );
+		if ( cursor.Y > calculatedSize.Y )
+			calculatedSize = calculatedSize.WithY( cursor.Y );
 
 		ApplyStretch();
 	}
@@ -64,17 +77,14 @@ internal class VerticalLayout
 		}
 	}
 
-	public void Render( PanelRenderer panelRenderer )
-	{
-		if ( !Visible )
-			return;
-
-		Widgets.OrderBy( x => x.Widget.ZIndex ).ToList().ForEach( x => x.Widget.Render( ref panelRenderer ) );
-	}
-
 	internal void AddSpacing( float height )
 	{
-		Widgets.Add( ( true, new Widget() { Bounds = new Rectangle( 0, 0, 0, height ) } ) );
+		//
+		// This is kinda hacky.. rather than doing anything complex, we just make
+		// a simple dummy widget and let the automatic layout stuff do its work
+		//
+		var dummy = new Widget() { Bounds = new Rectangle( 0, 0, 0, height ) };
+		Add( dummy, true );
 
 		ApplyStretch();
 	}
