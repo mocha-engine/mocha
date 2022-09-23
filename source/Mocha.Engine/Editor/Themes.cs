@@ -36,3 +36,16 @@ public class LightTheme : ITheme
 
 	public Vector4 Border => MathX.GetColor( "#d9d9d9" );
 }
+
+public class TestTheme : ITheme
+{
+	public Vector4 BackgroundColor => MathX.GetColor( "#141416" );
+
+	public Vector4 TextColor => MathX.GetColor( "#ffffff" );
+
+	public Vector4 ButtonBgA => MathX.GetColor( "#29292b" );
+
+	public Vector4 ButtonBgB => MathX.GetColor( "#1f1f22" );
+
+	public Vector4 Border => MathX.GetColor( "#343436" );
+}

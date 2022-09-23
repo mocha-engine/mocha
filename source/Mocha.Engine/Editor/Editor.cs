@@ -144,6 +144,7 @@ internal class EditorInstance
 		var themeSwitcher = new Dropdown( "Dark Theme" );
 		themeSwitcher.AddOption( "Dark Theme" );
 		themeSwitcher.AddOption( "Light Theme" );
+		themeSwitcher.AddOption( "Test Theme" );
 		themeSwitcher.OnSelected += SwitchTheme;
 		RootLayout.Add( themeSwitcher );
 
@@ -151,7 +152,10 @@ internal class EditorInstance
 		// Different button lengths (sizing test)
 		//
 		RootLayout.Add( new Button( "Another awesome button" ) );
-		RootLayout.Add( new Button( "I like big butts" ) );
+		RootLayout.Add( new Button( "I like big butts", () =>
+		{
+			RootLayout.Add( new Label( "Hello!!!!!!", 32 ) );
+		} ) );
 		RootLayout.Add( new Button( "OK" ) );
 		RootLayout.Add( new Button( "A" ) );
 		RootLayout.Add( new Button( "QWERTY" ) );
@@ -216,10 +220,12 @@ internal class EditorInstance
 
 		if ( newSelection == 0 )
 			ITheme.Current = new DarkTheme();
-		else
+		else if ( newSelection == 1 )
 			ITheme.Current = new LightTheme();
+		else
+			ITheme.Current = new TestTheme();
 
-		Window.Current.SetDarkMode( ITheme.Current is DarkTheme );
+		Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
 	}
 
 	internal void Clear()
