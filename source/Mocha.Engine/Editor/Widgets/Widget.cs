@@ -11,9 +11,9 @@ internal class Widget
 
 	public Widget? Parent { get; set; }
 	public int ZIndex { get => (Parent?.ZIndex ?? 0) + zIndex; set => zIndex = value; }
+	public bool Visible { get => (Parent?.Visible ?? true) && visible; set => visible = value; }
 
 	public PanelInputFlags InputFlags { get; set; }
-	public bool Visible { get => (Parent?.Visible ?? true) && visible; set => visible = value; }
 	public Rectangle Bounds { get; set; }
 
 	internal Widget()
