@@ -4,9 +4,10 @@ namespace Mocha.Engine.Editor;
 
 internal class Button : Widget
 {
-	private Label label;
+	protected Label label;
 	public Action OnClick;
 	public Vector2 TextAnchor = new Vector2( 0.5f, 0.5f );
+	private Vector2 Padding => new Vector2( 20, 15 );
 
 	public string Text
 	{
@@ -16,7 +17,7 @@ internal class Button : Widget
 
 	public Button( string text, Action? onClick = null ) : base()
 	{
-		label = new( text, 12f );
+		label = new( text, 13f );
 		label.Parent = this;
 
 		if ( onClick != null )
@@ -25,36 +26,28 @@ internal class Button : Widget
 
 	bool mouseWasDown = false;
 
-	internal override void Render( ref PanelRenderer panelRenderer )
+	internal override void Render()
 	{
 		Vector4 colorA = ITheme.Current.ButtonBgA;
 		Vector4 colorB = ITheme.Current.ButtonBgB;
 
 		Vector4 border = ITheme.Current.Border;
 
+		Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+
 		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
 		{
-			panelRenderer.AddRectangle( Bounds, Colors.Blue );
+			Graphics.DrawRect( Bounds, Colors.Blue );
 
 			if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
 			{
-				panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
-					colorB * 1.25f,
-					colorA * 1.25f,
-					colorB * 1.25f,
-					colorA * 1.25f
-				);
+				Graphics.DrawRect( Bounds.Shrink( 1f ), colorB, colorA );
 
 				mouseWasDown = true;
 			}
 			else
 			{
-				panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
-					colorA,
-					colorB,
-					colorA,
-					colorB
-				);
+				Graphics.DrawRect( Bounds.Shrink( 1f ), colorA, colorB );
 
 				if ( mouseWasDown )
 				{
@@ -66,26 +59,25 @@ internal class Button : Widget
 		}
 		else
 		{
-			panelRenderer.AddRectangle( Bounds, border );
-
-			panelRenderer.AddRectangle( Bounds.Shrink( 1f ),
-				colorA,
-				colorB,
-				colorA,
-				colorB
-			);
+			Graphics.DrawRect( Bounds, border );
+			Graphics.DrawRect( Bounds.Shrink( 1f ), colorA, colorB );
 		}
 
+		UpdateLabel();
+	}
+
+	protected void UpdateLabel()
+	{
 		var labelBounds = label.Bounds;
-		labelBounds.X = Bounds.X + ((Bounds.Width - 24f - Label.MeasureText( label.Text, label.FontSize ).X) * TextAnchor.X);
-		labelBounds.X += 12f;
-		labelBounds.Y = Bounds.Y + label.FontSize / 3.0f;
+		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - Label.MeasureText( label.Text, label.FontSize ).X) * TextAnchor.X);
+		labelBounds.X += Padding.X;
+		labelBounds.Y = Bounds.Y + (Padding.Y) - 8;
 		label.Bounds = labelBounds;
 	}
 
 	internal override Vector2 GetDesiredSize()
 	{
-		var size = new Vector2( (Label.MeasureText( label.Text, label.FontSize ).X + 24f).Clamp( 75f, float.MaxValue ), 24 );
+		var size = new Vector2( (Label.MeasureText( label.Text, label.FontSize ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
 		return size;
 	}
 }

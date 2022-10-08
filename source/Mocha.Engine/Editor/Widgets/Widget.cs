@@ -1,6 +1,4 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 internal class Widget
 {
@@ -9,12 +7,29 @@ internal class Widget
 
 	internal static List<Widget> All { get; } = new();
 
+	public BaseLayout Layout { get; set; }
 	public Widget? Parent { get; set; }
 	public int ZIndex { get => (Parent?.ZIndex ?? 0) + zIndex; set => zIndex = value; }
 	public bool Visible { get => (Parent?.Visible ?? true) && visible; set => visible = value; }
 
 	public PanelInputFlags InputFlags { get; set; }
-	public Rectangle Bounds { get; set; }
+
+	private Rectangle bounds;
+	public Rectangle Bounds
+	{
+		get
+		{
+			if ( Layout != null )
+				return bounds + Layout.Bounds.Position;
+
+			return bounds;
+		}
+		set
+		{
+			bounds = value;
+			OnBoundsChanged();
+		}
+	}
 
 	internal Widget()
 	{
@@ -26,7 +41,7 @@ internal class Widget
 		All.Remove( this );
 	}
 
-	internal virtual void Render( ref PanelRenderer panelRenderer )
+	internal virtual void Render()
 	{
 	}
 
@@ -45,5 +60,10 @@ internal class Widget
 	internal virtual Vector2 GetDesiredSize()
 	{
 		return Bounds.Size;
+	}
+
+	internal virtual void OnBoundsChanged()
+	{
+
 	}
 }

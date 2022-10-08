@@ -21,6 +21,6 @@ internal class Panel : Widget
 
 	internal virtual void Render( ref PanelRenderer panelRenderer )
 	{
-		panelRenderer.AddRectangle( Bounds, Color );
+		Graphics.DrawRect( Bounds, Color );
 	}
 }
