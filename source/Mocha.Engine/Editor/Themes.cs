@@ -9,6 +9,7 @@ public interface ITheme
 	Vector4 ButtonBgA { get; }
 	Vector4 ButtonBgB { get; }
 	Vector4 Border { get; }
+	float ShadowOpacity { get; }
 }
 
 public class DarkTheme : ITheme
@@ -22,6 +23,8 @@ public class DarkTheme : ITheme
 	public Vector4 ButtonBgB => MathX.GetColor( "#292524" );
 
 	public Vector4 Border => MathX.GetColor( "#050506" );
+
+	public float ShadowOpacity => 0.05f;
 }
 
 public class LightTheme : ITheme
@@ -35,17 +38,21 @@ public class LightTheme : ITheme
 	public Vector4 ButtonBgB => MathX.GetColor( "#f2f2f2" );
 
 	public Vector4 Border => MathX.GetColor( "#d9d9d9" );
+
+	public float ShadowOpacity => 0.025f;
 }
 
 public class TestTheme : ITheme
 {
-	public Vector4 BackgroundColor => MathX.GetColor( "#141416" );
+	public Vector4 BackgroundColor => MathX.GetColor( "#333438" );
 
-	public Vector4 TextColor => MathX.GetColor( "#ffffff" );
+	public Vector4 TextColor => MathX.GetColor( "#aaffffff" );
 
-	public Vector4 ButtonBgA => MathX.GetColor( "#29292b" );
+	public Vector4 ButtonBgA => MathX.GetColor( "#53595b" );
 
-	public Vector4 ButtonBgB => MathX.GetColor( "#1f1f22" );
+	public Vector4 ButtonBgB => MathX.GetColor( "#3b3e42" );
 
-	public Vector4 Border => MathX.GetColor( "#343436" );
+	public Vector4 Border => MathX.GetColor( "#551a1c20" );
+
+	public float ShadowOpacity => 0.1f;
 }

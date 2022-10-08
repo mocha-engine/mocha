@@ -1,11 +1,20 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 internal class Label : Widget
 {
-	public string Text { get; set; }
-	public float FontSize { get; set; } = 16f;
+	private string calculatedText = "";
+	private string text;
+
+	public string Text
+	{
+		get => text; set
+		{
+			text = value;
+			CalculateText();
+		}
+	}
+	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
+	public float FontSize { get; set; } = 14f;
 
 	[Obsolete( "Bad place for this" )]
 	public static Vector2 MeasureText( string text, float fontSize )
@@ -21,7 +30,7 @@ internal class Label : Widget
 		return new Vector2( x, fontSize * 1.25f );
 	}
 
-	internal Label( string text, float fontSize = 16f ) : base()
+	internal Label( string text, float fontSize = 14f ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;
@@ -46,11 +55,11 @@ internal class Label : Widget
 		return glyphRect;
 	}
 
-	internal override void Render( ref PanelRenderer panelRenderer )
+	internal override void Render()
 	{
 		float x = 0;
 
-		foreach ( var c in Text )
+		foreach ( var c in calculatedText )
 		{
 			var glyph = EditorInstance.FontData.Glyphs.First( x => x.Unicode == (int)c );
 
@@ -67,10 +76,14 @@ internal class Label : Widget
 				glyphPos.X += (float)glyph.PlaneBounds.Left * FontSize;
 				glyphPos.Y -= (float)glyph.PlaneBounds.Top * FontSize;
 
-				panelRenderer.AddRectangle(
+				float screenPxRange = EditorInstance.FontData.Atlas.DistanceRange * (glyphPos.Size / EditorInstance.FontData.Atlas.Size).Length;
+				screenPxRange *= 1.5f;
+
+				Graphics.DrawRect(
 					glyphPos,
 					glyphRect,
-					ITheme.Current.TextColor
+					screenPxRange,
+					Color
 				);
 			}
 
@@ -81,5 +94,35 @@ internal class Label : Widget
 	internal override Vector2 GetDesiredSize()
 	{
 		return MeasureText( Text, FontSize );
+	}
+
+	internal override void OnBoundsChanged()
+	{
+		CalculateText();
+	}
+
+	private void CalculateText()
+	{
+		var text = Text;
+
+		if ( MeasureText( text, FontSize ).X > Bounds.Width )
+		{
+			for ( int i = 0; i < text.Length; ++i )
+			{
+				var search = text[..^i] + "...";
+				var searchSize = MeasureText( search, FontSize );
+
+				if ( char.IsWhiteSpace( search[^1] ) )
+					continue;
+
+				if ( searchSize.X < Bounds.Width )
+				{
+					text = search;
+					break;
+				}
+			}
+		}
+
+		calculatedText = text;
 	}
 }

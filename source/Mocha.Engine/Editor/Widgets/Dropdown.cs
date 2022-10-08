@@ -1,10 +1,8 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 internal class Dropdown : Button
 {
-	private List<Button> options = new();
+	private List<Selectable> options = new();
 
 	private bool drawOptions = false;
 	private bool DrawOptions
@@ -36,6 +34,7 @@ internal class Dropdown : Button
 
 		TextAnchor = new Vector2( 0f, 0.5f );
 		ZIndex = 10;
+
 		DrawOptions = false;
 	}
 
@@ -43,7 +42,7 @@ internal class Dropdown : Button
 	{
 		int index = options.Count;
 
-		var option = new Button( text, () =>
+		var option = new Selectable( text, () =>
 		{
 			SelectedIndex = index;
 			Selected = text;
@@ -58,11 +57,11 @@ internal class Dropdown : Button
 		options.Add( option );
 	}
 
-	internal override void Render( ref PanelRenderer panelRenderer )
+	internal override void Render()
 	{
-		base.Render( ref panelRenderer );
+		base.Render();
 
-		var cursor = Bounds.Position + new Vector2( 0, 24 );
+		var cursor = Bounds.Position + new Vector2( 0, GetDesiredSize().Y );
 
 		foreach ( var option in options )
 		{
@@ -80,12 +79,35 @@ internal class Dropdown : Button
 
 			option.Bounds = new Rectangle( cursor, desiredSize );
 			option.TextAnchor = new Vector2( 0f, 0.5f );
+
 			cursor += new Vector2( 0, desiredSize.Y );
+		}
+
+		if ( DrawOptions )
+		{
+			Vector4 colorA = ITheme.Current.ButtonBgA;
+			Vector4 colorB = ITheme.Current.ButtonBgB;
+			Vector4 border = ITheme.Current.Border;
+
+			var optionBounds = Bounds;
+			optionBounds.Position += new Vector2( 0, GetDesiredSize().Y - 1 );
+			optionBounds.Size = optionBounds.Size.WithY( GetDesiredSize().Y * options.Count );
+
+			Graphics.DrawShadow( optionBounds, 4f, ITheme.Current.ShadowOpacity );
+			Graphics.DrawRect( optionBounds, border );
+			Graphics.DrawRect( optionBounds.Shrink( 1f ),
+					colorA,
+					colorB,
+					colorA,
+					colorB
+			);
 		}
 	}
 
 	internal override Vector2 GetDesiredSize()
 	{
-		return new Vector2( 128, 24 );
+		var baseSize = base.GetDesiredSize();
+		baseSize.X = 256;
+		return baseSize;
 	}
 }

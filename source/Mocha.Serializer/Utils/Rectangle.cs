@@ -63,13 +63,13 @@ public struct Rectangle
 		return $"Position: {X}, {Y} | Size: {Width}, {Height}";
 	}
 
-	public Rectangle Expand( float v )
+	public Rectangle Expand( Vector2 v )
 	{
-		return new Rectangle( this.X - v, this.Y - v, this.Width + v*2, this.Height + v*2 );
+		return new Rectangle( this.X - v.X, this.Y - v.Y, this.Width + v.X*2, this.Height + v.Y*2 );
 	}
 
-	public Rectangle Shrink( float v )
+	public Rectangle Shrink( Vector2 v )
 	{
-		return new Rectangle( this.X + v, this.Y + v, this.Width - v*2, this.Height - v*2 );
+		return new Rectangle( this.X + v.X, this.Y + v.Y, this.Width - v.X*2, this.Height - v.Y*2 );
 	}
 }
