@@ -78,4 +78,11 @@ internal class Button : Widget
 		var size = new Vector2( (Label.MeasureText( label.Text, label.FontSize ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
 		return size;
 	}
+
+	internal override void OnDelete()
+	{
+		base.OnDelete();
+
+		label.Delete();
+	}
 }

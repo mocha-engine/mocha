@@ -30,8 +30,14 @@ internal class Widget
 		All.Add( this );
 	}
 
+	internal virtual void OnDelete()
+	{
+
+	}
+
 	internal void Delete()
 	{
+		OnDelete();
 		Layout?.Remove( this );
 		All?.Remove( this );
 	}
