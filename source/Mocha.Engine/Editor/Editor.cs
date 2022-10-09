@@ -11,7 +11,7 @@ internal partial class EditorInstance
 		Event.Register( this );
 		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{Font}.json" );
 
-		BuildAtlas();
+		InitializeAtlas();
 		Graphics.PanelRenderer = new( AtlasTexture );
 
 		var window = new Window();

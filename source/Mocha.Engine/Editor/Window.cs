@@ -7,6 +7,7 @@ internal class Window : Widget
 
 	bool titlebarFocus = false;
 	Vector2 lastPos = 0;
+	private Image CurrentImage;
 
 	public Window()
 	{
@@ -169,10 +170,6 @@ internal class Window : Widget
 		// Different button lengths (sizing test)
 		//
 		RootLayout.Add( new Button( "Another awesome button" ) );
-		RootLayout.Add( new Button( "I like big butts", () =>
-		{
-			RootLayout.Add( new Image( 200 ), false );
-		} ) );
 		RootLayout.Add( new Button( "OK" ) );
 		RootLayout.Add( new Button( "I am a really long button with some really long text inside it" ) );
 		RootLayout.Add( new Button( "Stretch" ) );
@@ -187,6 +184,24 @@ internal class Window : Widget
 		dropdown.AddOption( "I am a really long dropdown entry" );
 		dropdown.AddOption( "Poo" );
 		RootLayout.Add( dropdown );
+
+		//
+		// Images test
+		//
+		var imageDropdown = new Dropdown( "Image Gallery" );
+
+		foreach ( var file in FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ) )
+		{
+			imageDropdown.AddOption( file.NormalizePath() );
+		}
+
+		imageDropdown.OnSelected += ( i ) =>
+		{
+			CurrentImage.SetImage( FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ).ToList()[i] );
+		};
+
+		RootLayout.Add( imageDropdown );
+		CurrentImage = RootLayout.Add( new Image( new Vector2( 200, 200 ), "core/ui/mercy.mtex" ), false );
 	}
 
 	internal string GetCurrentTheme()

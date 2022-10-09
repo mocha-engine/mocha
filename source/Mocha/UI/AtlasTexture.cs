@@ -89,9 +89,17 @@ public class AtlasBuilder
 		return sprite;
 	}
 
+	public void RemoveSprite( Sprite sprite )
+	{
+		Log.Trace( $"Freeing sprite with size {sprite.Rect.Size}" );
+		sprites.Remove( sprite );
+	}
+
 	public Texture Build()
 	{
 		var (width, height) = CalculateSize();
+
+		Log.Trace( $"Building atlas with size {(width, height)}" );
 
 		//
 		// Collect all texture data
@@ -135,7 +143,7 @@ public class AtlasBuilder
 		//
 		// Make texture
 		//
-		var texture = TextureBuilder.UITexture.FromData( TextureData, (uint)width, (uint)height ).Build();
+		var texture = TextureBuilder.UITexture.FromData( TextureData, (uint)width, (uint)height ).IgnoreCache().Build();
 		return texture;
 	}
 }

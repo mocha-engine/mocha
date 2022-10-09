@@ -33,11 +33,11 @@ internal class BaseLayout
 
 	public void Delete()
 	{
-		Widgets.ForEach( x => x.Widget.Delete() );
+		Widgets.ToList().ForEach( x => x.Widget.Delete() );
 		All.Remove( this );
 	}
 
-	public void Add<T>( T widget, bool stretch = true ) where T : Widget
+	public T Add<T>( T widget, bool stretch = true ) where T : Widget
 	{
 		widget.Layout = this;
 
@@ -63,6 +63,8 @@ internal class BaseLayout
 		}
 
 		Widgets.Add( (stretch, widget) );
+
+		return widget;
 	}
 
 	internal void AddSpacing( float height )
@@ -113,5 +115,10 @@ internal class BaseLayout
 		Layouts.Add( verticalLayout );
 
 		return verticalLayout;
+	}
+
+	public void Remove( Widget widget )
+	{
+		Widgets.RemoveAll( x => x.Widget == widget );
 	}
 }
