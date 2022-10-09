@@ -21,9 +21,6 @@ partial class EditorInstance
 		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/baked/{Font}.mtex" );
 		var fontTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data;
 
-		var testBytes = FileSystem.Game.ReadAllBytes( $"core/ui/sombra.mtex" );
-		var testTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( testBytes ).Data;
-
 		//
 		// Resize the atlas to fit everything we need
 		//

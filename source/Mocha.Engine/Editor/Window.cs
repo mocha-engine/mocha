@@ -1,13 +1,14 @@
 ﻿namespace Mocha.Engine.Editor;
+
 internal class Window : Widget
 {
-	private VerticalLayout RootLayout { get; set; }
+	protected VerticalLayout RootLayout { get; set; }
 	private const string Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed pharetra lorem. Aliquam eget tristique turpis, eget tristique mi. Nullam et ex vitae mauris dapibus luctus nec vel nisl. Nam venenatis vel orci a sagittis.";
 	private bool DrawBounds = false;
 
 	bool titlebarFocus = false;
 	Vector2 lastPos = 0;
-	private Image CurrentImage;
+	bool Focused = false;
 
 	public Window()
 	{
@@ -22,9 +23,6 @@ internal class Window : Widget
 
 		RootLayout?.Delete();
 		RootLayout = null;
-
-		Widget.All.ToList().ForEach( x => x.Delete() );
-		Widget.All.Clear();
 	}
 
 	float t = 0;
@@ -48,7 +46,7 @@ internal class Window : Widget
 		//
 		Graphics.DrawRectUnfilled( Bounds, Colors.TransparentGray );
 
-		if ( Bounds.Contains( Input.MousePosition ) )
+		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
 		{
 			t = t.LerpTo( 1.0f, Time.Delta * 15f );
 		}
@@ -60,7 +58,7 @@ internal class Window : Widget
 		for ( int i = 0; i < 4 * t; ++i )
 			Graphics.DrawRectUnfilled( Bounds.Shrink( i ), Colors.Blue * t );
 
-		if ( !Input.MouseLeft && titlebarFocus )
+		if ( !InputFlags.HasFlag( PanelInputFlags.MouseDown ) && titlebarFocus )
 		{
 			titlebarFocus = false;
 		}
@@ -73,19 +71,19 @@ internal class Window : Widget
 			bounds.Position += (Vector2)Input.MousePosition - (Vector2)lastPos;
 			lastPos = Input.MousePosition;
 			Bounds = bounds;
+
+			Widget.All.OfType<Window>().ToList().ForEach( x => x.Focused = false );
+			Focused = true;
 		}
 
-		if ( titlebarBounds.Contains( Input.MousePosition ) )
+		if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
 		{
-			if ( Input.MouseLeft )
-			{
-				lastPos = Input.MousePosition;
-				titlebarFocus = true;
-			}
+			lastPos = Input.MousePosition;
+			titlebarFocus = true;
 		}
 
+		ZIndex = (Focused) ? 100 : 0;
 		RootLayout.Bounds = Bounds;
-		RootLayout.Render();
 
 		//
 		// Debug: draw widget bounds
@@ -116,7 +114,7 @@ internal class Window : Widget
 		CreateUI();
 	}
 
-	public void CreateUI()
+	public virtual void CreateUI()
 	{
 		using var _ = new Stopwatch( "CreateUI" );
 
@@ -130,7 +128,8 @@ internal class Window : Widget
 		//
 		RootLayout = new VerticalLayout
 		{
-			Size = (Vector2)Screen.Size
+			Size = (Vector2)Screen.Size,
+			Parent = this
 		};
 
 		RootLayout.Spacing = 10;
@@ -140,8 +139,8 @@ internal class Window : Widget
 		//
 		// Text rendering
 		//
-		RootLayout.Add( new Label( "The quick brown fox", 64 ) );
-		RootLayout.Add( new Label( "This is a test", 32 ) );
+		RootLayout.Add( new Label( "Test Window", 64 ) );
+		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
 		RootLayout.Add( new Label( Lipsum, 13 ) );
 
 		RootLayout.AddSpacing( 4f );
@@ -149,11 +148,11 @@ internal class Window : Widget
 		//
 		// Theme switcher (dropdown)
 		//
-		var themeSwitcher = new Dropdown( GetCurrentTheme() );
+		var themeSwitcher = new Dropdown( EditorInstance.Instance.GetCurrentTheme() );
 		themeSwitcher.AddOption( "Dark Theme" );
 		themeSwitcher.AddOption( "Light Theme" );
 		themeSwitcher.AddOption( "Test Theme" );
-		themeSwitcher.OnSelected += SwitchTheme;
+		themeSwitcher.OnSelected += EditorInstance.Instance.SwitchTheme;
 		RootLayout.Add( themeSwitcher );
 
 		//
@@ -184,50 +183,5 @@ internal class Window : Widget
 		dropdown.AddOption( "I am a really long dropdown entry" );
 		dropdown.AddOption( "Poo" );
 		RootLayout.Add( dropdown );
-
-		//
-		// Images test
-		//
-		var imageDropdown = new Dropdown( "Image Gallery" );
-
-		foreach ( var file in FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ) )
-		{
-			imageDropdown.AddOption( file.NormalizePath() );
-		}
-
-		imageDropdown.OnSelected += ( i ) =>
-		{
-			CurrentImage.SetImage( FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ).ToList()[i] );
-		};
-
-		RootLayout.Add( imageDropdown );
-		CurrentImage = RootLayout.Add( new Image( new Vector2( 200, 200 ), "core/ui/mercy.mtex" ), false );
-	}
-
-	internal string GetCurrentTheme()
-	{
-		if ( ITheme.Current is LightTheme )
-			return "Light Theme";
-		if ( ITheme.Current is DarkTheme )
-			return "Dark Theme";
-		if ( ITheme.Current is TestTheme )
-			return "Test Theme";
-
-		return "???";
-	}
-
-	internal void SwitchTheme( int newSelection )
-	{
-		Log.Trace( newSelection );
-
-		if ( newSelection == 0 )
-			ITheme.Current = new DarkTheme();
-		else if ( newSelection == 1 )
-			ITheme.Current = new LightTheme();
-		else
-			ITheme.Current = new TestTheme();
-
-		Renderer.Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
-		CreateUI();
 	}
 }

@@ -25,6 +25,7 @@ internal class BaseLayout
 	}
 
 	public Rectangle Bounds { get; set; }
+	public Widget? Parent { get; set; }
 
 	public BaseLayout()
 	{
@@ -40,6 +41,9 @@ internal class BaseLayout
 	public T Add<T>( T widget, bool stretch = true ) where T : Widget
 	{
 		widget.Layout = this;
+
+		if ( Parent != null )
+			widget.Parent = Parent;
 
 		var desiredSize = widget.GetDesiredSize();
 		widget.Bounds = new Rectangle( cursor + Margin, desiredSize );
@@ -75,38 +79,6 @@ internal class BaseLayout
 		//
 		var dummy = new Widget() { Bounds = new Rectangle( 0, 0, 0, height ) };
 		Add( dummy, true );
-	}
-
-	internal void Render()
-	{
-		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
-		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
-
-		foreach ( var widget in widgets )
-		{
-			widget.InputFlags = PanelInputFlags.None;
-		}
-
-		if ( mouseOverWidgets.Any() )
-		{
-			var focusedWidget = mouseOverWidgets.Last();
-			focusedWidget.InputFlags |= PanelInputFlags.MouseOver;
-
-			if ( Input.MouseLeft )
-			{
-				focusedWidget.InputFlags |= PanelInputFlags.MouseDown;
-			}
-		}
-
-		foreach ( var widget in widgets )
-		{
-			widget.Render();
-		}
-
-		foreach ( var layout in Layouts )
-		{
-			layout.Render();
-		}
 	}
 
 	public VerticalLayout AddVerticalLayout()

@@ -110,4 +110,11 @@ internal class Dropdown : Button
 		baseSize.X = 256;
 		return baseSize;
 	}
+
+	internal override void OnDelete()
+	{
+		base.OnDelete();
+
+		options.ForEach( x => x.Delete() );
+	}
 }
