@@ -42,8 +42,6 @@ public class PanelRenderer : Asset
 	private int RectCount = 0;
 	private List<UIVertex> Vertices = new();
 
-	private Texture atlasTexture;
-
 	[StructLayout( LayoutKind.Sequential )]
 	public struct UIUniformBuffer
 	{
@@ -103,8 +101,14 @@ public class PanelRenderer : Asset
 
 		All.Add( this );
 		Material.Shader.OnRecompile += CreateResources;
+	}
 
-		this.atlasTexture = atlasTexture;
+	public void UpdateAtlas( Texture atlasTexture )
+	{
+		Material.DiffuseTexture = atlasTexture;
+		CreateResources();
+
+		Log.Trace( "Updated atlas" );
 	}
 
 	private void UpdateIndexBuffer( uint[] indices )
@@ -151,6 +155,8 @@ public class PanelRenderer : Asset
 			uniformBuffer );
 
 		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
+
+		Log.Trace( "Updated object rsrc set" );
 	}
 
 	private void CreateUniformBuffer()

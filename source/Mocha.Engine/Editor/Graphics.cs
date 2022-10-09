@@ -69,9 +69,9 @@ public static class Graphics
 		DrawRect( lineD, color );
 	}
 
-	public static void DrawImage( Rectangle bounds )
+	public static void DrawImage( Rectangle bounds, Sprite sprite )
 	{
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0.46f, 0.0f, 0.5f, 1.0f ), 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
+		PanelRenderer.AddRectangle( bounds, sprite.Rect / EditorInstance.AtlasTexture.Size, 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
 	}
 
 	internal static void DrawTexture( Rectangle bounds, Texture texture )

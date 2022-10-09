@@ -32,7 +32,8 @@ internal class Widget
 
 	internal void Delete()
 	{
-		All.Remove( this );
+		Layout?.Remove( this );
+		All?.Remove( this );
 	}
 
 	internal virtual void Render()
