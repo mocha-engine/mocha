@@ -1,9 +1,16 @@
-﻿using SharpDX.D3DCompiler;
-using System.Net.Http.Headers;
-using System.Runtime.InteropServices;
-using Veldrid;
+﻿using System.Runtime.InteropServices;
 
 namespace Mocha.Renderer.UI;
+
+[Flags]
+public enum GraphicsFlags
+{
+	None = 0,
+	UseRawImage = 1,
+	UseSdf = 2,
+
+	HighDistMul = 4,
+}
 
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public class PanelRenderer : Asset
@@ -54,18 +61,18 @@ public class PanelRenderer : Asset
 		public Vector3 Position { get; set; }
 		public Vector2 TexCoords { get; set; }
 		public Vector4 Color { get; set; }
-		public float ScreenPxRange { get; set; }
 		public Vector2 PanelPos { get; set; }
 		public Vector2 PanelSize { get; set; }
+		public short Flags { get; set; }
 
 		public static VertexElementDescription[] VertexElementDescriptions = new[]
 		{
 			new VertexElementDescription( "position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float3 ),
 			new VertexElementDescription( "texCoords", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
 			new VertexElementDescription( "color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4 ),
-			new VertexElementDescription( "screenPxRange", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float1 ),
 			new VertexElementDescription( "panelPos", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
 			new VertexElementDescription( "panelSize", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2 ),
+			new VertexElementDescription( "flags", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Int1 ),
 		};
 	}
 
@@ -160,7 +167,7 @@ public class PanelRenderer : Asset
 		RectCount = 0;
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD )
+	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, GraphicsFlags flags )
 	{
 		var ndcRect = rect / (Vector2)Screen.Size;
 		var vertices = RectVertices.Select( ( x, i ) =>
@@ -180,7 +187,6 @@ public class PanelRenderer : Asset
 
 			tx.Position = position;
 			tx.TexCoords = texCoords;
-			tx.ScreenPxRange = screenPxRange;
 			tx.PanelPos *= rect.Size;
 			tx.PanelSize = rect.Size;
 			tx.Color = i switch
@@ -191,6 +197,7 @@ public class PanelRenderer : Asset
 				3 => colorD,
 				_ => Vector4.Zero,
 			};
+			tx.Flags = (short)flags;
 
 			return tx;
 		} ).ToArray();

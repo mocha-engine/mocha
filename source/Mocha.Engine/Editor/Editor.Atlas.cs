@@ -10,7 +10,8 @@ partial class EditorInstance
 	internal static Sprite FontSprite { get; set; }
 	internal static Sprite WhiteSprite { get; set; }
 	internal static Sprite SDFSprite { get; set; }
-	
+	internal static Sprite TestSprite { get; set; }
+
 	private void BuildAtlas()
 	{
 		AtlasTexture?.Delete();
@@ -19,12 +20,17 @@ partial class EditorInstance
 		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/baked/{Font}.mtex" );
 		var fontTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes ).Data;
 
+
+		var testBytes = FileSystem.Game.ReadAllBytes( $"core/ui/widow.mtex" );
+		var testTextureInfo = Serializer.Deserialize<MochaFile<TextureInfo>>( testBytes ).Data;
+
 		//
 		// Resize the atlas to fit everything we need
 		//
 		WhiteSprite = atlasBuilder.AddSprite( new Point2( 32, 32 ) );
 		SDFSprite = atlasBuilder.AddSprite( new Point2( 32, 32 ) );
 		FontSprite = atlasBuilder.AddSprite( new Point2( (int)fontTextureInfo.Width, (int)fontTextureInfo.Height ) );
+		TestSprite = atlasBuilder.AddSprite( new Point2( (int)testTextureInfo.Width, (int)testTextureInfo.Height ) );
 
 		//
 		// Set sprite data
@@ -95,6 +101,23 @@ partial class EditorInstance
 			}
 
 			FontSprite.SetData( fontSpriteData );
+		}
+
+		// Test data
+		{
+			var testSpriteData = new Vector4[testTextureInfo.Width * testTextureInfo.Height];
+
+			for ( int i = 0; i < testTextureInfo.MipData[0].Length; i += 4 )
+			{
+				float x = testTextureInfo.MipData[0][i] / 255f;
+				float y = testTextureInfo.MipData[0][i + 1] / 255f;
+				float z = testTextureInfo.MipData[0][i + 2] / 255f;
+				float w = testTextureInfo.MipData[0][i + 3] / 255f;
+
+				testSpriteData[i / 4] = new Vector4( x, y, z, w );
+			}
+
+			TestSprite.SetData( testSpriteData );
 		}
 
 		//

@@ -11,7 +11,6 @@ internal class BaseLayout
 	public Vector2 Margin { get; set; } = 0;
 
 	private Vector2 cursor = 0;
-	private Vector2 offset = 0;
 	private Vector2 calculatedSize;
 	public Vector2 Size { get; set; } = new( -1, -1 );
 	public Vector2 CalculatedSize
@@ -32,67 +31,38 @@ internal class BaseLayout
 		All.Add( this );
 	}
 
-	public BaseLayout( Vector2 offset ) : this()
-	{
-		this.offset = offset;
-	}
-
 	public void Delete()
 	{
 		Widgets.ForEach( x => x.Widget.Delete() );
 		All.Remove( this );
 	}
 
-	public void Add<T>( T widget, bool stretch = false ) where T : Widget
+	public void Add<T>( T widget, bool stretch = true ) where T : Widget
 	{
-		stretch = true;
 		widget.Layout = this;
-		Widgets.Add( (stretch, widget) );
 
-		RecalculateLayout();
-	}
+		var desiredSize = widget.GetDesiredSize();
+		widget.Bounds = new Rectangle( cursor + Margin, desiredSize );
 
-	private void ApplyStretch()
-	{
-		for ( int i = 0; i < Widgets.Count; i++ )
+		cursor = cursor.WithY( cursor.Y + desiredSize.Y + Spacing );
+
+		//
+		// Update auto-calculated size
+		//
+		if ( desiredSize.X > calculatedSize.X )
+			calculatedSize = calculatedSize.WithX( desiredSize.X );
+
+		if ( cursor.Y > calculatedSize.Y )
+			calculatedSize = calculatedSize.WithY( cursor.Y );
+
+		if ( stretch )
 		{
-			if ( !Widgets[i].Stretch )
-				continue;
-
-			var calculatedRect = Widgets[i].Widget.Bounds;
+			var calculatedRect = widget.RelativeBounds;
 			calculatedRect.Width = CalculatedSize.X - (Margin.X * 2.0f);
-			Widgets[i].Widget.Bounds = calculatedRect;
-		}
-	}
-
-	private void RecalculateLayout()
-	{
-		cursor = Margin;
-		Log.Trace( $"Recalculating layout, cursor is at {cursor}" );
-
-		for ( int i = 0; i < Widgets.Count; i++ )
-		{
-			var widget = Widgets[i].Widget;
-			var desiredSize = widget.GetDesiredSize();
-			widget.Bounds = new Rectangle( cursor + offset, desiredSize );
-
-			cursor = cursor.WithY( cursor.Y + desiredSize.Y + Spacing );
-
-			//
-			// Update auto-calculated size
-			//
-			if ( desiredSize.X > calculatedSize.X )
-				calculatedSize = calculatedSize.WithX( desiredSize.X );
-
-			if ( cursor.Y > calculatedSize.Y )
-				calculatedSize = calculatedSize.WithY( cursor.Y );
-
-			var calculatedRect = Widgets[i].Widget.Bounds;
-			calculatedRect.Width = CalculatedSize.X;
-			Widgets[i].Widget.Bounds = calculatedRect;
+			widget.Bounds = calculatedRect;
 		}
 
-		ApplyStretch();
+		Widgets.Add( (stretch, widget) );
 	}
 
 	internal void AddSpacing( float height )
@@ -103,8 +73,6 @@ internal class BaseLayout
 		//
 		var dummy = new Widget() { Bounds = new Rectangle( 0, 0, 0, height ) };
 		Add( dummy, true );
-
-		ApplyStretch();
 	}
 
 	internal void Render()

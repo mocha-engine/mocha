@@ -26,6 +26,7 @@ internal class Window : Widget
 		Widget.All.Clear();
 	}
 
+	float t = 0;
 	internal override void Render()
 	{
 		//
@@ -33,16 +34,30 @@ internal class Window : Widget
 		//
 		Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
 		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor );
-		// Graphics.DrawRectUnfilled( Bounds, Colors.Red );
-
-		RootLayout.Render();
 
 		//
 		// Titlebar
 		//
 		var titlebarBounds = Bounds;
-		titlebarBounds.Size = titlebarBounds.Size.WithY( 24 );
+		titlebarBounds.Size = titlebarBounds.Size.WithY( 32 );
 		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB );
+
+		//
+		// Window border
+		//
+		Graphics.DrawRectUnfilled( Bounds, Colors.TransparentGray );
+
+		if ( Bounds.Contains( Input.MousePosition ) )
+		{
+			t = t.LerpTo( 1.0f, Time.Delta * 15f );
+		}
+		else
+		{
+			t = t.LerpTo( 0.0f, Time.Delta * 5f );
+		}
+
+		for ( int i = 0; i < 4 * t; ++i )
+			Graphics.DrawRectUnfilled( Bounds.Shrink( i ), Colors.Blue * t );
 
 		if ( !Input.MouseLeft && titlebarFocus )
 		{
@@ -69,6 +84,7 @@ internal class Window : Widget
 		}
 
 		RootLayout.Bounds = Bounds;
+		RootLayout.Render();
 
 		//
 		// Debug: draw widget bounds
@@ -96,18 +112,13 @@ internal class Window : Widget
 	[Event.Hotload]
 	public void OnHotload()
 	{
-		// CreateUI();
-	}
-
-	[Event.Window.Resized]
-	public void OnResize( Point2 _ )
-	{
 		CreateUI();
 	}
 
-	[Event.Hotload]
 	public void CreateUI()
 	{
+		using var _ = new Stopwatch( "CreateUI" );
+
 		//
 		// Clean up existing widgets & panels
 		//
@@ -160,11 +171,11 @@ internal class Window : Widget
 		RootLayout.Add( new Button( "Another awesome button" ) );
 		RootLayout.Add( new Button( "I like big butts", () =>
 		{
-			RootLayout.Add( new Label( "Hello!!!!!!", 32 ) );
+			RootLayout.Add( new Image( 200 ), false );
 		} ) );
 		RootLayout.Add( new Button( "OK" ) );
 		RootLayout.Add( new Button( "I am a really long button with some really long text inside it" ) );
-		RootLayout.Add( new Button( "Stretch" ), true );
+		RootLayout.Add( new Button( "Stretch" ) );
 
 		//
 		// Test dropdown

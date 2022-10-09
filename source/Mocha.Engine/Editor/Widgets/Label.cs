@@ -13,6 +13,7 @@ internal class Label : Widget
 			CalculateText();
 		}
 	}
+
 	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
 	public float FontSize { get; set; } = 14f;
 
@@ -49,6 +50,7 @@ internal class Label : Widget
 
 		var glyphRect = new Rectangle( mins, maxs );
 
+		glyphRect.Y += EditorInstance.FontSprite.Rect.Y - 12f;
 		glyphRect /= EditorInstance.AtlasTexture.Size;
 		glyphRect.Y = 1.0f - glyphRect.Y;
 
@@ -68,8 +70,9 @@ internal class Label : Widget
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
 				float heightMul = EditorInstance.AtlasTexture.Height / EditorInstance.FontSprite.Rect.Height;
+				float widthMul = EditorInstance.AtlasTexture.Width / EditorInstance.FontSprite.Rect.Width;
 
-				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height * heightMul );
+				var glyphSize = new Vector2( glyphRect.Width * widthMul, glyphRect.Height * heightMul );
 				glyphSize *= FontSize * 6;
 
 				var glyphPos = new Rectangle( new Vector2( Bounds.X + x, Bounds.Y + FontSize ), glyphSize );
@@ -78,6 +81,9 @@ internal class Label : Widget
 
 				float screenPxRange = EditorInstance.FontData.Atlas.DistanceRange * (glyphPos.Size / EditorInstance.FontData.Atlas.Size).Length;
 				screenPxRange *= 1.5f;
+
+				if ( glyphPos.X > Bounds.X + Bounds.Width && Bounds.Width > 0 )
+					return;
 
 				Graphics.DrawRect(
 					glyphPos,
@@ -104,25 +110,6 @@ internal class Label : Widget
 	private void CalculateText()
 	{
 		var text = Text;
-
-		if ( MeasureText( text, FontSize ).X > Bounds.Width )
-		{
-			for ( int i = 0; i < text.Length; ++i )
-			{
-				var search = text[..^i] + "...";
-				var searchSize = MeasureText( search, FontSize );
-
-				if ( char.IsWhiteSpace( search[^1] ) )
-					continue;
-
-				if ( searchSize.X < Bounds.Width )
-				{
-					text = search;
-					break;
-				}
-			}
-		}
-
 		calculatedText = text;
 	}
 }

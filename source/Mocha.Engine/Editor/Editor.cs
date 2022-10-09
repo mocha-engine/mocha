@@ -15,7 +15,7 @@ internal partial class EditorInstance
 		Graphics.PanelRenderer = new( AtlasTexture );
 
 		var window = new Window();
-		window.Bounds = new Rectangle( 32, 32, 500, 550 );
+		window.Bounds = new Rectangle( 32, 32, 500, 750 );
 		window.CreateUI();
 
 		Windows.Add( window );
@@ -28,30 +28,6 @@ internal partial class EditorInstance
 
 		foreach ( var window in Windows )
 			window.Render();
-
-		//var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
-		//var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
-
-		//foreach ( var widget in widgets )
-		//{
-		//	widget.InputFlags = PanelInputFlags.None;
-		//}
-
-		//if ( mouseOverWidgets.Any() )
-		//{
-		//	var focusedWidget = mouseOverWidgets.Last();
-		//	focusedWidget.InputFlags |= PanelInputFlags.MouseOver;
-
-		//	if ( Input.MouseLeft )
-		//	{
-		//		focusedWidget.InputFlags |= PanelInputFlags.MouseDown;
-		//	}
-		//}
-
-		//foreach ( var widget in widgets )
-		//{
-		//	widget.Render( ref panelRenderer );
-		//}
 
 		Graphics.PanelRenderer.Draw( commandList );
 	}
