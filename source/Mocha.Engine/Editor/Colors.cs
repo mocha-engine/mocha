@@ -2,7 +2,7 @@
 
 static class Colors
 {
-	public static System.Numerics.Vector4 LightText => MathX.GetColor( "#ABB2BF" );
+	public static System.Numerics.Vector4 TransparentGray => MathX.GetColor( "#77ABB2BF" );
 
 	public static System.Numerics.Vector4 Red => MathX.GetColor( "#E06B74" );
 	public static System.Numerics.Vector4 Green => MathX.GetColor( "#98C379" );

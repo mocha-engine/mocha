@@ -43,9 +43,9 @@ struct VS_OUT {
 layout( location = 0 ) in vec3 g_vPosition;
 layout( location = 1 ) in vec2 g_vTexCoords;
 layout( location = 2 ) in vec4 g_vColor;
-layout( location = 3 ) in float g_flScreenPxRange;
-layout( location = 4 ) in vec2 g_vPanelPos;
-layout( location = 5 ) in vec2 g_vPanelSize;
+layout( location = 3 ) in vec2 g_vPanelPos;
+layout( location = 4 ) in vec2 g_vPanelSize;
+layout( location = 5 ) in int g_flags;
 
 #define g_flRounding 32
 
@@ -53,6 +53,7 @@ layout( location = 5 ) in vec2 g_vPanelSize;
 // Out
 //
 layout( location = 0 ) out VS_OUT vs_out;
+layout( location = 8 ) flat out int vs_flags;
 
 void main() {
     vec4 pos = vec4( g_vPosition.xy, 0.0, 1.0 );
@@ -61,10 +62,10 @@ void main() {
     vs_out.vPositionPS = pos.xyz;
     vs_out.vTexCoords = g_vTexCoords;
     vs_out.vColor = g_vColor;
-    vs_out.flScreenPxRange = g_flScreenPxRange;
     vs_out.vPanelPos = g_vPanelPos;
     vs_out.vPanelSize = g_vPanelSize;
-   
+
+    vs_flags = g_flags;
     gl_Position = pos;
 }
 
@@ -81,6 +82,7 @@ void main() {
 // In
 //
 layout( location = 0 ) in VS_OUT fs_in;
+layout( location = 8 ) flat in int fs_flags;
 
 //
 // Out
@@ -98,24 +100,41 @@ void main()
     normalizedPanelPos *= vec2( 0.15686275, 0.13559322 );
     normalizedPanelPos += vec2( 0.15686275, 0 );
 
-    // vec3 texSample = texture( sampler2D( g_tAtlas, g_sSampler ), normalizedPanelPos ).xyz;
+    float opacity = 1.0;
     vec3 texSample = GetTextureSample( g_tAtlas );
 
-    float r = texSample.r;
-    float g = texSample.g;
-    float b = texSample.b;
-    
-    float median = max(min(r, g), min(max(r, g), b));
-    float signed_dist = fs_in.flScreenPxRange * ( median - 0.5 );
-    float opacity = clamp( signed_dist + 0.5, 0.0, 1.0 );
+    //
+    // UseRawImage = 1
+    //
+    if ( (fs_flags & 1) == 1 )
+    {
+        fragColor = vec4( texSample, fs_in.vColor.a );
+    }
+    else
+    {
+        //
+        // UseSdf = 2
+        //
+        if ( (fs_flags & 2) == 2 )
+        {
+            float r = texSample.r;
+            float g = texSample.g;
+            float b = texSample.b;
+            
+            float median = max(min(r, g), min(max(r, g), b));
+            float signed_dist = 1.0 * ( median - 0.5 );
 
-    if ( fs_in.flScreenPxRange <= 0.01 )
-        opacity = 1;
+            //
+            // HighDistMul = 4
+            //
+            if ( (fs_flags & 4) == 4 )
+                signed_dist *= 3.0;
 
-
-    fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
-    // fragColor = vec4( sdfSample, 1 );
-    // fragColor = vec4( texSample, 1 );
+            opacity = clamp( signed_dist + 0.5, 0.0, 1.0 );
+        }
+        
+        fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
+    }
 }
 #endif
 // ==========================================================================================================================

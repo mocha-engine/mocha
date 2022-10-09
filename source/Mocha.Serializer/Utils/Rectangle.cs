@@ -43,6 +43,11 @@ public struct Rectangle
 		return new Rectangle( r.X + p.X, r.Y + p.Y, r.Width, r.Height );
 	}
 
+	public static Rectangle operator -( Rectangle r, Vector2 p )
+	{
+		return new Rectangle( r.X - p.X, r.Y - p.Y, r.Width, r.Height );
+	}
+
 	public static Rectangle operator /( Rectangle r, Vector2 p )
 	{
 		return new Rectangle( r.X / p.X, r.Y / p.Y, r.Width / p.X, r.Height / p.Y );
@@ -65,11 +70,11 @@ public struct Rectangle
 
 	public Rectangle Expand( Vector2 v )
 	{
-		return new Rectangle( this.X - v.X, this.Y - v.Y, this.Width + v.X*2, this.Height + v.Y*2 );
+		return new Rectangle( this.X - v.X, this.Y - v.Y, this.Width + v.X * 2, this.Height + v.Y * 2 );
 	}
 
 	public Rectangle Shrink( Vector2 v )
 	{
-		return new Rectangle( this.X + v.X, this.Y + v.Y, this.Width - v.X*2, this.Height - v.Y*2 );
+		return new Rectangle( this.X + v.X, this.Y + v.Y, this.Width - v.X * 2, this.Height - v.Y * 2 );
 	}
 }

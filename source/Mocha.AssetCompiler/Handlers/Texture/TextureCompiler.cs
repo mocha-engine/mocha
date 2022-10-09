@@ -65,7 +65,7 @@ public class TextureCompiler : BaseCompiler
 				textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
 			}
-			else if ( path.Contains( "font" ) )
+			else if ( path.Contains( "font" ) || path.Contains( "ui" ) )
 			{
 				// Do not compress
 				textureFormat.CompressionFormat = Veldrid.PixelFormat.R8_G8_B8_A8_UNorm;

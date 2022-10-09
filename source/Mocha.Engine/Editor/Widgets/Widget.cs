@@ -14,19 +14,13 @@ internal class Widget
 
 	public PanelInputFlags InputFlags { get; set; }
 
-	private Rectangle bounds;
+	public Rectangle RelativeBounds { get; private set; }
 	public Rectangle Bounds
 	{
-		get
-		{
-			if ( Layout != null )
-				return bounds + Layout.Bounds.Position;
-
-			return bounds;
-		}
+		get => RelativeBounds + (Layout?.Bounds.Position ?? 0);
 		set
 		{
-			bounds = value;
+			RelativeBounds = value;
 			OnBoundsChanged();
 		}
 	}
