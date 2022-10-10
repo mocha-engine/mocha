@@ -111,7 +111,7 @@ internal class Window : Widget
 	[Event.Hotload]
 	public void OnHotload()
 	{
-		CreateUI();
+		// CreateUI();
 	}
 
 	public virtual void CreateUI()

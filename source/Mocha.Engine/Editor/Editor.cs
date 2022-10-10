@@ -35,6 +35,9 @@ internal partial class EditorInstance
 
 		RenderWidgets();
 
+		const float size = 256;
+		float aspect = AtlasTexture.Width / (float)AtlasTexture.Height;
+		Graphics.DrawAtlas( new Rectangle( 0, 0, size * aspect, size ) );
 		Graphics.PanelRenderer.Draw( commandList );
 	}
 
@@ -89,6 +92,9 @@ internal partial class EditorInstance
 			ITheme.Current = new TestTheme();
 
 		Renderer.Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
+
+		InitializeAtlas();
+		Graphics.PanelRenderer.UpdateAtlas( AtlasTexture );
 
 		Windows.ForEach( x => x.CreateUI() );
 	}
