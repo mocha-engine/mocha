@@ -30,6 +30,15 @@ struct VS_OUT {
     vec2 vPanelSize;
 };
 
+//
+// Flags
+//
+// GraphicsFlags
+const uint None        = 0;
+const uint UseRawImage = 1;
+const uint UseSdf      = 2;
+const uint HighDistMul = 4;
+
 // ==========================================================================================================================
 
 //
@@ -89,9 +98,9 @@ layout( location = 8 ) flat in int fs_flags;
 //
 layout( location = 0 ) out vec4 fragColor;
 
-vec3 GetTextureSample( texture2D tex )
+vec4 GetTextureSample( texture2D tex )
 {
-    return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords ).xyz;
+    return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords );
 }
 
 void main() 
@@ -101,21 +110,15 @@ void main()
     normalizedPanelPos += vec2( 0.15686275, 0 );
 
     float opacity = 1.0;
-    vec3 texSample = GetTextureSample( g_tAtlas );
+    vec4 texSample = GetTextureSample( g_tAtlas );
 
-    //
-    // UseRawImage = 1
-    //
-    if ( (fs_flags & 1) == 1 )
+    if ( (fs_flags & UseRawImage) == UseRawImage )
     {
-        fragColor = vec4( texSample, fs_in.vColor.a );
+        fragColor = texSample;
     }
     else
     {
-        //
-        // UseSdf = 2
-        //
-        if ( (fs_flags & 2) == 2 )
+        if ( (fs_flags & UseSdf) == UseSdf )
         {
             float r = texSample.r;
             float g = texSample.g;
@@ -124,10 +127,7 @@ void main()
             float median = max(min(r, g), min(max(r, g), b));
             float signed_dist = 1.0 * ( median - 0.5 );
 
-            //
-            // HighDistMul = 4
-            //
-            if ( (fs_flags & 4) == 4 )
+            if ( (fs_flags & HighDistMul) == HighDistMul )
                 signed_dist *= 3.0;
 
             opacity = clamp( signed_dist + 0.5, 0.0, 1.0 );
