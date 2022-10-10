@@ -52,6 +52,7 @@ internal class Label : Widget
 
 		// glyphRect.Y -= EditorInstance.FontSprite.Rect.Y;
 		glyphRect.Y += EditorInstance.AtlasTexture.Height - EditorInstance.FontSprite.Rect.Height - EditorInstance.FontSprite.Rect.Y;
+		glyphRect.X += EditorInstance.FontSprite.Rect.X;
 		glyphRect /= EditorInstance.AtlasTexture.Size;
 		glyphRect.Y = 1.0f - glyphRect.Y;
 

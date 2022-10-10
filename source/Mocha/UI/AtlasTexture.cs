@@ -61,26 +61,18 @@ public class AtlasBuilder
 	{
 		var position = new Vector2( 0, 0 );
 
+		//
+		// TODO: pack these properly
+		// and do it all ahead-of-time..
+		//
+
 		if ( sprites.Any() )
 		{
 			var lastSpriteRect = sprites.Last().Rect;
 			var (width, height) = CalculateSize();
 
-			// We want the atlas to be as square as possible, so expand along the
-			// shortest axis
-
-			if ( width > height )
-			{
-				// Y axis
-				position = lastSpriteRect.Position + new Vector2( 0, lastSpriteRect.Size.Y );
-				position.X = 0;
-			}
-			else
-			{
-				// X axis
-				position = lastSpriteRect.Position + new Vector2( lastSpriteRect.Size.X, 0 );
-				position.Y = 0;
-			}
+			position = lastSpriteRect.Position + new Vector2( lastSpriteRect.Size.X, 0 );
+			position.Y = 0;
 		}
 
 		var sprite = new Sprite( new Common.Rectangle( position, (Vector2)size ), this );

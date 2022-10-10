@@ -71,7 +71,17 @@ public static class Graphics
 
 	public static void DrawImage( Rectangle bounds, Sprite sprite )
 	{
-		PanelRenderer.AddRectangle( bounds, sprite.Rect / EditorInstance.AtlasTexture.Size, 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
+		var texBounds = sprite.Rect / EditorInstance.AtlasTexture.Size;
+		float shift = 0.001f;
+		texBounds.X += shift;
+		texBounds.Width -= shift * 2f;
+
+		PanelRenderer.AddRectangle( bounds, texBounds, 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
+	}
+
+	public static void DrawAtlas( Rectangle bounds )
+	{
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 1, 1 ), 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
 	}
 
 	internal static void DrawTexture( Rectangle bounds, Texture texture )

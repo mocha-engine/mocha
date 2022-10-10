@@ -77,4 +77,12 @@ public struct Rectangle
 	{
 		return new Rectangle( this.X + v.X, this.Y + v.Y, this.Width - v.X * 2, this.Height - v.Y * 2 );
 	}
+
+	public bool Intersects( Rectangle rect )
+	{
+		return !(rect.X > this.X + this.Width
+			|| rect.X + rect.Width < this.X
+			|| rect.Y > this.Y + this.Height
+			|| rect.Y + rect.Height < this.Y);
+	}
 }

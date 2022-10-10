@@ -6,8 +6,6 @@ internal class Window2 : Window
 	{
 	}
 
-	private Image CurrentImage;
-
 	public override void CreateUI()
 	{
 		using var _ = new Stopwatch( "CreateUI" );
@@ -33,26 +31,17 @@ internal class Window2 : Window
 		//
 		// Text rendering
 		//
-		RootLayout.Add( new Label( "Images", 64 ) );
-		RootLayout.Add( new Label( "Wow!! Pretty pictures!!", 32 ) );
+		RootLayout.Add( new Label( "Icons", 64 ) );
+		RootLayout.Add( new Label( "Different file types and stuff!", 32 ) );
 		RootLayout.AddSpacing( 4f );
 
 		//
 		// Images test
 		//
-		var imageDropdown = new Dropdown( "Image Gallery" );
-
-		foreach ( var file in FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ) )
+		foreach ( var file in FileSystem.Game.GetFiles( "core/ui/icons" ).Where( x => x.EndsWith( ".mtex_c" ) ) )
 		{
-			imageDropdown.AddOption( file.NormalizePath() );
+			Log.Trace( $"Adding {file}" );
+			RootLayout.Add( new Image( new Vector2( 96 ), file ), true );
 		}
-
-		imageDropdown.OnSelected += ( i ) =>
-		{
-			CurrentImage.SetImage( FileSystem.Game.GetFiles( "core/ui" ).Where( x => x.EndsWith( ".mtex_c" ) ).ToList()[i] );
-		};
-
-		RootLayout.Add( imageDropdown );
-		CurrentImage = RootLayout.Add( new Image( new Vector2( 300 ), "core/ui/image.mtex" ), true );
 	}
 }

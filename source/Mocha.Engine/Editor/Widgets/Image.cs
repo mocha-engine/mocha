@@ -7,7 +7,7 @@ internal class Image : Widget
 {
 	public Vector4 Color { get; set; } = new Vector4( 1, 1, 1, 1 );
 	public TextureInfo TextureInfo { get; set; }
-	internal static Sprite? TestSprite { get; set; }
+	internal Sprite? Sprite { get; set; }
 
 	internal Image( Vector2 size, string path ) : base()
 	{
@@ -35,11 +35,11 @@ internal class Image : Widget
 			spriteData[i / 4] = new Vector4( x, y, z, w );
 		}
 
-		if ( TestSprite != null )
-			EditorInstance.AtlasBuilder.RemoveSprite( TestSprite );
+		if ( Sprite != null )
+			EditorInstance.AtlasBuilder.RemoveSprite( Sprite );
 
-		TestSprite = EditorInstance.AtlasBuilder.AddSprite( new Point2( (int)TextureInfo.Width, (int)TextureInfo.Height ) );
-		TestSprite.SetData( spriteData );
+		Sprite = EditorInstance.AtlasBuilder.AddSprite( new Point2( (int)TextureInfo.Width, (int)TextureInfo.Height ) );
+		Sprite.SetData( spriteData );
 
 		EditorInstance.AtlasTexture = EditorInstance.AtlasBuilder.Build();
 		Graphics.PanelRenderer.UpdateAtlas( EditorInstance.AtlasTexture );
@@ -51,7 +51,7 @@ internal class Image : Widget
 		var bounds = Bounds;
 		bounds.Width = bounds.Height * aspect;
 
-		if ( TestSprite != null )
-			Graphics.DrawImage( bounds, TestSprite );
+		if ( Sprite != null )
+			Graphics.DrawImage( bounds, Sprite );
 	}
 }
