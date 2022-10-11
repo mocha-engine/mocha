@@ -69,8 +69,14 @@ public static class Graphics
 		DrawRect( lineD, color );
 	}
 
+	public static void DrawImage( Rectangle bounds, Texture texture )
+	{
+
+	}
+
 	public static void DrawImage( Rectangle bounds, Sprite sprite )
 	{
+		return;
 		var texBounds = sprite.Rect / EditorInstance.AtlasTexture.Size;
 		float shift = 0.001f;
 		texBounds.X += shift;
