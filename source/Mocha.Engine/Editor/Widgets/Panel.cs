@@ -1,13 +1,11 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 [Flags]
 public enum PanelInputFlags
 {
-	None		= 0,
-	MouseOver	= 1,
-	MouseDown	= 2
+	None = 0,
+	MouseOver = 1,
+	MouseDown = 2
 }
 
 internal class Panel : Widget
@@ -19,7 +17,7 @@ internal class Panel : Widget
 		Bounds = new Rectangle( 0, size );
 	}
 
-	internal virtual void Render( ref PanelRenderer panelRenderer )
+	internal override void Render()
 	{
 		Graphics.DrawRect( Bounds, Color );
 	}
