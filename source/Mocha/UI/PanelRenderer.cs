@@ -3,8 +3,12 @@
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public partial class PanelRenderer
 {
+	public AtlasBuilder AtlasBuilder { get; set; }
+
 	public PanelRenderer()
 	{
+		AtlasBuilder = new();
+
 		var pipeline = RenderPipeline.Factory
 			.WithVertexElementDescriptions( UIVertex.VertexElementDescriptions )
 			.AddObjectResource( "g_tAtlas", ResourceKind.TextureReadOnly, ShaderStages.Fragment )
@@ -22,23 +26,10 @@ public partial class PanelRenderer
 			Shader = shader
 		};
 
-		CreateUniformBuffer();
-		CreateResources();
-
+		AtlasBuilder.OnBuild += CreateResources;
 		material.Shader.OnRecompile += CreateResources;
-	}
 
-	public PanelRenderer( Texture atlasTexture ) : this()
-	{
-		UpdateAtlas( atlasTexture );
-	}
-
-	public void UpdateAtlas( Texture atlasTexture )
-	{
-		material.DiffuseTexture = atlasTexture;
-		CreateResources();
-
-		Log.Trace( "Updated atlas" );
+		CreateUniformBuffer();
 	}
 
 	public void NewFrame()

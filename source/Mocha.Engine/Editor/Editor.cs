@@ -4,21 +4,17 @@ internal partial class EditorInstance
 {
 	internal static EditorInstance Instance { get; private set; }
 
-	private const string Font = "qaz";
-
 	private List<Window> Windows = new();
 
 	internal EditorInstance()
 	{
 		Event.Register( this );
 		Instance = this;
-		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{Font}.json" );
 
-		InitializeAtlas();
-		Graphics.PanelRenderer = new( AtlasTexture );
+		Graphics.Init();
 
 		var window = new Window();
-		window.Bounds = new Rectangle( 32, 32, 500, 600 );
+		window.Bounds = new Rectangle( 32, 32, 500, 650 );
 		window.CreateUI();
 		Windows.Add( window );
 
@@ -35,9 +31,6 @@ internal partial class EditorInstance
 
 		RenderWidgets();
 
-		const float size = 256;
-		float aspect = AtlasTexture.Width / (float)AtlasTexture.Height;
-		Graphics.DrawAtlas( new Rectangle( 0, 0, size * aspect, size ) );
 		Graphics.PanelRenderer.Draw( commandList );
 	}
 
@@ -92,9 +85,6 @@ internal partial class EditorInstance
 			ITheme.Current = new TestTheme();
 
 		Renderer.Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
-
-		InitializeAtlas();
-		Graphics.PanelRenderer.UpdateAtlas( AtlasTexture );
 
 		Windows.ForEach( x => x.CreateUI() );
 	}

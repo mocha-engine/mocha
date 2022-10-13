@@ -33,7 +33,7 @@ internal class Selectable : Button
 			}
 			else
 			{
-				Graphics.DrawRect( Bounds.Shrink( new( 1f, 2f ) ), Colors.Blue );
+				Graphics.DrawRect( Bounds.Shrink( new( 1f, 2f ) ), Colors.Accent );
 				Graphics.DrawRect( Bounds.Shrink( new( 1f, 2f ) ),
 					colorA * 0.5f,
 					colorB * 0.5f,

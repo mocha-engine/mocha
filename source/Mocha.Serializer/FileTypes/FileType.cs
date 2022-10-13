@@ -18,19 +18,19 @@ public struct FileType
 	public Vector4 Color { get; set; }
 
 	public static FileType Shader =>
-		new FileType( "Shader", "mshdr", "core/icons/shader.mtex", FontAwesome.Glasses, MathX.GetColor( "#ffc710" ) );
+		new FileType( "Shader", "mshdr", "core/ui/icons/shader.mtex", FontAwesome.Glasses, MathX.GetColor( "#ffc710" ) );
 
 	public static FileType Material =>
-		new FileType( "Material", "mmat", "core/icons/material.mtex", FontAwesome.Circle, MathX.GetColor( "#f7b239" ) );
+		new FileType( "Material", "mmat", "core/ui/icons/material.mtex", FontAwesome.Circle, MathX.GetColor( "#f7b239" ) );
 
 	public static FileType Texture =>
-		new FileType( "Texture", "mtex", "core/icons/image.mtex", FontAwesome.Image, MathX.GetColor( "#5292fa" ) );
+		new FileType( "Texture", "mtex", "core/ui/icons/image.mtex", FontAwesome.Image, MathX.GetColor( "#5292fa" ) );
 
 	public static FileType Model =>
-		new FileType( "Model", "mmdl", "core/icons/model.mtex", FontAwesome.Cube, MathX.GetColor( "#1ee3a5" ) );
+		new FileType( "Model", "mmdl", "core/ui/icons/model.mtex", FontAwesome.Cube, MathX.GetColor( "#1ee3a5" ) );
 
 	public static FileType Default =>
-		new FileType( "Unknown", "*", "core/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#ffffff" ) );
+		new FileType( "Unknown", "*", "core/ui/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#ffffff" ) );
 
 	public static FileType[] All
 	{
