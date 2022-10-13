@@ -1,5 +1,4 @@
 ﻿using Mocha.Common.Serialization;
-using StbImageSharp;
 using System.Runtime.InteropServices;
 
 namespace Mocha.Renderer;

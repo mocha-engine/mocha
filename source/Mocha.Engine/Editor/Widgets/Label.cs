@@ -5,6 +5,10 @@ internal class Label : Widget
 	private string calculatedText = "";
 	private string text;
 
+	// TODO: font loader & cache
+	internal Font.Data FontData { get; set; }
+	internal Texture FontTexture { get; set; }
+
 	public string Text
 	{
 		get => text; set
@@ -17,14 +21,13 @@ internal class Label : Widget
 	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
 	public float FontSize { get; set; } = 14f;
 
-	[Obsolete( "Bad place for this" )]
-	public static Vector2 MeasureText( string text, float fontSize )
+	public Vector2 MeasureText( string text, float fontSize )
 	{
 		float x = 0;
 
 		foreach ( var c in text )
 		{
-			var glyph = EditorInstance.FontData.Glyphs.First( x => x.Unicode == c );
+			var glyph = FontData.Glyphs.First( x => x.Unicode == c );
 			x += (float)glyph.Advance * fontSize;
 		}
 
@@ -35,6 +38,8 @@ internal class Label : Widget
 	{
 		FontSize = fontSize;
 		Text = text;
+
+		SetFont( "qaz" );
 	}
 
 	private Rectangle FontBoundsToAtlasRect( Font.Glyph glyph, Font.Bounds bounds )
@@ -51,10 +56,10 @@ internal class Label : Widget
 		var glyphRect = new Rectangle( mins, maxs );
 
 		// glyphRect.Y -= EditorInstance.FontSprite.Rect.Y;
-		glyphRect.Y += EditorInstance.AtlasTexture.Height - EditorInstance.FontSprite.Rect.Height - EditorInstance.FontSprite.Rect.Y;
-		glyphRect.X += EditorInstance.FontSprite.Rect.X;
-		glyphRect /= EditorInstance.AtlasTexture.Size;
-		glyphRect.Y = 1.0f - glyphRect.Y;
+		// glyphRect.Y += EditorInstance.AtlasTexture.Height - EditorInstance.FontSprite.Rect.Height - EditorInstance.FontSprite.Rect.Y;
+		// glyphRect.X += EditorInstance.FontSprite.Rect.X;
+		// glyphRect /= EditorInstance.AtlasTexture.Size;
+		// glyphRect.Y = 1.0f - glyphRect.Y;
 
 		return glyphRect;
 	}
@@ -63,40 +68,55 @@ internal class Label : Widget
 	{
 		float x = 0;
 
+		if ( FontData == null )
+			return;
+
+		if ( FontTexture == null )
+			return;
+
 		foreach ( var c in calculatedText )
 		{
-			var glyph = EditorInstance.FontData.Glyphs.First( x => x.Unicode == (int)c );
+			var glyph = FontData.Glyphs.First( x => x.Unicode == (int)c );
 
 			if ( glyph.AtlasBounds != null )
 			{
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
-				float heightMul = EditorInstance.AtlasTexture.Height / EditorInstance.FontSprite.Rect.Height;
-				float widthMul = EditorInstance.AtlasTexture.Width / EditorInstance.FontSprite.Rect.Width;
+				// float heightMul = EditorInstance.AtlasTexture.Height / EditorInstance.FontSprite.Rect.Height;
+				// float widthMul = EditorInstance.AtlasTexture.Width / EditorInstance.FontSprite.Rect.Width;
+
+				float widthMul = 1.0f;
+				float heightMul = 1.0f;
 
 				var glyphSize = new Vector2( glyphRect.Width * widthMul, glyphRect.Height * heightMul );
-				glyphSize *= FontSize * 6;
+				glyphSize *= FontSize * 0.03f;
 
 				var glyphPos = new Rectangle( new Vector2( Bounds.X + x, Bounds.Y + FontSize ), glyphSize );
 				glyphPos.X += (float)glyph.PlaneBounds.Left * FontSize;
 				glyphPos.Y -= (float)glyph.PlaneBounds.Top * FontSize;
 
-				float screenPxRange = EditorInstance.FontData.Atlas.DistanceRange * (glyphPos.Size / EditorInstance.FontData.Atlas.Size).Length;
+				float screenPxRange = FontData.Atlas.DistanceRange * (glyphPos.Size / FontData.Atlas.Size).Length;
 				screenPxRange *= 1.5f;
 
 				if ( glyphPos.X > Bounds.X + Bounds.Width && Bounds.Width > 0 )
 					return;
 
-				Graphics.DrawRect(
+				Graphics.DrawCharacter(
 					glyphPos,
+					FontTexture,
 					glyphRect,
-					screenPxRange,
 					Color
 				);
 			}
 
 			x += (float)glyph.Advance * FontSize;
 		}
+	}
+
+	public void SetFont( string fontName )
+	{
+		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{fontName}.json" );
+		FontTexture = Texture.Builder.FromPath( $"core/fonts/baked/{fontName}.mtex" ).Build();
 	}
 
 	internal override Vector2 GetDesiredSize()

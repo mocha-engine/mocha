@@ -2,7 +2,7 @@
 
 internal class Window : Widget
 {
-	protected VerticalLayout RootLayout { get; set; }
+	protected BaseLayout RootLayout { get; set; }
 	private const string Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed pharetra lorem. Aliquam eget tristique turpis, eget tristique mi. Nullam et ex vitae mauris dapibus luctus nec vel nisl. Nam venenatis vel orci a sagittis.";
 	private bool DrawBounds = false;
 
@@ -25,13 +25,16 @@ internal class Window : Widget
 		RootLayout = null;
 	}
 
-	float t = 0;
 	internal override void Render()
 	{
 		//
 		// Main background
 		//
-		Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+		if ( Focused )
+			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity * 4f );
+		else
+			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+
 		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor );
 
 		//
@@ -44,19 +47,10 @@ internal class Window : Widget
 		//
 		// Window border
 		//
-		Graphics.DrawRectUnfilled( Bounds, Colors.TransparentGray );
-
-		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
-		{
-			t = t.LerpTo( 1.0f, Time.Delta * 15f );
-		}
+		if ( Focused )
+			Graphics.DrawRectUnfilled( Bounds, Colors.Accent );
 		else
-		{
-			t = t.LerpTo( 0.0f, Time.Delta * 5f );
-		}
-
-		for ( int i = 0; i < 4 * t; ++i )
-			Graphics.DrawRectUnfilled( Bounds.Shrink( i ), Colors.Blue * t );
+			Graphics.DrawRectUnfilled( Bounds, Colors.TransparentGray );
 
 		if ( !InputFlags.HasFlag( PanelInputFlags.MouseDown ) && titlebarFocus )
 		{
@@ -65,8 +59,6 @@ internal class Window : Widget
 
 		if ( titlebarFocus )
 		{
-			Graphics.DrawRect( titlebarBounds, Colors.Blue );
-
 			var bounds = Bounds;
 			bounds.Position += (Vector2)Input.MousePosition - (Vector2)lastPos;
 			lastPos = Input.MousePosition;
@@ -142,6 +134,18 @@ internal class Window : Widget
 		RootLayout.Add( new Label( "Test Window", 64 ) );
 		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
 		RootLayout.Add( new Label( Lipsum, 13 ) );
+
+		var sourcesans = RootLayout.Add( new Label( "Source Sans Pro: The quick brown fox jumps over the lazy dog" ) );
+		sourcesans.SetFont( "sourcesanspro" );
+
+		var inter = RootLayout.Add( new Label( "Inter: The quick brown fox jumps over the lazy dog" ) );
+		inter.SetFont( "inter" );
+
+		var qaz = RootLayout.Add( new Label( "Qaz: The quick brown fox jumps over the lazy dog" ) );
+		qaz.SetFont( "qaz" );
+
+		var wavetosh = RootLayout.Add( new Label( "Wavetosh: The quick brown fox jumps over the lazy dog" ) );
+		wavetosh.SetFont( "wavetosh" );
 
 		RootLayout.AddSpacing( 4f );
 

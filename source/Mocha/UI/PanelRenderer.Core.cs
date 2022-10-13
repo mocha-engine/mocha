@@ -48,6 +48,11 @@ partial class PanelRenderer
 
 	private void CreateResources()
 	{
+		Log.Info( $"Updating PanelRenderer object resource set" );
+
+		material.DiffuseTexture = AtlasBuilder.Texture;
+		Log.Info( $"New atlas has size {material.DiffuseTexture.Size}" );
+
 		var objectResourceSetDescription = new ResourceSetDescription(
 			material.Shader.Pipeline.ResourceLayouts[0],
 			material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
@@ -55,8 +60,6 @@ partial class PanelRenderer
 			uniformBuffer );
 
 		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
-
-		Log.Trace( "Updated object rsrc set" );
 	}
 
 	private void CreateUniformBuffer()
@@ -87,6 +90,9 @@ partial class PanelRenderer
 			UpdateBuffers();
 
 		if ( vertexBuffer == null || indexBuffer == null )
+			return;
+
+		if ( objectResourceSet == null )
 			return;
 
 		RenderPipeline renderPipeline = material.Shader.Pipeline;

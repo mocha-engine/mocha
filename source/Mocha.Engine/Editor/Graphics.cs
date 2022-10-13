@@ -2,18 +2,9 @@
 
 namespace Mocha.Engine.Editor;
 
-public static class Graphics
+public static partial class Graphics
 {
 	internal static PanelRenderer PanelRenderer { get; set; }
-
-	public static void DrawRect( Rectangle bounds, Rectangle uvBounds, float screenPxRange, Vector4 color )
-	{
-		var flags = GraphicsFlags.UseSdf;
-		if ( bounds.Size.Length > 16f )
-			flags |= GraphicsFlags.HighDistMul;
-
-		PanelRenderer.AddRectangle( bounds, uvBounds, screenPxRange, color, color, color, color, flags );
-	}
 
 	public static void DrawRect( Rectangle bounds, Vector4 colorTop, Vector4 colorBottom )
 	{
@@ -43,9 +34,28 @@ public static class Graphics
 		}
 	}
 
-	public static void DrawText()
+	public static void DrawCharacter( Rectangle bounds, Texture texture, Rectangle atlasBounds, Vector4 color )
 	{
-		throw new NotImplementedException();
+		var flags = GraphicsFlags.UseSdf;
+		if ( bounds.Size.Length > 16f )
+			flags |= GraphicsFlags.HighDistMul;
+
+		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
+		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
+
+		var texBounds = new Rectangle( (Vector2)texturePos, textureSize );
+
+		// Move to top left of texture inside atlas
+		atlasBounds.Y += textureSize.Y - texture.Height;
+		atlasBounds.X += texBounds.X;
+
+		// Convert to [0..1] normalized space
+		atlasBounds /= textureSize;
+
+		// Flip y axis
+		atlasBounds.Y = 1.0f - atlasBounds.Y;
+
+		PanelRenderer.AddRectangle( bounds, atlasBounds, 0, color, color, color, color, flags );
 	}
 
 	public static void DrawRoundedRectangle()
@@ -53,15 +63,15 @@ public static class Graphics
 		throw new NotImplementedException();
 	}
 
-	public static void DrawRectUnfilled( Rectangle bounds, Vector4 color )
+	public static void DrawRectUnfilled( Rectangle bounds, Vector4 color, float thickness = 1.0f )
 	{
 		//
 		// Draw lines
 		//
-		var lineA = new Rectangle( bounds.X, bounds.Y, bounds.Width, 1 );
-		var lineB = new Rectangle( bounds.X, bounds.Y, 1, bounds.Height );
-		var lineC = new Rectangle( bounds.X + bounds.Width - 1, bounds.Y, 1, bounds.Height );
-		var lineD = new Rectangle( bounds.X, bounds.Y + bounds.Height - 1, bounds.Width, 1 );
+		var lineA = new Rectangle( bounds.X, bounds.Y, bounds.Width, thickness );
+		var lineB = new Rectangle( bounds.X, bounds.Y, thickness, bounds.Height );
+		var lineC = new Rectangle( bounds.X + bounds.Width - thickness, bounds.Y, thickness, bounds.Height );
+		var lineD = new Rectangle( bounds.X, bounds.Y + bounds.Height - thickness, bounds.Width, thickness );
 
 		DrawRect( lineA, color );
 		DrawRect( lineB, color );
@@ -69,29 +79,24 @@ public static class Graphics
 		DrawRect( lineD, color );
 	}
 
-	public static void DrawImage( Rectangle bounds, Texture texture )
+	internal static void DrawAtlas( Vector2 position )
 	{
-
-	}
-
-	public static void DrawImage( Rectangle bounds, Sprite sprite )
-	{
-		return;
-		var texBounds = sprite.Rect / EditorInstance.AtlasTexture.Size;
-		float shift = 0.001f;
-		texBounds.X += shift;
-		texBounds.Width -= shift * 2f;
-
-		PanelRenderer.AddRectangle( bounds, texBounds, 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
-	}
-
-	public static void DrawAtlas( Rectangle bounds )
-	{
+		const float size = 256;
+		float aspect = PanelRenderer.AtlasBuilder.Texture.Width / (float)PanelRenderer.AtlasBuilder.Texture.Height;
+		var bounds = new Rectangle( position, new( size * aspect, size ) );
 		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 1, 1 ), 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
 	}
 
 	internal static void DrawTexture( Rectangle bounds, Texture texture )
 	{
-		throw new NotImplementedException();
+		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
+		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
+
+		var texBounds = new Rectangle( (Vector2)texturePos, texture.Size );
+
+		// Convert to [0..1] normalized space
+		texBounds /= textureSize;
+
+		PanelRenderer.AddRectangle( bounds, texBounds, 0, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
 	}
 }

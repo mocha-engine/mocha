@@ -31,17 +31,17 @@ internal class Window2 : Window
 		//
 		// Text rendering
 		//
-		RootLayout.Add( new Label( "Icons", 64 ) );
-		RootLayout.Add( new Label( "Different file types and stuff!", 32 ) );
+		var title = RootLayout.Add( new Label( "Icons", 64 ) );
+		title.SetFont( "wavetosh" );
+
+		var subtitle = RootLayout.Add( new Label( "Different file types and stuff!", 32 ) );
+		subtitle.SetFont( "inter" );
+
 		RootLayout.AddSpacing( 4f );
 
-		//
-		// Images test
-		//
-		foreach ( var file in FileSystem.Game.GetFiles( "core/ui/icons" ).Where( x => x.EndsWith( ".mtex_c" ) ) )
+		foreach ( var fileType in FileType.All )
 		{
-			Log.Trace( $"Adding {file}" );
-			RootLayout.Add( new Image( new Vector2( 96 ), file ), true );
+			RootLayout.Add( new Icon( fileType ), false );
 		}
 	}
 }
