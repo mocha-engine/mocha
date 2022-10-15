@@ -135,17 +135,11 @@ internal class Window : Widget
 		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
 		RootLayout.Add( new Label( Lipsum, 13 ) );
 
-		var sourcesans = RootLayout.Add( new Label( "Source Sans Pro: The quick brown fox jumps over the lazy dog" ) );
-		sourcesans.SetFont( "sourcesanspro" );
-
-		var inter = RootLayout.Add( new Label( "Inter: The quick brown fox jumps over the lazy dog" ) );
-		inter.SetFont( "inter" );
-
-		var qaz = RootLayout.Add( new Label( "Qaz: The quick brown fox jumps over the lazy dog" ) );
-		qaz.SetFont( "qaz" );
-
-		var wavetosh = RootLayout.Add( new Label( "Wavetosh: The quick brown fox jumps over the lazy dog" ) );
-		wavetosh.SetFont( "wavetosh" );
+		// Different font families
+		RootLayout.Add( new Label( "Source Sans Pro: The quick brown fox jumps over the lazy dog", fontFamily: "sourcesanspro" ) );
+		RootLayout.Add( new Label( "Inter: The quick brown fox jumps over the lazy dog", fontFamily: "inter" ) );
+		RootLayout.Add( new Label( "Qaz: The quick brown fox jumps over the lazy dog", fontFamily: "qaz" ) );
+		RootLayout.Add( new Label( "Wavetosh: The quick brown fox jumps over the lazy dog", fontFamily: "wavetosh" ) );
 
 		RootLayout.AddSpacing( 4f );
 

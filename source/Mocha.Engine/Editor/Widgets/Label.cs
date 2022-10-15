@@ -34,12 +34,12 @@ internal class Label : Widget
 		return new Vector2( x, fontSize * 1.25f );
 	}
 
-	internal Label( string text, float fontSize = 14f ) : base()
+	internal Label( string text, float fontSize = 14f, string fontFamily = "Inter" ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;
 
-		SetFont( "Inter" );
+		SetFont( fontFamily );
 	}
 
 	private Rectangle FontBoundsToAtlasRect( Font.Glyph glyph, Font.Bounds bounds )
