@@ -25,7 +25,7 @@ internal class Icon : Widget
 		Graphics.DrawTexture( new Rectangle( center - imageSize / 2, imageSize ), Texture );
 
 		var b = Bounds;
-		b.Height = 24;
+		b.Height = 8;
 		b.Y = b.Y + Bounds.Height - b.Height;
 		Graphics.DrawRect( b, MathX.GetColor( "#77000000" ), Renderer.UI.RoundingFlags.BottomLeft | Renderer.UI.RoundingFlags.BottomRight );
 

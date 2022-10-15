@@ -27,6 +27,12 @@ internal class Label : Widget
 
 		foreach ( var c in text )
 		{
+			if ( !FontData.Glyphs.Any( x => x.Unicode == c ) )
+			{
+				x += fontSize;
+				continue;
+			}
+
 			var glyph = FontData.Glyphs.First( x => x.Unicode == c );
 			x += (float)glyph.Advance * fontSize;
 		}
@@ -70,19 +76,19 @@ internal class Label : Widget
 
 		foreach ( var c in calculatedText )
 		{
+			if ( !FontData.Glyphs.Any( x => x.Unicode == c ) )
+			{
+				x += FontSize;
+				continue;
+			}
+
 			var glyph = FontData.Glyphs.First( x => x.Unicode == (int)c );
 
 			if ( glyph.AtlasBounds != null )
 			{
 				var glyphRect = FontBoundsToAtlasRect( glyph, glyph.AtlasBounds );
 
-				// float heightMul = EditorInstance.AtlasTexture.Height / EditorInstance.FontSprite.Rect.Height;
-				// float widthMul = EditorInstance.AtlasTexture.Width / EditorInstance.FontSprite.Rect.Width;
-
-				float widthMul = 1.0f;
-				float heightMul = 1.0f;
-
-				var glyphSize = new Vector2( glyphRect.Width * widthMul, glyphRect.Height * heightMul );
+				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
 				glyphSize *= FontSize / FontData.Atlas.Size;
 
 				var glyphPos = new Rectangle( new Vector2( Bounds.X + x, Bounds.Y + FontSize ), glyphSize );
