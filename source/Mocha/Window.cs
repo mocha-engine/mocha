@@ -10,6 +10,11 @@ public class Window
 	public Sdl2Window SdlWindow { get; private set; }
 	public Point2 Size => new Point2( SdlWindow.Width, SdlWindow.Height );
 
+	public string Title
+	{
+		set => Sdl2Native.SDL_SetWindowTitle( SdlWindow.SdlWindowHandle, value );
+	}
+
 	public Window()
 	{
 		Current ??= this;
@@ -24,7 +29,7 @@ public class Window
 			WindowInitialState = WindowState.Maximized
 		};
 
-		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );		
+		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );
 		SetDarkMode( true );
 
 		Screen.UpdateFrom( Size );

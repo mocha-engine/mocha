@@ -79,6 +79,13 @@ public class RendererInstance
 			}
 
 			PostRender();
+
+			//
+			// Set window title
+			//
+			var framerate = 1.000f / Time.AverageDelta;
+			var windowTitle = $"Mocha | {Device.BackendType} | {framerate.CeilToInt()}fps";
+			Window.Current.Title = windowTitle;
 		}
 	}
 
@@ -172,9 +179,6 @@ public class RendererInstance
 		};
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options );
-
-		var windowTitle = $"Mocha | {Device.BackendType}";
-		Window.Current.SdlWindow.Title = windowTitle;
 	}
 
 	[Event.Window.Resized]

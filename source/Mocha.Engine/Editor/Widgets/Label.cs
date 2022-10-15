@@ -39,7 +39,7 @@ internal class Label : Widget
 		FontSize = fontSize;
 		Text = text;
 
-		SetFont( "qaz" );
+		SetFont( "Inter" );
 	}
 
 	private Rectangle FontBoundsToAtlasRect( Font.Glyph glyph, Font.Bounds bounds )
