@@ -1,92 +1,10 @@
 ﻿namespace Mocha.Engine.Editor;
-
-internal class Window : Widget
+internal class DemoWindow : Window
 {
-	protected BaseLayout RootLayout { get; set; }
 	private const string Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed pharetra lorem. Aliquam eget tristique turpis, eget tristique mi. Nullam et ex vitae mauris dapibus luctus nec vel nisl. Nam venenatis vel orci a sagittis.";
 
-	bool titlebarFocus = false;
-	Vector2 lastPos = 0;
-	bool Focused = false;
-
-	public Window()
+	public override void CreateUI()
 	{
-		Event.Register( this );
-	}
-
-	internal void Clear()
-	{
-		// Rebuild atlas (TODO: This should be automatic / transparent)
-		// BuildAtlas();
-		// panelRenderer = new( AtlasTexture );
-
-		RootLayout?.Delete();
-		RootLayout = null;
-	}
-
-	internal override void Render()
-	{
-		//
-		// Window border
-		//
-		if ( Focused )
-			Graphics.DrawRect( Bounds.Expand( 1 ), Colors.Accent, RoundingFlags.All );
-		else
-			Graphics.DrawRect( Bounds.Expand( 1 ), Colors.TransparentGray, RoundingFlags.All );
-
-		//
-		// Main background
-		//
-		if ( Focused )
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity * 2f );
-		else
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
-
-		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
-
-		//
-		// Titlebar
-		//
-		var titlebarBounds = Bounds;
-		titlebarBounds.Size = titlebarBounds.Size.WithY( 32 );
-		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB, RoundingFlags.TopLeft | RoundingFlags.TopRight );
-
-		if ( !InputFlags.HasFlag( PanelInputFlags.MouseDown ) && titlebarFocus )
-		{
-			titlebarFocus = false;
-		}
-
-		if ( titlebarFocus )
-		{
-			var bounds = Bounds;
-			bounds.Position += (Vector2)Input.MousePosition - (Vector2)lastPos;
-			lastPos = Input.MousePosition;
-			Bounds = bounds;
-
-			Widget.All.OfType<Window>().ToList().ForEach( x => x.Focused = false );
-			Focused = true;
-		}
-
-		if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
-		{
-			lastPos = Input.MousePosition;
-			titlebarFocus = true;
-		}
-
-		ZIndex = (Focused) ? 100 : 0;
-		RootLayout.Bounds = Bounds;
-	}
-
-	[Event.Hotload]
-	public void OnHotload()
-	{
-		// CreateUI();
-	}
-
-	public virtual void CreateUI()
-	{
-		using var _ = new Stopwatch( "CreateUI" );
-
 		//
 		// Clean up existing widgets & panels
 		//

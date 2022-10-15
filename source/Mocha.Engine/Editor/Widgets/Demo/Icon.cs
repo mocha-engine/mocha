@@ -1,8 +1,11 @@
 ﻿namespace Mocha.Engine.Editor;
 
+//
+// This is super messy code, just used as a demonstration
+// of what custom widgets could potentially achieve in future
+//
 internal class Icon : Widget
 {
-	private Image Image { get; set; }
 	private Texture Texture { get; set; }
 	private FileType FileType { get; set; }
 

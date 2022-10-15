@@ -13,15 +13,16 @@ internal partial class EditorInstance
 
 		Graphics.Init();
 
-		var window = new Window();
-		window.Bounds = new Rectangle( 32, 32, 500, 650 );
-		window.CreateUI();
-		Windows.Add( window );
+		var demoWindow = new DemoWindow();
+		demoWindow.Bounds = new Rectangle( 32, 32, 500, 650 );
+		demoWindow.Focused = true;
+		demoWindow.CreateUI();
+		Windows.Add( demoWindow );
 
-		var window2 = new Window2();
-		window2.Bounds = new Rectangle( 128, 32, 500, 600 );
-		window2.CreateUI();
-		Windows.Add( window2 );
+		var iconWindow = new IconWindow();
+		iconWindow.Bounds = new Rectangle( 128, 32, 500, 600 );
+		iconWindow.CreateUI();
+		Windows.Add( iconWindow );
 	}
 
 	internal void Render( Veldrid.CommandList commandList )

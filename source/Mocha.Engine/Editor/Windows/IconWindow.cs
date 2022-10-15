@@ -1,15 +1,13 @@
 ﻿namespace Mocha.Engine.Editor;
 
-internal class Window2 : Window
+internal class IconWindow : Window
 {
-	public Window2() : base()
+	public IconWindow() : base()
 	{
 	}
 
 	public override void CreateUI()
 	{
-		using var _ = new Stopwatch( "CreateUI" );
-
 		//
 		// Clean up existing widgets & panels
 		//
