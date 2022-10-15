@@ -8,6 +8,8 @@ internal class Label : Widget
 	// TODO: font loader & cache
 	internal Font.Data FontData { get; set; }
 	internal Texture FontTexture { get; set; }
+	internal Font.Data IconData { get; set; }
+	internal Texture IconTexture { get; set; }
 
 	public string Text
 	{
@@ -21,19 +23,35 @@ internal class Label : Widget
 	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
 	public float FontSize { get; set; } = 12;
 
+	private Font.Data GetFontDataForGlyph( char c )
+	{
+		if ( c > FontAwesome.IconMin )
+			return IconData;
+
+		return FontData;
+	}
+
+	private Texture GetTextureForGlyph( char c )
+	{
+		if ( c > FontAwesome.IconMin )
+			return IconTexture;
+
+		return FontTexture;
+	}
+
 	public Vector2 MeasureText( string text, float fontSize )
 	{
 		float x = 0;
 
 		foreach ( var c in text )
 		{
-			if ( !FontData.Glyphs.Any( x => x.Unicode == c ) )
+			if ( !GetFontDataForGlyph( c ).Glyphs.Any( x => x.Unicode == c ) )
 			{
 				x += fontSize;
 				continue;
 			}
 
-			var glyph = FontData.Glyphs.First( x => x.Unicode == c );
+			var glyph = GetFontDataForGlyph( c ).Glyphs.First( x => x.Unicode == c );
 			x += (float)glyph.Advance * fontSize;
 		}
 
@@ -76,13 +94,13 @@ internal class Label : Widget
 
 		foreach ( var c in calculatedText )
 		{
-			if ( !FontData.Glyphs.Any( x => x.Unicode == c ) )
+			if ( !GetFontDataForGlyph( c ).Glyphs.Any( x => x.Unicode == c ) )
 			{
 				x += FontSize;
 				continue;
 			}
 
-			var glyph = FontData.Glyphs.First( x => x.Unicode == (int)c );
+			var glyph = GetFontDataForGlyph( c ).Glyphs.First( x => x.Unicode == (int)c );
 
 			if ( glyph.AtlasBounds != null )
 			{
@@ -103,7 +121,7 @@ internal class Label : Widget
 
 				Graphics.DrawCharacter(
 					glyphPos,
-					FontTexture,
+					GetTextureForGlyph( c ),
 					glyphRect,
 					Color
 				);
@@ -117,6 +135,9 @@ internal class Label : Widget
 	{
 		FontData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{fontName}.json" );
 		FontTexture = Texture.Builder.FromPath( $"core/fonts/baked/{fontName}.mtex" ).Build();
+
+		IconTexture = Texture.Builder.FromPath( $"core/fonts/baked/fa-solid-900.mtex" ).Build();
+		IconData = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/fa-solid-900.json" );
 	}
 
 	internal override Vector2 GetDesiredSize()

@@ -162,7 +162,7 @@ void main()
     if ( rounded )
     {
         vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
-        vec4 rounding = vec4( 8 * 2.0 );
+        vec4 rounding = vec4( 4 * 2.0 );
 
         if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
             rounding.y *= 0.0;
