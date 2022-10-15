@@ -140,6 +140,7 @@ internal class Window : Widget
 		RootLayout.Add( new Label( "Inter: The quick brown fox jumps over the lazy dog", fontFamily: "inter" ) );
 		RootLayout.Add( new Label( "Qaz: The quick brown fox jumps over the lazy dog", fontFamily: "qaz" ) );
 		RootLayout.Add( new Label( "Wavetosh: The quick brown fox jumps over the lazy dog", fontFamily: "wavetosh" ) );
+		RootLayout.Add( new Label( FontAwesome.FaceSmile + " " + FontAwesome.FaceGrinStars + " " + FontAwesome.ShuttleSpace, fontFamily: "fa-solid-900", fontSize: 32 ) );
 
 		RootLayout.AddSpacing( 4f );
 
