@@ -3,7 +3,7 @@
 internal class Dropdown : Button
 {
 	private List<Selectable> options = new();
-
+	private Label icon;
 	private bool drawOptions = false;
 	private bool DrawOptions
 	{
@@ -36,6 +36,10 @@ internal class Dropdown : Button
 		ZIndex = 10;
 
 		DrawOptions = false;
+
+		icon = new Label( FontAwesome.ChevronDown );
+		icon.Parent = this;
+		icon.ZIndex = 11;
 	}
 
 	public void AddOption( string text )
@@ -62,8 +66,9 @@ internal class Dropdown : Button
 		base.Render();
 
 		var cursor = Bounds.Position + new Vector2( 0, GetDesiredSize().Y );
+		icon.Bounds = new Rectangle( Bounds.X + Bounds.Width - 32, Bounds.Y + ((Bounds.Height - 16) / 2.0f), 32, 32 );
 
-		foreach ( var option in options )
+		foreach ( Selectable? option in options )
 		{
 			var desiredSize = option.GetDesiredSize();
 			if ( desiredSize.X > Bounds.Width )
@@ -94,13 +99,28 @@ internal class Dropdown : Button
 			optionBounds.Size = optionBounds.Size.WithY( GetDesiredSize().Y * options.Count );
 
 			Graphics.DrawShadow( optionBounds, 4f, ITheme.Current.ShadowOpacity );
-			Graphics.DrawRect( optionBounds, border );
+			Graphics.DrawRect( optionBounds, border, RoundingFlags.Bottom );
 			Graphics.DrawRect( optionBounds.Shrink( 1f ),
 					colorA,
 					colorB,
 					colorA,
-					colorB
+					colorB,
+					RoundingFlags.Bottom
 			);
+
+			for ( int i = 0; i < options.Count; i++ )
+			{
+				var option = options[i];
+				if ( i != options.Count && i != 0 )
+				{
+					var b = Bounds.Shrink( 10f );
+					b.Y = option.Bounds.Y;
+					b.Height = 1f;
+					Graphics.DrawRect( b, ITheme.Current.ButtonBgB, RoundingFlags.All );
+					b.Y += 1f;
+					Graphics.DrawRect( b, ITheme.Current.ButtonBgA, RoundingFlags.All );
+				}
+			}
 		}
 	}
 
@@ -115,6 +135,7 @@ internal class Dropdown : Button
 	{
 		base.OnDelete();
 
+		icon.Delete();
 		options.ForEach( x => x.Delete() );
 	}
 }

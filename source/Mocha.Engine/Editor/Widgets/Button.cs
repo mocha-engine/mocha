@@ -31,34 +31,36 @@ internal class Button : Widget
 
 		Vector4 border = ITheme.Current.Border;
 
-		Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+		Graphics.DrawShadow( Bounds, 2f, ITheme.Current.ShadowOpacity );
+		Graphics.DrawRect( Bounds, border, RoundingFlags.All );
 
-		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
+		if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
 		{
-			Graphics.DrawRect( Bounds, Colors.Accent );
-
-			if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
-			{
-				Graphics.DrawRect( Bounds.Shrink( 1f ), colorB, colorA );
-
-				mouseWasDown = true;
-			}
-			else
-			{
-				Graphics.DrawRect( Bounds.Shrink( 1f ), colorA, colorB );
-
-				if ( mouseWasDown )
-				{
-					OnClick?.Invoke();
-				}
-
-				mouseWasDown = false;
-			}
+			mouseWasDown = true;
+			Graphics.DrawRect( Bounds.Shrink( 1f ), colorB, colorA, RoundingFlags.All );
 		}
 		else
 		{
-			Graphics.DrawRect( Bounds, border );
-			Graphics.DrawRect( Bounds.Shrink( 1f ), colorA, colorB );
+			var b = Bounds.Shrink( 1f );
+			Graphics.DrawRect( b, ITheme.Current.ButtonBgA * 1.25f, RoundingFlags.All );
+			float d = 1f;
+			b.Height -= d;
+			b.Y += d;
+
+			if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
+			{
+				Graphics.DrawRect( b, colorA * 0.75f, colorA * 0.75f, RoundingFlags.All );
+			}
+			else
+			{
+				Graphics.DrawRect( b, colorA, colorB, RoundingFlags.All );
+			}
+			if ( mouseWasDown )
+			{
+				OnClick?.Invoke();
+			}
+
+			mouseWasDown = false;
 		}
 
 		UpdateLabel();

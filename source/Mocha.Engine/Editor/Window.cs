@@ -4,7 +4,6 @@ internal class Window : Widget
 {
 	protected BaseLayout RootLayout { get; set; }
 	private const string Lipsum = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam sed pharetra lorem. Aliquam eget tristique turpis, eget tristique mi. Nullam et ex vitae mauris dapibus luctus nec vel nisl. Nam venenatis vel orci a sagittis.";
-	private bool DrawBounds = false;
 
 	bool titlebarFocus = false;
 	Vector2 lastPos = 0;
@@ -28,6 +27,14 @@ internal class Window : Widget
 	internal override void Render()
 	{
 		//
+		// Window border
+		//
+		if ( Focused )
+			Graphics.DrawRect( Bounds.Expand( 1 ), Colors.Accent, RoundingFlags.All );
+		else
+			Graphics.DrawRect( Bounds.Expand( 1 ), Colors.TransparentGray, RoundingFlags.All );
+
+		//
 		// Main background
 		//
 		if ( Focused )
@@ -35,22 +42,14 @@ internal class Window : Widget
 		else
 			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
 
-		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor, Renderer.UI.RoundingFlags.All );
+		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
 
 		//
 		// Titlebar
 		//
 		var titlebarBounds = Bounds;
 		titlebarBounds.Size = titlebarBounds.Size.WithY( 32 );
-		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB, Renderer.UI.RoundingFlags.TopLeft | Renderer.UI.RoundingFlags.TopRight );
-
-		//
-		// Window border
-		//
-		if ( Focused )
-			Graphics.DrawRectUnfilled( Bounds, Colors.Accent );
-		else
-			Graphics.DrawRectUnfilled( Bounds, Colors.TransparentGray );
+		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB, RoundingFlags.TopLeft | RoundingFlags.TopRight );
 
 		if ( !InputFlags.HasFlag( PanelInputFlags.MouseDown ) && titlebarFocus )
 		{
@@ -76,28 +75,6 @@ internal class Window : Widget
 
 		ZIndex = (Focused) ? 100 : 0;
 		RootLayout.Bounds = Bounds;
-
-		//
-		// Debug: draw widget bounds
-		//
-		if ( DrawBounds )
-		{
-			var widgets = Widget.All.Where( x => x.Visible ).ToList();
-			for ( int i = 0; i < widgets.Count; i++ )
-			{
-				Widget? widget = widgets[i];
-				var widgetBounds = widget.Bounds;
-				var color = (i % 3) switch
-				{
-					0 => Colors.Red,
-					1 => Colors.Green,
-					2 => Colors.Blue,
-					_ => Vector4.One
-				};
-
-				Graphics.DrawRectUnfilled( widgetBounds, color );
-			}
-		}
 	}
 
 	[Event.Hotload]
@@ -133,6 +110,7 @@ internal class Window : Widget
 		//
 		RootLayout.Add( new Label( "Test Window", 64 ) );
 		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
+		RootLayout.Add( new Label( $"{FontAwesome.FaceSmile} Icons!! {FontAwesome.FaceGrin} {FontAwesome.Icons}", 16 ) );
 		RootLayout.Add( new Label( Lipsum, 13 ) );
 
 		// Different font families
@@ -140,7 +118,6 @@ internal class Window : Widget
 		RootLayout.Add( new Label( "Inter: The quick brown fox jumps over the lazy dog", fontFamily: "inter" ) );
 		RootLayout.Add( new Label( "Qaz: The quick brown fox jumps over the lazy dog", fontFamily: "qaz" ) );
 		RootLayout.Add( new Label( "Wavetosh: The quick brown fox jumps over the lazy dog", fontFamily: "wavetosh" ) );
-		RootLayout.Add( new Label( FontAwesome.FaceSmile + " " + FontAwesome.FaceGrinStars + " " + FontAwesome.ShuttleSpace, fontFamily: "fa-solid-900", fontSize: 32 ) );
 
 		RootLayout.AddSpacing( 4f );
 
@@ -155,22 +132,10 @@ internal class Window : Widget
 		RootLayout.Add( themeSwitcher );
 
 		//
-		// Debug
-		//
-		var boundsDropdown = new Dropdown( "Don't Draw Bounds" );
-		boundsDropdown.AddOption( "Don't Draw Bounds" );
-		boundsDropdown.AddOption( "Draw Bounds" );
-		boundsDropdown.OnSelected += ( i ) => DrawBounds = i == 1;
-		boundsDropdown.ZIndex = 9;
-		RootLayout.Add( boundsDropdown );
-
-		//
 		// Different button lengths (sizing test)
 		//
-		RootLayout.Add( new Button( "Another awesome button" ) );
 		RootLayout.Add( new Button( "OK" ) );
 		RootLayout.Add( new Button( "I am a really long button with some really long text inside it" ) );
-		RootLayout.Add( new Button( "Stretch" ) );
 
 		//
 		// Test dropdown
@@ -180,7 +145,7 @@ internal class Window : Widget
 		dropdown.AddOption( "World" );
 		dropdown.AddOption( "This is a test" );
 		dropdown.AddOption( "I am a really long dropdown entry" );
-		dropdown.AddOption( "Poo" );
+		dropdown.AddOption( $"{FontAwesome.Poo} Poo" );
 		RootLayout.Add( dropdown );
 	}
 }

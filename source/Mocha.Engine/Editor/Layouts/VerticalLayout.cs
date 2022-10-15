@@ -50,7 +50,7 @@ internal class GridLayout : BaseLayout
 
 		cursor = cursor.WithX( cursor.X + maxWidth + Spacing );
 
-		if ( cursor.X + maxWidth > Size.X )
+		if ( cursor.X + maxWidth + Spacing > Size.X )
 			cursor = cursor.WithY( cursor.Y + maxHeight + Spacing ).WithX( 0 );
 
 		//

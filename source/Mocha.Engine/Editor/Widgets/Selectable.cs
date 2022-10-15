@@ -1,6 +1,4 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.Engine.Editor;
 
 internal class Selectable : Button
 {
@@ -33,8 +31,8 @@ internal class Selectable : Button
 			}
 			else
 			{
-				Graphics.DrawRect( Bounds.Shrink( new( 1f, 2f ) ), Colors.Accent );
-				Graphics.DrawRect( Bounds.Shrink( new( 1f, 2f ) ),
+				Graphics.DrawRect( Bounds.Shrink( new( 1f, 4f ) ), Colors.Accent );
+				Graphics.DrawRect( Bounds.Shrink( new( 1f, 4f ) ),
 					colorA * 0.5f,
 					colorB * 0.5f,
 					colorA * 0.5f,

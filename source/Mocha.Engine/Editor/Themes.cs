@@ -2,7 +2,7 @@
 
 public interface ITheme
 {
-	public static ITheme Current { get; set; } = new DarkTheme();
+	public static ITheme Current { get; set; } = new TestTheme();
 
 	Vector4 BackgroundColor { get; }
 	Vector4 TextColor { get; }
@@ -22,7 +22,7 @@ public class DarkTheme : ITheme
 
 	public Vector4 ButtonBgB => MathX.GetColor( "#292524" );
 
-	public Vector4 Border => MathX.GetColor( "#050506" );
+	public Vector4 Border => MathX.GetColor( "#55050506" );
 
 	public float ShadowOpacity => 0.05f;
 }

@@ -71,8 +71,10 @@ internal class BaseLayout
 	public T AddLayout<T>() where T : BaseLayout
 	{
 		var layout = Activator.CreateInstance<T>();
-		Layouts.Add( layout );
+		layout.Parent = Parent;
+		layout.Margin = cursor;
 
+		Layouts.Add( layout );
 		return layout;
 	}
 
