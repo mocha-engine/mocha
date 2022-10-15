@@ -19,7 +19,7 @@ internal class Label : Widget
 	}
 
 	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
-	public float FontSize { get; set; } = 14f;
+	public float FontSize { get; set; } = 12;
 
 	public Vector2 MeasureText( string text, float fontSize )
 	{
@@ -34,7 +34,7 @@ internal class Label : Widget
 		return new Vector2( x, fontSize * 1.25f );
 	}
 
-	internal Label( string text, float fontSize = 14f, string fontFamily = "Inter" ) : base()
+	internal Label( string text, float fontSize = 12, string fontFamily = "sourcesanspro" ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;
@@ -54,12 +54,6 @@ internal class Label : Widget
 		Vector2 maxs = (max - min) * new Vector2( 1, -1 );
 
 		var glyphRect = new Rectangle( mins, maxs );
-
-		// glyphRect.Y -= EditorInstance.FontSprite.Rect.Y;
-		// glyphRect.Y += EditorInstance.AtlasTexture.Height - EditorInstance.FontSprite.Rect.Height - EditorInstance.FontSprite.Rect.Y;
-		// glyphRect.X += EditorInstance.FontSprite.Rect.X;
-		// glyphRect /= EditorInstance.AtlasTexture.Size;
-		// glyphRect.Y = 1.0f - glyphRect.Y;
 
 		return glyphRect;
 	}
@@ -89,7 +83,7 @@ internal class Label : Widget
 				float heightMul = 1.0f;
 
 				var glyphSize = new Vector2( glyphRect.Width * widthMul, glyphRect.Height * heightMul );
-				glyphSize *= FontSize * 0.03f;
+				glyphSize *= FontSize / FontData.Atlas.Size;
 
 				var glyphPos = new Rectangle( new Vector2( Bounds.X + x, Bounds.Y + FontSize ), glyphSize );
 				glyphPos.X += (float)glyph.PlaneBounds.Left * FontSize;

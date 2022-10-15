@@ -6,30 +6,48 @@ public static partial class Graphics
 {
 	internal static PanelRenderer PanelRenderer { get; set; }
 
-	public static void DrawRect( Rectangle bounds, Vector4 colorTop, Vector4 colorBottom, bool rounded = false )
+	private static GraphicsFlags GetRoundedGraphicsFlags( RoundingFlags roundingFlags )
 	{
-		var flags = GraphicsFlags.None;
-		if ( rounded )
-			flags |= GraphicsFlags.Rounded;
+		GraphicsFlags graphicsFlags = GraphicsFlags.None;
 
+		if ( roundingFlags.HasFlag( RoundingFlags.TopLeft ) )
+		{
+			graphicsFlags |= GraphicsFlags.RoundedTopLeft;
+		}
+
+		if ( roundingFlags.HasFlag( RoundingFlags.TopRight ) )
+		{
+			graphicsFlags |= GraphicsFlags.RoundedTopRight;
+		}
+
+		if ( roundingFlags.HasFlag( RoundingFlags.BottomLeft ) )
+		{
+			graphicsFlags |= GraphicsFlags.RoundedBottomLeft;
+		}
+
+		if ( roundingFlags.HasFlag( RoundingFlags.BottomRight ) )
+		{
+			graphicsFlags |= GraphicsFlags.RoundedBottomRight;
+		}
+
+		return graphicsFlags;
+	}
+
+	public static void DrawRect( Rectangle bounds, Vector4 colorTop, Vector4 colorBottom, RoundingFlags roundingFlags = RoundingFlags.None )
+	{
+		var flags = GetRoundedGraphicsFlags( roundingFlags );
 		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, colorTop, colorBottom, colorTop, colorBottom, flags );
 	}
 
-	public static void DrawRect( Rectangle bounds, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, bool rounded = false )
+	public static void DrawRect( Rectangle bounds, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, RoundingFlags roundingFlags = RoundingFlags.None )
 	{
-		var flags = GraphicsFlags.None;
-		if ( rounded )
-			flags |= GraphicsFlags.Rounded;
-
+		var flags = GetRoundedGraphicsFlags( roundingFlags );
 		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, colorA, colorB, colorC, colorD, flags );
 	}
 
-	public static void DrawRect( Rectangle bounds, Vector4 color, bool rounded = false )
+	public static void DrawRect( Rectangle bounds, Vector4 color, RoundingFlags roundingFlags = RoundingFlags.None )
 	{
-		var flags = GraphicsFlags.None;
-		if ( rounded )
-			flags |= GraphicsFlags.Rounded;
-
+		var flags = GetRoundedGraphicsFlags( roundingFlags );
 		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color, flags );
 	}
 
@@ -42,7 +60,7 @@ public static partial class Graphics
 		{
 			var currBounds = bounds.Shrink( i );
 			var color = new Vector4( 0, 0, 0, (1f / size) * opacity );
-			PanelRenderer.AddRectangle( currBounds, new Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color, GraphicsFlags.Rounded );
+			PanelRenderer.AddRectangle( currBounds, new Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color, GetRoundedGraphicsFlags( RoundingFlags.All ) );
 		}
 	}
 
@@ -72,20 +90,8 @@ public static partial class Graphics
 
 	public static void DrawRectUnfilled( Rectangle bounds, Vector4 color, float thickness = 1.0f )
 	{
-		//
-		// Draw lines
-		//
-		var top = new Rectangle( bounds.X + thickness, bounds.Y, bounds.Width - thickness * 2, thickness );
-		DrawRect( top, color );
-
-		var bottom = new Rectangle( bounds.X + thickness, bounds.Y + bounds.Height - thickness, bounds.Width - thickness * 2, thickness );
-		DrawRect( bottom, color );
-
-		var left = new Rectangle( bounds.X, bounds.Y, thickness, bounds.Height );
-		DrawRect( left, color );
-
-		var right = new Rectangle( bounds.X + bounds.Width - thickness, bounds.Y, thickness, bounds.Height );
-		DrawRect( right, color );
+		return;
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), thickness, color, color, color, color, GraphicsFlags.Border );
 	}
 
 	internal static void DrawAtlas( Vector2 position )

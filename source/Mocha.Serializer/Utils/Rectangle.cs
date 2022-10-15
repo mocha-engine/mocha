@@ -19,6 +19,7 @@ public struct Rectangle
 		get => new Vector2( Width, Height );
 		set => (Width, Height) = value;
 	}
+	public Vector2 Center => new Vector2( X + Width / 2.0f, Y + Height / 2.0f );
 
 	public Rectangle( Vector2 position, Vector2 size )
 	{

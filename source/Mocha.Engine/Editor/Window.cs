@@ -31,18 +31,18 @@ internal class Window : Widget
 		// Main background
 		//
 		if ( Focused )
-			Graphics.DrawShadow( Bounds, 16f, ITheme.Current.ShadowOpacity * 2f );
+			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity * 2f );
 		else
-			Graphics.DrawShadow( Bounds, 16f, ITheme.Current.ShadowOpacity );
+			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
 
-		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor );
+		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor, Renderer.UI.RoundingFlags.All );
 
 		//
 		// Titlebar
 		//
 		var titlebarBounds = Bounds;
 		titlebarBounds.Size = titlebarBounds.Size.WithY( 32 );
-		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB );
+		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB, Renderer.UI.RoundingFlags.TopLeft | Renderer.UI.RoundingFlags.TopRight );
 
 		//
 		// Window border
