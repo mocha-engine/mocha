@@ -56,6 +56,8 @@ public class AtlasBuilder
 
 	private void Build()
 	{
+		var _ = new Stopwatch( "AtlasBuilder.Build" );
+
 		var (width, height) = CalculateSize();
 		Log.Trace( $"Building atlas with size {(width, height)}" );
 
