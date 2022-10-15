@@ -6,6 +6,7 @@
  */
 
 #pragma optionNV (unroll all)
+
 //
 // Common
 //
@@ -38,6 +39,7 @@ const uint None        = 0;
 const uint UseRawImage = 1;
 const uint UseSdf      = 2;
 const uint HighDistMul = 4;
+const uint Rounded     = 8;
 
 // ==========================================================================================================================
 
@@ -55,8 +57,6 @@ layout( location = 2 ) in vec4 g_vColor;
 layout( location = 3 ) in vec2 g_vPanelPos;
 layout( location = 4 ) in vec2 g_vPanelSize;
 layout( location = 5 ) in int g_flags;
-
-#define g_flRounding 32
 
 //
 // Out
@@ -103,13 +103,16 @@ vec4 GetTextureSample( texture2D tex )
     return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords );
 }
 
+float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
+{
+    r.xy = (p.x>0.0)?r.xy : r.zw;
+    r.x  = (p.y>0.0)?r.x  : r.y;
+    vec2 q = abs(p)-b+r.x;
+    return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
+}
+
 void main() 
 {
-    vec2 normalizedPanelPos = fs_in.vPanelPos / fs_in.vPanelSize;
-    normalizedPanelPos *= vec2( 0.15686275, 0.13559322 );
-    normalizedPanelPos += vec2( 0.15686275, 0 );
-
-    float opacity = 1.0;
     vec4 texSample = GetTextureSample( g_tAtlas );
 
     if ( (fs_flags & UseRawImage) == UseRawImage )
@@ -118,6 +121,8 @@ void main()
     }
     else
     {
+        float opacity = 1.0;
+
         if ( (fs_flags & UseSdf) == UseSdf )
         {
             float r = texSample.r;
@@ -134,6 +139,18 @@ void main()
         }
         
         fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
+    }
+    
+    if ( (fs_flags & Rounded) == Rounded )
+    {
+        vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
+        vec4 rounding = vec4( 8 * 2.0 );
+        vec2 size = fs_in.vPanelSize;
+        
+        float r = sdRoundedBox( uv, size, rounding );
+        float a = clamp( r + 0.5, 0.0, 1.0 );
+
+        fragColor.a *= 1.0 - a;
     }
 }
 #endif

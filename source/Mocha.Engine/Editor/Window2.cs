@@ -18,7 +18,7 @@ internal class Window2 : Window
 		//
 		// Everything has to go inside a layout otherwise they'll go in funky places
 		//
-		RootLayout = new VerticalLayout
+		RootLayout = new GridLayout
 		{
 			Size = (Vector2)Screen.Size,
 			Parent = this
@@ -26,18 +26,7 @@ internal class Window2 : Window
 
 		RootLayout.Spacing = 10;
 		RootLayout.Size = Bounds.Size;
-		RootLayout.Margin = new( 16, 32 );
-
-		//
-		// Text rendering
-		//
-		var title = RootLayout.Add( new Label( "Icons", 64 ) );
-		title.SetFont( "wavetosh" );
-
-		var subtitle = RootLayout.Add( new Label( "Different file types and stuff!", 32 ) );
-		subtitle.SetFont( "inter" );
-
-		RootLayout.AddSpacing( 4f );
+		RootLayout.Margin = new( 16, 48 );
 
 		foreach ( var fileType in FileType.All )
 		{

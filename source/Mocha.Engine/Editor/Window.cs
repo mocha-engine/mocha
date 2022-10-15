@@ -31,9 +31,9 @@ internal class Window : Widget
 		// Main background
 		//
 		if ( Focused )
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity * 4f );
+			Graphics.DrawShadow( Bounds, 16f, ITheme.Current.ShadowOpacity * 2f );
 		else
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+			Graphics.DrawShadow( Bounds, 16f, ITheme.Current.ShadowOpacity );
 
 		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor );
 

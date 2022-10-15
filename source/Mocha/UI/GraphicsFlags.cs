@@ -8,4 +8,6 @@ public enum GraphicsFlags
 	UseSdf = 2,
 
 	HighDistMul = 4,
+
+	Rounded = 8
 }

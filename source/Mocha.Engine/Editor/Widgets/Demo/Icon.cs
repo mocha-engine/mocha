@@ -17,14 +17,19 @@ internal class Icon : Widget
 		base.Render();
 
 		Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
-		Graphics.DrawRect( Bounds, FileType.Color );
-		Graphics.DrawRect( Bounds, MathX.GetColor( "#00000000" ), MathX.GetColor( "#77000000" ) );
+		Graphics.DrawRect( Bounds, FileType.Color, true );
+		Graphics.DrawRect( Bounds, MathX.GetColor( "#00000000" ), MathX.GetColor( "#77000000" ), true );
 		Graphics.DrawTexture( new Rectangle( Bounds.X, Bounds.Y + (Bounds.Height - Bounds.Width) / 2.0f, Bounds.Width, Bounds.Width ), Texture );
-		Graphics.DrawRectUnfilled( Bounds, MathX.GetColor( "#77000000" ), 4.0f );
+		// Graphics.DrawRectUnfilled( Bounds, MathX.GetColor( "#77000000" ), 2.0f );
+
+		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
+		{
+			Graphics.DrawRect( Bounds, MathX.GetColor( "#88ffffff" ), true );
+		}
 	}
 
 	internal override Vector2 GetDesiredSize()
 	{
-		return new Vector2( 128, 196 );
+		return new Vector2( 96, 96 * 1.5f );
 	}
 }

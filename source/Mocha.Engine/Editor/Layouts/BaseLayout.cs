@@ -5,13 +5,14 @@ internal class BaseLayout
 	public static List<BaseLayout> All { get; } = new();
 
 	public List<BaseLayout> Layouts { get; } = new();
-	private List<(bool Stretch, Widget Widget)> Widgets { get; } = new();
+	protected List<(bool Stretch, Widget Widget)> Widgets { get; } = new();
 	public bool Visible { get; set; } = true;
 	public float Spacing { get; set; } = 0;
 	public Vector2 Margin { get; set; } = 0;
 
-	private Vector2 cursor = 0;
-	private Vector2 calculatedSize;
+	protected Vector2 cursor = 0;
+	protected Vector2 calculatedSize;
+
 	public Vector2 Size { get; set; } = new( -1, -1 );
 	public Vector2 CalculatedSize
 	{
@@ -38,6 +39,11 @@ internal class BaseLayout
 		All.Remove( this );
 	}
 
+	public virtual void CalculateWidgetBounds( Widget widget, bool stretch )
+	{
+
+	}
+
 	public T Add<T>( T widget, bool stretch = true ) where T : Widget
 	{
 		widget.Layout = this;
@@ -45,26 +51,7 @@ internal class BaseLayout
 		if ( Parent != null )
 			widget.Parent = Parent;
 
-		var desiredSize = widget.GetDesiredSize();
-		widget.Bounds = new Rectangle( cursor + Margin, desiredSize );
-
-		cursor = cursor.WithY( cursor.Y + desiredSize.Y + Spacing );
-
-		//
-		// Update auto-calculated size
-		//
-		if ( desiredSize.X > calculatedSize.X )
-			calculatedSize = calculatedSize.WithX( desiredSize.X );
-
-		if ( cursor.Y > calculatedSize.Y )
-			calculatedSize = calculatedSize.WithY( cursor.Y );
-
-		if ( stretch )
-		{
-			var calculatedRect = widget.RelativeBounds;
-			calculatedRect.Width = CalculatedSize.X - (Margin.X * 2.0f);
-			widget.Bounds = calculatedRect;
-		}
+		CalculateWidgetBounds( widget, stretch );
 
 		Widgets.Add( (stretch, widget) );
 
@@ -81,12 +68,12 @@ internal class BaseLayout
 		Add( dummy, true );
 	}
 
-	public VerticalLayout AddVerticalLayout()
+	public T AddLayout<T>() where T : BaseLayout
 	{
-		var verticalLayout = new VerticalLayout();
-		Layouts.Add( verticalLayout );
+		var layout = Activator.CreateInstance<T>();
+		Layouts.Add( layout );
 
-		return verticalLayout;
+		return layout;
 	}
 
 	public void Remove( Widget widget )
