@@ -32,6 +32,9 @@ public struct FileType
 	public static FileType Default =>
 		new FileType( "Unknown", "*", "core/ui/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#ffffff" ) );
 
+	public static FileType Sound =>
+		new FileType( "Sound", "msnd", "core/ui/icons/sound.mtex", FontAwesome.VolumeHigh, MathX.GetColor( "#fe646f" ) );
+
 	public static FileType[] All
 	{
 		get

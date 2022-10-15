@@ -15,7 +15,7 @@ internal class Button : Widget
 
 	public Button( string text, Action? onClick = null ) : base()
 	{
-		label = new( text, 13f );
+		label = new( text );
 		label.Parent = this;
 
 		if ( onClick != null )

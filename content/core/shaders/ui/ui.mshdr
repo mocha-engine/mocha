@@ -39,7 +39,14 @@ const uint None        = 0;
 const uint UseRawImage = 1;
 const uint UseSdf      = 2;
 const uint HighDistMul = 4;
-const uint Rounded     = 8;
+// const uint Rounded     = 8;
+
+const uint RoundedTopLeft    = 8;
+const uint RoundedTopRight   = 16;
+const uint RoundedBottomLeft = 32;
+const uint RoundedBottomRight = 64;
+
+const uint Border = 128;
 
 // ==========================================================================================================================
 
@@ -111,6 +118,12 @@ float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
     return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
 }
 
+float sdBox( in vec2 p, in vec2 b )
+{
+    vec2 d = abs(p) - b;
+    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+}
+
 void main() 
 {
     vec4 texSample = GetTextureSample( g_tAtlas );
@@ -140,17 +153,43 @@ void main()
         
         fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
     }
+
+    bool rounded = (fs_flags & RoundedTopLeft) == RoundedTopLeft 
+                || (fs_flags & RoundedTopRight) == RoundedTopRight 
+                || (fs_flags & RoundedBottomLeft) == RoundedBottomLeft 
+                || (fs_flags & RoundedBottomRight) == RoundedBottomRight;
     
-    if ( (fs_flags & Rounded) == Rounded )
+    if ( rounded )
     {
         vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
         vec4 rounding = vec4( 8 * 2.0 );
+
+        if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
+            rounding.y *= 0.0;
+        if ( (fs_flags & RoundedBottomLeft) != RoundedBottomLeft )
+            rounding.z *= 0.0;
+        if ( (fs_flags & RoundedBottomRight) != RoundedBottomRight )
+            rounding.x *= 0.0;
+        if ( (fs_flags & RoundedTopRight) != RoundedTopRight )
+            rounding.w *= 0.0;
+            
         vec2 size = fs_in.vPanelSize;
         
         float r = sdRoundedBox( uv, size, rounding );
         float a = clamp( r + 0.5, 0.0, 1.0 );
-
+        
         fragColor.a *= 1.0 - a;
+    }
+
+    if ( (fs_flags & Border) == Border )
+    {
+        vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
+        vec2 size = fs_in.vPanelSize;
+        
+        float r = sdBox( uv, size );
+        float a = clamp( r + 0.5, 0.0, 1.0 );
+        
+        fragColor.rgb = smoothstep( 1.0, 0.99, a ).xxx;
     }
 }
 #endif

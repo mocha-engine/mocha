@@ -9,5 +9,22 @@ public enum GraphicsFlags
 
 	HighDistMul = 4,
 
-	Rounded = 8
+	RoundedTopLeft = 8,
+	RoundedTopRight = 16,
+	RoundedBottomLeft = 32,
+	RoundedBottomRight = 64,
+
+	Border = 128
+}
+
+[Flags]
+public enum RoundingFlags
+{
+	None = 0,
+	TopLeft = 1,
+	TopRight = 2,
+	BottomLeft = 4,
+	BottomRight = 8,
+
+	All = TopLeft | TopRight | BottomLeft | BottomRight
 }
