@@ -27,6 +27,8 @@ internal partial class EditorInstance
 
 	internal void Render( Veldrid.CommandList commandList )
 	{
+		UpdateWidgets();
+
 		Graphics.PanelRenderer.NewFrame();
 		Graphics.DrawRect( new Rectangle( 0, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor * 1.25f );
 
@@ -36,6 +38,17 @@ internal partial class EditorInstance
 	}
 
 	internal void RenderWidgets()
+	{
+		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
+		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
+
+		foreach ( var widget in widgets )
+		{
+			widget.Render();
+		}
+	}
+
+	internal void UpdateWidgets()
 	{
 		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
 		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
@@ -58,7 +71,7 @@ internal partial class EditorInstance
 
 		foreach ( var widget in widgets )
 		{
-			widget.Render();
+			widget.Update();
 		}
 	}
 
