@@ -14,13 +14,13 @@ internal partial class EditorInstance
 		Graphics.Init();
 
 		var demoWindow = new DemoWindow();
-		demoWindow.Bounds = new Rectangle( 32, 32, 500, 650 );
+		demoWindow.Bounds = new Rectangle( 128, 128, 500, 650 );
 		demoWindow.Focused = true;
 		demoWindow.CreateUI();
 		Windows.Add( demoWindow );
 
 		var iconWindow = new IconWindow();
-		iconWindow.Bounds = new Rectangle( 128, 32, 500, 600 );
+		iconWindow.Bounds = new Rectangle( 0, 0, 1500, 1080 );
 		iconWindow.CreateUI();
 		Windows.Add( iconWindow );
 	}

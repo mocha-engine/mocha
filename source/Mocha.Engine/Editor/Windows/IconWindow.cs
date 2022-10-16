@@ -2,8 +2,23 @@
 
 internal class IconWindow : Window
 {
-	public IconWindow() : base()
+	private void AddFiles( string directory )
 	{
+		foreach ( var filePath in FileSystem.Game.GetFiles( directory ) )
+		{
+			var extension = Path.GetExtension( filePath );
+			var fileType = FileType.GetFileTypeForExtension( extension );
+
+			if ( !fileType.HasValue )
+				continue;
+
+			RootLayout.Add( new Icon( filePath ) );
+		}
+
+		foreach ( var subDirectory in FileSystem.Game.GetDirectories( directory ) )
+		{
+			AddFiles( subDirectory );
+		}
 	}
 
 	public override void CreateUI()
@@ -26,9 +41,6 @@ internal class IconWindow : Window
 		RootLayout.Size = Bounds.Size;
 		RootLayout.Margin = new( 16, 48 );
 
-		foreach ( var fileType in FileType.All )
-		{
-			RootLayout.Add( new Icon( fileType ), false );
-		}
+		AddFiles( "." );
 	}
 }

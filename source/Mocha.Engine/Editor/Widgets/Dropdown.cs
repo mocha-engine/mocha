@@ -66,7 +66,19 @@ internal class Dropdown : Button
 		base.Render();
 
 		var cursor = Bounds.Position + new Vector2( 0, GetDesiredSize().Y );
-		icon.Bounds = new Rectangle( Bounds.X + Bounds.Width - 32, Bounds.Y + ((Bounds.Height - 16) / 2.0f), 32, 32 );
+		icon.Bounds = new Rectangle( Bounds.X + Bounds.Width - 24, Bounds.Y + ((Bounds.Height - 16) / 2.0f), 16, 16 );
+		var bgb = new Rectangle( icon.Bounds.X - 8, icon.Bounds.Y, 0, 0 ).Expand( 6 );
+		bgb.Size = new( 38, 28 );
+		Graphics.DrawRect( bgb, ITheme.Current.ButtonBgB * 0.1f, RoundingFlags.Right );
+
+		bgb.Height = Bounds.Height;
+		bgb.Y = Bounds.Y;
+		bgb = bgb.Shrink( 1f );
+		bgb.X -= 1;
+		bgb.Width = 1f;
+		Graphics.DrawRect( bgb, ITheme.Current.Border );
+		bgb.X -= 1;
+		Graphics.DrawRect( bgb, ITheme.Current.ButtonBgA );
 
 		foreach ( Selectable? option in options )
 		{

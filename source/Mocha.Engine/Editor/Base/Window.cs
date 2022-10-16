@@ -10,6 +10,11 @@ internal class Window : Widget
 
 	private const int TitlebarHeight = 24;
 
+	//
+	// This flag will call CreateUI
+	//
+	private bool IsDirty = false;
+
 	public Window()
 	{
 		Event.Register( this );
@@ -23,6 +28,12 @@ internal class Window : Widget
 
 	internal override void Render()
 	{
+		if ( IsDirty )
+		{
+			CreateUI();
+			IsDirty = false;
+		}
+
 		//
 		// Window border
 		//
@@ -85,7 +96,7 @@ internal class Window : Widget
 	[Event.Hotload]
 	public void OnHotload()
 	{
-		CreateUI();
+		IsDirty = true;
 	}
 
 	public virtual void CreateUI()
