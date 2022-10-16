@@ -45,10 +45,10 @@ internal class Window : Widget
 		//
 		// Main background
 		//
-		if ( Focused )
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity * 2f );
-		else
-			Graphics.DrawShadow( Bounds, 8f, ITheme.Current.ShadowOpacity );
+		//if ( Focused )
+		//	Graphics.DrawShadow( Bounds, 64f, ITheme.Current.ShadowOpacity * 8f );
+		//else
+		//	Graphics.DrawShadow( Bounds, 64f, ITheme.Current.ShadowOpacity );
 
 		Graphics.DrawRect( Bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
 
@@ -58,6 +58,17 @@ internal class Window : Widget
 		var titlebarBounds = Bounds;
 		titlebarBounds.Size = titlebarBounds.Size.WithY( TitlebarHeight );
 		Graphics.DrawRect( titlebarBounds, ITheme.Current.ButtonBgA, ITheme.Current.ButtonBgB, RoundingFlags.TopLeft | RoundingFlags.TopRight );
+
+		ZIndex = (Focused) ? 100 : 0;
+		RootLayout.Bounds = Bounds;
+	}
+
+	internal override void Update()
+	{
+		base.Update();
+
+		var titlebarBounds = Bounds;
+		titlebarBounds.Size = titlebarBounds.Size.WithY( TitlebarHeight );
 
 		if ( !InputFlags.HasFlag( PanelInputFlags.MouseDown ) && titlebarFocus )
 		{
@@ -88,9 +99,6 @@ internal class Window : Widget
 				Log.Info( "Resize" );
 			}
 		}
-
-		ZIndex = (Focused) ? 100 : 0;
-		RootLayout.Bounds = Bounds;
 	}
 
 	[Event.Hotload]

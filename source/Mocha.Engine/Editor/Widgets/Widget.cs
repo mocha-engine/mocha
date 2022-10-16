@@ -44,18 +44,27 @@ internal class Widget
 
 	internal virtual void Render()
 	{
+
+	}
+
+	internal virtual void Update()
+	{
+
 	}
 
 	internal virtual void OnMouseOver()
 	{
+
 	}
 
 	internal virtual void OnMouseDown()
 	{
+
 	}
 
 	internal virtual void OnMouseUp()
 	{
+
 	}
 
 	internal virtual Vector2 GetDesiredSize()

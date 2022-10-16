@@ -80,30 +80,6 @@ public static partial class Graphics
 		}
 	}
 
-	public static void DrawCharacter( Rectangle bounds, Texture texture, Rectangle atlasBounds, Vector4 color )
-	{
-		var flags = GraphicsFlags.UseSdf;
-		if ( bounds.Size.Length > 16f )
-			flags |= GraphicsFlags.HighDistMul;
-
-		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
-		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
-
-		var texBounds = new Rectangle( (Vector2)texturePos, textureSize );
-
-		// Move to top left of texture inside atlas
-		atlasBounds.Y += textureSize.Y - texture.Height;
-		atlasBounds.X += texBounds.X;
-
-		// Convert to [0..1] normalized space
-		atlasBounds /= textureSize;
-
-		// Flip y axis
-		atlasBounds.Y = 1.0f - atlasBounds.Y;
-
-		PanelRenderer.AddRectangle( bounds, atlasBounds, 0, color, color, color, color, flags );
-	}
-
 	public static void DrawRectUnfilled( Rectangle bounds, Vector4 color, float thickness = 1.0f )
 	{
 		return;

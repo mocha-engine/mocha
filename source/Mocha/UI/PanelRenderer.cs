@@ -3,6 +3,7 @@
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public partial class PanelRenderer
 {
+	private float totalSw = 0;
 	public AtlasBuilder AtlasBuilder { get; set; }
 
 	public PanelRenderer()

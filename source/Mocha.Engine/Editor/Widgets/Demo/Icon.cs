@@ -8,28 +8,30 @@ internal class Icon : Widget
 {
 	private Texture Texture { get; set; }
 	private FileType FileType { get; set; }
-	private string FilePath { get; set; }
-	private Label Label { get; set; }
+	private string FileName { get; set; }
+	private float Size => 144;
 
 	public Icon( string filePath )
 	{
-		FilePath = filePath;
 		var extension = Path.GetExtension( filePath );
 		var fileType = FileType.GetFileTypeForExtension( extension ) ?? FileType.Default;
 
+		FileName = Path.GetFileName( filePath );
 		FileType = fileType;
 
 		if ( fileType.Extension == "mtex" )
 		{
 			Texture = Texture.Builder.FromPath( filePath ).Build();
 		}
+		else if ( fileType.Extension == "mmat" )
+		{
+			var material = Material.FromPath( filePath );
+			Texture = material.DiffuseTexture;
+		}
 		else
 		{
 			Texture = Texture.Builder.FromPath( FileType.IconLg ).Build();
 		}
-
-		Label = new( Path.GetFileName( filePath ) );
-		Label.Parent = this;
 	}
 
 	float t = 0;
@@ -52,19 +54,8 @@ internal class Icon : Widget
 		// Icon image
 		//
 		var center = Bounds.Center;
-		float imageSize = 96;
+		float imageSize = Size / 1.5f;
 		Graphics.DrawTexture( new Rectangle( center - imageSize / 2, imageSize ), Texture );
-
-		//
-		// Top/bottom stripes
-		//
-		var b = Bounds;
-		b.Height = 24;
-		b.Y = b.Y + Bounds.Height - b.Height;
-		Graphics.DrawRect( b, transparentGray, RoundingFlags.BottomLeft | RoundingFlags.BottomRight );
-
-		b.Y = Bounds.Y;
-		// Graphics.DrawRect( b, transparentGray, RoundingFlags.TopLeft | RoundingFlags.TopRight );
 
 		//
 		// Mouse hover overlay
@@ -75,26 +66,49 @@ internal class Icon : Widget
 		Graphics.DrawRect( Bounds, c, RoundingFlags.All );
 
 		//
-		// Label
+		// Top/bottom stripes
 		//
-		// TODO: Should probably just have a Graphics.DrawText function
+		var b = Bounds;
+		b.Height = 32;
+		b.Y = b.Y + Bounds.Height - b.Height;
+		Graphics.DrawRect( b, transparentGray, RoundingFlags.BottomLeft | RoundingFlags.BottomRight );
+
+		b.Y = Bounds.Y;
+		Graphics.DrawRect( b, transparentGray, RoundingFlags.TopLeft | RoundingFlags.TopRight );
+
+		//
+		// Text
+		//
 		var lb = Bounds;
-		lb.Y = lb.Y + lb.Height - 20;
+		lb.Y = lb.Y + lb.Height - 24;
 		lb.X += Bounds.Width / 2f;
-		lb.X -= Label.MeasureText( Label.Text, Label.FontSize ).X / 2f;
-		Label.Bounds = lb;
-	}
+		lb.X -= Graphics.MeasureText( FileName, "sourcesanspro", 13 ).X / 2f;
+		Graphics.DrawText( lb, FileName, "sourcesanspro", 13 );
 
-	internal override void OnDelete()
-	{
-		base.OnDelete();
+		lb.Y = Bounds.Y + 8;
+		lb.X = Bounds.X + Bounds.Width - 24;
+		Graphics.DrawText( lb, FileType.IconSm, "sourcesanspro", 13 );
 
-		Label.Delete();
+		{
+			lb.X -= 18f;
+			Graphics.DrawText( lb, FontAwesome.HardDrive, "sourcesanspro", 13 );
+		}
+
+		if ( FileName.Contains( "subaru" ) )
+		{
+			lb.X -= 18f;
+			Graphics.DrawText( lb, FontAwesome.Star, "sourcesanspro", 13, Colors.Yellow );
+		}
+
+		if ( FileName.Contains( "_c" ) )
+		{
+			lb.X -= 18f;
+			Graphics.DrawText( lb, FontAwesome.Check, "sourcesanspro", 13, Colors.Green );
+		}
 	}
 
 	internal override Vector2 GetDesiredSize()
 	{
-		float size = 96 * 1.25f;
-		return new Vector2( size, size * 1.5f );
+		return new Vector2( Size, Size * 1.25f );
 	}
 }

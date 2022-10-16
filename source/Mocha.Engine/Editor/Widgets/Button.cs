@@ -69,7 +69,7 @@ internal class Button : Widget
 	protected void UpdateLabel()
 	{
 		var labelBounds = label.Bounds;
-		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - label.MeasureText( label.Text, label.FontSize ).X) * TextAnchor.X);
+		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - Graphics.MeasureText( label.Text, label.FontFamily, label.FontSize ).X) * TextAnchor.X);
 		labelBounds.X += Padding.X;
 		labelBounds.Y = Bounds.Y + (Padding.Y) - 8;
 		label.Bounds = labelBounds;
@@ -77,7 +77,7 @@ internal class Button : Widget
 
 	internal override Vector2 GetDesiredSize()
 	{
-		var size = new Vector2( (label.MeasureText( label.Text, label.FontSize ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
+		var size = new Vector2( (Graphics.MeasureText( label.Text, label.FontFamily, label.FontSize ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
 		return size;
 	}
 
