@@ -165,13 +165,13 @@ void main()
         vec4 rounding = vec4( 4 * 2.0 );
 
         if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
-            rounding.y *= 0.0;
+            rounding.w *= 0.0;
         if ( (fs_flags & RoundedBottomLeft) != RoundedBottomLeft )
             rounding.z *= 0.0;
         if ( (fs_flags & RoundedBottomRight) != RoundedBottomRight )
             rounding.x *= 0.0;
         if ( (fs_flags & RoundedTopRight) != RoundedTopRight )
-            rounding.w *= 0.0;
+            rounding.y *= 0.0;
             
         vec2 size = fs_in.vPanelSize;
         
