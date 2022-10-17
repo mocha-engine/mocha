@@ -37,7 +37,7 @@ internal class IconWindow : Window
 			Parent = this
 		};
 
-		RootLayout.Spacing = 10;
+		RootLayout.Spacing = 12;
 		RootLayout.Size = Bounds.Size;
 		RootLayout.Margin = new( 16, 48 );
 

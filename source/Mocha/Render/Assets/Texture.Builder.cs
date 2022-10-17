@@ -31,6 +31,12 @@ public partial class TextureBuilder
 
 	private static bool TryGetExistingTexture( string path, out Texture texture )
 	{
+		if ( string.IsNullOrEmpty( path ) )
+		{
+			texture = default;
+			return false;
+		}
+
 		var existingTexture = Asset.All.OfType<Texture>().ToList().FirstOrDefault( t => t.Path == path );
 		if ( existingTexture != null )
 		{

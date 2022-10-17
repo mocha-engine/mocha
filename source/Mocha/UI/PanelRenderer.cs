@@ -41,6 +41,9 @@ public partial class PanelRenderer
 
 	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, GraphicsFlags flags )
 	{
+		if ( rect.X > Screen.Size.X || rect.Y > Screen.Size.Y )
+			return;
+
 		var ndcRect = rect / (Vector2)Screen.Size;
 		var vertices = RectVertices.Select( ( x, i ) =>
 		{

@@ -16,9 +16,9 @@ internal class Label : Widget
 
 	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
 	public float FontSize { get; set; } = 12;
-	public string FontFamily { get; set; } = "sourcesanspro";
+	public string FontFamily { get; set; } = "qaz";
 
-	internal Label( string text, float fontSize = 12, string fontFamily = "sourcesanspro" ) : base()
+	internal Label( string text, float fontSize = 12, string fontFamily = "qaz" ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;
