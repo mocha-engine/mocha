@@ -35,13 +35,13 @@ internal class Icon : Widget
 	}
 
 	float t = 0;
+	Vector4 transparentGray = MathX.GetColor( "#77000000" );
+	Vector4 transparent = MathX.GetColor( "#00000000" );
+	Vector4 transparentWhite = MathX.GetColor( "#33ffffff" );
 
 	internal override void Render()
 	{
 		base.Render();
-		var transparentGray = MathX.GetColor( "#77000000" );
-		var transparent = MathX.GetColor( "#00000000" );
-		var transparentWhite = MathX.GetColor( "#33ffffff" );
 
 		//
 		// Background & shadow
