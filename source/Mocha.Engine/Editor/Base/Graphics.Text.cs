@@ -25,7 +25,7 @@ partial class Graphics
 
 		var font = LoadOrGetFont( fontFamily );
 
-		var targetSize = MeasureText( text, fontFamily, font.Data.Atlas.Size ) + 32;
+		var targetSize = MeasureText( text, fontFamily, font.Data.Atlas.Size );
 		var stitcher = new TextureStitcher( (int)targetSize.X, (int)targetSize.Y );
 		stitcher.Texture.Path = "internal:editor_" + fontFamily + "_" + text + "_" + fontSize;
 
@@ -46,13 +46,15 @@ partial class Graphics
 				fontTexture = fontAwesome.Texture;
 			}
 
-			if ( !fontData.Glyphs.Any( x => x.Unicode == c ) )
+			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
+
+			// If we don't have anything for this glyph, render a blank space
+			// (should probably just draw the missing texture though)
+			if ( glyph == null )
 			{
 				x += fontData.Atlas.Size;
 				continue;
 			}
-
-			var glyph = fontData.Glyphs.First( x => x.Unicode == (int)c );
 
 			if ( glyph.AtlasBounds != null )
 			{
@@ -60,16 +62,15 @@ partial class Graphics
 				glyphRect.Y = fontTexture.Height - glyphRect.Y;
 
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
-				// glyphSize *= fontSize / fontData.Atlas.Size;
 
 				var glyphPos = new Vector2( x, 32 );
-				glyphPos.X += (float)glyph.PlaneBounds.Left;
+				glyphPos.X += (float)glyph.PlaneBounds.Left * 4f;
 				glyphPos.Y -= (float)glyph.PlaneBounds.Top * 32f;
 
 				stitcher.AddTexture( glyphPos, glyphRect.Position, glyphRect.Size, fontTexture );
 			}
 
-			x += (float)glyph.Advance * fontData.Atlas.Size;// * fontSize;
+			x += (float)glyph.Advance * fontData.Atlas.Size;
 		}
 
 		CachedStringTextures.Add( key, stitcher.Texture );
@@ -104,7 +105,7 @@ partial class Graphics
 		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
 		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
 
-		var texBounds = new Rectangle( (Vector2)texturePos, textureSize );
+		var texBounds = new Rectangle( texturePos, textureSize );
 
 		// Move to top left of texture inside atlas
 		atlasBounds.Y += textureSize.Y - texture.Height;
@@ -137,25 +138,80 @@ partial class Graphics
 
 	public static Vector2 MeasureText( string text, string fontFamily, float fontSize )
 	{
-		float x = 0;
-
+		var size = new Vector2();
+		var key = GetKeyForText( text, fontFamily );
 		var font = LoadOrGetFont( fontFamily );
-		var fontData = font.Data;
-		var fontTexture = font.Texture;
+		var scale = (fontSize / font.Data.Atlas.Size);
 
+		if ( CachedStringTextures.TryGetValue( key, out var cachedTexture ) )
+		{
+			return cachedTexture.Size * scale;
+		}
+
+		float x = 0;
 		foreach ( var c in text )
 		{
-			if ( !fontData.Glyphs.Any( x => x.Unicode == c ) )
+			var fontData = font.Data;
+			var fontTexture = font.Texture;
+
+			//
+			// HACK HACK: Hard check to see if this is a font awesome glyph, swap the font
+			// data and texture out temporarily
+			//
+			if ( c > FontAwesome.IconMin )
 			{
-				x += fontSize;
+				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
+				fontData = fontAwesome.Data;
+				fontTexture = fontAwesome.Texture;
+
+				x += 32;
+			}
+
+			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
+
+			// If we don't have anything for this glyph, render a blank space
+			// (should probably just draw the missing texture though)
+			if ( glyph == null )
+			{
+				x += fontData.Atlas.Size;
 				continue;
 			}
 
-			var glyph = fontData.Glyphs.First( x => x.Unicode == c );
-			x += (float)glyph.Advance * fontSize;
+			if ( glyph.AtlasBounds != null )
+			{
+				var glyphRect = FontBoundsToAtlasRect( glyph );
+				glyphRect.Y = fontTexture.Height - glyphRect.Y;
+
+				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
+
+				var glyphPos = new Vector2( x, 32 );
+				glyphPos.X += (float)glyph.PlaneBounds.Left * 4f;
+				glyphPos.Y -= (float)glyph.PlaneBounds.Top * 32f;
+
+				if ( glyphPos.X + glyphSize.X > size.X )
+				{
+					size.X = glyphPos.X + glyphSize.X;
+				}
+
+				if ( glyphPos.Y + glyphSize.Y > size.Y )
+				{
+					size.Y = glyphPos.Y + glyphSize.Y;
+				}
+			}
+
+			x += (float)glyph.Advance * fontData.Atlas.Size;
 		}
 
-		return new Vector2( x, fontSize * 1.25f ); // ???
+		//
+		// HACK: If texture is blank, allocate one anyway
+		//
+		if ( size.X < 1 )
+			size.X = 1;
+
+		if ( size.Y < 1 )
+			size.Y = 1;
+
+		return size * scale;
 	}
 
 	public static Vector2 MeasureText( string text, float fontSize = 12 )
@@ -181,7 +237,7 @@ partial class Graphics
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
 	{
 		var flags = GraphicsFlags.UseSdf;
-		if ( bounds.Size.Length > 16f )
+		if ( fontSize > 24f )
 			flags |= GraphicsFlags.HighDistMul;
 
 		var texture = GetTextureForText( text, fontFamily, fontSize );

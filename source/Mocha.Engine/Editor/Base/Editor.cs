@@ -49,9 +49,11 @@ internal partial class EditorInstance
 		UpdateWidgets();
 
 		Graphics.PanelRenderer.NewFrame();
-		Graphics.DrawRect( new Rectangle( 0, (Vector2)Screen.Size ), MathX.GetColor( "#1e1f21" ) );
+		Graphics.DrawRect( new Rectangle( 0, Screen.Size ), MathX.GetColor( "#1e1f21" ) );
 
 		RenderWidgets();
+
+		RenderPerformanceOverlay();
 
 		Graphics.PanelRenderer.Draw( commandList );
 	}
@@ -120,5 +122,18 @@ internal partial class EditorInstance
 		Renderer.Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
 
 		Windows.ForEach( x => x.CreateUI() );
+	}
+
+	internal void RenderPerformanceOverlay()
+	{
+		var size = new Vector2( 80, 36 );
+		var position = new Vector2( (Screen.Size.X - size.X) / 2f, 8 );
+
+		var bounds = new Rectangle( position, size );
+
+		Graphics.DrawShadow( bounds, 8f, 0.25f );
+		Graphics.DrawRect( bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
+		var framerate = 1.000f / Time.AverageDelta;
+		Graphics.DrawText( bounds.Shrink( 8 ), $"FPS: {framerate.CeilToInt()}", 16 );
 	}
 }

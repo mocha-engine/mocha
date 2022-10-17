@@ -82,8 +82,17 @@ public static partial class Graphics
 
 	public static void DrawRectUnfilled( Rectangle bounds, Vector4 color, float thickness = 1.0f )
 	{
-		return;
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), thickness, color, color, color, color, GraphicsFlags.Border );
+		var top = new Rectangle( bounds.X + thickness, bounds.Y, bounds.Width - thickness * 2, thickness );
+		DrawRect( top, color );
+
+		var bottom = new Rectangle( bounds.X + thickness, bounds.Y + bounds.Height - thickness, bounds.Width - thickness * 2, thickness );
+		DrawRect( bottom, color );
+
+		var left = new Rectangle( bounds.X, bounds.Y, thickness, bounds.Height );
+		DrawRect( left, color );
+
+		var right = new Rectangle( bounds.X + bounds.Width - thickness, bounds.Y, thickness, bounds.Height );
+		DrawRect( right, color );
 	}
 
 	internal static void DrawAtlas( Vector2 position )
@@ -104,7 +113,7 @@ public static partial class Graphics
 		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
 		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
 
-		var texBounds = new Rectangle( (Vector2)texturePos, texture.Size );
+		var texBounds = new Rectangle( texturePos, texture.Size );
 
 		// Convert to [0..1] normalized space
 		texBounds /= textureSize;

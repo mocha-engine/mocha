@@ -53,6 +53,8 @@ public struct Vector2 : IEquatable<Vector2>
 
 	}
 
+
+	public static implicit operator Vector2( Point2 value ) => new Vector2( value.X, value.Y );
 	public static implicit operator Vector2( System.Numerics.Vector2 value ) => new Vector2( value.X, value.Y );
 
 	public static implicit operator System.Numerics.Vector2( Vector2 value ) => new System.Numerics.Vector2( value.X, value.Y );
@@ -85,11 +87,6 @@ public struct Vector2 : IEquatable<Vector2>
 	public static implicit operator Vector2( float v )
 	{
 		return new Vector2( v );
-	}
-
-	public static explicit operator Vector2( Point2 v )
-	{
-		return new Vector2( v.X, v.Y );
 	}
 
 	public override bool Equals( object? obj )
