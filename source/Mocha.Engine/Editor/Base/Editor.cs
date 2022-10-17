@@ -6,6 +6,8 @@ internal partial class EditorInstance
 
 	private List<Window> Windows = new();
 
+	private bool IsRendering = false;
+
 	internal EditorInstance()
 	{
 		Event.Register( this );
@@ -13,24 +15,41 @@ internal partial class EditorInstance
 
 		Graphics.Init();
 
-		var demoWindow = new DemoWindow();
-		demoWindow.Bounds = new Rectangle( 128, 128, 500, 650 );
-		demoWindow.Focused = true;
-		demoWindow.CreateUI();
-		Windows.Add( demoWindow );
+		Windows.Add( new DemoWindow
+		{
+			Bounds = new Rectangle( 128, 128, 500, 650 ),
+			Focused = true,
+			Dock = Dock.Left,
+			Title = "aljkfdjgfkljafkfajsfdkasdjfkasfj"
+		} );
 
-		var iconWindow = new IconWindow();
-		iconWindow.Bounds = new Rectangle( 0, 0, 1500, 1080 );
-		iconWindow.CreateUI();
-		Windows.Add( iconWindow );
+		Windows.Add( new IconWindow
+		{
+			Bounds = new Rectangle( 0, 0, 1500, 1080 ),
+			Dock = Dock.Bottom,
+			Title = "Asset Browser"
+		} );
+
+		Windows.Add( new OutlinerWindow
+		{
+			Bounds = new Rectangle( 0, 0, 1500, 1080 ),
+			Dock = Dock.Right,
+			Title = "Outliner"
+		} );
 	}
 
 	internal void Render( Veldrid.CommandList commandList )
 	{
+		if ( Input.Pressed( InputButton.SwitchMode ) )
+			IsRendering = !IsRendering;
+
+		if ( !IsRendering )
+			return;
+
 		UpdateWidgets();
 
 		Graphics.PanelRenderer.NewFrame();
-		Graphics.DrawRect( new Rectangle( 0, (Vector2)Screen.Size ), ITheme.Current.BackgroundColor * 1.25f );
+		Graphics.DrawRect( new Rectangle( 0, (Vector2)Screen.Size ), MathX.GetColor( "#1e1f21" ) );
 
 		RenderWidgets();
 
@@ -78,11 +97,11 @@ internal partial class EditorInstance
 	internal string GetCurrentTheme()
 	{
 		if ( ITheme.Current is LightTheme )
-			return "Light Theme";
+			return "Default Light Theme";
 		if ( ITheme.Current is DarkTheme )
-			return "Dark Theme";
+			return "Default Dark Theme";
 		if ( ITheme.Current is TestTheme )
-			return "Test Theme";
+			return "2012";
 
 		return "???";
 	}

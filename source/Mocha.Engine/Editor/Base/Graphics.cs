@@ -94,7 +94,12 @@ public static partial class Graphics
 		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 1, 1 ), 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
 	}
 
-	internal static void DrawTexture( Rectangle bounds, Texture texture )
+	internal static void DrawTexture( Rectangle bounds, Texture texture, GraphicsFlags flags = GraphicsFlags.UseRawImage )
+	{
+		DrawTexture( bounds, texture, Vector4.One, flags );
+	}
+
+	internal static void DrawTexture( Rectangle bounds, Texture texture, Vector4 tint, GraphicsFlags flags = GraphicsFlags.UseRawImage )
 	{
 		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
 		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
@@ -104,6 +109,6 @@ public static partial class Graphics
 		// Convert to [0..1] normalized space
 		texBounds /= textureSize;
 
-		PanelRenderer.AddRectangle( bounds, texBounds, 0, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
+		PanelRenderer.AddRectangle( bounds, texBounds, screenPxRange: 0, tint, tint, tint, tint, flags );
 	}
 }

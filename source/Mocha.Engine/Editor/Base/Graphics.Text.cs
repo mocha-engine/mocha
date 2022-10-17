@@ -12,6 +12,75 @@ partial class Graphics
 
 	private static Dictionary<string, CachedFont> CachedFonts { get; } = new();
 
+	private static Dictionary<string, Texture> CachedStringTextures { get; } = new();
+
+	private static Texture GetTextureForText( string text, string fontFamily, float fontSize )
+	{
+		var key = GetKeyForText( text, fontFamily );
+
+		if ( CachedStringTextures.TryGetValue( key, out var cachedTexture ) )
+		{
+			return cachedTexture;
+		}
+
+		var font = LoadOrGetFont( fontFamily );
+
+		var targetSize = MeasureText( text, fontFamily, font.Data.Atlas.Size ) + 32;
+		var stitcher = new TextureStitcher( (int)targetSize.X, (int)targetSize.Y );
+		stitcher.Texture.Path = "internal:editor_" + fontFamily + "_" + text + "_" + fontSize;
+
+		float x = 0;
+		foreach ( var c in text )
+		{
+			var fontData = font.Data;
+			var fontTexture = font.Texture;
+
+			//
+			// HACK HACK: Hard check to see if this is a font awesome glyph, swap the font
+			// data and texture out temporarily
+			//
+			if ( c > FontAwesome.IconMin )
+			{
+				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
+				fontData = fontAwesome.Data;
+				fontTexture = fontAwesome.Texture;
+			}
+
+			if ( !fontData.Glyphs.Any( x => x.Unicode == c ) )
+			{
+				x += fontData.Atlas.Size;
+				continue;
+			}
+
+			var glyph = fontData.Glyphs.First( x => x.Unicode == (int)c );
+
+			if ( glyph.AtlasBounds != null )
+			{
+				var glyphRect = FontBoundsToAtlasRect( glyph );
+				glyphRect.Y = fontTexture.Height - glyphRect.Y;
+
+				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
+				// glyphSize *= fontSize / fontData.Atlas.Size;
+
+				var glyphPos = new Vector2( x, 32 );
+				glyphPos.X += (float)glyph.PlaneBounds.Left;
+				glyphPos.Y -= (float)glyph.PlaneBounds.Top * 32f;
+
+				stitcher.AddTexture( glyphPos, glyphRect.Position, glyphRect.Size, fontTexture );
+			}
+
+			x += (float)glyph.Advance * fontData.Atlas.Size;// * fontSize;
+		}
+
+		CachedStringTextures.Add( key, stitcher.Texture );
+		return stitcher.Texture;
+	}
+
+	private static string GetKeyForText( string text, string fontName )
+	{
+		return text + "_" + fontName;
+	}
+
 	private static CachedFont LoadOrGetFont( string fontName )
 	{
 		if ( CachedFonts.TryGetValue( fontName, out var cachedFont ) )
@@ -89,6 +158,21 @@ partial class Graphics
 		return new Vector2( x, fontSize * 1.25f ); // ???
 	}
 
+	public static Vector2 MeasureText( string text, float fontSize = 12 )
+	{
+		return MeasureText( text, "qaz", fontSize );
+	}
+
+	public static void DrawText( Rectangle bounds, string text, float fontSize = 12 )
+	{
+		DrawText( bounds, text, "qaz", fontSize );
+	}
+
+	public static void DrawText( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
+	{
+		DrawText( bounds, text, "qaz", fontSize, color );
+	}
+
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize )
 	{
 		DrawText( bounds, text, fontFamily, fontSize, ITheme.Current.TextColor );
@@ -96,60 +180,14 @@ partial class Graphics
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
 	{
-		float x = 0;
+		var flags = GraphicsFlags.UseSdf;
+		if ( bounds.Size.Length > 16f )
+			flags |= GraphicsFlags.HighDistMul;
 
-		var font = LoadOrGetFont( fontFamily );
+		var texture = GetTextureForText( text, fontFamily, fontSize );
+		bounds.Width = texture.Width * (fontSize / 32f);
+		bounds.Height = texture.Height * (fontSize / 32f);
 
-		foreach ( var c in text )
-		{
-			var fontData = font.Data;
-			var fontTexture = font.Texture;
-
-			//
-			// HACK HACK: Hard check to see if this is a font awesome glyph, swap the font
-			// data and texture out temporarily
-			//
-			if ( c > FontAwesome.IconMin )
-			{
-				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
-				fontData = fontAwesome.Data;
-				fontTexture = fontAwesome.Texture;
-			}
-
-			if ( !fontData.Glyphs.Any( x => x.Unicode == c ) )
-			{
-				x += fontSize;
-				continue;
-			}
-
-			var glyph = fontData.Glyphs.First( x => x.Unicode == (int)c );
-
-			if ( glyph.AtlasBounds != null )
-			{
-				var glyphRect = FontBoundsToAtlasRect( glyph );
-
-				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
-				glyphSize *= fontSize / fontData.Atlas.Size;
-
-				var glyphPos = new Rectangle( new Vector2( bounds.X + x, bounds.Y + fontSize ), glyphSize );
-				glyphPos.X += (float)glyph.PlaneBounds.Left * fontSize;
-				glyphPos.Y -= (float)glyph.PlaneBounds.Top * fontSize;
-
-				float screenPxRange = fontData.Atlas.DistanceRange * (glyphPos.Size / fontData.Atlas.Size).Length;
-				screenPxRange *= 1.5f;
-
-				if ( glyphPos.X > bounds.X + bounds.Width && bounds.Width > 0 )
-					return;
-
-				Graphics.DrawCharacter(
-					glyphPos,
-					fontTexture,
-					glyphRect,
-					color
-				);
-			}
-
-			x += (float)glyph.Advance * fontSize;
-		}
+		DrawTexture( bounds, texture, color, flags );
 	}
 }

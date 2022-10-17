@@ -82,28 +82,28 @@ internal class Icon : Widget
 		var lb = Bounds;
 		lb.Y = lb.Y + lb.Height - 24;
 		lb.X += Bounds.Width / 2f;
-		lb.X -= Graphics.MeasureText( FileName, "sourcesanspro", 13 ).X / 2f;
-		Graphics.DrawText( lb, FileName, "sourcesanspro", 13 );
+		lb.X -= Graphics.MeasureText( FileName ).X / 2f;
+		Graphics.DrawText( lb, FileName );
 
 		lb.Y = Bounds.Y + 8;
 		lb.X = Bounds.X + Bounds.Width - 24;
-		Graphics.DrawText( lb, FileType.IconSm, "sourcesanspro", 13 );
+		Graphics.DrawText( lb, FileType.IconSm );
 
 		{
 			lb.X -= 18f;
-			Graphics.DrawText( lb, FontAwesome.HardDrive, "sourcesanspro", 13 );
+			Graphics.DrawText( lb, FontAwesome.HardDrive );
 		}
 
 		if ( FileName.Contains( "subaru" ) )
 		{
 			lb.X -= 18f;
-			Graphics.DrawText( lb, FontAwesome.Star, "sourcesanspro", 13, Colors.Yellow );
+			Graphics.DrawText( lb, FontAwesome.Star, Colors.Yellow );
 		}
 
 		if ( FileName.Contains( "_c" ) )
 		{
 			lb.X -= 18f;
-			Graphics.DrawText( lb, FontAwesome.Check, "sourcesanspro", 13, Colors.Green );
+			Graphics.DrawText( lb, FontAwesome.Check, Colors.Green );
 		}
 	}
 

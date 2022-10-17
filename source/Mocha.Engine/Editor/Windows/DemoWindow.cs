@@ -29,7 +29,7 @@ internal class DemoWindow : Window
 		RootLayout.Add( new Label( "Test Window", 64 ) );
 		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
 		RootLayout.Add( new Label( $"{FontAwesome.FaceSmile} Icons!! {FontAwesome.FaceGrin} {FontAwesome.Icons}", 16 ) );
-		RootLayout.Add( new Label( Lipsum, 13 ) );
+		RootLayout.Add( new Label( Lipsum ) );
 
 		// Different font families
 		RootLayout.Add( new Label( "Source Sans Pro: The quick brown fox jumps over the lazy dog", fontFamily: "sourcesanspro" ) );
@@ -43,9 +43,9 @@ internal class DemoWindow : Window
 		// Theme switcher (dropdown)
 		//
 		var themeSwitcher = new Dropdown( EditorInstance.Instance.GetCurrentTheme() );
-		themeSwitcher.AddOption( "Dark Theme" );
-		themeSwitcher.AddOption( "Light Theme" );
-		themeSwitcher.AddOption( "Test Theme" );
+		themeSwitcher.AddOption( "Default Dark Theme" );
+		themeSwitcher.AddOption( "Default Light Theme" );
+		themeSwitcher.AddOption( "2012" );
 		themeSwitcher.OnSelected += EditorInstance.Instance.SwitchTheme;
 		RootLayout.Add( themeSwitcher );
 

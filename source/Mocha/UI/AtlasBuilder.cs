@@ -5,31 +5,17 @@ public class AtlasBuilder
 	private List<(Point2 Position, Texture Texture)> TextureCache { get; } = new();
 
 	public Texture Texture { get; private set; }
+
 	public Action OnBuild;
+
+	private int RowHeight = 0;
+	private Vector2 Cursor = new();
+
+	private const uint Size = 8192;
 
 	public AtlasBuilder()
 	{
-	}
-
-	private Point2 CalculateSize()
-	{
-		//
-		// Get total texture size
-		//
-		int width = 0;
-		int height = 0;
-
-		foreach ( var item in TextureCache )
-		{
-			var texture = item.Texture;
-
-			width += texture.Width;
-
-			if ( texture.Height > height )
-				height = texture.Height;
-		}
-
-		return new Point2( width, height );
+		Texture = Texture.Builder.FromEmpty( Size, Size ).IgnoreCache().Build();
 	}
 
 	public Point2 AddOrGetTexture( Texture texture )
@@ -39,66 +25,50 @@ public class AtlasBuilder
 			return TextureCache.First( x => x.Texture == texture ).Position;
 		}
 
-		Log.Trace( $"Adding new texture '{texture.Path}' to atlas" );
+		if ( RowHeight < texture.Height )
+			RowHeight = texture.Height;
 
-		Point2 pos;
-		int x = 0;
-		int y = 0;
-
-		TextureCache.ForEach( t => x += t.Texture.Width );
-		pos = new Point2( x, y );
-
-		TextureCache.Add( (pos, texture) );
-
-		Build();
-		return pos;
-	}
-
-	private void Build()
-	{
-		var _ = new Stopwatch( "AtlasBuilder.Build" );
-
-		var (width, height) = CalculateSize();
-		Log.Trace( $"Building atlas with size {(width, height)}" );
-
-		var result = Texture.Builder.FromEmpty( (uint)width, (uint)height ).IgnoreCache().Build();
+		if ( Cursor.X + texture.Size.X > Size )
+		{
+			Cursor.X = 0;
+			Cursor.Y += RowHeight;
+			RowHeight = 0;
+		}
 
 		var commandList = Device.ResourceFactory.CreateCommandList();
 		commandList.Name = "AtlasTexture update";
 		commandList.Begin();
 
-		foreach ( var item in TextureCache )
-		{
-			var texture = item.Texture;
-			var pos = item.Position;
+		//
+		// Copy the texture into the atlas
+		//
+		Point2 pos = new Point2( (int)Cursor.X, (int)Cursor.Y );
+		Log.Trace( $"Adding new texture '{texture.Path}' to atlas, pos: {Cursor}, size: {texture.Size}" );
+		commandList.CopyTexture( texture.VeldridTexture,
+			 0,
+			 0,
+			 0,
+			 0,
+			 0,
+			 Texture.VeldridTexture,
+			 (uint)pos.X,
+			 (uint)pos.Y,
+			 0,
+			 0,
+			 0,
+			 (uint)texture.Width,
+			 (uint)texture.Height,
+			 1,
+			 1 );
 
-			//
-			// Copy the texture into the atlas
-			//
-			Log.Trace( $"Copying texture {texture.Path} into texture atlas.." );
+		TextureCache.Add( (pos, texture) );
 
-			commandList.CopyTexture( texture.VeldridTexture,
-				 0,
-				 0,
-				 0,
-				 0,
-				 0,
-				 result.VeldridTexture,
-				 (uint)pos.X,
-				 (uint)pos.Y,
-				 0,
-				 0,
-				 0,
-				 (uint)texture.Width,
-				 (uint)texture.Height,
-				 1,
-				 1 );
-		}
+		Cursor.X += texture.Size.X;
 
 		commandList.End();
 		Device.SubmitCommands( commandList );
 
-		Texture = result;
 		OnBuild?.Invoke();
+		return pos;
 	}
 }
