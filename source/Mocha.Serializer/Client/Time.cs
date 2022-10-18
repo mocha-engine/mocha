@@ -22,7 +22,7 @@ public class Time
 
 		DeltaHistory[0] = Delta;
 
-		if ( TimeSinceAverageCalculated > 1 )
+		if ( TimeSinceAverageCalculated > 0.25f )
 		{
 			AverageDelta = DeltaHistory.Average();
 			TimeSinceAverageCalculated = 0;

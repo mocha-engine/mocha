@@ -111,9 +111,9 @@ public class RendererInstance
 	private void PostRender()
 	{
 		commandList.SetFramebuffer( Device.SwapchainFramebuffer );
-		commandList.SetViewport( 0, new Viewport( 0, 0, Device.SwapchainFramebuffer.Width, Device.SwapchainFramebuffer.Height, 0, 1 ) );
 		commandList.SetFullViewports();
 		commandList.SetFullScissorRects();
+
 		commandList.ClearColorTarget( 0, RgbaFloat.Black );
 		commandList.ClearDepthStencil( 1 );
 
