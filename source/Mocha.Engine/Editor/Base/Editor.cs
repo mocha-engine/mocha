@@ -5,7 +5,7 @@ internal partial class EditorInstance
 	internal static EditorInstance Instance { get; private set; }
 
 	private List<Window> Windows = new();
-
+	private bool Debug => true;
 	private bool IsRendering = false;
 
 	internal EditorInstance()
@@ -66,6 +66,43 @@ internal partial class EditorInstance
 		foreach ( var widget in widgets )
 		{
 			widget.Render();
+		}
+
+		if ( !Debug )
+			return;
+
+		foreach ( var widget in widgets )
+		{
+			if ( widget.InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
+			{
+				float thickness = widget.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
+
+				Graphics.DrawRectUnfilled( widget.Bounds, Colors.Red, thickness );
+
+				void DrawShadowText( Vector2 position, string text )
+				{
+					Graphics.DrawText( new Rectangle( position + new Vector2( 1, 1 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
+					Graphics.DrawText( new Rectangle( position + new Vector2( 1, 0 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
+					Graphics.DrawText( new Rectangle( position + new Vector2( -1, -1 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
+					Graphics.DrawText( new Rectangle( position + new Vector2( -1, 0 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
+					Graphics.DrawText( new Rectangle( position, 128 ), text, new Vector4( 1, 1, 1, 1 ), 16 );
+				}
+
+				var textPosition = Input.MousePosition + 16;
+				DrawShadowText( textPosition, $"{widget}:" );
+
+				textPosition.Y += 20f;
+				DrawShadowText( textPosition, $"{widget.Bounds}" );
+
+				var parent = widget.Parent;
+				while ( parent != null )
+				{
+					thickness = parent.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
+
+					Graphics.DrawRectUnfilled( parent.Bounds, Colors.Blue, thickness );
+					parent = parent.Parent;
+				}
+			}
 		}
 	}
 

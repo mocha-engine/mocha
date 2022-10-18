@@ -17,8 +17,8 @@ public static partial class Input
 
 	public static MochaInputSnapshot Snapshot { get; private set; }
 
-	public static System.Numerics.Vector2 MouseDelta => Snapshot.MouseDelta;
-	public static System.Numerics.Vector2 MousePosition => Snapshot.MousePosition;
+	public static Vector2 MouseDelta => Snapshot.MouseDelta;
+	public static Vector2 MousePosition => Snapshot.MousePosition;
 
 	public static float Forward => Snapshot.Forward;
 	public static float Left => Snapshot.Left;
