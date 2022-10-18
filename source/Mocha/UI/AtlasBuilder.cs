@@ -43,7 +43,7 @@ public class AtlasBuilder
 		// Copy the texture into the atlas
 		//
 		Point2 pos = new Point2( (int)Cursor.X, (int)Cursor.Y );
-		Log.Trace( $"Adding new texture '{texture.Path}' to atlas, pos: {Cursor}, size: {texture.Size}" );
+
 		commandList.CopyTexture( texture.VeldridTexture,
 			 0,
 			 0,

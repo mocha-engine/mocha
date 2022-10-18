@@ -51,7 +51,6 @@ partial class PanelRenderer
 		Log.Info( $"Updating PanelRenderer object resource set" );
 
 		material.DiffuseTexture = AtlasBuilder.Texture;
-		Log.Info( $"New atlas has size {material.DiffuseTexture.Size}" );
 
 		var objectResourceSetDescription = new ResourceSetDescription(
 			material.Shader.Pipeline.ResourceLayouts[0],

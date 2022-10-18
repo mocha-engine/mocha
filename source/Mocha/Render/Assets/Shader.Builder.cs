@@ -87,7 +87,7 @@ public class ShaderBuilder
 			var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
 			var shader = new Shader( Path, targetFramebuffer, faceCullMode, shaderProgram );
 
-			var pipelineFactory = ( PipelineFactory ?? new() )
+			var pipelineFactory = (PipelineFactory ?? new())
 				.WithShader( shader )
 				.WithFramebuffer( targetFramebuffer )
 				.WithFaceCullMode( faceCullMode );
@@ -111,6 +111,7 @@ public class ShaderBuilder
 			}
 
 			shader.Pipeline = pipelineFactory.Build();
+			shader.PipelineFactory = pipelineFactory;
 
 			return shader;
 		}

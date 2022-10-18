@@ -30,6 +30,7 @@ internal class DemoWindow : Window
 		RootLayout.Add( new Label( "Lots of different widgets", 32 ) );
 		RootLayout.Add( new Label( $"{FontAwesome.FaceSmile} Icons!! {FontAwesome.FaceGrin} {FontAwesome.Icons}", 16 ) );
 		RootLayout.Add( new Label( Lipsum ) );
+		RootLayout.Add( new Label( Lipsum, 32 ) );
 
 		// Different font families
 		RootLayout.Add( new Label( "Source Sans Pro: The quick brown fox jumps over the lazy dog", fontFamily: "sourcesanspro" ) );

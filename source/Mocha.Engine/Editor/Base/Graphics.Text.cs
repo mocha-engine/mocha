@@ -48,12 +48,16 @@ partial class Graphics
 
 			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
 
-			// If we don't have anything for this glyph, render a blank space
-			// (should probably just draw the missing texture though)
+			// If we don't have anything for this glyph, return a replacement texture
+			// ( makes it super obvious )
 			if ( glyph == null )
 			{
-				x += fontData.Atlas.Size;
-				continue;
+				Log.Warning( "Couldn't find glyph; using replacement texture" );
+
+				var replacementTexture = GetTextureForText( "Unsupported glyph!", "micross", 32 );
+				CachedStringTextures.Add( key, replacementTexture );
+
+				return replacementTexture;
 			}
 
 			if ( glyph.AtlasBounds != null )
@@ -63,9 +67,12 @@ partial class Graphics
 
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
 
-				var glyphPos = new Vector2( x, 32 );
-				glyphPos.X += (float)glyph.PlaneBounds.Left * 4f;
-				glyphPos.Y -= (float)glyph.PlaneBounds.Top * 32f;
+				var glyphPos = new Vector2( x, fontData.Atlas.Size );
+				glyphPos.X += (float)glyph.PlaneBounds.Left * fontData.Atlas.Size;
+				glyphPos.Y -= (float)glyph.PlaneBounds.Top * fontData.Atlas.Size;
+
+				glyphPos.X = glyphPos.X.Clamp( 0, float.MaxValue );
+				glyphPos.Y = glyphPos.Y.Clamp( 0, float.MaxValue );
 
 				stitcher.AddTexture( glyphPos, glyphRect.Position, glyphRect.Size, fontTexture );
 			}
@@ -184,9 +191,12 @@ partial class Graphics
 
 				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
 
-				var glyphPos = new Vector2( x, 32 );
-				glyphPos.X += (float)glyph.PlaneBounds.Left * 4f;
-				glyphPos.Y -= (float)glyph.PlaneBounds.Top * 32f;
+				var glyphPos = new Vector2( x, fontData.Atlas.Size );
+				glyphPos.X += (float)glyph.PlaneBounds.Left * fontData.Atlas.Size;
+				glyphPos.Y -= (float)glyph.PlaneBounds.Top * fontData.Atlas.Size;
+
+				glyphPos.X = glyphPos.X.Clamp( 0, float.MaxValue );
+				glyphPos.Y = glyphPos.Y.Clamp( 0, float.MaxValue );
 
 				if ( glyphPos.X + glyphSize.X > size.X )
 				{
@@ -216,17 +226,17 @@ partial class Graphics
 
 	public static Vector2 MeasureText( string text, float fontSize = 12 )
 	{
-		return MeasureText( text, "qaz", fontSize );
+		return MeasureText( text, "inter", fontSize );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, float fontSize = 12 )
 	{
-		DrawText( bounds, text, "qaz", fontSize );
+		DrawText( bounds, text, "inter", fontSize );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
 	{
-		DrawText( bounds, text, "qaz", fontSize, color );
+		DrawText( bounds, text, "inter", fontSize, color );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize )
