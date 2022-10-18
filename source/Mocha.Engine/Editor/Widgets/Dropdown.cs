@@ -3,7 +3,6 @@
 internal class Dropdown : Button
 {
 	private List<Selectable> options = new();
-	private Label icon;
 	private bool drawOptions = false;
 	private bool DrawOptions
 	{
@@ -36,10 +35,6 @@ internal class Dropdown : Button
 		ZIndex = 10;
 
 		DrawOptions = false;
-
-		icon = new Label( FontAwesome.ChevronDown );
-		icon.Parent = this;
-		icon.ZIndex = 11;
 	}
 
 	public void AddOption( string text )
@@ -66,19 +61,21 @@ internal class Dropdown : Button
 		base.Render();
 
 		var cursor = Bounds.Position + new Vector2( 0, GetDesiredSize().Y );
-		icon.Bounds = new Rectangle( Bounds.X + Bounds.Width - 24, Bounds.Y + ((Bounds.Height - 16) / 2.0f), 16, 16 );
-		var bgb = new Rectangle( icon.Bounds.X - 8, icon.Bounds.Y, 0, 0 ).Expand( 6 );
-		bgb.Size = new( 38, 28 );
-		Graphics.DrawRect( bgb, ITheme.Current.ButtonBgB * 0.1f, RoundingFlags.Right );
+		var iconBounds = new Rectangle( Bounds.X + Bounds.Width - 26, Bounds.Y + ((Bounds.Height - 16) / 2.0f), 16, 16 );
+		Graphics.DrawText( iconBounds, FontAwesome.CircleChevronDown );
 
-		bgb.Height = Bounds.Height;
-		bgb.Y = Bounds.Y;
-		bgb = bgb.Shrink( 1f );
-		bgb.X -= 1;
-		bgb.Width = 1f;
-		Graphics.DrawRect( bgb, ITheme.Current.Border );
-		bgb.X -= 1;
-		Graphics.DrawRect( bgb, ITheme.Current.ButtonBgA );
+		var iconBackgroundBounds = new Rectangle( iconBounds.X - 8, iconBounds.Y, 0, 0 ).Expand( 6 );
+		iconBackgroundBounds.Size = new( 40, 28 );
+		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.ButtonBgB * 0.1f, RoundingFlags.Right );
+
+		iconBackgroundBounds.Height = Bounds.Height;
+		iconBackgroundBounds.Y = Bounds.Y;
+		iconBackgroundBounds = iconBackgroundBounds.Shrink( 1f );
+		iconBackgroundBounds.X -= 1;
+		iconBackgroundBounds.Width = 1f;
+		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.Border );
+		iconBackgroundBounds.X -= 1;
+		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.ButtonBgA );
 
 		foreach ( Selectable? option in options )
 		{
@@ -147,7 +144,6 @@ internal class Dropdown : Button
 	{
 		base.OnDelete();
 
-		icon.Delete();
 		options.ForEach( x => x.Delete() );
 	}
 }
