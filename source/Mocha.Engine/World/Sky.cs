@@ -41,7 +41,7 @@ public class Sky : Entity
 	public override void Update()
 	{
 		base.Update();
-		
+
 		SceneObject.Transform = Transform.WithPosition( Vector3.Zero );
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System.Collections;
-using System.Linq;
 using Veldrid.Sdl2;
 
 namespace Mocha.Common;
