@@ -38,6 +38,12 @@ public class World
 			Rotation = Rotation.From( 27, 15, 0 )
 		};
 
+		_ = new ModelEntity( "core/models/dev/dev_map.mmdl" )
+		{
+			Scale = new( 0.3937f ),
+			Rotation = Rotation.From( 0, 0, 90 )
+		};
+
 		//Sky = new Sky
 		//{
 		//    Scale = Vector3.One * -10000f
