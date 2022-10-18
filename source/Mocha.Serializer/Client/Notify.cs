@@ -12,9 +12,7 @@ public static class Notify
 		{
 			this.Title = title;
 			this.Text = text;
-
-			// TODO: What the fuck
-			this.Lifetime = -0.29f;
+			this.Lifetime = 0;
 		}
 	}
 
