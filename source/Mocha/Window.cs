@@ -10,6 +10,12 @@ public class Window
 	public Sdl2Window SdlWindow { get; private set; }
 	public Point2 Size => new Point2( SdlWindow.Width, SdlWindow.Height );
 
+	public bool Fullscreen
+	{
+		set => SdlWindow.WindowState = value ? WindowState.BorderlessFullScreen : WindowState.Normal;
+		get => SdlWindow.WindowState == WindowState.BorderlessFullScreen;
+	}
+
 	public string Title
 	{
 		set => Sdl2Native.SDL_SetWindowTitle( SdlWindow.SdlWindowHandle, value );
@@ -26,7 +32,7 @@ public class Window
 			WindowTitle = "Mocha",
 			X = 128,
 			Y = 128,
-			WindowInitialState = WindowState.Maximized
+			WindowInitialState = WindowState.Maximized,
 		};
 
 		SdlWindow = VeldridStartup.CreateWindow( windowCreateInfo );

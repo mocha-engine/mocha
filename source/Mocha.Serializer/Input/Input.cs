@@ -212,6 +212,7 @@ public static partial class Input
 		InputButton.Sprint => SDL_Keycode.SDLK_LSHIFT,
 		InputButton.QuickSwitcher => SDL_Keycode.SDLK_F2,
 		InputButton.SwitchMode => SDL_Keycode.SDLK_F3,
+		InputButton.Fullscreen => SDL_Keycode.SDLK_F11,
 
 		_ => SDL_Keycode.SDLK_UNKNOWN
 	};

@@ -8,5 +8,6 @@ public enum InputButton
 	Jump,
 	Sprint,
 	QuickSwitcher,
-	SwitchMode
+	SwitchMode,
+	Fullscreen
 }

@@ -44,15 +44,18 @@ internal partial class EditorInstance
 		if ( Input.Pressed( InputButton.SwitchMode ) )
 			IsRendering = !IsRendering;
 
-		if ( !IsRendering )
-			return;
-
-		UpdateWidgets();
+		if ( IsRendering )
+		{
+			UpdateWidgets();
+		}
 
 		Graphics.PanelRenderer.NewFrame();
-		Graphics.DrawRect( new Rectangle( 0, Screen.Size ), MathX.GetColor( "#1e1f21" ) );
 
-		RenderWidgets();
+		if ( IsRendering )
+		{
+			Graphics.DrawRect( new Rectangle( 0, Screen.Size ), MathX.GetColor( "#1e1f21" ) );
+			RenderWidgets();
+		}
 
 		RenderPerformanceOverlay();
 
