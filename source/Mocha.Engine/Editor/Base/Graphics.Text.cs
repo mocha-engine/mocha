@@ -220,6 +220,30 @@ partial class Graphics
 		DrawText( bounds, text, fontFamily, fontSize, ITheme.Current.TextColor );
 	}
 
+	public static void DrawTextWithShadow( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
+	{
+		DrawText( bounds + new Vector2( 1, 1 ), text, fontFamily, fontSize, new Vector4( 0, 0, 0, 0.25f ) );
+		DrawText( bounds + new Vector2( 1, 0 ), text, fontFamily, fontSize, new Vector4( 0, 0, 0, 0.25f ) );
+		DrawText( bounds + new Vector2( -1, -1 ), text, fontFamily, fontSize, new Vector4( 0, 0, 0, 0.25f ) );
+		DrawText( bounds + new Vector2( -1, 0 ), text, fontFamily, fontSize, new Vector4( 0, 0, 0, 0.25f ) );
+		DrawText( bounds, text, fontFamily, fontSize, new Vector4( 1, 1, 1, 1 ) );
+	}
+
+	public static void DrawTextWithShadow( Rectangle bounds, string text, float fontSize = 12 )
+	{
+		DrawTextWithShadow( bounds, text, "inter", fontSize );
+	}
+
+	public static void DrawTextWithShadow( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
+	{
+		DrawTextWithShadow( bounds, text, "inter", fontSize, color );
+	}
+
+	public static void DrawTextWithShadow( Rectangle bounds, string text, string fontFamily, float fontSize )
+	{
+		DrawTextWithShadow( bounds, text, fontFamily, fontSize, ITheme.Current.TextColor );
+	}
+
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
 	{
 		var flags = GraphicsFlags.UseSdf;
