@@ -32,8 +32,6 @@ internal class Dropdown : Button
 		};
 
 		TextAnchor = new Vector2( 0f, 0.5f );
-		ZIndex = 10;
-
 		DrawOptions = false;
 	}
 
@@ -97,6 +95,8 @@ internal class Dropdown : Button
 			cursor += new Vector2( 0, desiredSize.Y );
 		}
 
+		ZIndex = 0;
+
 		if ( DrawOptions )
 		{
 			Vector4 colorA = ITheme.Current.ButtonBgA;
@@ -130,6 +130,8 @@ internal class Dropdown : Button
 					Graphics.DrawRect( b, ITheme.Current.ButtonBgA, RoundingFlags.All );
 				}
 			}
+
+			ZIndex = 10;
 		}
 	}
 
