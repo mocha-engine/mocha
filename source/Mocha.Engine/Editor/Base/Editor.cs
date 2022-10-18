@@ -2,10 +2,11 @@
 
 internal partial class EditorInstance
 {
+	public bool Debug { get; set; }
+
 	internal static EditorInstance Instance { get; private set; }
 
 	private List<Window> Windows = new();
-	private bool Debug => true;
 	private bool IsRendering = false;
 
 	internal EditorInstance()
@@ -79,20 +80,11 @@ internal partial class EditorInstance
 
 				Graphics.DrawRectUnfilled( widget.Bounds, Colors.Red, thickness );
 
-				void DrawShadowText( Vector2 position, string text )
-				{
-					Graphics.DrawText( new Rectangle( position + new Vector2( 1, 1 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
-					Graphics.DrawText( new Rectangle( position + new Vector2( 1, 0 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
-					Graphics.DrawText( new Rectangle( position + new Vector2( -1, -1 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
-					Graphics.DrawText( new Rectangle( position + new Vector2( -1, 0 ), 128 ), text, new Vector4( 0, 0, 0, 0.25f ), 16 );
-					Graphics.DrawText( new Rectangle( position, 128 ), text, new Vector4( 1, 1, 1, 1 ), 16 );
-				}
+				var textBounds = new Rectangle( Input.MousePosition + 16, 128 );
+				Graphics.DrawTextWithShadow( textBounds, $"{widget}:" );
 
-				var textPosition = Input.MousePosition + 16;
-				DrawShadowText( textPosition, $"{widget}:" );
-
-				textPosition.Y += 20f;
-				DrawShadowText( textPosition, $"{widget.Bounds}" );
+				textBounds.Y += 20f;
+				Graphics.DrawTextWithShadow( textBounds, $"{widget.Bounds}" );
 
 				var parent = widget.Parent;
 				while ( parent != null )
@@ -159,6 +151,24 @@ internal partial class EditorInstance
 		Renderer.Window.Current.SetDarkMode( ITheme.Current is not LightTheme );
 
 		Windows.ForEach( x => x.CreateUI() );
+	}
+
+	internal string GetCurrentDebug()
+	{
+		if ( Debug )
+			return "Debug Enabled";
+
+		return "Debug Disabled";
+	}
+
+	internal void SwitchDebug( int newSelection )
+	{
+		Log.Trace( newSelection );
+
+		if ( newSelection == 0 )
+			Debug = false;
+		else if ( newSelection == 1 )
+			Debug = true;
 	}
 
 	internal void RenderPerformanceOverlay()

@@ -51,6 +51,15 @@ internal class DemoWindow : Window
 		RootLayout.Add( themeSwitcher );
 
 		//
+		// Debug enabled (dropdown)
+		//
+		var debugToggle = new Dropdown( EditorInstance.Instance.GetCurrentDebug() );
+		debugToggle.AddOption( "Debug Disabled" );
+		debugToggle.AddOption( "Debug Enabled" );
+		debugToggle.OnSelected += EditorInstance.Instance.SwitchDebug;
+		RootLayout.Add( debugToggle );
+
+		//
 		// Different button lengths (sizing test)
 		//
 		RootLayout.Add( new Button( "OK" ) );
