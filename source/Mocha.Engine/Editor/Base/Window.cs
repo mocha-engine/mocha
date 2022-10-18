@@ -65,7 +65,7 @@ internal class Window : Widget
 		}
 		else
 		{
-			Graphics.DrawRect( Bounds.Expand( 1 ), ITheme.Current.BackgroundColor, rounding );
+			Graphics.DrawRect( Bounds.Expand( 1 ), ITheme.Current.Border, rounding );
 		}
 
 		//
@@ -89,12 +89,13 @@ internal class Window : Widget
 			//
 			float dockHeight = 32;
 			var colorA = MathX.GetColor( "#33ffffff" );
-			var colorB = MathX.GetColor( "#11ffffff" );
+			var colorB = MathX.GetColor( "#22ffffff" );
+			var colorC = MathX.GetColor( "#00ffffff" );
 
 			var b = Bounds;
 			b.Y += dockHeight + 2;
 			b.Height -= dockHeight - 2;
-			Graphics.DrawRect( b, colorB );
+			Graphics.DrawRect( b, colorB, colorC );
 			var textSize = Graphics.MeasureText( Title );
 
 			var titlebarBounds = Bounds;

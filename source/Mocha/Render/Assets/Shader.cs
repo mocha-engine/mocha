@@ -7,6 +7,7 @@ namespace Mocha.Renderer;
 public class Shader : Asset
 {
 	public Veldrid.Shader[] ShaderProgram { get; private set; }
+	public PipelineFactory PipelineFactory { get; set; }
 	public RenderPipeline Pipeline { get; set; }
 	public Action OnRecompile { get; set; }
 	public bool IsDirty { get; private set; }
@@ -25,7 +26,7 @@ public class Shader : Asset
 
 		var directoryName = System.IO.Path.GetDirectoryName( Path );
 		var fileName = System.IO.Path.GetFileName( Path );
-		
+
 		watcher = FileSystem.Game.CreateWatcher( directoryName, fileName );
 		watcher.Changed += OnWatcherChanged;
 
@@ -93,6 +94,7 @@ public class Shader : Asset
 			Notify.AddNotification( $"Shader Compilation Fail", $"{ex.Message}", FontAwesome.FaceSadCry );
 		}
 
+		Pipeline = PipelineFactory.Build();
 		IsDirty = false;
 		OnRecompile?.Invoke();
 	}
