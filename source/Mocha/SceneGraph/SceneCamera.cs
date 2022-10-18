@@ -51,7 +51,7 @@ public class SceneCamera : SceneObject
 
 		CurrentSize = newSize;
 	}
-	
+
 	public void BuildCamera( ref CameraSetup cameraSetup )
 	{
 		cameraSetup.AspectRatio = (float)CurrentSize.X / (float)CurrentSize.Y;

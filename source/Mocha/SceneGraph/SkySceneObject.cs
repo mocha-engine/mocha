@@ -1,6 +1,4 @@
-﻿using Mocha.Common.World;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha.Renderer;
 
 public class SkySceneObject : ModelSceneObject
 {

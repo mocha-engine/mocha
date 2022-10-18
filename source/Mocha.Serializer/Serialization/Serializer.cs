@@ -18,7 +18,7 @@ public static class Serializer
 	public static byte[] Serialize<T>( T obj )
 	{
 		var serialized = JsonSerializer.SerializeToUtf8Bytes( obj, CreateSerializerOptions() );
-		
+
 		return Compress( serialized );
 	}
 

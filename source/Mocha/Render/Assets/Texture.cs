@@ -1,6 +1,4 @@
-﻿using Veldrid;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha.Renderer;
 
 [Icon( FontAwesome.Image ), Title( "Texture" )]
 public class Texture : Asset

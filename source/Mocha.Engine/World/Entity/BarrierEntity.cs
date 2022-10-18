@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Mocha.Engine;
+﻿namespace Mocha.Engine;
 
 [Icon( FontAwesome.TrowelBricks ), Category( "World" ), Title( "Barrier Entity" )]
 public class BarrierEntity : ModelEntity

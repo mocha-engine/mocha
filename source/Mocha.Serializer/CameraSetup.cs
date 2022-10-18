@@ -6,7 +6,7 @@ public struct CameraSetup
 	public Rotation Rotation { get; set; }
 
 	public float AspectRatio { get; set; }
-	
+
 	public float ZFar { get; set; }
 	public float ZNear { get; set; }
 
