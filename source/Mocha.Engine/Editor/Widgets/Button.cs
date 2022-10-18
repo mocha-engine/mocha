@@ -2,24 +2,18 @@
 
 internal class Button : Widget
 {
-	protected Label label;
 	public Action OnClick;
 	public Vector2 TextAnchor = new Vector2( 0.5f, 0.5f );
 	private Vector2 Padding => new Vector2( 20, 15 );
 
-	public string Text
-	{
-		get => label.Text;
-		set => label.Text = value;
-	}
+	public string Text { get; set; } = "";
 
 	public Button( string text, Action? onClick = null ) : base()
 	{
-		label = new( text );
-		label.Parent = this;
-
 		if ( onClick != null )
 			OnClick += onClick;
+
+		Text = text;
 	}
 
 	bool mouseWasDown = false;
@@ -68,23 +62,17 @@ internal class Button : Widget
 
 	protected void UpdateLabel()
 	{
-		var labelBounds = label.Bounds;
-		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - Graphics.MeasureText( label.Text, label.FontFamily, label.FontSize ).X) * TextAnchor.X);
+		var labelBounds = Bounds;
+		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - Graphics.MeasureText( Text ).X) * TextAnchor.X);
 		labelBounds.X += Padding.X;
 		labelBounds.Y = Bounds.Y + (Padding.Y) - 8;
-		label.Bounds = labelBounds;
+
+		Graphics.DrawText( labelBounds, Text );
 	}
 
 	internal override Vector2 GetDesiredSize()
 	{
-		var size = new Vector2( (Graphics.MeasureText( label.Text, label.FontFamily, label.FontSize ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
+		var size = new Vector2( (Graphics.MeasureText( Text ).X + (Padding.X * 2)).Clamp( 75f, float.MaxValue ), Padding.Y * 2 );
 		return size;
-	}
-
-	internal override void OnDelete()
-	{
-		base.OnDelete();
-
-		label.Delete();
 	}
 }

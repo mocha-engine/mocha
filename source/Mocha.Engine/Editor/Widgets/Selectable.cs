@@ -14,7 +14,6 @@ internal class Selectable : Button
 		Vector4 colorB = new( 0, 0, 0, 0.2f );
 
 		Vector4 border = ITheme.Current.Border;
-		label.Color = ITheme.Current.TextColor;
 
 		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
 		{
@@ -45,8 +44,6 @@ internal class Selectable : Button
 				}
 
 				mouseWasDown = false;
-
-				label.Color = new System.Numerics.Vector4( 0, 0, 0, 1 );
 			}
 		}
 

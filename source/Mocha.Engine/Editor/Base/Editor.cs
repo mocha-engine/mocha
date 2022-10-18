@@ -20,7 +20,7 @@ internal partial class EditorInstance
 			Bounds = new Rectangle( 128, 128, 500, 650 ),
 			Focused = true,
 			Dock = Dock.Left,
-			Title = "aljkfdjgfkljafkfajsfdkasdjfkasfj"
+			Title = "Demo Window"
 		} );
 
 		Windows.Add( new IconWindow
@@ -126,14 +126,15 @@ internal partial class EditorInstance
 
 	internal void RenderPerformanceOverlay()
 	{
-		var size = new Vector2( 80, 36 );
+		var framerate = 1.000f / Time.AverageDelta;
+		var text = $"FPS: {framerate.CeilToInt()}";
+
+		var size = Graphics.MeasureText( text, 16 ) + 20;
 		var position = new Vector2( (Screen.Size.X - size.X) / 2f, 8 );
 
 		var bounds = new Rectangle( position, size );
 
-		Graphics.DrawShadow( bounds, 8f, 0.25f );
 		Graphics.DrawRect( bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
-		var framerate = 1.000f / Time.AverageDelta;
-		Graphics.DrawText( bounds.Shrink( 8 ), $"FPS: {framerate.CeilToInt()}", 16 );
+		Graphics.DrawText( bounds.Shrink( 8 ), text, 16 );
 	}
 }
