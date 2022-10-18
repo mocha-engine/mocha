@@ -27,7 +27,7 @@ partial class Graphics
 
 		var targetSize = MeasureText( text, fontFamily, font.Data.Atlas.Size );
 		var stitcher = new TextureStitcher( (int)targetSize.X, (int)targetSize.Y );
-		stitcher.Texture.Path = "internal:editor_" + fontFamily + "_" + text + "_" + fontSize;
+		stitcher.Texture.Path = "internal:editor_" + fontFamily + "_" + text;
 
 		float x = 0;
 		foreach ( var c in text )

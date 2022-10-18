@@ -158,6 +158,11 @@ public class RendererInstance
 		PreUpdate?.Invoke();
 		OnUpdate?.Invoke();
 		PostUpdate?.Invoke();
+
+		if ( Input.Pressed( InputButton.Fullscreen ) )
+		{
+			Window.Current.Fullscreen = !Window.Current.Fullscreen;
+		}
 	}
 
 	private void CreateGraphicsDevice()
@@ -168,7 +173,7 @@ public class RendererInstance
 			PreferDepthRangeZeroToOne = true,
 			SwapchainDepthFormat = PixelFormat.D24_UNorm_S8_UInt,
 			SwapchainSrgbFormat = false,
-			SyncToVerticalBlank = true
+			SyncToVerticalBlank = false
 		};
 
 		Device = VeldridStartup.CreateGraphicsDevice( Window.Current.SdlWindow, options );
