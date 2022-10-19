@@ -1,173 +1,98 @@
-﻿using System.Runtime.InteropServices;
+﻿using Mocha.Common.Serialization;
 
 namespace Mocha.Renderer;
-
-[Icon( FontAwesome.Cube ), Title( "Model" )]
-public class Mesh : Asset
+public class Model
 {
-	private DeviceBuffer uniformBuffer;
+	public List<Mesh> Meshes { get; } = new();
 
-	public DeviceBuffer TBNBuffer { get; private set; }
-	public DeviceBuffer VertexBuffer { get; private set; }
-	public DeviceBuffer IndexBuffer { get; private set; }
-
-	public Material Material { get; set; }
-	private Material DepthOnlyMaterial { get; set; }
-
-	private ResourceSet objectResourceSet;
-	private ResourceSet lightingResourceSet;
-
-	public bool IsIndexed { get; private set; }
-
-	private uint indexCount;
-	private uint vertexCount;
-
-	public Mesh( string path, Material material, bool isIndexed )
+	public Model( params Mesh[] meshes )
 	{
-		DepthOnlyMaterial = new Material()
+		Meshes.AddRange( meshes );
+	}
+
+	public Model( string path )
+	{
+		using var _ = new Stopwatch( "Mocha model generation" );
+		using var fileStream = FileSystem.Game.OpenRead( path );
+		using var binaryReader = new BinaryReader( fileStream );
+
+		binaryReader.ReadChars( 4 ); // MMSH
+
+		var verMajor = binaryReader.ReadInt32();
+		var verMinor = binaryReader.ReadInt32();
+
+		if ( verMajor != 4 && verMinor != 0 )
+			throw new Exception( $"Unsupported MMDL file version {verMajor}.{verMinor}" );
+
+		Log.Trace( $"Mocha model {verMajor}.{verMinor}" );
+
+		binaryReader.ReadInt32(); // Pad
+		var meshCount = binaryReader.ReadInt32();
+
+		Log.Trace( $"{meshCount} meshes" );
+
+		//
+		// Decompress the rest of the file
+		//
+		var compressedData = binaryReader.ReadBytes( (int)(fileStream.Length - fileStream.Position) );
+		var decompressedData = Serializer.Decompress( compressedData );
+
+		var decompressedStream = new MemoryStream( decompressedData );
+		var decompressedBinaryReader = new BinaryReader( decompressedStream );
+
+		for ( int i = 0; i < meshCount; i++ )
 		{
-			Shader = new ShaderBuilder().FromPath( "core/shaders/depthonly.mshdr" )
-										  .WithFaceCullMode( FaceCullMode.None )
-										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
-										  .Build(),
-			UniformBufferType = typeof( GenericModelUniformBuffer )
-		};
+			decompressedBinaryReader.ReadChars( 4 ); // MTRL
+			var materialPath = decompressedBinaryReader.ReadString();
 
-		Path = path;
-		Material = material;
-		IsIndexed = isIndexed;
+			decompressedBinaryReader.ReadChars( 4 ); // VRTX
+			var vertexCount = decompressedBinaryReader.ReadInt32();
+			var vertices = new List<Vertex>();
 
-		All.Add( this );
+			for ( int j = 0; j < vertexCount; j++ )
+			{
+				var vertex = new Vertex();
 
-		Material.Shader.OnRecompile += CreateResources;
-	}
+				Vector3 ReadVector3()
+				{
+					// binaryReader.ReadInt32();
+					float x = decompressedBinaryReader.ReadSingle();
+					float y = decompressedBinaryReader.ReadSingle();
+					float z = decompressedBinaryReader.ReadSingle();
+					return new Vector3( x, y, z );
+				}
 
-	public Mesh( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
-	{
-		SetupMesh( vertices, indices );
-		CreateUniformBuffer();
-		CreateResources();
-	}
+				Vector2 ReadVector2()
+				{
+					// binaryReader.ReadInt32();
+					// binaryReader.ReadInt32();
+					float x = decompressedBinaryReader.ReadSingle();
+					float y = decompressedBinaryReader.ReadSingle();
+					return new Vector2( x, y );
+				}
 
-	public Mesh( string path, Vertex[] vertices, Material material ) : this( path, material, false )
-	{
-		SetupMesh( vertices );
-		CreateUniformBuffer();
-		CreateResources();
-	}
+				vertex.Position = ReadVector3();
+				vertex.Normal = ReadVector3();
+				vertex.TexCoords = ReadVector2();
+				vertex.Tangent = ReadVector3();
+				vertex.Bitangent = ReadVector3();
 
-	private void SetupMesh( Vertex[] vertices )
-	{
-		var factory = Device.ResourceFactory;
-		var vertexStructSize = (uint)Marshal.SizeOf( typeof( Vertex ) );
-		vertexCount = (uint)vertices.Length;
+				vertices.Add( vertex );
+			}
 
-		VertexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( vertexCount * vertexStructSize, Veldrid.BufferUsage.VertexBuffer )
-		);
+			decompressedBinaryReader.ReadChars( 4 ); // INDX
 
-		Device.UpdateBuffer( VertexBuffer, 0, vertices );
-	}
+			var indexCount = decompressedBinaryReader.ReadInt32();
+			var indices = new List<uint>();
 
-	private void SetupMesh( Vertex[] vertices, uint[] indices )
-	{
-		SetupMesh( vertices );
+			for ( int j = 0; j < indexCount; j++ )
+			{
+				indices.Add( decompressedBinaryReader.ReadUInt32() );
+			}
 
-		var factory = Device.ResourceFactory;
-		indexCount = (uint)indices.Length;
-
-		IndexBuffer = factory.CreateBuffer(
-			new Veldrid.BufferDescription( indexCount * sizeof( uint ), Veldrid.BufferUsage.IndexBuffer )
-		);
-
-		Device.UpdateBuffer( IndexBuffer, 0, indices );
-	}
-
-	private void CreateResources()
-	{
-		var objectResourceSetDescription = new ResourceSetDescription(
-			Material.Shader.Pipeline.ResourceLayouts[0],
-			Material.DiffuseTexture?.VeldridTexture ?? TextureBuilder.MissingTexture.VeldridTexture,
-			Material.AlphaTexture?.VeldridTexture ?? TextureBuilder.One.VeldridTexture,
-			Material.NormalTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
-			Material.ORMTexture?.VeldridTexture ?? TextureBuilder.Zero.VeldridTexture,
-			Device.PointSampler,
-			uniformBuffer );
-
-		objectResourceSet = Device.ResourceFactory.CreateResourceSet( objectResourceSetDescription );
-
-		var shadowSamplerDescription = new SamplerDescription(
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-			SamplerAddressMode.Border,
-
-			SamplerFilter.Anisotropic,
-			null,
-			16,
-			0,
-			uint.MaxValue,
-			0,
-			SamplerBorderColor.OpaqueBlack
-		);
-
-		var shadowSampler = Device.ResourceFactory.CreateSampler( shadowSamplerDescription );
-
-		var lightingResourceSetDescription = new ResourceSetDescription(
-			Material.Shader.Pipeline.ResourceLayouts[1],
-			SceneWorld.Current.Sun.DepthTexture.VeldridTexture,
-			shadowSampler );
-
-		lightingResourceSet = Device.ResourceFactory.CreateResourceSet( lightingResourceSetDescription );
-	}
-
-	private void CreateUniformBuffer()
-	{
-		uint uboSizeInBytes = 4 * (uint)Marshal.SizeOf( Material.UniformBufferType );
-		uniformBuffer = Device.ResourceFactory.CreateBuffer(
-			new BufferDescription( uboSizeInBytes,
-				BufferUsage.UniformBuffer | BufferUsage.Dynamic ) );
-	}
-
-	public void Draw<T>( RenderPass renderPass, T uniformBufferContents, CommandList commandList ) where T : struct
-	{
-		if ( uniformBufferContents.GetType() != Material.UniformBufferType )
-		{
-			throw new Exception( $"Tried to set unmatching uniform buffer object" +
-				$" of type {uniformBufferContents.GetType()}, expected {Material.UniformBufferType}" );
-		}
-
-		RenderPipeline renderPipeline = renderPass switch
-		{
-			RenderPass.Main => Material.Shader.Pipeline,
-			RenderPass.ShadowMap => DepthOnlyMaterial.Shader.Pipeline,
-			RenderPass.Combine => Material.Shader.Pipeline,
-			RenderPass.Ui => Material.Shader.Pipeline,
-
-			_ => throw new NotImplementedException(),
-		};
-
-		commandList.SetVertexBuffer( 0, VertexBuffer );
-		commandList.UpdateBuffer( uniformBuffer, 0, new[] { uniformBufferContents } );
-		commandList.SetPipeline( renderPipeline.Pipeline );
-
-		commandList.SetGraphicsResourceSet( 0, objectResourceSet );
-		commandList.SetGraphicsResourceSet( 1, lightingResourceSet );
-
-		if ( IsIndexed )
-		{
-			commandList.SetIndexBuffer( IndexBuffer, IndexFormat.UInt32 );
-
-			commandList.DrawIndexed(
-				indexCount: indexCount,
-				instanceCount: 1,
-				indexStart: 0,
-				vertexOffset: 0,
-				instanceStart: 0
-			);
-		}
-		else
-		{
-			commandList.Draw( vertexCount );
+			// TODO make all paths relative
+			var material = Material.FromPath( materialPath );
+			Meshes.Add( new Mesh( path, vertices.ToArray(), indices.ToArray(), material ) );
 		}
 	}
 }
