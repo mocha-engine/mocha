@@ -1,12 +1,10 @@
+
 <p align="center">
-    <h1 align="center">
+    <h3 align="center">
         Mocha
-    </h1>
+    </h3>
     <p align="center">
         Yet Another Game Engine
-        <br>
-        <a href="https://github.com/xezno/mocha/issues">Issues</a> |
-        <a href="https://github.com/xezno/mocha/pulls">Pull Requests</a>
     </p>
 </p>
 
