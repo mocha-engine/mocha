@@ -3,7 +3,7 @@
 namespace Mocha.Renderer;
 
 [Icon( FontAwesome.Cube ), Title( "Model" )]
-public class Model : Asset
+public class Mesh : Asset
 {
 	private DeviceBuffer uniformBuffer;
 
@@ -22,11 +22,11 @@ public class Model : Asset
 	private uint indexCount;
 	private uint vertexCount;
 
-	public Model( string path, Material material, bool isIndexed )
+	public Mesh( string path, Material material, bool isIndexed )
 	{
 		DepthOnlyMaterial = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "core/shaders/depthonly.mshdr" )
+			Shader = new ShaderBuilder().FromPath( "core/shaders/depthonly.mshdr" )
 										  .WithFaceCullMode( FaceCullMode.None )
 										  .WithFramebuffer( SceneWorld.Current.Sun.ShadowBuffer )
 										  .Build(),
@@ -42,14 +42,14 @@ public class Model : Asset
 		Material.Shader.OnRecompile += CreateResources;
 	}
 
-	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
+	public Mesh( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
 	{
 		SetupMesh( vertices, indices );
 		CreateUniformBuffer();
 		CreateResources();
 	}
 
-	public Model( string path, Vertex[] vertices, Material material ) : this( path, material, false )
+	public Mesh( string path, Vertex[] vertices, Material material ) : this( path, material, false )
 	{
 		SetupMesh( vertices );
 		CreateUniformBuffer();

@@ -49,9 +49,8 @@ public partial class TextureBuilder
 				255, 255, 255, 255,
 			};
 
-			one = Texture.Builder
+			one = new TextureBuilder()
 				.FromData( missingTextureData, 1, 1 )
-				.WithType( "internal" )
 				.WithName( "internal:one" )
 				.Build();
 		}
@@ -66,9 +65,8 @@ public partial class TextureBuilder
 				0, 0, 0, 255,
 			};
 
-			zero = Texture.Builder
+			zero = new TextureBuilder()
 				.FromData( missingTextureData, 1, 1 )
-				.WithType( "internal" )
 				.WithName( "internal:zero" )
 				.Build();
 		}
@@ -87,19 +85,19 @@ public partial class TextureBuilder
 				255, 0, 255, 255,	// P
 				0, 0, 0, 255,		// B
 				255, 0, 255, 255,	// P
-								
+
 				//
 				255, 0, 255, 255,	// P
 				0, 0, 0, 255,		// B
 				255, 0, 255, 255,	// P
 				0, 0, 0, 255,		// B
-								
+
 				//
 				0, 0, 0, 255,		// B
 				255, 0, 255, 255,	// P
 				0, 0, 0, 255,		// B
 				255, 0, 255, 255,	// P
-								
+
 				//
 				255, 0, 255, 255,	// P
 				0, 0, 0, 255,		// B
@@ -107,9 +105,8 @@ public partial class TextureBuilder
 				0, 0, 0, 255,		// B
 			};
 
-			missingTexture = Texture.Builder
+			missingTexture = new TextureBuilder()
 				.FromData( missingTextureData, 4, 4 )
-				.WithType( "internal" )
 				.WithName( "internal:missing" )
 				.Build();
 		}

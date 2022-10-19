@@ -14,7 +14,7 @@ internal class Image : Widget
 
 	public void SetImage( string path )
 	{
-		Texture = Texture.Builder.FromPath( path ).Build();
+		Texture = new Texture( path );
 	}
 
 	internal override void Render()

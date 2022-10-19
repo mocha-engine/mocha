@@ -6,7 +6,7 @@ public class TextureStitcher
 
 	public TextureStitcher( int width, int height )
 	{
-		Texture = Texture.Builder.FromEmpty( (uint)width, (uint)height ).Build();
+		Texture = new TextureBuilder().FromEmpty( (uint)width, (uint)height ).Build();
 	}
 
 	public void AddTexture( Vector2 pos, Vector2 offset, Vector2 size, Texture texture )

@@ -6,13 +6,14 @@ public partial class Primitives
 {
 	public class MochaModel
 	{
-		public static List<Model> GenerateModels( string path )
+		[Obsolete( "Use Model ctor" )]
+		public static List<Mesh> GenerateModels( string path )
 		{
 			using var _ = new Stopwatch( "Mocha model generation" );
 			using var fileStream = FileSystem.Game.OpenRead( path );
 			using var binaryReader = new BinaryReader( fileStream );
 
-			var models = new List<Model>();
+			var models = new List<Mesh>();
 
 			binaryReader.ReadChars( 4 ); // MMSH
 
@@ -90,7 +91,7 @@ public partial class Primitives
 
 				// TODO make all paths relative
 				var material = Material.FromPath( materialPath );
-				models.Add( new Model( path, vertices.ToArray(), indices.ToArray(), material ) );
+				models.Add( new Mesh( path, vertices.ToArray(), indices.ToArray(), material ) );
 			}
 
 			return models;
