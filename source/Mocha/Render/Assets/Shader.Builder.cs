@@ -14,11 +14,9 @@ public class ShaderBuilder
 	private bool UseCustomPipeline;
 	private PipelineFactory PipelineFactory;
 
-	public static ShaderBuilder Default => new ShaderBuilder();
-
 	public string Path { get; set; }
 
-	internal ShaderBuilder()
+	public ShaderBuilder()
 	{
 	}
 

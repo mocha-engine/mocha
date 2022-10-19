@@ -11,7 +11,7 @@ public partial class ModelEntity : Entity
 	{
 		SceneObject = new ModelSceneObject()
 		{
-			models = Primitives.MochaModel.GenerateModels( modelPath )
+			model = new Model( modelPath )
 		};
 	}
 

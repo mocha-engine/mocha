@@ -5,8 +5,6 @@ namespace Mocha.Renderer;
 
 public partial class TextureBuilder
 {
-	private string type = "texture_diffuse";
-
 	private byte[][] data;
 	private uint width;
 	private uint height;
@@ -94,16 +92,10 @@ public partial class TextureBuilder
 
 		var textureView = Device.ResourceFactory.CreateTextureView( texture );
 
-		return new Texture( path, texture, textureView, type, (int)width, (int)height );
+		return new Texture( path, texture, textureView, (int)width, (int)height );
 	}
 
-	public TextureBuilder WithType( string type = "texture_diffuse" )
-	{
-		this.type = type;
-
-		return this;
-	}
-
+	[Obsolete( "Use ctor" )]
 	public TextureBuilder FromPath( string path )
 	{
 		if ( TryGetExistingTexture( path, out _ ) )

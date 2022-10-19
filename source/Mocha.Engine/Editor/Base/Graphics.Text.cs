@@ -97,7 +97,7 @@ partial class Graphics
 		}
 
 		var loadedFont = new CachedFont();
-		loadedFont.Texture = Texture.Builder.FromPath( $"core/fonts/baked/{fontName}.mtex" ).Build();
+		loadedFont.Texture = new Texture( $"core/fonts/baked/{fontName}.mtex" );
 		loadedFont.Data = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{fontName}.json" );
 
 		return CachedFonts[fontName] = loadedFont;

@@ -21,16 +21,16 @@ internal class Icon : Widget
 
 		if ( fileType.Extension == "mtex" )
 		{
-			Texture = Texture.Builder.FromPath( filePath ).Build();
+			Texture = new Texture( filePath );
 		}
 		else if ( fileType.Extension == "mmat" )
 		{
-			var material = Material.FromPath( filePath );
+			var material = new Material( filePath );
 			Texture = material.DiffuseTexture;
 		}
 		else
 		{
-			Texture = Texture.Builder.FromPath( FileType.IconLg ).Build();
+			Texture = new Texture( FileType.IconLg );
 		}
 	}
 

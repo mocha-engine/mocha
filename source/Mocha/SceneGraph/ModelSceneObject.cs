@@ -4,17 +4,12 @@ namespace Mocha.Renderer;
 
 public class ModelSceneObject : SceneObject
 {
-	public List<Model> models;
+	public Model model;
 
 	public Matrix4x4 ModelMatrix => Transform.BuildMatrix();
 
 	public ModelSceneObject()
 	{
-	}
-
-	public void SetModels( List<Model> models )
-	{
-		this.models = models;
 	}
 
 	public override void Render( Matrix4x4 viewProjMatrix, RenderPass renderPass, CommandList commandList )
@@ -37,6 +32,6 @@ public class ModelSceneObject : SceneObject
 			_padding2 = 0
 		};
 
-		models.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
+		model.Meshes.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
 	}
 }
