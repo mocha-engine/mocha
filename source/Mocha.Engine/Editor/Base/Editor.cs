@@ -75,6 +75,11 @@ internal partial class EditorInstance
 		if ( !Debug )
 			return;
 
+		foreach ( var layout in BaseLayout.All )
+		{
+			Graphics.DrawRectUnfilled( layout.Bounds, Colors.Green, 1f );
+		}
+
 		foreach ( var widget in widgets )
 		{
 			if ( widget.InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
