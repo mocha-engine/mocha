@@ -18,20 +18,7 @@ internal class Icon : Widget
 
 		FileName = Path.GetFileName( filePath );
 		FileType = fileType;
-
-		if ( fileType.Extension == "mtex" )
-		{
-			Texture = new Texture( filePath );
-		}
-		else if ( fileType.Extension == "mmat" )
-		{
-			var material = new Material( filePath );
-			Texture = material.DiffuseTexture ?? TextureBuilder.MissingTexture;
-		}
-		else
-		{
-			Texture = new Texture( FileType.IconLg );
-		}
+		Texture = new Texture( FileType.IconLg );
 	}
 
 	float t = 0;
