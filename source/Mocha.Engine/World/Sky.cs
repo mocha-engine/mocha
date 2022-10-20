@@ -28,13 +28,13 @@ public class Sky : Entity
 	{
 		Material = new()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "core/shaders/atmosphere.mshdr" ).Build(),
+			Shader = new ShaderBuilder().FromPath( "core/shaders/atmosphere.mshdr" ).Build(),
 			UniformBufferType = typeof( SkyUniformBuffer )
 		};
 
 		SceneObject = new SkySceneObject()
 		{
-			models = new() { Primitives.Cube.GenerateModel( Material ) }
+			model = Primitives.Cube.GenerateModel( Material )
 		};
 	}
 

@@ -3,7 +3,6 @@
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public partial class PanelRenderer
 {
-	private float totalSw = 0;
 	public AtlasBuilder AtlasBuilder { get; set; }
 
 	public PanelRenderer()
@@ -16,7 +15,7 @@ public partial class PanelRenderer
 			.AddObjectResource( "g_sSampler", ResourceKind.Sampler, ShaderStages.Fragment )
 			.AddObjectResource( "g_oUbo", ResourceKind.UniformBuffer, ShaderStages.Fragment | ShaderStages.Vertex );
 
-		var shader = ShaderBuilder.Default.FromPath( "core/shaders/ui/ui.mshdr" )
+		var shader = new ShaderBuilder().FromPath( "core/shaders/ui/ui.mshdr" )
 			.WithFramebuffer( Device.SwapchainFramebuffer )
 			.WithCustomPipeline( pipeline )
 			.Build();
