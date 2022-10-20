@@ -26,7 +26,7 @@ internal class Icon : Widget
 		else if ( fileType.Extension == "mmat" )
 		{
 			var material = new Material( filePath );
-			Texture = material.DiffuseTexture;
+			Texture = material.DiffuseTexture ?? TextureBuilder.MissingTexture;
 		}
 		else
 		{

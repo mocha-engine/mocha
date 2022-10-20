@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Renderer;
 
-partial class Primitives
+public partial class Primitives
 {
 	internal static class Plane
 	{

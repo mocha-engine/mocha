@@ -83,7 +83,7 @@ public class ShaderBuilder
 			VertexShaderDescription.ShaderBytes = vertCompilation.SpirvBytes;
 
 			var shaderProgram = Device.ResourceFactory.CreateFromSpirv( VertexShaderDescription, FragmentShaderDescription );
-			var shader = new Shader( Path, targetFramebuffer, faceCullMode, shaderProgram );
+			var shader = new Shader( Path, shaderProgram );
 
 			var pipelineFactory = (PipelineFactory ?? new())
 				.WithShader( shader )
