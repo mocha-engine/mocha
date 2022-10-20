@@ -19,7 +19,7 @@ public class SceneLight : SceneObject
 	{
 		uint res = 8192;
 
-		DepthTexture = Texture.Builder
+		DepthTexture = new TextureBuilder()
 			.FromEmpty( res, res )
 			.AsDepthAttachment()
 			.WithName( "Sun Light Depth" )

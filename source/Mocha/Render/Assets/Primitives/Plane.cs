@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Renderer;
 
-partial class Primitives
+public partial class Primitives
 {
 	internal static class Plane
 	{
@@ -38,9 +38,9 @@ partial class Primitives
 			3, 1, 0,
 		};
 
-		public static Model GenerateModel( Material material )
+		public static Mesh GenerateModel( Material material )
 		{
-			var model = new Model( "internal:plane", Vertices, Indices, material );
+			var model = new Mesh( "internal:plane", Vertices, Indices, material );
 			return model;
 		}
 	}

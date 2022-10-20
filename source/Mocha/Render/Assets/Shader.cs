@@ -12,12 +12,9 @@ public class Shader : Asset
 	public Action OnRecompile { get; set; }
 	public bool IsDirty { get; private set; }
 
-	private Framebuffer TargetFramebuffer { get; set; }
-	private FaceCullMode FaceCullMode { get; set; }
-
 	private FileSystemWatcher watcher;
 
-	internal Shader( string path, Framebuffer targetFramebuffer, FaceCullMode faceCullMode, Veldrid.Shader[] shaderProgram )
+	internal Shader( string path, Veldrid.Shader[] shaderProgram )
 	{
 		All.Add( this );
 
@@ -29,9 +26,11 @@ public class Shader : Asset
 
 		watcher = FileSystem.Game.CreateWatcher( directoryName, fileName );
 		watcher.Changed += OnWatcherChanged;
+	}
 
-		this.TargetFramebuffer = targetFramebuffer;
-		this.FaceCullMode = faceCullMode;
+	public void GetPipelineFor( Framebuffer targetFramebuffer )
+	{
+
 	}
 
 	private void OnWatcherChanged( object sender, FileSystemEventArgs e )

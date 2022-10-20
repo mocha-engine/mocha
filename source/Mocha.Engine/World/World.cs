@@ -40,7 +40,7 @@ public class World
 
 		_ = new ModelEntity( "core/models/dev/dev_map.mmdl" )
 		{
-			Scale = new( 0.3937f ),
+			Scale = new( 0.05f ),
 			Rotation = Rotation.From( 0, 0, 90 )
 		};
 

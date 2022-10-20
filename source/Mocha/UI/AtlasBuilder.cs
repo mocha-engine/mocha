@@ -15,7 +15,7 @@ public class AtlasBuilder
 
 	public AtlasBuilder()
 	{
-		Texture = Texture.Builder.FromEmpty( Size, Size ).IgnoreCache().Build();
+		Texture = new TextureBuilder().FromEmpty( Size, Size ).IgnoreCache().Build();
 	}
 
 	public Point2 AddOrGetTexture( Texture texture )

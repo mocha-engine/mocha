@@ -30,14 +30,14 @@ public class SceneCamera : SceneObject
 
 		Framebuffer?.Dispose();
 
-		DepthTexture = Texture.Builder
+		DepthTexture = new TextureBuilder()
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsDepthAttachment()
 			.IgnoreCache()
 			.WithName( $"SceneCamera depth" )
 			.Build();
 
-		ColorTexture = Texture.Builder
+		ColorTexture = new TextureBuilder()
 			.FromEmpty( (uint)newSize.X, (uint)newSize.Y )
 			.AsColorAttachment()
 			.IgnoreCache()

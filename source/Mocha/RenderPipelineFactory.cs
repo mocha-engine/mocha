@@ -90,7 +90,7 @@ public class PipelineFactory
 				PolygonFillMode.Solid,
 				FrontFace.Clockwise,
 				true,
-				false ),
+				true ),
 
 			PrimitiveTopology = PrimitiveTopology.TriangleList,
 			ResourceLayouts = new[] { objectResourceLayout, lightingResourceLayout },

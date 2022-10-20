@@ -29,6 +29,6 @@ public class SkySceneObject : ModelSceneObject
 			g_vSunPos = SceneWorld.Current.Sun.Transform.Rotation.Backward
 		};
 
-		models.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
+		model.Meshes.ForEach( x => x.Draw( renderPass, uniformBuffer, commandList ) );
 	}
 }

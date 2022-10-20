@@ -13,7 +13,7 @@ public class RendererInstance
 	private CommandList commandList;
 
 	private Material gbufferCombineMaterial;
-	private Model fullscreenQuad;
+	private Mesh fullscreenQuad;
 
 	public Action PreUpdate;
 	public Action OnUpdate;
@@ -46,7 +46,7 @@ public class RendererInstance
 	{
 		gbufferCombineMaterial = new Material()
 		{
-			Shader = ShaderBuilder.Default.FromPath( "core/shaders/combine.mshdr" )
+			Shader = new ShaderBuilder().FromPath( "core/shaders/combine.mshdr" )
 											.WithFramebuffer( Device.SwapchainFramebuffer )
 											.WithFaceCullMode( FaceCullMode.None )
 											.Build(),
