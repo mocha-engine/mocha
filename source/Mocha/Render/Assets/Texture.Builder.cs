@@ -19,10 +19,6 @@ public partial class TextureBuilder
 
 	private bool ignoreCache;
 
-	public TextureBuilder()
-	{
-	}
-
 	public static TextureBuilder Default => new TextureBuilder();
 	public static TextureBuilder WorldTexture => new TextureBuilder();
 	public static TextureBuilder UITexture => new TextureBuilder();

@@ -91,7 +91,7 @@ public class Model
 			}
 
 			// TODO make all paths relative
-			var material = Material.FromPath( materialPath );
+			var material = new Material( materialPath );
 			Meshes.Add( new Mesh( path, vertices.ToArray(), indices.ToArray(), material ) );
 		}
 	}
