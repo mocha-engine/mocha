@@ -1,7 +1,9 @@
 #include "CRenderer.h"
 
 #include "Assert.h"
+#include "CPipelineBuilder.h"
 #include "CWindow.h"
+#include "Globals.h"
 
 #include <fstream>
 #include <iostream>
@@ -11,10 +13,12 @@
 CRenderer::CRenderer( CWindow* window )
 {
 	mWindow = window;
+	mSwapchainSize = { 1280, 720 };
 
 	InitAPI();
 
 	InitCommands();
+	InitSwapchain();
 	InitDefaultRenderPass();
 
 	InitSyncStructures();
@@ -80,6 +84,7 @@ void CRenderer::InitAPI()
 	}
 
 	mDevice = vkbDevice.device;
+	g_Device = &mDevice;
 	mPhysicalDevice = physicalDevice.physical_device;
 
 	//

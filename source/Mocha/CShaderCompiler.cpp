@@ -167,7 +167,7 @@ bool CShaderCompiler::Compile( const vk::ShaderStageFlagBits shader_type, const 
 	std::string preamble = GetPreamble( stage );
 	shader.setPreamble( preamble.c_str() );
 
-	if ( !shader.parse( &builtInResources, 450, false, messages ) )
+	if ( !shader.parse( &builtInResources, 460, false, messages ) )
 	{
 		puts( shader.getInfoLog() );
 		puts( shader.getInfoDebugLog() );

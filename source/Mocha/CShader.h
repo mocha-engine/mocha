@@ -13,6 +13,8 @@ private:
 	std::string mSource;
 	std::string mPath;
 
+	//@InteropGen ignore
+	void CreatePipeline();
 public:
 	CShader( const char* path, const char* source );
 
@@ -20,6 +22,14 @@ public:
 	~CShader();
 
 	bool Compile();
+
+	//@InteropGen ignore
+	VkShaderModule CreateModule( std::vector<unsigned int> bytes );
+
+	VkShaderModule mFragmentModule;
+	VkShaderModule mVertexModule;
+
+	VkPipeline mPipeline;
 };
 
 //@InteropGen generate class

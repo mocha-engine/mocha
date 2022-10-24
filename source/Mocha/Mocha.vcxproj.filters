@@ -96,6 +96,9 @@
     <ClInclude Include="CShaderCompiler.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="CPipelineBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CMochaEngine.cpp">
@@ -130,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="CShaderCompiler.cpp">
       <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="CPipelineBuilder.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
