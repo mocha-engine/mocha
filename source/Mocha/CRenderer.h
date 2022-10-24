@@ -63,6 +63,11 @@ private:
 	VkSemaphore mPresentSemaphore, mRenderSemaphore;
 	VkFence mRenderFence;
 
+	//
+	// Pipeline
+	//
+	VkPipeline mMainPipeline;
+
 	void InitAPI();
 	void InitSwapchain();
 	void InitCommands();
@@ -81,4 +86,6 @@ public:
 
 	// IObserver
 	void OnNotify( Event event, void* data );
+
+	inline VkRenderPass GetMainRenderPass() { return mRenderPass; }
 };
