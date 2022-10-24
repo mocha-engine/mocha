@@ -7,6 +7,7 @@
 
 CImgui* g_Imgui = nullptr;
 CMochaEngine* g_Engine = nullptr;
+VkDevice* g_Device = nullptr;
 bool g_EngineIsRunning = true;
 
 void InitRenderdoc()
