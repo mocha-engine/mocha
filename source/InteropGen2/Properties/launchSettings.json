@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "InteropGen2": {
+      "commandName": "Project",
+      "workingDirectory": "$(SolutionDir)"
+    }
+  }
+}
