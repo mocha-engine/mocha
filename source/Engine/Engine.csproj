@@ -56,7 +56,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
-		<ProjectReference Include="..\Editor\Editor.csproj" Condition="'$(Configuration)'=='Debug'" />
 	</ItemGroup>
 
 </Project>

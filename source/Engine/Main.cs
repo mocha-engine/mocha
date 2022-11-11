@@ -32,7 +32,7 @@ public class Main
 	public static void Render()
 	{
 #if DEBUG
-		editor.Render();
+		// editor.Render();
 #endif
 
 		world.Render();

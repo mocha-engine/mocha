@@ -5,8 +5,7 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.Cube ), Title( "Model" )]
 public class Model : Asset
 {
-	private Glue.CDeviceBuffer VertexBuffer { get; set; }
-	private Glue.CDeviceBuffer IndexBuffer { get; set; }
+	private Glue.ManagedModel NativeModel { get; set; }
 
 	public Material Material { get; set; }
 	public bool IsIndexed { get; private set; }
@@ -18,6 +17,8 @@ public class Model : Asset
 		Path = path;
 		Material = material;
 		IsIndexed = isIndexed;
+
+		NativeModel = new();
 
 		All.Add( this );
 
@@ -91,10 +92,6 @@ public class Model : Asset
 			throw new Exception( "no" );
 		}
 
-		Glue.Renderer.DrawModel(
-			Material.Shader.NativePtr,
-			indexCount,
-			VertexBuffer.NativePtr,
-			IndexBuffer.NativePtr );
+		Log.Trace( "Render" );
 	}
 }
