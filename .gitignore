@@ -373,3 +373,4 @@ content/models/rainier
 build/
 *.dxbc
 vcpkg_installed/
+source/Host/tmp
