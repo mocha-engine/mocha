@@ -149,15 +149,9 @@
   <ItemGroup>
     <ClCompile Include="game\g_model.cpp" />
     <ClCompile Include="game\g_camera.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\g_shader.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_impl_sdl.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
     <ClCompile Include="vulkan\vk_engine.cpp" />
     <ClCompile Include="vulkan\vk_mesh.cpp" />
@@ -169,11 +163,8 @@
     <ClInclude Include="game\g_model.h" />
     <ClInclude Include="game\g_camera.h" />
     <ClInclude Include="game\g_types.h" />
-    <ClInclude Include="thirdparty\imgui\imgui.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="game\g_shader.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_impl_sdl.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_impl_vulkan.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
     <ClInclude Include="vulkan\vk_engine.h" />

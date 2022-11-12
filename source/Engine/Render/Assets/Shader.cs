@@ -17,7 +17,7 @@ public class Shader : Asset
 		All.Add( this );
 		Path = path;
 
-		// NativeShader = new( Path, source );
+		NativeShader = new();
 
 		CreateWatcher();
 		Compile();
