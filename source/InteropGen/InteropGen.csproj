@@ -22,8 +22,4 @@
 		</None>
 	</ItemGroup>
 
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="$(TargetDir)InteropGen.exe $(SolutionDir)" />
-	</Target>
-
 </Project>
