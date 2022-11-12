@@ -27,7 +27,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 		foreach ( var method in sel.Methods )
 		{
-			var returnType = method.ReturnType;
+			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
@@ -68,7 +68,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 		// Ctor
 		var ctor = sel.Methods.First( x => x.IsConstructor );
-		var managedCtorArgs = string.Join( ", ", ctor.Parameters );
+		var managedCtorArgs = string.Join( ", ", ctor.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 
 		writer.WriteLine( $"public {sel.Name}( {managedCtorArgs} )" );
 		writer.WriteLine( "{" );
@@ -95,9 +95,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		{
 			writer.WriteLine();
 
-			var managedCallParams = string.Join( ", ", method.Parameters );
+			var managedCallParams = string.Join( ", ", method.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 			var name = method.Name;
-			var returnType = method.ReturnType;
+			var returnType = Utils.GetManagedType( method.ReturnType );
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
 
 			writer.WriteLine( $"{accessLevel} {returnType} {name}( {managedCallParams} ) " );
