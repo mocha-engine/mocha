@@ -18,15 +18,6 @@
     <None Update="libclang.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="Templates\Cpp\CppHeader.template">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\Cs\CsClass.template">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Templates\Cs\CsStaticClass.template">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Update="test.h">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

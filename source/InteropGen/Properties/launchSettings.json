@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Mocha.InteropGen": {
-      "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)"
-    }
-  }
-}

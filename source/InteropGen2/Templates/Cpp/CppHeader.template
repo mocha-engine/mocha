@@ -1,8 +1,0 @@
-﻿/*
- * This file was auto-generated using InteropGen2.
- */
-
-#pragma once
-#include "..\<#= HeaderPath #>.h"
-
-<#= FunctionDecls #>
