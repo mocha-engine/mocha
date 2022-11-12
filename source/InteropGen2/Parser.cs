@@ -74,6 +74,7 @@ public static class Parser
 							// Constructor specific stuff here
 							m.ReturnType = "IntPtr";
 							m.Name = "Ctor";
+							m.IsConstructor = true;
 						}
 
 						if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic )
@@ -148,6 +149,21 @@ public static class Parser
 				{
 					Console.WriteLine( $"\tField - {f}" );
 				}
+			}
+		}
+
+		//
+		// Post-processing
+		//
+		foreach ( var o in units )
+		{
+			// Create a default constructor if one wasn't already defined
+			if ( !o.Methods.Any( x => x.IsConstructor ) )
+			{
+				o.Methods.Add( new Method( "Ctor", "IntPtr" )
+				{
+					IsConstructor = true
+				} );
 			}
 		}
 

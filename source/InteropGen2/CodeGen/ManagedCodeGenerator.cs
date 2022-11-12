@@ -8,7 +8,8 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 	private List<string> GetUsings()
 	{
-		return new() { "System.Runtime.InteropServices" };
+		// return new() { "System.Runtime.InteropServices" };
+		return new();
 	}
 
 	private string GetNamespace()
@@ -66,7 +67,10 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine();
 
 		// Ctor
-		writer.WriteLine( $"public {sel.Name}()" );
+		var ctor = sel.Methods.First( x => x.IsConstructor );
+		var managedCtorArgs = string.Join( ", ", ctor.Parameters );
+
+		writer.WriteLine( $"public {sel.Name}( {managedCtorArgs} )" );
 		writer.WriteLine( "{" );
 		writer.Indent++;
 
@@ -79,7 +83,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		}
 
 		writer.WriteLine();
-		writer.WriteLine( "this.instance = this.Ctor();" );
+
+		var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
+		writer.WriteLine( $"this.instance = this.Ctor( {ctorCallArgs} );" );
 
 		writer.Indent--;
 		writer.WriteLine( "}" );
@@ -92,8 +98,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var managedCallParams = string.Join( ", ", method.Parameters );
 			var name = method.Name;
 			var returnType = method.ReturnType;
+			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
 
-			writer.WriteLine( $"public {returnType} {name}( {managedCallParams} ) " );
+			writer.WriteLine( $"{accessLevel} {returnType} {name}( {managedCallParams} ) " );
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
