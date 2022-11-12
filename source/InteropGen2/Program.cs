@@ -2,6 +2,7 @@
 {
 	internal static List<string> GeneratedPaths { get; set; } = new();
 	internal static List<IUnit> Units { get; set; } = new();
+	internal static List<string> Files { get; set; } = new();
 
 	private static void ProcessHeader( string baseDir, string path )
 	{
@@ -20,12 +21,13 @@
 		File.WriteAllText( $"{baseDir}/Common/Glue/{fileName}.generated.cs", managedCode );
 
 		var nativeGenerator = new NativeCodeGenerator( units );
-		var relativePath = Path.GetRelativePath( "Host/", path );
+		var relativePath = Path.GetRelativePath( $"{baseDir}/Host/", path );
 		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
 
 		Console.WriteLine( $"{baseDir}/Host/generated/{fileName}.generated.h" );
 		File.WriteAllText( $"{baseDir}/Host/generated/{fileName}.generated.h", nativeCode );
 
+		Files.Add( fileName );
 		Units.AddRange( units );
 	}
 
@@ -105,7 +107,7 @@
 			nativeStructWriter.WriteLine( $"{{" );
 			nativeStructWriter.Indent++;
 
-			var nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr" ) );
+			var nativeStructBody = string.Join( "\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr;" ) );
 			nativeStructWriter.Write( nativeStructBody );
 			nativeStructWriter.WriteLine();
 
@@ -117,7 +119,7 @@
 			nativeStructWriter.WriteLine( $"{{" );
 			nativeStructWriter.Indent++;
 
-			nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}MethodPtr" ) );
+			nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}" ) );
 			nativeStructWriter.Write( nativeStructBody );
 			nativeStructWriter.WriteLine();
 
@@ -142,7 +144,7 @@
 			nativeListWriter.WriteLine();
 			nativeListWriter.Indent++;
 
-			var nativeListBody = string.Join( "\r\n\t", Units.Select( x => $"#include \"{x.Name}.generated.h\"" ) );
+			var nativeListBody = string.Join( "\r\n\t", Files.Select( x => $"#include \"{x}.generated.h\"" ) );
 			nativeListWriter.Write( nativeListBody );
 			nativeListWriter.WriteLine();
 

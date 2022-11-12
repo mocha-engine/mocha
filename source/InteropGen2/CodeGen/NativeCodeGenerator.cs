@@ -60,36 +60,35 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 				return $"{x.Type} {x.Name}";
 			} ) );
 
-			var functionSignature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
-			var functionBody = "";
-			var functionParams = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
+			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
+			var body = "";
+			var @params = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
 
-			//if ( function.IsConstructor )
-			//{
-			//	functionBody += $"return new {c.Name}( {functionArgs} );";
-			//}
-			//else if ( function.IsDestructor )
-			//{
-			//	functionBody += $"instance->~{c.Name}( {functionArgs} );";
-			//}
-			//else
-			//{
-
-			var accessor = method.IsStatic ? $"{c.Name}::" : "instance->";
-
-			if ( method.ReturnType == "void" )
-				functionBody += $"{accessor}{method.Name}( {functionParams} );";
-			else if ( method.ReturnType == "std::string" )
-				functionBody += $"std::string text = {accessor}{method.Name}( {functionParams} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
+			if ( method.IsConstructor )
+			{
+				body += $"return new {c.Name}( {@params} );";
+			}
+			else if ( method.IsDestructor )
+			{
+				body += $"instance->~{c.Name}( {@params} );";
+			}
 			else
-				functionBody += $"return {accessor}{method.Name}( {functionParams} );";
-			//}
+			{
+				var accessor = method.IsStatic ? $"{c.Name}::" : "instance->";
 
-			writer.WriteLine( functionSignature );
+				if ( method.ReturnType == "void" )
+					body += $"{accessor}{method.Name}( {@params} );";
+				else if ( method.ReturnType == "std::string" )
+					body += $"std::string text = {accessor}{method.Name}( {@params} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
+				else
+					body += $"return {accessor}{method.Name}( {@params} );";
+			}
+
+			writer.WriteLine( signature );
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
-			writer.WriteLine( functionBody );
+			writer.WriteLine( body );
 
 			writer.Indent--;
 			writer.WriteLine( "}" );

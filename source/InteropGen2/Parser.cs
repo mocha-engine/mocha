@@ -56,7 +56,7 @@ public static class Parser
 						{
 							if ( cursor.Kind == CXCursorKind.CXCursor_ParmDecl )
 							{
-								var type = Utils.CppTypeToCsharp( cursor.Type.ToString() );
+								var type = cursor.Type.ToString();
 								var name = cursor.Spelling.ToString();
 
 								var parameter = new Variable( name, type );
@@ -72,7 +72,7 @@ public static class Parser
 						if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
 						{
 							// Constructor specific stuff here
-							m.ReturnType = "IntPtr";
+							m.ReturnType = $"{o.Name}*";
 							m.Name = "Ctor";
 							m.IsConstructor = true;
 						}
@@ -160,7 +160,7 @@ public static class Parser
 			// Create a default constructor if one wasn't already defined
 			if ( !o.Methods.Any( x => x.IsConstructor ) )
 			{
-				o.Methods.Add( new Method( "Ctor", "IntPtr" )
+				o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
 				{
 					IsConstructor = true
 				} );

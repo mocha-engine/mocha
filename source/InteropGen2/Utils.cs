@@ -2,19 +2,22 @@
 
 static class Utils
 {
-	public static string CppTypeToCsharp( string type )
+	public static string GetManagedType( string nativeType )
 	{
-		if ( type.EndsWith( "*" ) )
+		if ( nativeType == "void" )
+			return nativeType;
+
+		if ( nativeType.EndsWith( "*" ) )
 		{
 			// Pointer
 			return "IntPtr";
 		}
 
-		return type switch
+		return nativeType switch
 		{
 			"std::string" => "string",
 
-			_ => type
+			_ => nativeType
 		};
 	}
 
