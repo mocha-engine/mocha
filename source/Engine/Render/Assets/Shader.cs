@@ -3,7 +3,7 @@
 [Icon( FontAwesome.Glasses ), Title( "Shader" )]
 public class Shader : Asset
 {
-	private Glue.CShader NativeShader { get; }
+	private Glue.Shader NativeShader { get; }
 
 	public IntPtr NativePtr => NativeShader.NativePtr;
 
@@ -17,7 +17,7 @@ public class Shader : Asset
 		All.Add( this );
 		Path = path;
 
-		NativeShader = new( Path, source );
+		// NativeShader = new( Path, source );
 
 		CreateWatcher();
 		Compile();
@@ -63,16 +63,16 @@ public class Shader : Asset
 
 		Notify.AddNotification( $"Shader Compiling", $"Compiling '{Path}'...", FontAwesome.Ellipsis );
 
-		if ( NativeShader.Compile() )
-		{
-			Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader '{Path}'", FontAwesome.FaceGrinStars );
-			CreatePipelines();
-			OnRecompile?.Invoke();
-		}
-		else
-		{
-			Notify.AddNotification( $"Shader Compilation Fail", $"Failed to compile '{Path}'", FontAwesome.FaceSadCry );
-		}
+		//if ( NativeShader.Compile() )
+		//{
+		//	Notify.AddNotification( $"Shader Compilation Success!", $"Compiled shader '{Path}'", FontAwesome.FaceGrinStars );
+		//	CreatePipelines();
+		//	OnRecompile?.Invoke();
+		//}
+		//else
+		//{
+		//	Notify.AddNotification( $"Shader Compilation Fail", $"Failed to compile '{Path}'", FontAwesome.FaceSadCry );
+		//}
 
 		IsDirty = false;
 	}

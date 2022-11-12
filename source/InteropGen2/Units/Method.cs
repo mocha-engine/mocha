@@ -5,13 +5,14 @@
 		Name = name;
 		ReturnType = Utils.CppTypeToCsharp( returnType );
 		Parameters = new();
-
-		IsStatic = false;
 	}
+
+	public bool IsConstructor { get; set; } = false;
+	public bool IsDestructor { get; set; } = false;
+	public bool IsStatic { get; set; } = false;
 
 	public string Name { get; set; }
 	public string ReturnType { get; set; }
-	public bool IsStatic { get; set; }
 	public List<Variable> Parameters { get; set; }
 
 	public override string ToString()
