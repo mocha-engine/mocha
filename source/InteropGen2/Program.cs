@@ -1,132 +1,156 @@
-﻿using ClangSharp.Interop;
-
-public static class Program
+﻿public static class Program
 {
-	private static bool Debug => false;
+	internal static List<string> GeneratedPaths { get; set; } = new();
+	internal static List<IUnit> Units { get; set; } = new();
 
-	public static void Main()
+	private static void ProcessHeader( string baseDir, string path )
 	{
-		List<IUnit> objects = new();
+		Console.WriteLine( $"\t Processing header {path}" );
 
-		unsafe
+		var fileContents = File.ReadAllText( path );
+
+		if ( !fileContents.Contains( "//@InteropGen" ) )
+			return; // Fast early bail
+
+		var units = Parser.GetUnits( path );
+		var fileName = Path.GetFileNameWithoutExtension( path );
+
+		var managedGenerator = new ManagedCodeGenerator( units );
+		var managedCode = managedGenerator.GenerateManagedCode();
+		File.WriteAllText( $"{baseDir}/Common/Glue/{fileName}.generated.cs", managedCode );
+
+		var nativeGenerator = new NativeCodeGenerator( units );
+		var relativePath = Path.GetRelativePath( "Host/", path );
+		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
+
+		Console.WriteLine( $"{baseDir}/Host/generated/{fileName}.generated.h" );
+		File.WriteAllText( $"{baseDir}/Host/generated/{fileName}.generated.h", nativeCode );
+
+		Units.AddRange( units );
+	}
+
+	private static void ProcessDirectory( string baseDir, string directoryPath )
+	{
+		foreach ( var file in Directory.GetFiles( directoryPath ) )
 		{
-			var file = "InteropGen2/test.h";
-
-			Console.WriteLine( $"Scanning {file}" );
-
-			using var index = CXIndex.Create();
-			using var unit = CXTranslationUnit.Parse( index, file, new string[] { "-x", "c++" }, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
-
-			var cursor = unit.Cursor;
-
-			//
-			// Display all tokens
-			//
-
-			if ( Debug )
+			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
 			{
-				Console.WriteLine();
-				Console.WriteLine( $"{"Kind",32} {"Spelling",24} {"Location",48} {"Lexical Parent",32}" );
-				Console.WriteLine( new string( '-', 32 + 24 + 48 + 32 + 3 ) );
+				ProcessHeader( baseDir, file );
 			}
+		}
 
-			CXCursorVisitor cursorVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
-			{
-				if ( !cursor.Location.IsFromMainFile )
-					return CXChildVisitResult.CXChildVisit_Continue;
+		foreach ( var subDirectory in Directory.GetDirectories( directoryPath ) )
+		{
+			ProcessDirectory( baseDir, subDirectory );
+		}
+	}
 
-				switch ( cursor.Kind )
-				{
-					case CXCursorKind.CXCursor_ClassDecl:
-						objects.Add( new Class( cursor.Spelling.ToString() ) );
-						break;
-					case CXCursorKind.CXCursor_StructDecl:
-						objects.Add( new Structure( cursor.Spelling.ToString() ) );
-						break;
-					case CXCursorKind.CXCursor_Constructor:
-					case CXCursorKind.CXCursor_CXXMethod:
-						{
-							var oName = cursor.LexicalParent.Spelling.ToString();
-							var o = objects.First( x => x.Name == oName );
-							var m = new Method( cursor.Spelling.ToString(), cursor.ReturnType.Spelling.ToString() );
+	public static void Main( string[] args )
+	{
+		Console.WriteLine( "Generating C# <--> C++ interop code..." );
 
-							CXCursorVisitor methodChildVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
-							{
-								if ( cursor.Kind == CXCursorKind.CXCursor_ParmDecl )
-								{
-									m.Parameters.Add( Utils.CppTypeToCsharp( cursor.Type.ToString() ) + " " + cursor.Spelling.ToString() );
-								}
+		var destCsDir = $"{args[0]}\\Common\\Glue\\";
+		var destHeaderDir = $"{args[0]}\\Host\\generated\\";
 
-								return CXChildVisitResult.CXChildVisit_Recurse;
-							};
+		if ( Directory.Exists( destHeaderDir ) )
+			Directory.Delete( destHeaderDir, true );
+		if ( Directory.Exists( destCsDir ) )
+			Directory.Delete( destCsDir, true );
 
-							cursor.VisitChildren( methodChildVisitor, default );
+		Directory.CreateDirectory( destHeaderDir );
+		Directory.CreateDirectory( destCsDir );
 
-							if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic )
-								o.Methods.Add( m );
+		ProcessDirectory( args[0], args[0] );
 
-							break;
-						}
-					case CXCursorKind.CXCursor_FieldDecl:
-						{
-							var oName = cursor.LexicalParent.Spelling.ToString();
-							var s = objects.First( x => x.Name == oName );
-							s.Fields.Add( new Field( cursor.Spelling.ToString(), cursor.Type.ToString() ) );
-							break;
-						}
-				}
+		// Expand methods out into list of (method name, method)
+		var methods = Units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
-				if ( Debug )
-					Console.WriteLine( $"{cursor.Kind,32} {cursor.Spelling,24} {cursor.Location,48} {cursor.LexicalParent.Kind,32}" );
+		//
+		// Write managed struct
+		//
+		{
+			var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
 
-				return CXChildVisitResult.CXChildVisit_Recurse;
-			};
+			managedStructWriter.WriteLine( $"using System.Runtime.InteropServices;" );
+			managedStructWriter.WriteLine();
+			managedStructWriter.WriteLine( $"[StructLayout( LayoutKind.Sequential )]" );
+			managedStructWriter.WriteLine( $"public struct UnmanagedArgs" );
+			managedStructWriter.WriteLine( $"{{" );
 
-			cursor.VisitChildren( cursorVisitor, default );
+			managedStructWriter.Indent++;
 
-			//
-			// Classes
-			//
-			Console.WriteLine();
-			Console.WriteLine( "Objects:" );
-			foreach ( var o in objects )
-			{
-				if ( o is not Class c )
-					continue;
+			var managedStructBody = string.Join( "\r\n\t", methods.Select( x => $"public IntPtr __{x.Name}_{x.method.Name}MethodPtr;" ) );
+			managedStructWriter.Write( managedStructBody );
+			managedStructWriter.WriteLine();
 
-				Console.WriteLine( $"Class {c}:" );
+			managedStructWriter.Indent--;
 
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
+			managedStructWriter.WriteLine( $"}}" );
+			managedStructWriter.Dispose();
 
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
+			File.WriteAllText( $"{args[0]}/Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
+		}
 
-			//
-			// Structs
-			//
-			foreach ( var o in objects )
-			{
-				if ( o is not Structure s )
-					continue;
+		//
+		// Write native struct
+		//
+		{
+			var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
 
-				Console.WriteLine( $"Struct {s}:" );
+			nativeStructWriter.WriteLine( "#ifndef __GENERATED_UNMANAGED_ARGS_H" );
+			nativeStructWriter.WriteLine( "#define __GENERATED_UNMANAGED_ARGS_H" );
+			nativeStructWriter.WriteLine( "#include \"InteropList.generated.h\"" );
+			nativeStructWriter.WriteLine();
+			nativeStructWriter.WriteLine( "struct UnmanagedArgs" );
+			nativeStructWriter.WriteLine( $"{{" );
+			nativeStructWriter.Indent++;
 
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
+			var nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr" ) );
+			nativeStructWriter.Write( nativeStructBody );
+			nativeStructWriter.WriteLine();
 
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
+			nativeStructWriter.Indent--;
+			nativeStructWriter.WriteLine( $"}};" );
+			nativeStructWriter.WriteLine();
+
+			nativeStructWriter.WriteLine( "inline UnmanagedArgs args" );
+			nativeStructWriter.WriteLine( $"{{" );
+			nativeStructWriter.Indent++;
+
+			nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}MethodPtr" ) );
+			nativeStructWriter.Write( nativeStructBody );
+			nativeStructWriter.WriteLine();
+
+			nativeStructWriter.Indent--;
+			nativeStructWriter.WriteLine( $"}};" );
+
+			nativeStructWriter.WriteLine();
+			nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
+			nativeStructWriter.Dispose();
+
+			File.WriteAllText( $"{args[0]}/Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+		}
+
+		//
+		// Write native includes
+		//
+		{
+			var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
+
+			nativeListWriter.WriteLine( "#ifndef __GENERATED_INTEROPLIST_H" );
+			nativeListWriter.WriteLine( "#define __GENERATED_INTEROPLIST_H" );
+			nativeListWriter.WriteLine();
+			nativeListWriter.Indent++;
+
+			var nativeListBody = string.Join( "\r\n\t", Units.Select( x => $"#include \"{x.Name}.generated.h\"" ) );
+			nativeListWriter.Write( nativeListBody );
+			nativeListWriter.WriteLine();
+
+			nativeListWriter.Indent--;
+			nativeListWriter.WriteLine();
+			nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
+
+			File.WriteAllText( $"{args[0]}/Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
 		}
 	}
 }

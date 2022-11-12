@@ -1,6 +1,6 @@
-﻿struct Field
+﻿public struct Variable
 {
-	public Field( string name, string type ) : this()
+	public Variable( string name, string type ) : this()
 	{
 		Name = name;
 		Type = type;

@@ -1,4 +1,4 @@
-﻿struct Class : IUnit
+﻿public struct Class : IUnit
 {
 	public Class( string name ) : this()
 	{
@@ -10,7 +10,7 @@
 
 	public string Name { get; set; }
 	public List<Method> Methods { get; set; }
-	public List<Field> Fields { get; set; }
+	public List<Variable> Fields { get; set; }
 
 	public override string ToString()
 	{

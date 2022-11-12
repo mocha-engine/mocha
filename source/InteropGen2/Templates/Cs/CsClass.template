@@ -1,0 +1,25 @@
+﻿/*
+ * This file was auto-generated using InteropGen2.
+ */
+
+using System.Runtime.InteropServices;
+
+namespace Mocha.Glue;
+
+public unsafe class <#= ClassName #>
+{
+	private IntPtr instance;
+	public IntPtr NativePtr => instance;
+
+<#= FunctionDecls #>
+	
+	public <#= ClassName #>( <#= CtorArgs #> )
+	{
+		var args = Mocha.Common.Global.UnmanagedArgs;
+		
+<#= FunctionDefs #>
+		<#= Ctor #>
+	}
+
+<#= FunctionBodies #>
+}
