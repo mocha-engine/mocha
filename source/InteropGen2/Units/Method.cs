@@ -3,7 +3,7 @@
 	public Method( string name, string returnType )
 	{
 		Name = name;
-		ReturnType = Utils.CppTypeToCsharp( returnType );
+		ReturnType = returnType;
 		Parameters = new();
 	}
 
