@@ -18,8 +18,6 @@ public class Model : Asset
 		Material = material;
 		IsIndexed = isIndexed;
 
-		NativeModel = new();
-
 		All.Add( this );
 
 		Material.Shader.OnRecompile += CreateResources;
@@ -41,18 +39,14 @@ public class Model : Asset
 
 	private void SetupMesh( Vertex[] vertices )
 	{
-		VertexBuffer = new();
-
 		int strideInBytes = Marshal.SizeOf( typeof( Vertex ) );
 		int sizeInBytes = strideInBytes * vertices.Length;
-
-		VertexBuffer.CreateVertexBuffer( sizeInBytes, strideInBytes );
 
 		unsafe
 		{
 			fixed ( void* data = vertices )
 			{
-				VertexBuffer.SetData( (IntPtr)data );
+				NativeModel = new( sizeInBytes, (IntPtr)data );
 			}
 		}
 	}
@@ -61,19 +55,7 @@ public class Model : Asset
 	{
 		SetupMesh( vertices );
 
-		IndexBuffer = new();
-		indexCount = indices.Length;
-
-		int sizeInBytes = Marshal.SizeOf( typeof( uint ) ) * indices.Length;
-		IndexBuffer.CreateIndexBuffer( sizeInBytes );
-
-		unsafe
-		{
-			fixed ( void* data = indices )
-			{
-				IndexBuffer.SetData( (IntPtr)data );
-			}
-		}
+		// TODO: Indexed models
 	}
 
 	private void CreateResources()
@@ -86,7 +68,7 @@ public class Model : Asset
 
 	public void Render()
 	{
-		if ( !IsIndexed )
+		if ( IsIndexed )
 		{
 			Log.Error( "fuck off" );
 			throw new Exception( "no" );
