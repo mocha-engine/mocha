@@ -73,7 +73,7 @@
 		ProcessDirectory( args[0], args[0] );
 
 		// Expand methods out into list of (method name, method)
-		var methods = Units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
+		var methods = Units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
 		//
 		// Write managed struct

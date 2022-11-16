@@ -97,7 +97,7 @@ public static class Parser
 
 			if ( Debug )
 			{
-				Console.WriteLine( $"{cursor.Kind,32} {cursor.Spelling,24} {cursor.Location,48} {cursor.LexicalParent.Kind,32}" );
+				Console.WriteLine( $"{cursor.Kind,32} {cursor.Spelling,24} {cursor.Type,48} {cursor.LexicalParent.Kind,32}" );
 			}
 
 			return CXChildVisitResult.CXChildVisit_Recurse;

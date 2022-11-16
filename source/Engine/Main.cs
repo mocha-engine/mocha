@@ -16,16 +16,15 @@ public class Main
 	public static void Run( IntPtr args )
 	{
 		SetupFunctionPointers( args );
+		Log.Info( "Managed init" );
 
-		Log.Info( "Hello from managed" );
-
-		// get parent process path
+		// Get parent process path
 		var parentProcess = System.Diagnostics.Process.GetCurrentProcess();
 		var parentModule = parentProcess.MainModule;
 		var parentPath = parentModule?.FileName ?? "None";
 		Log.Info( $"Parent process: {parentPath}" );
 
-		// world = new World();
+		world = new World();
 	}
 
 	[UnmanagedCallersOnly]
