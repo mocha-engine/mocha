@@ -30,7 +30,7 @@ public:
 
 	void LoadMeshes( VmaAllocator allocator );
 
-	inline void UploadMesh( VmaAllocator allocator, Mesh& mesh );
+	void UploadMesh( VmaAllocator allocator, Mesh& mesh );
 
 	bool LoadShaderModule(
 	    VkDevice device, const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
