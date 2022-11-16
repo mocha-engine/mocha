@@ -48,6 +48,9 @@
     <ClCompile Include="game\g_shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="managed\ManagedHost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="vulkan\vk_engine.h">
@@ -117,6 +120,21 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\*.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\*.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\*.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\*.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\*.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="managed\ManagedHost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

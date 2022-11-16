@@ -15,7 +15,7 @@ static class Utils
 
 		return nativeType switch
 		{
-			"std::string" => "string",
+			"std::string" => "[MarshalAs( UnmanagedType.LPStr )] string",
 
 			_ => nativeType
 		};

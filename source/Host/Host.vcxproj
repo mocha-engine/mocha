@@ -152,6 +152,7 @@
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\g_shader.cpp" />
+    <ClCompile Include="managed\ManagedHost.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
     <ClCompile Include="vulkan\vk_engine.cpp" />
     <ClCompile Include="vulkan\vk_mesh.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="game\g_types.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="game\g_shader.h" />
+    <ClInclude Include="managed\ManagedHost.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
     <ClInclude Include="vulkan\vk_engine.h" />
