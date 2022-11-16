@@ -1,14 +1,17 @@
 #include "thirdparty/renderdoc_app.h"
 #include "vulkan/vk_engine.h"
 
+#include "managed/ManagedHost.h"
+
 #include <SDL2/SDL.h>
 #include <iostream>
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 #undef main
 
 void InitRenderdoc()
 {
-	RENDERDOC_API_1_2_0* rdoc_api = NULL;
+	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
 	auto renderdocDll = LoadLibrary( L"renderdoc.dll" );
 	if ( renderdocDll == nullptr )
@@ -33,10 +36,23 @@ int main()
 {
 	InitRenderdoc();
 
+	// Setup spdlog
+	auto managed = spdlog::stdout_color_mt( "managed" );
+	auto main = spdlog::stderr_color_mt( "main" );
+	auto renderer = spdlog::stderr_color_mt( "renderer" );
+	spdlog::set_default_logger( main );
 	spdlog::set_level( spdlog::level::trace );
 
-	// Set pattern to [time] [type, pad right] [message]
-	spdlog::set_pattern( "[%H:%M:%S] %^%-8l%$ %v" );
+	// Set pattern "time logger,8 type,8 message"
+	spdlog::set_pattern( "%H:%M:%S %-8n %^%-8l%$ %v" );
+
+	// Get current working directory
+	char cwd[1024];
+	_getcwd( cwd, sizeof( cwd ) );
+	spdlog::info( "Current working directory: {}", cwd );
+
+	// Start managed bullshit
+	auto managedHost = ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine", L"Run" );
 
 	CNativeEngine engine;
 
