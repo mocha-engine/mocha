@@ -17,7 +17,15 @@ public class Main
 	{
 		SetupFunctionPointers( args );
 
-		world = new World();
+		Log.Info( "Hello from managed" );
+
+		// get parent process path
+		var parentProcess = System.Diagnostics.Process.GetCurrentProcess();
+		var parentModule = parentProcess.MainModule;
+		var parentPath = parentModule?.FileName ?? "None";
+		Log.Info( $"Parent process: {parentPath}" );
+
+		// world = new World();
 	}
 
 	[UnmanagedCallersOnly]

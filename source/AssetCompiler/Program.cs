@@ -76,6 +76,7 @@ public static class Program
 			Thread.Sleep( 500 );
 		}
 
+		Thread.Sleep( 1000 );
 		Log.Results();
 	}
 

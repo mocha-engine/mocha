@@ -52,7 +52,7 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 
 			var argStr = string.Join( ", ", args.Select( x =>
 			{
-				if ( x.Type == "string" )
+				if ( x.Type == "std::string" )
 				{
 					return $"const char* {x.Name}";
 				}

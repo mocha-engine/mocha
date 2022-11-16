@@ -8,8 +8,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 	private List<string> GetUsings()
 	{
-		// return new() { "System.Runtime.InteropServices" };
-		return new();
+		return new() { "System.Runtime.InteropServices" };
 	}
 
 	private string GetNamespace()

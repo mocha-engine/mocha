@@ -37,7 +37,14 @@
 		{
 			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
 			{
+				var start = DateTime.Now;
+
 				ProcessHeader( baseDir, file );
+
+				var end = DateTime.Now;
+
+				var totalTime = (end - start);
+				Console.WriteLine( $"\t Took {totalTime.TotalSeconds} seconds." );
 			}
 		}
 
@@ -49,6 +56,7 @@
 
 	public static void Main( string[] args )
 	{
+		var start = DateTime.Now;
 		Console.WriteLine( "Generating C# <--> C++ interop code..." );
 
 		var destCsDir = $"{args[0]}\\Common\\Glue\\";
@@ -154,5 +162,10 @@
 
 			File.WriteAllText( $"{args[0]}/Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
 		}
+
+		var end = DateTime.Now;
+
+		var totalTime = (end - start);
+		Console.WriteLine( $"-- Took {totalTime.TotalSeconds} seconds." );
 	}
 }

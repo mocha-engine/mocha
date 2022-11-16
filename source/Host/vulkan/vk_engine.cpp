@@ -14,6 +14,30 @@
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
+VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
+    const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
+{
+	const std::shared_ptr<spdlog::logger> logger = spdlog::get( "renderer" );
+
+	switch (messageSeverity)
+	{
+	case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+		logger->trace( pCallbackData->pMessage );
+		break;
+	case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+		logger->info( pCallbackData->pMessage );
+		break;
+	case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+		logger->warn( pCallbackData->pMessage );
+		break;
+	case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+		logger->error( pCallbackData->pMessage );
+		break;
+	}
+
+	return VK_FALSE;
+}
+
 void CNativeEngine::InitVulkan()
 {
 	vkb::InstanceBuilder builder;
@@ -22,7 +46,7 @@ void CNativeEngine::InitVulkan()
 	               .set_engine_name( "Mocha" )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
-	               .use_default_debug_messenger()
+	               .set_debug_callback( &DebugCallback )
 	               .build();
 
 	vkb::Instance vkbInstance = ret.value();
