@@ -4,7 +4,7 @@ CWindow::CWindow( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
 
-	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN );
+	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 
 	m_window = SDL_CreateWindow( "Mocha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 }

@@ -12,6 +12,7 @@ struct VertexInputDescription
 	VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
+//@InteropGen generate struct
 struct Vertex
 {
 	glm::vec3 position;
