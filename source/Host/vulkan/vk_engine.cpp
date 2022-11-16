@@ -19,7 +19,7 @@ VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
 {
 	const std::shared_ptr<spdlog::logger> logger = spdlog::get( "renderer" );
 
-	switch (messageSeverity)
+	switch ( messageSeverity )
 	{
 	case VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
 		logger->trace( pCallbackData->pMessage );
@@ -187,7 +187,8 @@ void CNativeEngine::Render()
 
 	// Acquire swapchain image ( 1 second timeout )
 	uint32_t swapchainImageIndex;
-	VK_CHECK( vkAcquireNextImageKHR( m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageIndex ) );
+	VK_CHECK( vkAcquireNextImageKHR( m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr,
+	    &swapchainImageIndex ) ); // TODO: Check for VK_ERROR_OUT_OF_DATE_KHR or VK_SUBOPTIMAL_KHR and resize
 	VK_CHECK( vkResetCommandBuffer( m_commandBuffer, 0 ) );
 
 	// Begin command buffer
@@ -216,7 +217,8 @@ void CNativeEngine::Render()
 
 	// Present
 	VkPresentInfoKHR presentInfo = vkinit::PresentInfo( &m_swapchain, &m_renderSemaphore, &swapchainImageIndex );
-	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
+	VK_CHECK( vkQueuePresentKHR(
+	    m_graphicsQueue, &presentInfo ) ); // TODO: Check for VK_ERROR_OUT_OF_DATE_KHR or VK_SUBOPTIMAL_KHR and resize
 
 	m_frameNumber++;
 }

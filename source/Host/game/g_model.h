@@ -43,5 +43,9 @@ class ManagedModel
 {
 private:
 public:
-	ManagedModel( int size, void* data ) {}
+	ManagedModel( int size, void* data )
+	{
+		spdlog::info( "ManagedModel: Received {} bytes", size );
+		// Model model;
+	}
 };

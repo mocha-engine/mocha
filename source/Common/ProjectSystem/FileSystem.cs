@@ -2,7 +2,7 @@
 
 public class FileSystem
 {
-	public static FileSystem Game => new FileSystem( "..\\content" );
+	public static FileSystem Game => new FileSystem( "content\\" );
 
 	private string BasePath { get; }
 
