@@ -53,9 +53,18 @@ public class Model : Asset
 
 	private void SetupMesh( Vertex[] vertices, uint[] indices )
 	{
-		SetupMesh( vertices );
-
 		// TODO: Indexed models
+		Log.Trace( "Indices were given but we don't support those yet. Unpacking them" );
+
+		// Unpack indices for now
+		var unpackedVertices = new Vertex[indices.Length];
+		int i = 0;
+		foreach ( var index in indices )
+		{
+			unpackedVertices[i++] = vertices[index];
+		}
+
+		SetupMesh( unpackedVertices );
 	}
 
 	private void CreateResources()

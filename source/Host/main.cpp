@@ -51,12 +51,13 @@ int main()
 	_getcwd( cwd, sizeof( cwd ) );
 	spdlog::info( "Current working directory: {}", cwd );
 
-	// Start managed bullshit
-	auto managedHost = ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine", L"Run" );
-
 	CNativeEngine engine;
 
 	engine.Init();
+
+	// Start managed bullshit
+	auto managedHost = ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine", L"Run" );
+
 	engine.Run();
 	engine.Cleanup();
 

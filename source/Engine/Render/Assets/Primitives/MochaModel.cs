@@ -60,9 +60,13 @@ public partial class Primitives
 
 					vertex.Position = ReadVector3();
 					vertex.Normal = ReadVector3();
-					vertex.TexCoords = ReadVector2();
-					vertex.Tangent = ReadVector3();
-					vertex.Bitangent = ReadVector3();
+					// vertex.TexCoords = ReadVector2();
+					// vertex.Tangent = ReadVector3();
+					// vertex.Bitangent = ReadVector3();
+
+					ReadVector2();
+					ReadVector3();
+					ReadVector3();
 
 					vertices.Add( vertex );
 				}
