@@ -26,26 +26,13 @@ private:
 	Mesh m_mesh;
 
 public:
-	void InitPipelines( VmaAllocator allocator, VkDevice device, VkExtent2D windowExtent, VkFormat swapchainImageFormat );
+	void InitPipelines();
 
-	void LoadMeshes( VmaAllocator allocator );
+	void UploadTriangleMesh();
 
-	void UploadMesh( VmaAllocator allocator, Mesh& mesh );
+	void UploadMesh( Mesh& mesh );
 
-	bool LoadShaderModule(
-	    VkDevice device, const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
+	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
 
 	void Render( Camera* camera, VkCommandBuffer cmd, int frameNumber );
-};
-
-//@InteropGen generate class
-class ManagedModel
-{
-private:
-public:
-	ManagedModel( int size, void* data )
-	{
-		spdlog::info( "ManagedModel: Received {} bytes", size );
-		// Model model;
-	}
 };

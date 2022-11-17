@@ -6,7 +6,6 @@
 #include "vk_types.h"
 
 #include <glm/glm.hpp>
-#include <memory>
 #include <vector>
 
 class CNativeEngine

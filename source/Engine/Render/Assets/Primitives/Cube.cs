@@ -75,8 +75,9 @@ partial class Primitives
 					tmp.Add( new Vertex()
 					{
 						Position = new Vector3( x, y, z ),
-						TexCoords = new Vector2( u, v ),
+						// TexCoords = new Vector2( u, v ),
 						Normal = new Vector3( nX, nY, nZ ),
+						Color = new Vector3( x, y, z )
 					} );
 				}
 

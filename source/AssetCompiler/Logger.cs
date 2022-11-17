@@ -28,5 +28,5 @@ public class Logger
 
 	public void Processing( string type, string path ) => Log( "PROCESS", $"Processing '{path}' as {type}" );
 
-	public void Results() => Log( "Results", $"========== Build: {SuccessCount} succeeded, {FailCount} failed, {UpToDateCount} up-to-date, {SkipCount} skipped ==========" );
+	public void Results( TimeSpan totalTime ) => Log( "Results", $"========== Build: {SuccessCount} succeeded, {FailCount} failed, {UpToDateCount} up-to-date, {SkipCount} skipped ==========\nBuild took {totalTime.TotalSeconds} seconds." );
 }
