@@ -12,7 +12,14 @@
 #include <spdlog/spdlog.h>
 
 #define VMA_IMPLEMENTATION
+#include <globalvars.h>
 #include <vk_mem_alloc.h>
+
+namespace Global
+{
+	VmaAllocator* g_allocator;
+	CNativeEngine* g_engine;
+} // namespace Global
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
@@ -145,13 +152,19 @@ void CNativeEngine::Init()
 	m_window = std::make_unique<CWindow>( CWindow( m_windowExtent.width, m_windowExtent.height ) );
 
 	InitVulkan();
+
+	// Set up global vars
+	Global::g_engine = this;
+	Global::g_allocator = &m_allocator;
+	
 	InitSwapchain();
 	InitCommands();
 	InitSyncStructures();
 
 	m_camera = Camera();
 
-	m_triangle.InitPipelines( m_allocator, m_device, m_windowExtent, m_swapchainImageFormat );
+	m_triangle.InitPipelines();
+	m_triangle.UploadTriangleMesh();
 
 	m_isInitialized = true;
 }

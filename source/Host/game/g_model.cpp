@@ -2,16 +2,23 @@
 
 #include "../vulkan/vk_types.h"
 
-void Model::InitPipelines( VmaAllocator allocator, VkDevice device, VkExtent2D windowExtent, VkFormat swapchainImageFormat )
+#include <globalvars.h>
+#include <vulkan/vk_engine.h>
+
+void Model::InitPipelines()
 {
+	VkDevice device = Global::g_engine->m_device;
+	VkExtent2D windowExtent = Global::g_engine->m_windowExtent;
+	VkFormat swapchainImageFormat = Global::g_engine->m_swapchainImageFormat;
+
 	VkShaderModule triangleFragShader;
-	if ( LoadShaderModule( device, "content/shaders/triangle.frag", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
+	if ( LoadShaderModule( "content/shaders/triangle.frag", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
 	{
 		spdlog::info( "Frag shader compiled successfully" );
 	}
 
 	VkShaderModule triangleVertexShader;
-	if ( LoadShaderModule( device, "content/shaders/triangle.vert", VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
+	if ( LoadShaderModule( "content/shaders/triangle.vert", VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
 	{
 		spdlog::info( "Vert shader compiled successfully" );
 	}
@@ -29,16 +36,14 @@ void Model::InitPipelines( VmaAllocator allocator, VkDevice device, VkExtent2D w
 	VK_CHECK( vkCreatePipelineLayout( device, &pipeline_layout_info, nullptr, &m_pipelineLayout ) );
 
 	m_pipeline = PipelineFactory::begin()
-	                    .WithFragmentShader( triangleFragShader )
-	                    .WithVertexShader( triangleVertexShader )
-	                    .WithVertexDescription( Vertex::GetVertexDescription() )
-	                    .WithLayout( m_pipelineLayout )
-	                    .Build( device, swapchainImageFormat );
-
-	LoadMeshes( allocator );
+	                 .WithFragmentShader( triangleFragShader )
+	                 .WithVertexShader( triangleVertexShader )
+	                 .WithVertexDescription( Vertex::GetVertexDescription() )
+	                 .WithLayout( m_pipelineLayout )
+	                 .Build( device, swapchainImageFormat );
 }
 
-void Model::LoadMeshes( VmaAllocator allocator )
+void Model::UploadTriangleMesh()
 {
 	m_mesh.vertices.resize( 3 );
 
@@ -50,33 +55,36 @@ void Model::LoadMeshes( VmaAllocator allocator )
 	m_mesh.vertices[1].color = { 0.0f, 1.0f, 0.0f };
 	m_mesh.vertices[2].color = { 0.0f, 0.0f, 1.0f };
 
-	UploadMesh( allocator, m_mesh );
+	UploadMesh( m_mesh );
 }
 
-void Model::UploadMesh( VmaAllocator allocator, Mesh& mesh )
+void Model::UploadMesh( Mesh& mesh )
 {
+	m_mesh = mesh;
+
 	VkBufferCreateInfo bufferInfo = {};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.pNext = nullptr;
 
-	bufferInfo.size = mesh.vertices.size() * sizeof( Vertex );
+	bufferInfo.size = m_mesh.vertices.size() * sizeof( Vertex );
 	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 	VmaAllocationCreateInfo vmaallocInfo = {};
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
-	VK_CHECK( vmaCreateBuffer(
-	    allocator, &bufferInfo, &vmaallocInfo, &mesh.vertexBuffer.buffer, &mesh.vertexBuffer.allocation, nullptr ) );
+	VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
+	    &m_mesh.vertexBuffer.allocation, nullptr ) );
 
 	void* data;
-	vmaMapMemory( allocator, mesh.vertexBuffer.allocation, &data );
-	memcpy( data, mesh.vertices.data(), mesh.vertices.size() * sizeof( Vertex ) );
-	vmaUnmapMemory( allocator, mesh.vertexBuffer.allocation );
+	vmaMapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation, &data );
+	memcpy( data, m_mesh.vertices.data(), m_mesh.vertices.size() * sizeof( Vertex ) );
+	vmaUnmapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation );
 }
 
-bool Model::LoadShaderModule(
-    VkDevice device, const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
+bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
 {
+	VkDevice device = Global::g_engine->m_device;
+
 	std::string line, text;
 	std::ifstream in( filePath );
 

@@ -76,6 +76,7 @@
     <IntDir>tmp\</IntDir>
     <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)build</OutDir>
@@ -83,6 +84,7 @@
     <IntDir>tmp\</IntDir>
     <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -152,6 +154,7 @@
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\g_shader.cpp" />
+    <ClCompile Include="ManagedModel.cpp" />
     <ClCompile Include="managed\ManagedHost.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
     <ClCompile Include="vulkan\vk_engine.cpp" />
@@ -164,8 +167,10 @@
     <ClInclude Include="game\g_model.h" />
     <ClInclude Include="game\g_camera.h" />
     <ClInclude Include="game\g_types.h" />
+    <ClInclude Include="globalvars.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="game\g_shader.h" />
+    <ClInclude Include="ManagedModel.h" />
     <ClInclude Include="managed\ManagedHost.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
@@ -176,10 +181,6 @@
     <ClInclude Include="vulkan\vk_shadercompiler.h" />
     <ClInclude Include="vulkan\vk_types.h" />
     <ClInclude Include="window.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="generated\*.h">
-    </ClInclude>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

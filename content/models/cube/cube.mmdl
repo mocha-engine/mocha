@@ -1,0 +1,6 @@
+{
+    "Model": "/models/cube/cube.fbx",
+    "Materials": [
+        "/materials/subaru/subaru.mmat"
+    ]
+}

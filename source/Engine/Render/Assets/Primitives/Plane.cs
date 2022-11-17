@@ -9,25 +9,29 @@ partial class Primitives
 			new Vertex()
 			{
 				Position = new Vector3(-1.0f, -1.0f, 0.0f),
-				TexCoords = new Vector2(0.0f, 0.0f),
+				// TexCoords = new Vector2(0.0f, 0.0f),
+						Color = new Vector3( 1, 0, 1 ),
 				Normal = new Vector3(0.0f, 0.0f, 1.0f),
 			},
 			new Vertex()
 			{
 				Position = new Vector3(1.0f, -1.0f, 0.0f),
-				TexCoords = new Vector2(1.0f, 0.0f),
+				// TexCoords = new Vector2(1.0f, 0.0f),
+						Color = new Vector3( 1, 0, 1 ),
 				Normal = new Vector3(0.0f, 0.0f, 1.0f),
 			},
 			new Vertex()
 			{
 				Position = new Vector3(-1.0f, 1.0f, 0.0f),
-				TexCoords = new Vector2(0.0f, 1.0f),
+				// TexCoords = new Vector2(0.0f, 1.0f),
+						Color = new Vector3( 1, 0, 1 ),
 				Normal = new Vector3(0.0f, 0.0f, 1.0f),
 			},
 			new Vertex()
 			{
 				Position = new Vector3(1.0f, 1.0f, 0.0f),
-				TexCoords = new Vector2(1.0f, 1.0f),
+				// TexCoords = new Vector2(1.0f, 1.0f),
+						Color = new Vector3( 1, 0, 1 ),
 				Normal = new Vector3(0.0f, 0.0f, 1.0f),
 			}
 		};

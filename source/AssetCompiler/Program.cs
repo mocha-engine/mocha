@@ -9,6 +9,8 @@ public static class Program
 
 	public static void Main( string[] args )
 	{
+		var start = DateTime.Now;
+
 		if ( args.Length == 0 )
 		{
 			Console.WriteLine( "Expected filename" );
@@ -69,7 +71,9 @@ public static class Program
 		}
 
 		Thread.Sleep( 1000 );
-		Log.Results();
+		var end = DateTime.Now;
+
+		Log.Results( (end - start) );
 	}
 
 	private static void QueueDirectory( ref List<string> queue, string directory )
