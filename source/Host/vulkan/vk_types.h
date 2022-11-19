@@ -8,6 +8,12 @@ struct AllocatedBuffer
 	VmaAllocation allocation;
 };
 
+struct AllocatedImage
+{
+	VkImage image;
+	VmaAllocation allocation;
+};
+
 #define VK_CHECK( x )                                          \
 	do                                                         \
 	{                                                          \

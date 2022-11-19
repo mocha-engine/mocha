@@ -104,6 +104,28 @@ void CNativeEngine::InitSwapchain()
 	m_swapchainImages = vkbSwapchain.get_images().value();
 	m_swapchainImageViews = vkbSwapchain.get_image_views().value();
 	m_swapchainImageFormat = vkbSwapchain.image_format;
+
+	VkExtent3D depthImageExtent = {
+	    m_windowExtent.width,
+	    m_windowExtent.height,
+	    1,
+	};
+
+	m_depthFormat = VK_FORMAT_D32_SFLOAT_S8_UINT; // Depth & stencil format
+
+	VkImageCreateInfo depthImageInfo =
+	    vkinit::ImageCreateInfo( m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent );
+
+	VmaAllocationCreateInfo depthAllocInfo = {};
+	depthAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	depthAllocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+
+	vmaCreateImage( m_allocator, &depthImageInfo, &depthAllocInfo, &m_depthImage.image, &m_depthImage.allocation, nullptr );
+
+	VkImageViewCreateInfo depthViewInfo =
+	    vkinit::ImageViewCreateInfo( m_depthFormat, m_depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT );
+
+	VK_CHECK( vkCreateImageView( m_device, &depthViewInfo, nullptr, &m_depthImageView ) );
 }
 
 void CNativeEngine::InitCommands()
@@ -156,7 +178,7 @@ void CNativeEngine::Init()
 	// Set up global vars
 	Global::g_engine = this;
 	Global::g_allocator = &m_allocator;
-	
+
 	InitSwapchain();
 	InitCommands();
 	InitSyncStructures();
@@ -211,8 +233,18 @@ void CNativeEngine::Render()
 
 	// Dynamic rendering
 	VkImageView currentImageView = m_swapchainImageViews[swapchainImageIndex];
-	VkRenderingAttachmentInfo colorAttachmentInfo = vkinit::RenderingAttachmentInfo( currentImageView );
-	VkRenderingInfo renderInfo = vkinit::RenderingInfo( colorAttachmentInfo, m_windowExtent );
+
+	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+	VkClearValue depthClear = {};
+	depthClear.depthStencil.depth = 1.0f;
+	
+	VkRenderingAttachmentInfo colorAttachmentInfo =
+	    vkinit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, colorClear );
+
+	VkRenderingAttachmentInfo depthAttachmentInfo =
+	    vkinit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, depthClear );
+
+	VkRenderingInfo renderInfo = vkinit::RenderingInfo( colorAttachmentInfo, depthAttachmentInfo, m_windowExtent );
 
 	// Start drawing
 	vkCmdBeginRendering( cmd, &renderInfo );

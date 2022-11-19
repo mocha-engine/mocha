@@ -9,7 +9,8 @@ void Model::InitPipelines()
 {
 	VkDevice device = Global::g_engine->m_device;
 	VkExtent2D windowExtent = Global::g_engine->m_windowExtent;
-	VkFormat swapchainImageFormat = Global::g_engine->m_swapchainImageFormat;
+	VkFormat colorFormat = Global::g_engine->m_swapchainImageFormat;
+	VkFormat depthFormat = Global::g_engine->m_depthFormat;
 
 	VkShaderModule triangleFragShader;
 	if ( LoadShaderModule( "content/shaders/triangle.frag", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
@@ -40,7 +41,7 @@ void Model::InitPipelines()
 	                 .WithVertexShader( triangleVertexShader )
 	                 .WithVertexDescription( Vertex::GetVertexDescription() )
 	                 .WithLayout( m_pipelineLayout )
-	                 .Build( device, swapchainImageFormat );
+	                 .Build( device, colorFormat, depthFormat );
 }
 
 void Model::UploadTriangleMesh()
