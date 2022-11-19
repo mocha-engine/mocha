@@ -13,18 +13,18 @@ void Model::InitPipelines()
 	VkFormat depthFormat = Global::g_engine->m_depthFormat;
 
 	VkShaderModule triangleFragShader;
-	if ( LoadShaderModule( "content/shaders/triangle.frag", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
+	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
 	{
 		spdlog::info( "Frag shader compiled successfully" );
 	}
 
 	VkShaderModule triangleVertexShader;
-	if ( LoadShaderModule( "content/shaders/triangle.vert", VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
+	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
 	{
 		spdlog::info( "Vert shader compiled successfully" );
 	}
 
-	VkPipelineLayoutCreateInfo pipeline_layout_info = vkinit::PipelineLayoutCreateInfo();
+	VkPipelineLayoutCreateInfo pipeline_layout_info = VKInit::PipelineLayoutCreateInfo();
 	VkPushConstantRange push_constant = {};
 
 	push_constant.offset = 0;

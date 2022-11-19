@@ -1,6 +1,6 @@
 #include "window.h"
 
-CWindow::CWindow( uint32_t width, uint32_t height )
+Window::Window( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
 
@@ -9,19 +9,19 @@ CWindow::CWindow( uint32_t width, uint32_t height )
 	m_window = SDL_CreateWindow( "Mocha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 }
 
-VkSurfaceKHR CWindow::CreateSurface( VkInstance instance )
+VkSurfaceKHR Window::CreateSurface( VkInstance instance )
 {
 	VkSurfaceKHR surface;
 	SDL_Vulkan_CreateSurface( m_window, instance, &surface );
 	return surface;
 }
 
-void CWindow::Cleanup()
+void Window::Cleanup()
 {
 	SDL_DestroyWindow( m_window );
 }
 
-bool CWindow::Update()
+bool Window::Update()
 {
 	SDL_Event e;
 	bool bQuit = false;

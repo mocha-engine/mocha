@@ -51,7 +51,7 @@ int main()
 	_getcwd( cwd, sizeof( cwd ) );
 	spdlog::info( "Current working directory: {}", cwd );
 
-	CNativeEngine engine;
+	NativeEngine engine;
 
 	engine.Init();
 

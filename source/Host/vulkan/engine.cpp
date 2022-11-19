@@ -21,7 +21,7 @@
 namespace Global
 {
 	VmaAllocator* g_allocator;
-	CNativeEngine* g_engine;
+	NativeEngine* g_engine;
 } // namespace Global
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
@@ -48,7 +48,7 @@ VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
 	return VK_FALSE;
 }
 
-void CNativeEngine::InitVulkan()
+void NativeEngine::InitVulkan()
 {
 	vkb::InstanceBuilder builder;
 
@@ -92,7 +92,7 @@ void CNativeEngine::InitVulkan()
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
 }
 
-void CNativeEngine::InitSwapchain()
+void NativeEngine::InitSwapchain()
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
 
@@ -117,7 +117,7 @@ void CNativeEngine::InitSwapchain()
 	m_depthFormat = VK_FORMAT_D32_SFLOAT_S8_UINT; // Depth & stencil format
 
 	VkImageCreateInfo depthImageInfo =
-	    vkinit::ImageCreateInfo( m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent );
+	    VKInit::ImageCreateInfo( m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent );
 
 	VmaAllocationCreateInfo depthAllocInfo = {};
 	depthAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -126,12 +126,12 @@ void CNativeEngine::InitSwapchain()
 	vmaCreateImage( m_allocator, &depthImageInfo, &depthAllocInfo, &m_depthImage.image, &m_depthImage.allocation, nullptr );
 
 	VkImageViewCreateInfo depthViewInfo =
-	    vkinit::ImageViewCreateInfo( m_depthFormat, m_depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT );
+	    VKInit::ImageViewCreateInfo( m_depthFormat, m_depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT );
 
 	VK_CHECK( vkCreateImageView( m_device, &depthViewInfo, nullptr, &m_depthImageView ) );
 }
 
-void CNativeEngine::InitCommands()
+void NativeEngine::InitCommands()
 {
 	VkCommandPoolCreateInfo commandPoolInfo = {};
 	commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -153,7 +153,7 @@ void CNativeEngine::InitCommands()
 	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_commandBuffer ) );
 }
 
-void CNativeEngine::InitSyncStructures()
+void NativeEngine::InitSyncStructures()
 {
 	VkFenceCreateInfo fenceCreateInfo = {};
 	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -172,9 +172,9 @@ void CNativeEngine::InitSyncStructures()
 	VK_CHECK( vkCreateSemaphore( m_device, &semaphoreCreateInfo, nullptr, &m_renderSemaphore ) );
 }
 
-void CNativeEngine::Init()
+void NativeEngine::Init()
 {
-	m_window = std::make_unique<CWindow>( CWindow( m_windowExtent.width, m_windowExtent.height ) );
+	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
 
 	InitVulkan();
 
@@ -195,7 +195,7 @@ void CNativeEngine::Init()
 	m_isInitialized = true;
 }
 
-void CNativeEngine::Cleanup()
+void NativeEngine::Cleanup()
 {
 	if ( m_isInitialized )
 	{
@@ -218,7 +218,7 @@ void CNativeEngine::Cleanup()
 	}
 }
 
-void CNativeEngine::Render()
+void NativeEngine::Render()
 {
 	// Wait until we can render ( 1 second timeout )
 	VK_CHECK( vkWaitForFences( m_device, 1, &m_renderFence, true, 1000000000 ) );
@@ -232,7 +232,7 @@ void CNativeEngine::Render()
 
 	// Begin command buffer
 	VkCommandBuffer cmd = m_commandBuffer;
-	VkCommandBufferBeginInfo cmdBeginInfo = vkinit::CommandBufferBeginInfo();
+	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo();
 	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
 
 	// Dynamic rendering
@@ -243,12 +243,12 @@ void CNativeEngine::Render()
 	depthClear.depthStencil.depth = 1.0f;
 
 	VkRenderingAttachmentInfo colorAttachmentInfo =
-	    vkinit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, colorClear );
+	    VKInit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, colorClear );
 
 	VkRenderingAttachmentInfo depthAttachmentInfo =
-	    vkinit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, depthClear );
+	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, depthClear );
 
-	VkRenderingInfo renderInfo = vkinit::RenderingInfo( colorAttachmentInfo, depthAttachmentInfo, m_windowExtent );
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( colorAttachmentInfo, depthAttachmentInfo, m_windowExtent );
 
 	// Start drawing
 	vkCmdBeginRendering( cmd, &renderInfo );
@@ -261,18 +261,18 @@ void CNativeEngine::Render()
 
 	// Submit
 	VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	VkSubmitInfo submit = vkinit::SubmitInfo( &waitStage, &m_presentSemaphore, &m_renderSemaphore, &cmd );
+	VkSubmitInfo submit = VKInit::SubmitInfo( &waitStage, &m_presentSemaphore, &m_renderSemaphore, &cmd );
 	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_renderFence ) );
 
 	// Present
-	VkPresentInfoKHR presentInfo = vkinit::PresentInfo( &m_swapchain, &m_renderSemaphore, &swapchainImageIndex );
+	VkPresentInfoKHR presentInfo = VKInit::PresentInfo( &m_swapchain, &m_renderSemaphore, &swapchainImageIndex );
 	VK_CHECK( vkQueuePresentKHR(
 	    m_graphicsQueue, &presentInfo ) ); // TODO: Check for VK_ERROR_OUT_OF_DATE_KHR or VK_SUBOPTIMAL_KHR and resize
 
 	m_frameNumber++;
 }
 
-void CNativeEngine::Run( ManagedHost* managedHost )
+void NativeEngine::Run( ManagedHost* managedHost )
 {
 	bool bQuit = false;
 
@@ -287,7 +287,7 @@ void CNativeEngine::Run( ManagedHost* managedHost )
 	}
 }
 
-void CNativeEngine::SetCamera( Camera* camera )
+void NativeEngine::SetCamera( Camera* camera )
 {
 	m_camera = camera;
 }
