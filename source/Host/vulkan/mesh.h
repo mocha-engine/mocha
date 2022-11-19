@@ -1,5 +1,5 @@
 #pragma once
-#include "vk_types.h"
+#include "types.h"
 
 #include <glm/glm.hpp>
 #include <vector>

@@ -25,6 +25,12 @@ public static class InteropUtils
 		{
 			return b ? new IntPtr( 1 ) : IntPtr.Zero;
 		}
+		else if ( obj.GetType().IsValueType )
+		{
+			var ptr = Marshal.AllocHGlobal( Marshal.SizeOf( obj ) );
+			Marshal.StructureToPtr( obj, ptr, false );
+			return ptr;
+		}
 		else
 		{
 			Log.Error( $"Couldn't convert {obj} to pointer (type {obj.GetType()})" );

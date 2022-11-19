@@ -1,5 +1,5 @@
 #pragma once
-#include "g_types.h"
+#include "types.h"
 
 #include <memory>
 
@@ -9,6 +9,10 @@ class Camera
 public:
 	Transform m_transform = {};
 
+	Camera();
+	void SetPosition( Vector3 position );
 	void Update( int m_frameNumber );
+
+	//@InteropGen ignore
 	glm::mat4 GetProjectionViewMatrix();
 };

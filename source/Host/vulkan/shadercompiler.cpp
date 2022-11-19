@@ -1,4 +1,4 @@
-#include "vk_shadercompiler.h"
+#include "shadercompiler.h"
 
 void ShaderCompiler::InitResources( TBuiltInResource& Resources )
 {

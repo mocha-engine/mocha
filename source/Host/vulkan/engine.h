@@ -1,12 +1,15 @@
 #pragma once
-#include "../game/g_camera.h"
-#include "../game/g_model.h"
-#include "../game/g_types.h"
-#include "../window.h"
-#include "vk_types.h"
 
 #include <glm/glm.hpp>
 #include <vector>
+
+// Vulkan types
+#include "types.h"
+#include "../window.h"
+
+class Model;
+class ManagedHost;
+class Camera;
 
 class CNativeEngine
 {
@@ -51,11 +54,13 @@ public:
 
 	VmaAllocator m_allocator;
 
-	Model m_triangle;
-	Camera m_camera;
+	Model* m_triangle;
+	Camera* m_camera;
 
 	void Init();
 	void Cleanup();
 	void Render();
-	void Run();
+	void Run( ManagedHost* managedHost );
+
+	void SetCamera( Camera* camera );
 };

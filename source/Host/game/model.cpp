@@ -1,9 +1,9 @@
-#include "g_model.h"
+#include "model.h"
 
-#include "../vulkan/vk_types.h"
+#include "../vulkan/types.h"
 
 #include <globalvars.h>
-#include <vulkan/vk_engine.h>
+#include <vulkan/engine.h>
 
 void Model::InitPipelines()
 {

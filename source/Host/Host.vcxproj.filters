@@ -18,51 +18,48 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\vk_engine.cpp">
+    <ClCompile Include="vulkan\engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="thirdparty\VkBootstrap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\vk_mesh.cpp">
+    <ClCompile Include="vulkan\mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\vk_shadercompiler.cpp">
+    <ClCompile Include="vulkan\shadercompiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\g_model.cpp">
+    <ClCompile Include="game\model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\vk_pipeline.cpp">
+    <ClCompile Include="vulkan\pipeline.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\g_camera.cpp">
+    <ClCompile Include="game\camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="logger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="game\g_shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="managed\ManagedHost.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ManagedModel.cpp">
+    <ClCompile Include="game\managedmodel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vulkan\vk_engine.h">
+    <ClInclude Include="vulkan\engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\vk_initializers.h">
+    <ClInclude Include="vulkan\vkinit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\vk_types.h">
+    <ClInclude Include="vulkan\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\VkBootstrap.h">
@@ -71,31 +68,31 @@
     <ClInclude Include="thirdparty\renderdoc_app.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\vk_mesh.h">
+    <ClInclude Include="vulkan\mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\vk_shadercompiler.h">
+    <ClInclude Include="vulkan\shadercompiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\g_model.h">
+    <ClInclude Include="game\model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\vk_pipeline.h">
+    <ClInclude Include="vulkan\pipeline.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\g_camera.h">
+    <ClInclude Include="game\camera.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\g_types.h">
+    <ClInclude Include="game\types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="logger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="game\g_shader.h">
+    <ClInclude Include="game\shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\g_shader.generated.h">
@@ -224,7 +221,7 @@
     <ClInclude Include="globalvars.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ManagedModel.h">
+    <ClInclude Include="game\managedmodel.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
