@@ -4,12 +4,36 @@ public static class Parser
 {
 	private static bool Debug => false;
 
+	private static string[] GetLaunchArgs()
+	{
+		var includeDirs = new string[]
+		{
+			"C:\\VulkanSDK\\1.3.224.1\\Include",
+			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include"
+		};
+
+		var args = new List<string>();
+		args.Add( "-x" );
+		args.Add( "c++" );
+		args.Add( "-fparse-all-comments" );
+
+		args.AddRange( includeDirs.Select( x => "-I" + x ) );
+
+		return args.ToArray();
+	}
+
 	public unsafe static List<IUnit> GetUnits( string path )
 	{
 		List<IUnit> units = new();
 
 		using var index = CXIndex.Create();
-		using var unit = CXTranslationUnit.Parse( index, path, new string[] { "-x", "c++", "-fparse-all-comments" }, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+		using var unit = CXTranslationUnit.Parse( index, path, GetLaunchArgs(), ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+
+		for ( int i = 0; i < unit.NumDiagnostics; ++i )
+		{
+			var diagnostics = unit.GetDiagnostic( (uint)i );
+			Console.WriteLine( $"{diagnostics.Format( CXDiagnostic.DefaultDisplayOptions )}" );
+		}
 
 		var cursor = unit.Cursor;
 
