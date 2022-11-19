@@ -2,7 +2,7 @@
 
 public class Logger
 {
-	public Glue.CLogger? NativeLogger { get; set; }
+	public Glue.Logger? NativeLogger { get; set; }
 
 	public void Trace( object obj ) => NativeLogger?.Trace( obj?.ToString() );
 	public void Info( object obj ) => NativeLogger?.Info( obj?.ToString() );

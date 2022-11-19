@@ -4,13 +4,13 @@
 
 #include <spdlog/spdlog.h>
 
-class CWindow
+class Window
 {
 private:
 	struct SDL_Window* m_window{ nullptr };
 
 public:
-	CWindow( uint32_t width, uint32_t height );
+	Window( uint32_t width, uint32_t height );
 
 	VkSurfaceKHR CreateSurface( VkInstance instance );
 	void Cleanup();

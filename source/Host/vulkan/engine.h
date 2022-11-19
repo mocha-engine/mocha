@@ -11,7 +11,7 @@ class Model;
 class ManagedHost;
 class Camera;
 
-class CNativeEngine
+class NativeEngine
 {
 private:
 	void InitVulkan();
@@ -24,7 +24,7 @@ public:
 	int m_frameNumber{ 0 };
 
 	VkExtent2D m_windowExtent{ 1280, 720 };
-	std::unique_ptr<CWindow> m_window;
+	std::unique_ptr<Window> m_window;
 
 	VkInstance m_instance;
 	VkDebugUtilsMessengerEXT m_debugMessenger;

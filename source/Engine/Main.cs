@@ -9,7 +9,7 @@ public class Main
 	private static void SetupFunctionPointers( IntPtr args )
 	{
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
-		Log.NativeLogger = new Glue.CLogger();
+		Log.NativeLogger = new Glue.Logger();
 	}
 
 	[UnmanagedCallersOnly]
