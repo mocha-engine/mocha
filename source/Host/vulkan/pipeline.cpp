@@ -1,4 +1,4 @@
-#include "vk_pipeline.h"
+#include "pipeline.h"
 
 #include <spdlog/spdlog.h>
 

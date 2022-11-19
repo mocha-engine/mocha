@@ -74,12 +74,6 @@ public class Model : Asset
 
 	public void Render()
 	{
-		if ( IsIndexed )
-		{
-			Log.Error( "fuck off" );
-			throw new Exception( "no" );
-		}
-
-		Log.Trace( "Render" );
+		// Log.Trace( "Render" );
 	}
 }

@@ -7,7 +7,7 @@ struct Vector3
 	float x;
 	float y;
 	float z;
-
+	
 	inline glm::vec3 ToGLM() { return glm::vec3( x, y, z ); }
 };
 

@@ -25,11 +25,19 @@ public class Main
 		Log.Info( $"Parent process: {parentPath}" );
 
 		world = new World();
+		LastUpdate = DateTime.Now;
 	}
+
+	private static DateTime LastUpdate;
 
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
+		var delta = (DateTime.Now - LastUpdate);
+		Time.UpdateFrom( (float)delta.TotalSeconds );
+
+		world.Update();
 		world.Render();
+		LastUpdate = DateTime.Now;
 	}
 }

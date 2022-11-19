@@ -1,11 +1,11 @@
 #pragma once
-#include "../vulkan/vk_initializers.h"
-#include "../vulkan/vk_mesh.h"
-#include "../vulkan/vk_pipeline.h"
-#include "../vulkan/vk_shadercompiler.h"
-#include "../vulkan/vk_types.h"
-#include "g_camera.h"
-#include "g_types.h"
+#include "../vulkan/vkinit.h"
+#include "../vulkan/mesh.h"
+#include "../vulkan/pipeline.h"
+#include "../vulkan/shadercompiler.h"
+#include "../vulkan/types.h"
+#include "camera.h"
+#include "types.h"
 
 #include <fstream>
 #include <glm/ext.hpp>

@@ -1,4 +1,4 @@
-#include "vk_mesh.h"
+#include "mesh.h"
 
 VertexInputDescription Vertex::GetVertexDescription()
 {

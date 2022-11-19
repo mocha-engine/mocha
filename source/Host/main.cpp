@@ -1,5 +1,5 @@
 #include "thirdparty/renderdoc_app.h"
-#include "vulkan/vk_engine.h"
+#include "vulkan/engine.h"
 
 #include "managed/ManagedHost.h"
 
@@ -56,9 +56,10 @@ int main()
 	engine.Init();
 
 	// Start managed bullshit
-	auto managedHost = ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine", L"Run" );
+	auto managedHost = ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine" );
+	managedHost.Invoke( "Run" );
 
-	engine.Run();
+	engine.Run( &managedHost );
 	engine.Cleanup();
 
 	return 0;
