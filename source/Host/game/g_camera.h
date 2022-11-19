@@ -3,6 +3,7 @@
 
 #include <memory>
 
+//@InteropGen generate class
 class Camera
 {
 public:
