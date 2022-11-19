@@ -1,14 +1,17 @@
-#include "vk_engine.h"
+#include "engine.h"
 
+#include "../managed/ManagedHost.h"
 #include "../thirdparty/VkBootstrap.h"
-#include "vk_initializers.h"
-#include "vk_mesh.h"
-#include "vk_shadercompiler.h"
-#include "vk_types.h"
+#include "../window.h"
+#include "mesh.h"
+#include "shadercompiler.h"
+#include "types.h"
+#include "vkinit.h"
 
 #include <fstream>
 #include <glm/ext.hpp>
 #include <iostream>
+#include <memory>
 #include <spdlog/spdlog.h>
 
 #define VMA_IMPLEMENTATION
@@ -183,10 +186,11 @@ void CNativeEngine::Init()
 	InitCommands();
 	InitSyncStructures();
 
-	m_camera = Camera();
+	m_camera = new Camera();
 
-	m_triangle.InitPipelines();
-	m_triangle.UploadTriangleMesh();
+	m_triangle = new Model();
+	m_triangle->InitPipelines();
+	m_triangle->UploadTriangleMesh();
 
 	m_isInitialized = true;
 }
@@ -237,7 +241,7 @@ void CNativeEngine::Render()
 	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
 	VkClearValue depthClear = {};
 	depthClear.depthStencil.depth = 1.0f;
-	
+
 	VkRenderingAttachmentInfo colorAttachmentInfo =
 	    vkinit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, colorClear );
 
@@ -249,7 +253,7 @@ void CNativeEngine::Render()
 	// Start drawing
 	vkCmdBeginRendering( cmd, &renderInfo );
 
-	m_triangle.Render( &m_camera, cmd, m_frameNumber );
+	m_triangle->Render( m_camera, cmd, m_frameNumber );
 
 	// End drawing
 	vkCmdEndRendering( cmd );
@@ -268,7 +272,7 @@ void CNativeEngine::Render()
 	m_frameNumber++;
 }
 
-void CNativeEngine::Run()
+void CNativeEngine::Run( ManagedHost* managedHost )
 {
 	bool bQuit = false;
 
@@ -276,7 +280,14 @@ void CNativeEngine::Run()
 	{
 		bQuit = m_window->Update();
 
-		m_camera.Update( m_frameNumber );
+		managedHost->Invoke( "Render" );
+		m_camera->Update( m_frameNumber );
+
 		Render();
 	}
+}
+
+void CNativeEngine::SetCamera( Camera* camera )
+{
+	m_camera = camera;
 }

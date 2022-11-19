@@ -3,24 +3,11 @@
 public class World
 {
 	public static World Current { get; set; }
-	public static float Bounds => 48f;
 
 	public Camera? Camera { get; set; }
 	public Sun? Sun { get; set; }
 	public Sky? Sky { get; set; }
 	public Player? Player { get; set; }
-
-	public enum States
-	{
-		Playing,
-		Paused
-	}
-
-#if DEBUG
-	public States State { get; set; } = States.Paused;
-#else
-	public States State { get; set; } = States.Playing;
-#endif
 
 	public World()
 	{
@@ -50,8 +37,7 @@ public class World
 
 	public void Update()
 	{
-		if ( State == States.Playing )
-			BaseEntity.All.ForEach( entity => entity.Update() );
+		BaseEntity.All.ForEach( entity => entity.Update() );
 	}
 
 	public void Render()

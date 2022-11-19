@@ -1,7 +1,7 @@
 #pragma once
-#include "vk_initializers.h"
-#include "vk_mesh.h"
-#include "vk_types.h"
+#include "vkinit.h"
+#include "mesh.h"
+#include "types.h"
 
 #include <vector>
 

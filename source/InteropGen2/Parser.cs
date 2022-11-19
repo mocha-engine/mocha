@@ -53,6 +53,9 @@ public static class Parser
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
 
+			if ( cursor.RawCommentText.ToString() == "//@InteropGen ignore" )
+				return CXChildVisitResult.CXChildVisit_Continue;
+
 			switch ( cursor.Kind )
 			{
 				case CXCursorKind.CXCursor_ClassDecl:

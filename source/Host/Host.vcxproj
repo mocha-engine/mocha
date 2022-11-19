@@ -80,7 +80,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)build</OutDir>
     <TargetName>$(ProjectName)</TargetName>
-    <IntDir>tmp\</IntDir>
     <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
@@ -148,37 +147,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="game\g_model.cpp" />
-    <ClCompile Include="game\g_camera.cpp" />
+    <ClCompile Include="game\model.cpp" />
+    <ClCompile Include="game\camera.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="game\g_shader.cpp" />
-    <ClCompile Include="ManagedModel.cpp" />
+    <ClCompile Include="game\managedmodel.cpp" />
     <ClCompile Include="managed\ManagedHost.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
-    <ClCompile Include="vulkan\vk_engine.cpp" />
-    <ClCompile Include="vulkan\vk_mesh.cpp" />
-    <ClCompile Include="vulkan\vk_pipeline.cpp" />
-    <ClCompile Include="vulkan\vk_shadercompiler.cpp" />
+    <ClCompile Include="vulkan\engine.cpp" />
+    <ClCompile Include="vulkan\mesh.cpp" />
+    <ClCompile Include="vulkan\pipeline.cpp" />
+    <ClCompile Include="vulkan\shadercompiler.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="game\g_model.h" />
-    <ClInclude Include="game\g_camera.h" />
-    <ClInclude Include="game\g_types.h" />
+    <ClInclude Include="game\model.h" />
+    <ClInclude Include="game\camera.h" />
+    <ClInclude Include="game\types.h" />
     <ClInclude Include="globalvars.h" />
     <ClInclude Include="logger.h" />
-    <ClInclude Include="game\g_shader.h" />
-    <ClInclude Include="ManagedModel.h" />
+    <ClInclude Include="game\shader.h" />
+    <ClInclude Include="game\managedmodel.h" />
     <ClInclude Include="managed\ManagedHost.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
-    <ClInclude Include="vulkan\vk_engine.h" />
-    <ClInclude Include="vulkan\vk_initializers.h" />
-    <ClInclude Include="vulkan\vk_mesh.h" />
-    <ClInclude Include="vulkan\vk_pipeline.h" />
-    <ClInclude Include="vulkan\vk_shadercompiler.h" />
-    <ClInclude Include="vulkan\vk_types.h" />
+    <ClInclude Include="vulkan\engine.h" />
+    <ClInclude Include="vulkan\vkinit.h" />
+    <ClInclude Include="vulkan\mesh.h" />
+    <ClInclude Include="vulkan\pipeline.h" />
+    <ClInclude Include="vulkan\shadercompiler.h" />
+    <ClInclude Include="vulkan\types.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

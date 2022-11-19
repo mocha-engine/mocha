@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../generated/UnmanagedArgs.generated.h"
+
 #include <Windows.h>
 #include <assert.h>
 #include <coreclr_delegates.h>
@@ -9,8 +11,6 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <tuple>
-
-#include "../generated/UnmanagedArgs.generated.h"
 
 using string_t = std::basic_string<char_t>;
 
@@ -82,20 +82,39 @@ namespace HostGlobals
 
 class ManagedHost
 {
-public:
-	inline ManagedHost( std::wstring basePath, std::wstring signature, std::wstring method )
-	{
-		std::wstring dllPath = basePath + L".dll";
-		std::wstring configPath = basePath + L".runtimeconfig.json";
+private:
+	load_assembly_and_get_function_pointer_fn m_lagfp;
 
-		load_assembly_and_get_function_pointer_fn load_assembly_and_get_function_pointer =
-		    HostGlobals::GetDotnetLoadAssembly( configPath.c_str() );
+	std::wstring m_dllPath;
+	std::wstring m_configPath;
+	std::wstring m_signature;
+
+public:
+	inline ManagedHost( std::wstring basePath, std::wstring signature )
+	{
+		m_dllPath = basePath + L".dll";
+		m_configPath = basePath + L".runtimeconfig.json";
+		m_signature = signature;
+
+		m_lagfp = HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() );
+	}
+
+	inline void Invoke( std::string _method )
+	{
+		// Convert to std::wstring
+		std::wstring method( _method.begin(), _method.end() );
 
 		// Function pointer to managed delegate
 		run_fn fnPtr = nullptr;
-		int rc = load_assembly_and_get_function_pointer(
-		    dllPath.c_str(), signature.c_str(), method.c_str(), UNMANAGEDCALLERSONLY_METHOD, nullptr, ( void** )&fnPtr );
-		
+		int rc = m_lagfp(
+		    m_dllPath.c_str(), m_signature.c_str(), method.c_str(), UNMANAGEDCALLERSONLY_METHOD, nullptr, ( void** )&fnPtr );
+
+		if ( fnPtr == nullptr )
+		{
+			spdlog::error( "Failed to load managed method {}", _method );
+		}
+
+		// Invoke method
 		fnPtr( &args );
 	}
 };
