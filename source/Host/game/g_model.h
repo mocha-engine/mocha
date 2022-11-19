@@ -25,6 +25,8 @@ private:
 	VkPipeline m_pipeline;
 	Mesh m_mesh;
 
+	bool m_bHasIndexBuffer;
+
 public:
 	void InitPipelines();
 

@@ -68,18 +68,43 @@ void Model::UploadMesh( Mesh& mesh )
 	bufferInfo.pNext = nullptr;
 
 	bufferInfo.size = m_mesh.vertices.size() * sizeof( Vertex );
-	bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
 	VmaAllocationCreateInfo vmaallocInfo = {};
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
-	VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
-	    &m_mesh.vertexBuffer.allocation, nullptr ) );
+	//
+	// Vertex buffer
+	//
+	{
+		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		
+		VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
+		    &m_mesh.vertexBuffer.allocation, nullptr ) );
 
-	void* data;
-	vmaMapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation, &data );
-	memcpy( data, m_mesh.vertices.data(), m_mesh.vertices.size() * sizeof( Vertex ) );
-	vmaUnmapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation );
+		void* data;
+		vmaMapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation, &data );
+		memcpy( data, m_mesh.vertices.data(), m_mesh.vertices.size() * sizeof( Vertex ) );
+		vmaUnmapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation );
+	}
+
+	//
+	// Index buffer (if we have any indices)
+	//
+
+	if ( m_mesh.indices.size() > 0 )
+	{
+		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+		
+		VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.indexBuffer.buffer,
+		    &m_mesh.indexBuffer.allocation, nullptr ) );
+
+		void* data;
+		vmaMapMemory( *Global::g_allocator, m_mesh.indexBuffer.allocation, &data );
+		memcpy( data, m_mesh.indices.data(), m_mesh.indices.size() * sizeof( uint32_t ) );
+		vmaUnmapMemory( *Global::g_allocator, m_mesh.indexBuffer.allocation );
+
+		m_bHasIndexBuffer = true;
+	}
 }
 
 bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
@@ -137,6 +162,16 @@ void Model::Render( Camera* camera, VkCommandBuffer cmd, int frameNumber )
 
 	vkCmdPushConstants( cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( MeshPushConstants ), &constants );
 
-	uint32_t vertCount = static_cast<uint32_t>( m_mesh.vertices.size() );
-	vkCmdDraw( cmd, vertCount, 1, 0, 0 );
+	if ( m_bHasIndexBuffer )
+	{
+		vkCmdBindIndexBuffer( cmd, m_mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
+		uint32_t indexCount = static_cast<uint32_t>( m_mesh.indices.size() );
+		vkCmdDraw( cmd, indexCount, 1, 0, 0 );
+		vkCmdDrawIndexed( cmd, indexCount, 1, 0, 0, 0 );	
+	}
+	else 
+	{
+		uint32_t vertCount = static_cast<uint32_t>( m_mesh.vertices.size() );
+		vkCmdDraw( cmd, vertCount, 1, 0, 0 );
+	}
 }
