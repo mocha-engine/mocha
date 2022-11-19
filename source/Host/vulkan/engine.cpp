@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#include "../managed/ManagedHost.h"
+#include "../managed/managedhost.h"
 #include "../thirdparty/VkBootstrap.h"
 #include "../window.h"
 #include "mesh.h"
@@ -276,11 +276,13 @@ void CNativeEngine::Run( ManagedHost* managedHost )
 {
 	bool bQuit = false;
 
+	managedHost->FireEvent( "Event.Game.Load" );
+
 	while ( !bQuit )
 	{
 		bQuit = m_window->Update();
 
-		managedHost->Invoke( "Render" );
+		managedHost->Render();
 		m_camera->Update( m_frameNumber );
 
 		Render();

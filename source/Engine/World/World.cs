@@ -14,7 +14,6 @@ public class World
 		Current = this;
 		Event.Register( this );
 		Event.RegisterStatics();
-		Event.Run( Event.Game.LoadAttribute.Name );
 
 		SetupEntities();
 	}
@@ -43,5 +42,11 @@ public class World
 	public void Render()
 	{
 		BaseEntity.All.ForEach( entity => entity.Render() );
+	}
+
+	[Event.Game.Load]
+	public void OnGameLoad()
+	{
+		Log.Trace( "Event.Game.Load called!" );
 	}
 }

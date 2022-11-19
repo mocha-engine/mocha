@@ -152,7 +152,7 @@
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\managedmodel.cpp" />
-    <ClCompile Include="managed\ManagedHost.cpp" />
+    <ClCompile Include="managed\managedhost.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
     <ClCompile Include="vulkan\engine.cpp" />
     <ClCompile Include="vulkan\mesh.cpp" />
@@ -168,7 +168,7 @@
     <ClInclude Include="logger.h" />
     <ClInclude Include="game\shader.h" />
     <ClInclude Include="game\managedmodel.h" />
-    <ClInclude Include="managed\ManagedHost.h" />
+    <ClInclude Include="managed\managedhost.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
     <ClInclude Include="vulkan\engine.h" />
