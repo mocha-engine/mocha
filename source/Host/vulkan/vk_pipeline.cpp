@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorRenderingFormat )
+VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorFormat, VkFormat depthFormat )
 {
 	VkPipelineViewportStateCreateInfo viewportState = {};
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -26,7 +26,9 @@ VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorRenderingForma
 	pipeline_create.sType = VK_STRUCTURE_TYPE_PIPELINE_RENDERING_CREATE_INFO;
 	pipeline_create.pNext = VK_NULL_HANDLE;
 	pipeline_create.colorAttachmentCount = 1;
-	pipeline_create.pColorAttachmentFormats = &colorRenderingFormat;
+	pipeline_create.pColorAttachmentFormats = &colorFormat;
+	pipeline_create.depthAttachmentFormat = depthFormat;
+	pipeline_create.stencilAttachmentFormat = depthFormat;
 
 	VkGraphicsPipelineCreateInfo pipelineInfo = {};
 	pipelineInfo.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
@@ -40,6 +42,7 @@ VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorRenderingForma
 	pipelineInfo.pRasterizationState = &m_rasterizer;
 	pipelineInfo.pMultisampleState = &m_multisampling;
 	pipelineInfo.pColorBlendState = &colorBlending;
+	pipelineInfo.pDepthStencilState = &m_depthStencil;
 	pipelineInfo.layout = m_pipelineLayout;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;

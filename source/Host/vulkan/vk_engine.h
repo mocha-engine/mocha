@@ -41,6 +41,11 @@ public:
 	std::vector<VkImage> m_swapchainImages;
 	std::vector<VkImageView> m_swapchainImageViews;
 
+	VkImageView m_depthImageView;
+	AllocatedImage m_depthImage;
+
+	VkFormat m_depthFormat;
+
 	VkSemaphore m_presentSemaphore, m_renderSemaphore;
 	VkFence m_renderFence;
 
