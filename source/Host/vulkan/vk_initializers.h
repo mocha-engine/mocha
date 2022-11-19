@@ -102,23 +102,24 @@ namespace vkinit
 		return pipelineLayoutInfo;
 	}
 
-	inline VkRenderingAttachmentInfo RenderingAttachmentInfo( VkImageView imageView )
+	inline VkRenderingAttachmentInfo RenderingAttachmentInfo( VkImageView imageView, VkImageLayout imageLayout, VkClearValue clear )
 	{
 		VkRenderingAttachmentInfo renderingAttachmentInfo = {};
 		renderingAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
 		renderingAttachmentInfo.pNext = nullptr;
 
-		renderingAttachmentInfo.imageLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		renderingAttachmentInfo.imageLayout = imageLayout;
 		renderingAttachmentInfo.resolveMode = VK_RESOLVE_MODE_NONE;
 		renderingAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		renderingAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 		renderingAttachmentInfo.imageView = imageView;
-		renderingAttachmentInfo.clearValue = { { { 0.0f, 0.0f, 0.0f } } };
+		renderingAttachmentInfo.clearValue = clear;
 
 		return renderingAttachmentInfo;
 	}
 
-	inline VkRenderingInfo RenderingInfo( VkRenderingAttachmentInfo renderingAttachmentInfo, VkExtent2D extent )
+	inline VkRenderingInfo RenderingInfo(
+	    VkRenderingAttachmentInfo colorAttachmentInfo, VkRenderingAttachmentInfo depthAttachmentInfo, VkExtent2D extent )
 	{
 		VkRenderingInfo renderInfo = {};
 		renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
@@ -126,7 +127,9 @@ namespace vkinit
 		renderInfo.layerCount = 1;
 		renderInfo.renderArea = VkRect2D{ VkOffset2D{}, extent };
 		renderInfo.colorAttachmentCount = 1;
-		renderInfo.pColorAttachments = &renderingAttachmentInfo;
+		renderInfo.pColorAttachments = &colorAttachmentInfo;
+		renderInfo.pDepthAttachment = &depthAttachmentInfo;
+		renderInfo.pStencilAttachment = &depthAttachmentInfo;
 
 		return renderInfo;
 	}
@@ -172,12 +175,73 @@ namespace vkinit
 	inline VkCommandBufferBeginInfo CommandBufferBeginInfo()
 	{
 		VkCommandBufferBeginInfo cmdBeginInfo = {};
-		
+
 		cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		cmdBeginInfo.pNext = nullptr;
 		cmdBeginInfo.pInheritanceInfo = nullptr;
 		cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
 		return cmdBeginInfo;
+	}
+
+	inline VkImageCreateInfo ImageCreateInfo( VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent )
+	{
+		VkImageCreateInfo imageInfo = {};
+		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+		imageInfo.pNext = nullptr;
+
+		imageInfo.imageType = VK_IMAGE_TYPE_2D;
+
+		imageInfo.format = format;
+		imageInfo.extent = extent;
+
+		imageInfo.mipLevels = 1;
+		imageInfo.arrayLayers = 1;
+		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
+
+		imageInfo.usage = usageFlags;
+		imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+		imageInfo.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+		return imageInfo;
+	}
+
+	inline VkImageViewCreateInfo ImageViewCreateInfo( VkFormat format, VkImage image, VkImageAspectFlags aspectFlags )
+	{
+		VkImageViewCreateInfo viewInfo = {};
+		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+		viewInfo.pNext = nullptr;
+
+		viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+		viewInfo.image = image;
+		viewInfo.format = format;
+
+		viewInfo.subresourceRange.baseMipLevel = 0;
+		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.baseArrayLayer = 0;
+		viewInfo.subresourceRange.layerCount = 1;
+
+		viewInfo.subresourceRange.aspectMask = aspectFlags;
+
+		return viewInfo;
+	}
+
+	inline VkPipelineDepthStencilStateCreateInfo DepthStencilCreateInfo(
+	    bool bDepthTest, bool bDepthWrite, VkCompareOp compareOp )
+	{
+		VkPipelineDepthStencilStateCreateInfo info = {};
+		info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+		info.pNext = nullptr;
+
+		info.depthTestEnable = bDepthTest ? VK_TRUE : VK_FALSE;
+		info.depthWriteEnable = bDepthWrite ? VK_TRUE : VK_FALSE;
+		info.depthCompareOp = bDepthTest ? compareOp : VK_COMPARE_OP_ALWAYS;
+		info.depthBoundsTestEnable = VK_FALSE;
+		info.minDepthBounds = 0.0f; // Optional
+		info.maxDepthBounds = 1.0f; // Optional
+		info.stencilTestEnable = VK_FALSE;
+
+		return info;
 	}
 } // namespace vkinit

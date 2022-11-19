@@ -20,7 +20,9 @@ public:
 	VkPipelineMultisampleStateCreateInfo m_multisampling = {};
 	VkPipelineLayout m_pipelineLayout = {};
 
-	VkPipeline Build( VkDevice device, VkFormat colorRenderingFormat );
+	VkPipelineDepthStencilStateCreateInfo m_depthStencil = {};
+
+	VkPipeline Build( VkDevice device, VkFormat depthFormat, VkFormat colorFormat );
 };
 
 class PipelineFactory
@@ -101,7 +103,7 @@ public:
 		return *this;
 	}
 
-	inline VkPipeline Build( VkDevice device, VkFormat swapchainImageFormat )
+	inline VkPipeline Build( VkDevice device, VkFormat colorFormat, VkFormat depthFormat )
 	{
 		PipelineBuilder builder;
 
@@ -124,7 +126,8 @@ public:
 		builder.m_vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( m_vertexDescription.bindings.size() );
 
 		builder.m_inputAssembly = vkinit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
+		builder.m_depthStencil = vkinit::DepthStencilCreateInfo( true, true, VK_COMPARE_OP_LESS_OR_EQUAL );
 
-		return builder.Build( device, swapchainImageFormat );
+		return builder.Build( device, colorFormat, depthFormat );
 	}
 };
