@@ -3,11 +3,11 @@ using System.Runtime.InteropServices;
 [StructLayout( LayoutKind.Sequential )]
 public struct UnmanagedArgs
 {
-    public IntPtr __CLogger_CtorMethodPtr;
-	public IntPtr __CLogger_InfoMethodPtr;
-	public IntPtr __CLogger_WarningMethodPtr;
-	public IntPtr __CLogger_ErrorMethodPtr;
-	public IntPtr __CLogger_TraceMethodPtr;
+    public IntPtr __Logger_CtorMethodPtr;
+	public IntPtr __Logger_InfoMethodPtr;
+	public IntPtr __Logger_WarningMethodPtr;
+	public IntPtr __Logger_ErrorMethodPtr;
+	public IntPtr __Logger_TraceMethodPtr;
 	public IntPtr __Camera_CtorMethodPtr;
 	public IntPtr __Camera_SetPositionMethodPtr;
 	public IntPtr __Camera_UpdateMethodPtr;

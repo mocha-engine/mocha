@@ -1,7 +1,7 @@
 #pragma once
 #include "types.h"
 
-namespace vkinit
+namespace VKInit
 {
 	inline VkPipelineShaderStageCreateInfo PipelineShaderStageCreateInfo(
 	    VkShaderStageFlagBits stage, VkShaderModule shaderModule )
@@ -244,4 +244,4 @@ namespace vkinit
 
 		return info;
 	}
-} // namespace vkinit
+} // namespace VKInit

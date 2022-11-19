@@ -2,10 +2,10 @@
 #include <string>
 
 //@InteropGen generate class
-class CLogger
+class Logger
 {
 public:
-	CLogger();
+	Logger();
 
 	void Info( std::string str );
 	void Warning( std::string str );

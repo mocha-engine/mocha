@@ -1,10 +1,10 @@
 #pragma once
 #include <vk_mem_alloc.h>
 
-class CNativeEngine;
+class NativeEngine;
 
 namespace Global
 {
 	extern VmaAllocator* g_allocator;
-	extern CNativeEngine* g_engine;
+	extern NativeEngine* g_engine;
 }; // namespace Global

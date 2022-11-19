@@ -57,13 +57,13 @@ public:
 
 	inline PipelineFactory WithFragmentShader( VkShaderModule fragmentShader )
 	{
-		m_shaderStages.push_back( vkinit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader ) );
+		m_shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_FRAGMENT_BIT, fragmentShader ) );
 		return *this;
 	}
 
 	inline PipelineFactory WithVertexShader( VkShaderModule vertexShader )
 	{
-		m_shaderStages.push_back( vkinit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_VERTEX_BIT, vertexShader ) );
+		m_shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_VERTEX_BIT, vertexShader ) );
 		return *this;
 	}
 
@@ -111,13 +111,13 @@ public:
 		builder.m_scissor = m_scissor;
 		builder.m_pipelineLayout = m_layout;
 
-		builder.m_rasterizer = vkinit::PipelineRasterizationStateCreateInfo( m_fillMode );
-		builder.m_multisampling = vkinit::PipelineMultisampleStateCreateInfo();
-		builder.m_colorBlendAttachment = vkinit::PipelineColorBlendAttachmentState();
+		builder.m_rasterizer = VKInit::PipelineRasterizationStateCreateInfo( m_fillMode );
+		builder.m_multisampling = VKInit::PipelineMultisampleStateCreateInfo();
+		builder.m_colorBlendAttachment = VKInit::PipelineColorBlendAttachmentState();
 
 		builder.m_shaderStages = m_shaderStages;
 
-		builder.m_vertexInputInfo = vkinit::PipelineVertexInputStateCreateInfo();
+		builder.m_vertexInputInfo = VKInit::PipelineVertexInputStateCreateInfo();
 		builder.m_vertexInputInfo.pVertexAttributeDescriptions = m_vertexDescription.attributes.data();
 		builder.m_vertexInputInfo.vertexAttributeDescriptionCount =
 		    static_cast<uint32_t>( m_vertexDescription.attributes.size() );
@@ -125,8 +125,8 @@ public:
 		builder.m_vertexInputInfo.pVertexBindingDescriptions = m_vertexDescription.bindings.data();
 		builder.m_vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( m_vertexDescription.bindings.size() );
 
-		builder.m_inputAssembly = vkinit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
-		builder.m_depthStencil = vkinit::DepthStencilCreateInfo( true, true, VK_COMPARE_OP_LESS_OR_EQUAL );
+		builder.m_inputAssembly = VKInit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
+		builder.m_depthStencil = VKInit::DepthStencilCreateInfo( true, true, VK_COMPARE_OP_LESS_OR_EQUAL );
 
 		return builder.Build( device, colorFormat, depthFormat );
 	}
