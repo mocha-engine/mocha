@@ -26,19 +26,19 @@ public class Model : Asset
 	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
 	{
 		SetupMesh( vertices, indices );
-		CreateUniformBuffer();
 		CreateResources();
 	}
 
 	public Model( string path, Vertex[] vertices, Material material ) : this( path, material, false )
 	{
 		SetupMesh( vertices );
-		CreateUniformBuffer();
 		CreateResources();
 	}
 
 	private void SetupMesh( Vertex[] vertices )
 	{
+		NativeModel = new();
+
 		int strideInBytes = Marshal.SizeOf( typeof( Vertex ) );
 		int sizeInBytes = strideInBytes * vertices.Length;
 
@@ -46,33 +46,30 @@ public class Model : Asset
 		{
 			fixed ( void* data = vertices )
 			{
-				NativeModel = new( sizeInBytes, (IntPtr)data );
+				NativeModel.SetVertexData( sizeInBytes, (IntPtr)data );
 			}
 		}
 	}
 
 	private void SetupMesh( Vertex[] vertices, uint[] indices )
 	{
-		// TODO: Indexed models
-		Log.Trace( "Indices were given but we don't support those yet. Unpacking them" );
+		SetupMesh( vertices );
 
-		// Unpack indices for now
-		var unpackedVertices = new Vertex[indices.Length];
-		int i = 0;
-		foreach ( var index in indices )
+		int strideInBytes = Marshal.SizeOf( typeof( uint ) );
+		int sizeInBytes = strideInBytes * indices.Length;
+
+		unsafe
 		{
-			unpackedVertices[i++] = vertices[index];
+			fixed ( void* data = indices )
+			{
+				NativeModel.SetIndexData( sizeInBytes, (IntPtr)data );
+			}
 		}
-
-		SetupMesh( unpackedVertices );
 	}
 
 	private void CreateResources()
 	{
-	}
-
-	private void CreateUniformBuffer()
-	{
+		NativeModel.Finish();
 	}
 
 	public void Render()
