@@ -7,6 +7,15 @@ static class Utils
 		if ( nativeType == "void" )
 			return nativeType;
 
+		if ( nativeType == "glm::vec2" )
+			return "Vector2";
+
+		if ( nativeType == "glm::vec3" )
+			return "Vector3";
+
+		if ( nativeType == "glm::mat4" )
+			return "Matrix4x4";
+
 		if ( nativeType.EndsWith( "*" ) )
 		{
 			// Pointer

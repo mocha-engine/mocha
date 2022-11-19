@@ -1,10 +1,10 @@
-﻿using System.ComponentModel;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 [Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
 public class Camera : BaseEntity
 {
+	private Glue.Camera NativeCamera { get; set; }
+
 	[HideInInspector]
 	public SceneCamera SceneCamera { get; set; }
 
@@ -22,6 +22,7 @@ public class Camera : BaseEntity
 
 	public Camera()
 	{
+		NativeCamera = new();
 		SceneCamera = new( this );
 	}
 

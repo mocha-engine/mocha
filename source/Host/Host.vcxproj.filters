@@ -107,6 +107,9 @@
     <ClInclude Include="generated\logger.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\ManagedModel.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,16 +146,7 @@
     <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\*.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\*.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="managed\ManagedHost.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\g_shader.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">

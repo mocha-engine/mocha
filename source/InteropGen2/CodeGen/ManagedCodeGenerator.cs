@@ -129,7 +129,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 		foreach ( var field in sel.Fields )
 		{
-			writer.WriteLine( $"public {field};" );
+			writer.WriteLine( $"public {Utils.GetManagedType( field.Type )} {field.Name};" );
 		}
 
 		writer.Indent--;
