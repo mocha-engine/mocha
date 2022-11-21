@@ -48,7 +48,7 @@ public static class Program
 		// Bail to avoid division by zero
 		if ( batchSize == 0 )
 		{
-			Log.Results();
+			Log.Results( (DateTime.Now - start) );
 			return;
 		}
 
@@ -79,9 +79,7 @@ public static class Program
 		}
 
 		Thread.Sleep( 1000 );
-		var end = DateTime.Now;
-
-		Log.Results( (end - start) );
+		Log.Results( (DateTime.Now - start) );
 	}
 
 	private static void QueueDirectory( ref List<string> queue, string directory )

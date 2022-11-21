@@ -40,4 +40,17 @@ public class Main
 		world.Render();
 		LastUpdate = DateTime.Now;
 	}
+
+	public delegate void FireEventDelegate( IntPtr ptrEventName );
+
+	[UnmanagedCallersOnly]
+	public static void FireEvent( IntPtr args, int sizeBytes )
+	{
+		var eventName = Marshal.PtrToStringUTF8( args );
+
+		if ( eventName == null )
+			return;
+
+		Event.Run( eventName );
+	}
 }

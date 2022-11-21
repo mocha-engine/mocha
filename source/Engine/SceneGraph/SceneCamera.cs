@@ -11,7 +11,7 @@ public class SceneCamera : SceneObject
 
 	private Point2 CurrentSize { get; set; }
 
-	public SceneCamera( IEntity entity ) : base( entity )
+	public SceneCamera( IEntity entity )
 	{
 	}
 
