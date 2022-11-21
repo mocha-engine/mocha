@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
