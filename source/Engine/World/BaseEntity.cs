@@ -73,4 +73,8 @@ public class BaseEntity : IEntity
 	{
 		newParent.parentId = newParent.Id;
 	}
+
+	public void Delete( bool immediate )
+	{
+	}
 }
