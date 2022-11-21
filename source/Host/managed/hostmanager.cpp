@@ -1,4 +1,4 @@
-#include "managedhost.h"
+#include "hostmanager.h"
 
 void* HostGlobals::load_library( const char_t* path )
 {
@@ -56,7 +56,7 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 	return ( load_assembly_and_get_function_pointer_fn )load_assembly_and_get_function_pointer;
 }
 
-ManagedHost::ManagedHost( std::wstring basePath, std::wstring signature )
+HostManager::HostManager( std::wstring basePath, std::wstring signature )
 {
 	m_dllPath = basePath + L".dll";
 	m_configPath = basePath + L".runtimeconfig.json";
@@ -65,24 +65,24 @@ ManagedHost::ManagedHost( std::wstring basePath, std::wstring signature )
 	m_lagfp = HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() );
 }
 
-void ManagedHost::Render()
+void HostManager::Render()
 {
 	Invoke( "Render" );
 }
 
-void ManagedHost::StartUp()
+void HostManager::StartUp()
 {
 	Invoke( "Run", ( void* )&args );
 }
 
-void ManagedHost::ShutDown() {}
+void HostManager::ShutDown() {}
 
-void ManagedHost::FireEvent( std::string eventName )
+void HostManager::FireEvent( std::string eventName )
 {
 	Invoke( "FireEvent", ( void* )eventName.c_str() );
 }
 
-inline void ManagedHost::Invoke( std::string _method, void* params, const char_t* delegateTypeName )
+inline void HostManager::Invoke( std::string _method, void* params, const char_t* delegateTypeName )
 {
 	// Convert to std::wstring
 	std::wstring method( _method.begin(), _method.end() );

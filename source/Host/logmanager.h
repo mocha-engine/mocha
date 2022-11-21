@@ -5,10 +5,10 @@
 #include <subsystem.h>
 
 //@InteropGen generate class
-class Logger : ISubSystem
+class LogManager : ISubSystem
 {
 public:
-	Logger();
+	LogManager();
 
 	void StartUp();
 	void ShutDown();

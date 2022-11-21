@@ -3,14 +3,14 @@
 #include "../vulkan/types.h"
 
 #include <globalvars.h>
-#include <vulkan/engine.h>
+#include <vulkan/rendermanager.h>
 
 void Model::InitPipelines()
 {
-	VkDevice device = g_engine->m_device;
-	VkExtent2D windowExtent = g_engine->m_windowExtent;
-	VkFormat colorFormat = g_engine->m_swapchainImageFormat;
-	VkFormat depthFormat = g_engine->m_depthFormat;
+	VkDevice device = g_renderManager->m_device;
+	VkExtent2D windowExtent = g_renderManager->m_windowExtent;
+	VkFormat colorFormat = g_renderManager->m_swapchainImageFormat;
+	VkFormat depthFormat = g_renderManager->m_depthFormat;
 
 	VkShaderModule triangleFragShader;
 	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
@@ -109,7 +109,7 @@ void Model::UploadMesh( Mesh& mesh )
 
 bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
 {
-	VkDevice device = g_engine->m_device;
+	VkDevice device = g_renderManager->m_device;
 
 	std::string line, text;
 	std::ifstream in( filePath );

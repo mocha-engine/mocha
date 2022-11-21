@@ -1,19 +1,19 @@
 #pragma once
 #include <vk_mem_alloc.h>
 
-class NativeEngine;
-class Renderdoc;
-class ManagedHost;
-class Logger;
+class RenderManager;
+class RenderdocManager;
+class HostManager;
+class LogManager;
 
 //
 // Global vars
 //
 extern VmaAllocator* g_allocator;
-extern NativeEngine* g_engine;
-extern Logger* g_logger;
-extern ManagedHost* g_managedHost;
-extern Renderdoc* g_renderdoc;
+extern RenderManager* g_renderManager;
+extern LogManager* g_logManager;
+extern HostManager* g_hostManager;
+extern RenderdocManager* g_renderdocManager;
 
 extern float g_curTime;
 extern float g_frameTime;

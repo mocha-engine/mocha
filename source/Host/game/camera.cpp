@@ -3,7 +3,7 @@
 #include <glm/ext.hpp>
 
 #include <globalvars.h>
-#include <vulkan/engine.h>
+#include <vulkan/rendermanager.h>
 
 Camera::Camera() 
 {
@@ -11,7 +11,7 @@ Camera::Camera()
 
 void Camera::SetPosition( Vector3 position )
 {
-	g_engine->SetCamera( this );
+	g_renderManager->SetCamera( this );
 	
 	m_transform.position = position;
 }

@@ -1,6 +1,6 @@
 #include "ManagedModel.h"
 
-#include "../vulkan/engine.h"
+#include "../vulkan/rendermanager.h"
 #include "globalvars.h"
 
 #include <spdlog/spdlog.h>
@@ -36,5 +36,5 @@ void ManagedModel::Finish()
 	m_model.InitPipelines();
 	m_model.UploadMesh( m_mesh );
 
-	g_engine->m_triangle = &m_model;
+	g_renderManager->m_triangle = &m_model;
 }

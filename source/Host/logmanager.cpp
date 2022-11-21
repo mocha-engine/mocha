@@ -1,12 +1,12 @@
-#include "logger.h"
+#include "logmanager.h"
 
 #include "spdlog/spdlog.h"
 
 #include <iostream>
 
-Logger::Logger() {}
+LogManager::LogManager() {}
 
-void Logger::StartUp()
+void LogManager::StartUp()
 {
 	// Setup spdlog
 	auto managed = spdlog::stdout_color_mt( "managed" );
@@ -19,24 +19,24 @@ void Logger::StartUp()
 	spdlog::set_pattern( "%H:%M:%S %-8n %^%-8l%$ %v" );
 }
 
-void Logger::ShutDown() {}
+void LogManager::ShutDown() {}
 
-void Logger::Info( std::string str )
+void LogManager::Info( std::string str )
 {
 	spdlog::get( "managed" )->info( str );
 }
 
-void Logger::Warning( std::string str )
+void LogManager::Warning( std::string str )
 {
 	spdlog::get( "managed" )->warn( str );
 }
 
-void Logger::Error( std::string str )
+void LogManager::Error( std::string str )
 {
 	spdlog::get( "managed" )->error( str );
 }
 
-void Logger::Trace( std::string str )
+void LogManager::Trace( std::string str )
 {
 	spdlog::get( "managed" )->trace( str );
 }
