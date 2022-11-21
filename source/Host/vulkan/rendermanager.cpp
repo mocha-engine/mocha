@@ -202,7 +202,7 @@ void RenderManager::InitImGUI()
 	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	pool_info.maxSets = 1000;
-	pool_info.poolSizeCount = std::size( pool_sizes );
+	pool_info.poolSizeCount = (uint32_t)std::size( pool_sizes );
 	pool_info.pPoolSizes = pool_sizes;
 
 	VkDescriptorPool imguiPool;
@@ -230,7 +230,7 @@ void RenderManager::InitImGUI()
 #endif
 }
 
-void RenderManager::StartUp()
+void RenderManager::Startup()
 {
 	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
 
@@ -254,7 +254,7 @@ void RenderManager::StartUp()
 	m_isInitialized = true;
 }
 
-void RenderManager::ShutDown()
+void RenderManager::Shutdown()
 {
 	if ( m_isInitialized )
 	{

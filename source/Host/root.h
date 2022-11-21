@@ -10,7 +10,7 @@ public:
 		return instance;
 	}
 
-	void StartUp();
+	void Startup();
 	void Run();
-	void ShutDown();
+	void Shutdown();
 };

@@ -4,7 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-void RenderdocManager::StartUp()
+void RenderdocManager::Startup()
 {
 	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
@@ -27,4 +27,4 @@ void RenderdocManager::StartUp()
 	assert( ret == 1 );
 }
 
-void RenderdocManager::ShutDown() {}
+void RenderdocManager::Shutdown() {}

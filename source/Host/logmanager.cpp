@@ -6,7 +6,7 @@
 
 LogManager::LogManager() {}
 
-void LogManager::StartUp()
+void LogManager::Startup()
 {
 	// Setup spdlog
 	auto managed = spdlog::stdout_color_mt( "managed" );
@@ -19,7 +19,7 @@ void LogManager::StartUp()
 	spdlog::set_pattern( "%H:%M:%S %-8n %^%-8l%$ %v" );
 }
 
-void LogManager::ShutDown() {}
+void LogManager::Shutdown() {}
 
 void LogManager::Info( std::string str )
 {

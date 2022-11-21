@@ -4,8 +4,8 @@ using System.Runtime.InteropServices;
 public struct UnmanagedArgs
 {
     public IntPtr __LogManager_CtorMethodPtr;
-	public IntPtr __LogManager_StartUpMethodPtr;
-	public IntPtr __LogManager_ShutDownMethodPtr;
+	public IntPtr __LogManager_StartupMethodPtr;
+	public IntPtr __LogManager_ShutdownMethodPtr;
 	public IntPtr __LogManager_InfoMethodPtr;
 	public IntPtr __LogManager_WarningMethodPtr;
 	public IntPtr __LogManager_ErrorMethodPtr;

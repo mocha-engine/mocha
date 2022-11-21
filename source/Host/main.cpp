@@ -5,9 +5,9 @@ int main()
 {
 	auto& root = Root::GetInstance();
 
-	root.StartUp();
+	root.Startup();
 	root.Run();
-	root.ShutDown();
+	root.Shutdown();
 
 	return 0;
 }
