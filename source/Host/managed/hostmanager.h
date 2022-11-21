@@ -31,7 +31,7 @@ namespace HostGlobals
 
 }; // namespace HostGlobals
 
-class ManagedHost : ISubSystem
+class HostManager : ISubSystem
 {
 private:
 	load_assembly_and_get_function_pointer_fn m_lagfp;
@@ -43,7 +43,7 @@ private:
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
 
 public:
-	ManagedHost( std::wstring basePath, std::wstring signature );
+	HostManager( std::wstring basePath, std::wstring signature );
 
 	void StartUp();
 	void ShutDown();

@@ -1,10 +1,10 @@
-#include "renderdoc.h"
+#include "renderdocmanager.h"
 
 #include "thirdparty/renderdoc_app.h"
 
 #include <spdlog/spdlog.h>
 
-void Renderdoc::StartUp()
+void RenderdocManager::StartUp()
 {
 	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
@@ -27,4 +27,4 @@ void Renderdoc::StartUp()
 	assert( ret == 1 );
 }
 
-void Renderdoc::ShutDown() {}
+void RenderdocManager::ShutDown() {}

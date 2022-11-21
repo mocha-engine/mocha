@@ -1,6 +1,6 @@
-#include "engine.h"
+#include "rendermanager.h"
 
-#include "../managed/managedhost.h"
+#include "../managed/hostmanager.h"
 #include "../thirdparty/VkBootstrap.h"
 #include "../window.h"
 #include "mesh.h"
@@ -48,7 +48,7 @@ VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
 	return VK_FALSE;
 }
 
-void NativeEngine::InitVulkan()
+void RenderManager::InitVulkan()
 {
 	vkb::InstanceBuilder builder;
 
@@ -92,7 +92,7 @@ void NativeEngine::InitVulkan()
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
 }
 
-void NativeEngine::InitSwapchain()
+void RenderManager::InitSwapchain()
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
 
@@ -131,7 +131,7 @@ void NativeEngine::InitSwapchain()
 	VK_CHECK( vkCreateImageView( m_device, &depthViewInfo, nullptr, &m_depthImageView ) );
 }
 
-void NativeEngine::InitCommands()
+void RenderManager::InitCommands()
 {
 	VkCommandPoolCreateInfo commandPoolInfo = {};
 	commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -158,7 +158,7 @@ void NativeEngine::InitCommands()
 	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_uploadContext.commandBuffer ) );
 }
 
-void NativeEngine::InitSyncStructures()
+void RenderManager::InitSyncStructures()
 {
 	VkFenceCreateInfo fenceCreateInfo = {};
 	fenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -186,7 +186,7 @@ void NativeEngine::InitSyncStructures()
 	vkResetFences( m_device, 1, &m_uploadContext.uploadFence );
 }
 
-void NativeEngine::InitImGUI()
+void RenderManager::InitImGUI()
 {
 #ifdef _IMGUI
 
@@ -229,14 +229,14 @@ void NativeEngine::InitImGUI()
 #endif
 }
 
-void NativeEngine::StartUp()
+void RenderManager::StartUp()
 {
 	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
 
 	InitVulkan();
 
 	// Set up global vars
-	g_engine = this;
+	g_renderManager = this;
 	g_allocator = &m_allocator;
 
 	InitSwapchain();
@@ -253,7 +253,7 @@ void NativeEngine::StartUp()
 	m_isInitialized = true;
 }
 
-void NativeEngine::ShutDown()
+void RenderManager::ShutDown()
 {
 	if ( m_isInitialized )
 	{
@@ -276,7 +276,7 @@ void NativeEngine::ShutDown()
 	}
 }
 
-void NativeEngine::Render()
+void RenderManager::Render()
 {
 #ifdef _IMGUI
 	ImGui::Render();
@@ -376,11 +376,11 @@ void NativeEngine::Render()
 	m_frameNumber++;
 }
 
-void NativeEngine::Run()
+void RenderManager::Run()
 {
 	bool bQuit = false;
 
-	g_managedHost->FireEvent( "Event.Game.Load" );
+	g_hostManager->FireEvent( "Event.Game.Load" );
 
 	while ( !bQuit )
 	{
@@ -394,14 +394,14 @@ void NativeEngine::Run()
 		Editor::Draw();
 #endif
 
-		g_managedHost->Render();
+		g_hostManager->Render();
 		m_camera->Update( m_frameNumber );
 
 		Render();
 	}
 }
 
-void NativeEngine::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function )
+void RenderManager::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function )
 {
 	VkCommandBuffer cmd = m_uploadContext.commandBuffer;
 	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
@@ -420,7 +420,7 @@ void NativeEngine::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&&
 	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
 }
 
-void NativeEngine::SetCamera( Camera* camera )
+void RenderManager::SetCamera( Camera* camera )
 {
 	m_camera = camera;
 }

@@ -2,7 +2,7 @@
 
 #include <subsystem.h>
 
-class Renderdoc : ISubSystem
+class RenderdocManager : ISubSystem
 {
 public:
 	void StartUp();

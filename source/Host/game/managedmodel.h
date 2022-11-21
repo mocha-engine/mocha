@@ -4,7 +4,7 @@
 #include "game/model.h"
 
 struct Mesh;
-class NativeEngine;
+class RenderManager;
 
 //@InteropGen generate class
 class ManagedModel
