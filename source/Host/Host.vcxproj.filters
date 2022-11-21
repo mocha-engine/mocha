@@ -13,115 +13,106 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\Managers">
+      <UniqueIdentifier>{d8a92329-163f-4743-bd8c-9a18688162a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entities">
+      <UniqueIdentifier>{9917ff40-e6a6-4ba5-a0aa-b54e28f6810c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Thirdparty">
+      <UniqueIdentifier>{b8800892-a38d-4e8b-a5c8-00c57ad936f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Rendering">
+      <UniqueIdentifier>{03867828-cba3-4ead-9f43-fbeafa1445b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Managed">
+      <UniqueIdentifier>{50eeb928-6795-4de9-bae9-97e9b18f5ae8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{d9847a32-be91-47bf-bcae-c2df80dd7305}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Managers">
+      <UniqueIdentifier>{d0df6fbe-44e6-4c41-a0bf-b1c6f7e8efa5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Managed">
+      <UniqueIdentifier>{c3ac4f6e-6f5a-47fd-866e-efaf4738f45c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Rendering">
+      <UniqueIdentifier>{c42c252b-4332-410f-9f5c-0d71d0f4621c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Thirdparty">
+      <UniqueIdentifier>{cb4e1110-9e18-47bf-86ef-3258190dea8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Misc">
+      <UniqueIdentifier>{deff4fa0-2c23-4a10-a194-0d35cc148162}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\engine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\VkBootstrap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vulkan\mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vulkan\shadercompiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="vulkan\pipeline.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="managed\ManagedHost.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="game\managedmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_tables.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_demo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_impl_sdl.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\imgui\imgui_impl_vulkan.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="root.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="renderdoc.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="renderdocmanager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="logmanager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="managed\hostmanager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan\rendermanager.cpp">
+      <Filter>Source Files\Managers</Filter>
+    </ClCompile>
+    <ClCompile Include="game\camera.cpp">
+      <Filter>Source Files\Entities</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_demo.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_impl_sdl.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_impl_vulkan.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\imgui\imgui_tables.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\VkBootstrap.cpp">
+      <Filter>Source Files\Thirdparty</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan\pipeline.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="game\model.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan\mesh.cpp">
+      <Filter>Source Files\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="game\managedmodel.cpp">
+      <Filter>Source Files\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan\shadercompiler.cpp">
+      <Filter>Source Files\Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="vulkan\engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\vkinit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\VkBootstrap.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\renderdoc_app.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\mesh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\shadercompiler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\model.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\pipeline.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\shader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="generated\editor.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -170,9 +161,6 @@
     <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="managed\ManagedHost.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -243,49 +231,94 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\vk_mesh.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="globalvars.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="game\managedmodel.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imgui_impl_vulkan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imgui_internal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imstb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imstb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\imgui\imconfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\imgui\imgui.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\imgui\imgui_impl_sdl.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui_impl_vulkan.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imgui_internal.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_textedit.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imstb_truetype.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\imgui\imconfig.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\VkBootstrap.h">
+      <Filter>Header Files\Thirdparty</Filter>
+    </ClInclude>
+    <ClInclude Include="game\managedmodel.h">
+      <Filter>Header Files\Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="managed\hostmanager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\shadercompiler.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="globalvars.h">
+      <Filter>Header Files\Misc</Filter>
     </ClInclude>
     <ClInclude Include="vulkan\editor.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Managed</Filter>
     </ClInclude>
-    <ClInclude Include="root.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="game\camera.h">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="renderdoc.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="vulkan\mesh.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="game\model.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\pipeline.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="renderdocmanager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\renderdoc_app.h">
+      <Filter>Header Files\Thirdparty</Filter>
     </ClInclude>
     <ClInclude Include="subsystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="window.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\vkinit.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\types.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="game\types.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan\rendermanager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="logmanager.h">
+      <Filter>Header Files\Managers</Filter>
+    </ClInclude>
+    <ClInclude Include="root.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="game\shader.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
