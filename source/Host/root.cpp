@@ -1,5 +1,6 @@
 #include "root.h"
 
+#include <defs.h>
 #include <globalvars.h>
 #include <logmanager.h>
 #include <managed/hostmanager.h>
@@ -28,7 +29,7 @@ void Root::StartUp()
 	g_renderManager = new RenderManager();
 	g_renderManager->StartUp();
 
-	g_hostManager = new HostManager( L".\\build\\Engine", L"Mocha.Main, Engine" );
+	g_hostManager = new HostManager( MANAGED_PATH, MANAGED_CLASS );
 	g_hostManager->StartUp();
 }
 

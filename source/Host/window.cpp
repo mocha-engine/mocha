@@ -1,5 +1,7 @@
 #include "window.h"
 
+#include <defs.h>
+
 #ifdef _IMGUI
 #include <thirdparty/imgui/imgui.h>
 #include <thirdparty/imgui/imgui_impl_sdl.h>
@@ -11,7 +13,7 @@ Window::Window( uint32_t width, uint32_t height )
 
 	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 
-	m_window = SDL_CreateWindow( "Mocha", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
+	m_window = SDL_CreateWindow( GAME_NAME, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 }
 
 VkSurfaceKHR Window::CreateSurface( VkInstance instance )
@@ -44,10 +46,10 @@ bool Window::Update()
 			spdlog::info( "Key down: {}", c );
 		}
 
-		#ifdef _IMGUI
+#ifdef _IMGUI
 		// Pipe event to imgui too
 		ImGui_ImplSDL2_ProcessEvent( &e );
-		#endif
+#endif
 	}
 
 	return false;
