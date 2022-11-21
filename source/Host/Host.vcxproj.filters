@@ -320,6 +320,9 @@
     <ClInclude Include="root.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="defs.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="C:\Program Files\RenderDoc\renderdoc.dll" />

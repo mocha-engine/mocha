@@ -170,6 +170,7 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="defs.h" />
     <ClInclude Include="renderdocmanager.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
