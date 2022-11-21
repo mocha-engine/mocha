@@ -8,6 +8,7 @@
 #include "types.h"
 #include "vkinit.h"
 
+#include <defs.h>
 #include <fstream>
 #include <glm/ext.hpp>
 #include <iostream>
@@ -52,8 +53,8 @@ void RenderManager::InitVulkan()
 {
 	vkb::InstanceBuilder builder;
 
-	auto ret = builder.set_app_name( "Mocha VK" )
-	               .set_engine_name( "Mocha" )
+	auto ret = builder.set_app_name( GAME_NAME )
+	               .set_engine_name( ENGINE_NAME )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
 	               .set_debug_callback( &DebugCallback )
