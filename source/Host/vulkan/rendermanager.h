@@ -60,8 +60,8 @@ public:
 	Model* m_triangle;
 	Camera* m_camera;
 
-	void StartUp();
-	void ShutDown();
+	void Startup();
+	void Shutdown();
 	
 	void Render();
 	void Run();

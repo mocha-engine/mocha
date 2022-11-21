@@ -45,8 +45,8 @@ private:
 public:
 	HostManager( std::wstring basePath, std::wstring signature );
 
-	void StartUp();
-	void ShutDown();
+	void Startup();
+	void Shutdown();
 
 	void Render();
 	void FireEvent( std::string eventName );

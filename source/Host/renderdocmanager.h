@@ -5,6 +5,6 @@
 class RenderdocManager : ISubSystem
 {
 public:
-	void StartUp();
-	void ShutDown();
+	void Startup();
+	void Shutdown();
 };

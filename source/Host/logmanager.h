@@ -10,8 +10,8 @@ class LogManager : ISubSystem
 public:
 	LogManager();
 
-	void StartUp();
-	void ShutDown();
+	void Startup();
+	void Shutdown();
 
 	void Info( std::string str );
 	void Warning( std::string str );

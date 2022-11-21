@@ -70,12 +70,12 @@ void HostManager::Render()
 	Invoke( "Render" );
 }
 
-void HostManager::StartUp()
+void HostManager::Startup()
 {
 	Invoke( "Run", ( void* )&args );
 }
 
-void HostManager::ShutDown() {}
+void HostManager::Shutdown() {}
 
 void HostManager::FireEvent( std::string eventName )
 {
