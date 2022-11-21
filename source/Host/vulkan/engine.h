@@ -64,7 +64,7 @@ public:
 	void ShutDown();
 	
 	void Render();
-	void Run( ManagedHost* managedHost );
+	void Run();
 
 	UploadContext m_uploadContext;
 	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );

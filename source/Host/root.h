@@ -11,5 +11,6 @@ public:
 	}
 
 	void StartUp();
+	void Run();
 	void ShutDown();
 };
