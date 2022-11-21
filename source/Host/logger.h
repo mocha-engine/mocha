@@ -1,11 +1,17 @@
 #pragma once
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 #include <string>
+#include <subsystem.h>
 
 //@InteropGen generate class
-class Logger
+class Logger : ISubSystem
 {
 public:
 	Logger();
+
+	void StartUp();
+	void ShutDown();
 
 	void Info( std::string str );
 	void Warning( std::string str );

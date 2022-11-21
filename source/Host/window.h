@@ -15,4 +15,6 @@ public:
 	VkSurfaceKHR CreateSurface( VkInstance instance );
 	void Cleanup();
 	bool Update();
+
+	inline SDL_Window* GetSDLWindow() { return m_window; }
 };

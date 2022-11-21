@@ -16,4 +16,5 @@ public struct UnmanagedArgs
 	public IntPtr __ManagedModel_FinishMethodPtr;
 	public IntPtr __ManagedModel_CtorMethodPtr;
 	public IntPtr __Shader_CtorMethodPtr;
+	public IntPtr __Editor_GetImGuiContextMethodPtr;
 }

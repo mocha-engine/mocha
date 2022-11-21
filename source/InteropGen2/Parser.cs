@@ -2,14 +2,15 @@
 
 public static class Parser
 {
-	private static bool Debug => false;
+	private static bool Debug => true;
 
 	private static string[] GetLaunchArgs()
 	{
 		var includeDirs = new string[]
 		{
 			"C:\\VulkanSDK\\1.3.224.1\\Include",
-			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include"
+			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include",
+			"../Host/"
 		};
 
 		var args = new List<string>();
@@ -66,8 +67,16 @@ public static class Parser
 					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate struct" )
 						units.Add( new Structure( cursor.Spelling.ToString() ) );
 					break;
+				case CXCursorKind.CXCursor_Namespace:
+					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate class" )
+						units.Add( new Class( cursor.Spelling.ToString() )
+						{
+							IsNamespace = true
+						} );
+					break;
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
+				case CXCursorKind.CXCursor_FunctionDecl:
 					{
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var o = units.FirstOrDefault( x => x.Name == oName );
@@ -77,7 +86,10 @@ public static class Parser
 						};
 
 						if ( o == null )
+						{
+							Console.WriteLine( "No unit" );
 							break;
+						}
 
 						CXCursorVisitor methodChildVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
 						{
@@ -104,7 +116,7 @@ public static class Parser
 							m.IsConstructor = true;
 						}
 
-						if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic )
+						if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic || cursor.Kind == CXCursorKind.CXCursor_FunctionDecl )
 							o.Methods.Add( m );
 
 						break;
@@ -185,7 +197,7 @@ public static class Parser
 		foreach ( var o in units )
 		{
 			// Create a default constructor if one wasn't already defined
-			if ( !o.Methods.Any( x => x.IsConstructor ) )
+			if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
 			{
 				o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
 				{

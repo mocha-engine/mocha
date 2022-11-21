@@ -36,5 +36,5 @@ void ManagedModel::Finish()
 	m_model.InitPipelines();
 	m_model.UploadMesh( m_mesh );
 
-	Global::g_engine->m_triangle = &m_model;
+	g_engine->m_triangle = &m_model;
 }

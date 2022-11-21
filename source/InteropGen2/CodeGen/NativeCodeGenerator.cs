@@ -22,7 +22,10 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 		{
 			if ( unit is Class c )
 			{
-				GenerateClassCode( ref writer, c );
+				if ( c.IsNamespace )
+					GenerateNamespaceCode( ref writer, c );
+				else
+					GenerateClassCode( ref writer, c );
 			}
 
 			if ( unit is Structure s )
@@ -39,6 +42,46 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 	private void GenerateStructCode( ref IndentedTextWriter writer, Structure s )
 	{
 
+	}
+
+	private void GenerateNamespaceCode( ref IndentedTextWriter writer, Class c )
+	{
+		foreach ( var method in c.Methods )
+		{
+			var args = method.Parameters;
+
+			var argStr = string.Join( ", ", args.Select( x =>
+			{
+				if ( x.Type == "std::string" )
+				{
+					return $"const char* {x.Name}";
+				}
+
+				return $"{x.Type} {x.Name}";
+			} ) );
+
+			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
+			var body = "";
+			var @params = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
+
+			var accessor = $"{c.Name}::";
+
+			if ( method.ReturnType == "void" )
+				body += $"{accessor}{method.Name}( {@params} );";
+			else if ( method.ReturnType == "std::string" )
+				body += $"std::string text = {accessor}{method.Name}( {@params} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
+			else
+				body += $"return {accessor}{method.Name}( {@params} );";
+
+			writer.WriteLine( signature );
+			writer.WriteLine( "{" );
+			writer.Indent++;
+
+			writer.WriteLine( body );
+
+			writer.Indent--;
+			writer.WriteLine( "}" );
+		}
 	}
 
 	private void GenerateClassCode( ref IndentedTextWriter writer, Class c )

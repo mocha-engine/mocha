@@ -11,7 +11,7 @@ Camera::Camera()
 
 void Camera::SetPosition( Vector3 position )
 {
-	Global::g_engine->SetCamera( this );
+	g_engine->SetCamera( this );
 	
 	m_transform.position = position;
 }
