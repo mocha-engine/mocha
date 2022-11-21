@@ -7,10 +7,10 @@
 
 void Model::InitPipelines()
 {
-	VkDevice device = Global::g_engine->m_device;
-	VkExtent2D windowExtent = Global::g_engine->m_windowExtent;
-	VkFormat colorFormat = Global::g_engine->m_swapchainImageFormat;
-	VkFormat depthFormat = Global::g_engine->m_depthFormat;
+	VkDevice device = g_engine->m_device;
+	VkExtent2D windowExtent = g_engine->m_windowExtent;
+	VkFormat colorFormat = g_engine->m_swapchainImageFormat;
+	VkFormat depthFormat = g_engine->m_depthFormat;
 
 	VkShaderModule triangleFragShader;
 	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
@@ -78,13 +78,13 @@ void Model::UploadMesh( Mesh& mesh )
 	{
 		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 		
-		VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
+		VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
 		    &m_mesh.vertexBuffer.allocation, nullptr ) );
 
 		void* data;
-		vmaMapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation, &data );
+		vmaMapMemory( *g_allocator, m_mesh.vertexBuffer.allocation, &data );
 		memcpy( data, m_mesh.vertices.data(), m_mesh.vertices.size() * sizeof( Vertex ) );
-		vmaUnmapMemory( *Global::g_allocator, m_mesh.vertexBuffer.allocation );
+		vmaUnmapMemory( *g_allocator, m_mesh.vertexBuffer.allocation );
 	}
 
 	//
@@ -95,13 +95,13 @@ void Model::UploadMesh( Mesh& mesh )
 	{
 		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 		
-		VK_CHECK( vmaCreateBuffer( *Global::g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.indexBuffer.buffer,
+		VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.indexBuffer.buffer,
 		    &m_mesh.indexBuffer.allocation, nullptr ) );
 
 		void* data;
-		vmaMapMemory( *Global::g_allocator, m_mesh.indexBuffer.allocation, &data );
+		vmaMapMemory( *g_allocator, m_mesh.indexBuffer.allocation, &data );
 		memcpy( data, m_mesh.indices.data(), m_mesh.indices.size() * sizeof( uint32_t ) );
-		vmaUnmapMemory( *Global::g_allocator, m_mesh.indexBuffer.allocation );
+		vmaUnmapMemory( *g_allocator, m_mesh.indexBuffer.allocation );
 
 		m_bHasIndexBuffer = true;
 	}
@@ -109,7 +109,7 @@ void Model::UploadMesh( Mesh& mesh )
 
 bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
 {
-	VkDevice device = Global::g_engine->m_device;
+	VkDevice device = g_engine->m_device;
 
 	std::string line, text;
 	std::ifstream in( filePath );
@@ -166,7 +166,6 @@ void Model::Render( Camera* camera, VkCommandBuffer cmd, int frameNumber )
 	{
 		vkCmdBindIndexBuffer( cmd, m_mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
 		uint32_t indexCount = static_cast<uint32_t>( m_mesh.indices.size() );
-		vkCmdDraw( cmd, indexCount, 1, 0, 0 );
 		vkCmdDrawIndexed( cmd, indexCount, 1, 0, 0, 0 );	
 	}
 	else 

@@ -1,5 +1,10 @@
 #include "window.h"
 
+#ifdef _IMGUI
+#include <thirdparty/imgui/imgui.h>
+#include <thirdparty/imgui/imgui_impl_sdl.h>
+#endif
+
 Window::Window( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
@@ -38,6 +43,11 @@ bool Window::Update()
 			char c = SDL_GetKeyFromScancode( ke.keysym.scancode );
 			spdlog::info( "Key down: {}", c );
 		}
+
+		#ifdef _IMGUI
+		// Pipe event to imgui too
+		ImGui_ImplSDL2_ProcessEvent( &e );
+		#endif
 	}
 
 	return false;

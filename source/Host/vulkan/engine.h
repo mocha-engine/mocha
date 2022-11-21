@@ -2,6 +2,8 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <functional>
+#include <subsystem.h>
 
 // Vulkan types
 #include "types.h"
@@ -11,13 +13,14 @@ class Model;
 class ManagedHost;
 class Camera;
 
-class NativeEngine
+class NativeEngine : ISubSystem
 {
 private:
 	void InitVulkan();
 	void InitSwapchain();
 	void InitCommands();
 	void InitSyncStructures();
+	void InitImGUI();
 
 public:
 	bool m_isInitialized{ false };
@@ -57,10 +60,14 @@ public:
 	Model* m_triangle;
 	Camera* m_camera;
 
-	void Init();
-	void Cleanup();
+	void StartUp();
+	void ShutDown();
+	
 	void Render();
 	void Run( ManagedHost* managedHost );
+
+	UploadContext m_uploadContext;
+	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );
 
 	void SetCamera( Camera* camera );
 };

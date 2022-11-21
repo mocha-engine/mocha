@@ -14,6 +14,13 @@ struct AllocatedImage
 	VmaAllocation allocation;
 };
 
+struct UploadContext
+{
+	VkFence uploadFence;
+	VkCommandPool commandPool;
+	VkCommandBuffer commandBuffer;
+};
+
 #define VK_CHECK( x )                                          \
 	do                                                         \
 	{                                                          \

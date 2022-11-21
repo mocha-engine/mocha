@@ -1,6 +1,6 @@
 #include "engine.h"
 
-#include "../managed/ManagedHost.h"
+#include "../managed/managedhost.h"
 #include "../thirdparty/VkBootstrap.h"
 #include "../window.h"
 #include "mesh.h"
@@ -14,15 +14,15 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 
+#ifdef _IMGUI
+#include <thirdparty/imgui/imgui.h>
+#include <thirdparty/imgui/imgui_impl_sdl.h>
+#include <thirdparty/imgui/imgui_impl_vulkan.h>
+#endif
+
 #define VMA_IMPLEMENTATION
 #include <globalvars.h>
 #include <vk_mem_alloc.h>
-
-namespace Global
-{
-	VmaAllocator* g_allocator;
-	NativeEngine* g_engine;
-} // namespace Global
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
@@ -151,6 +151,11 @@ void NativeEngine::InitCommands()
 	commandAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
 
 	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_commandBuffer ) );
+
+	// create pool for upload context
+	VK_CHECK( vkCreateCommandPool( m_device, &commandPoolInfo, nullptr, &m_uploadContext.commandPool ) );
+	commandAllocInfo.commandPool = m_uploadContext.commandPool;
+	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_uploadContext.commandBuffer ) );
 }
 
 void NativeEngine::InitSyncStructures()
@@ -170,21 +175,74 @@ void NativeEngine::InitSyncStructures()
 
 	VK_CHECK( vkCreateSemaphore( m_device, &semaphoreCreateInfo, nullptr, &m_presentSemaphore ) );
 	VK_CHECK( vkCreateSemaphore( m_device, &semaphoreCreateInfo, nullptr, &m_renderSemaphore ) );
+
+	VkFenceCreateInfo uploadFenceCreateInfo = {};
+	uploadFenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceCreateInfo.pNext = nullptr;
+
+	fenceCreateInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	VK_CHECK( vkCreateFence( m_device, &fenceCreateInfo, nullptr, &m_uploadContext.uploadFence ) );
+	vkResetFences( m_device, 1, &m_uploadContext.uploadFence );
 }
 
-void NativeEngine::Init()
+void NativeEngine::InitImGUI()
+{
+#ifdef _IMGUI
+
+	VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 }, { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 }, { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+
+	VkDescriptorPoolCreateInfo pool_info = {};
+	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+	pool_info.maxSets = 1000;
+	pool_info.poolSizeCount = std::size( pool_sizes );
+	pool_info.pPoolSizes = pool_sizes;
+
+	VkDescriptorPool imguiPool;
+	VK_CHECK( vkCreateDescriptorPool( m_device, &pool_info, nullptr, &imguiPool ) );
+
+	ImGui::CreateContext();
+
+	ImGui_ImplSDL2_InitForVulkan( m_window->GetSDLWindow() );
+
+	ImGui_ImplVulkan_InitInfo init_info = {};
+	init_info.Instance = m_instance;
+	init_info.PhysicalDevice = m_chosenGPU;
+	init_info.Device = m_device;
+	init_info.Queue = m_graphicsQueue;
+	init_info.DescriptorPool = imguiPool;
+	init_info.MinImageCount = 3;
+	init_info.ImageCount = 3;
+	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+	init_info.UseDynamicRendering = true;
+	init_info.ColorAttachmentFormat = m_swapchainImageFormat;
+
+	ImGui_ImplVulkan_Init( &init_info, nullptr );
+	ImmediateSubmit( [&]( VkCommandBuffer cmd ) { ImGui_ImplVulkan_CreateFontsTexture( cmd ); } );
+	ImGui_ImplVulkan_DestroyFontUploadObjects();
+#endif
+}
+
+void NativeEngine::StartUp()
 {
 	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
 
 	InitVulkan();
 
 	// Set up global vars
-	Global::g_engine = this;
-	Global::g_allocator = &m_allocator;
+	g_engine = this;
+	g_allocator = &m_allocator;
 
 	InitSwapchain();
 	InitCommands();
 	InitSyncStructures();
+	InitImGUI();
 
 	m_camera = new Camera();
 
@@ -195,7 +253,7 @@ void NativeEngine::Init()
 	m_isInitialized = true;
 }
 
-void NativeEngine::Cleanup()
+void NativeEngine::ShutDown()
 {
 	if ( m_isInitialized )
 	{
@@ -220,6 +278,10 @@ void NativeEngine::Cleanup()
 
 void NativeEngine::Render()
 {
+#ifdef _IMGUI
+	ImGui::Render();
+#endif
+
 	// Wait until we can render ( 1 second timeout )
 	VK_CHECK( vkWaitForFences( m_device, 1, &m_renderFence, true, 1000000000 ) );
 	VK_CHECK( vkResetFences( m_device, 1, &m_renderFence ) );
@@ -232,8 +294,18 @@ void NativeEngine::Render()
 
 	// Begin command buffer
 	VkCommandBuffer cmd = m_commandBuffer;
-	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo();
+	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
+
+	//
+	// We want to draw the image, so we'll manually transition the layout to
+	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
+	//
+	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_swapchainImages[swapchainImageIndex] );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr,
+	    0, nullptr, 1, &startRenderImageMemoryBarrier );
 
 	// Dynamic rendering
 	VkImageView currentImageView = m_swapchainImageViews[swapchainImageIndex];
@@ -243,25 +315,57 @@ void NativeEngine::Render()
 	depthClear.depthStencil.depth = 1.0f;
 
 	VkRenderingAttachmentInfo colorAttachmentInfo =
-	    VKInit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, colorClear );
+	    VKInit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	colorAttachmentInfo.clearValue = colorClear;
 
 	VkRenderingAttachmentInfo depthAttachmentInfo =
-	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL, depthClear );
+	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
+	depthAttachmentInfo.clearValue = depthClear;
 
-	VkRenderingInfo renderInfo = VKInit::RenderingInfo( colorAttachmentInfo, depthAttachmentInfo, m_windowExtent );
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, m_windowExtent );
 
-	// Start drawing
+	// Draw scene
 	vkCmdBeginRendering( cmd, &renderInfo );
-
 	m_triangle->Render( m_camera, cmd, m_frameNumber );
-
-	// End drawing
 	vkCmdEndRendering( cmd );
+
+#ifdef _IMGUI
+	// Draw UI
+	VkRenderingAttachmentInfo uiAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	uiAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD; // Preserve existing color data (3d scene)
+
+	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, m_windowExtent );
+
+	vkCmdBeginRendering( cmd, &imguiRenderInfo );
+	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
+	vkCmdEndRendering( cmd );
+#endif
+
+	//
+	// We want to present the image, so we'll manually transition the layout to
+	// VK_IMAGE_LAYOUT_PRESENT_SRC_KHR before presenting
+	//
+	VkImageMemoryBarrier endRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, m_swapchainImages[swapchainImageIndex] );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0,
+	    nullptr, 0, nullptr, 1, &endRenderImageMemoryBarrier );
+
 	VK_CHECK( vkEndCommandBuffer( cmd ) );
 
 	// Submit
 	VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-	VkSubmitInfo submit = VKInit::SubmitInfo( &waitStage, &m_presentSemaphore, &m_renderSemaphore, &cmd );
+	VkSubmitInfo submit = VKInit::SubmitInfo( &cmd );
+
+	submit.pWaitDstStageMask = &waitStage;
+
+	submit.waitSemaphoreCount = 1;
+	submit.pWaitSemaphores = &m_presentSemaphore;
+
+	submit.signalSemaphoreCount = 1;
+	submit.pSignalSemaphores = &m_renderSemaphore;
+
 	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_renderFence ) );
 
 	// Present
@@ -276,15 +380,44 @@ void NativeEngine::Run( ManagedHost* managedHost )
 {
 	bool bQuit = false;
 
+	managedHost->FireEvent( "Event.Game.Load" );
+
 	while ( !bQuit )
 	{
 		bQuit = m_window->Update();
 
-		managedHost->Invoke( "Render" );
+#ifdef _IMGUI
+		ImGui_ImplVulkan_NewFrame();
+		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
+		ImGui::NewFrame();
+
+		Editor::Draw();
+#endif
+
+		managedHost->Render();
 		m_camera->Update( m_frameNumber );
 
 		Render();
 	}
+}
+
+void NativeEngine::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function )
+{
+	VkCommandBuffer cmd = m_uploadContext.commandBuffer;
+	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
+	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
+
+	function( cmd );
+
+	VK_CHECK( vkEndCommandBuffer( cmd ) );
+
+	VkSubmitInfo submit = VKInit::SubmitInfo( &cmd );
+	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_uploadContext.uploadFence ) );
+
+	vkWaitForFences( m_device, 1, &m_uploadContext.uploadFence, true, 9999999999 );
+	vkResetFences( m_device, 1, &m_uploadContext.uploadFence );
+
+	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
 }
 
 void NativeEngine::SetCamera( Camera* camera )
