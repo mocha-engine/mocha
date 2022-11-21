@@ -1,16 +1,17 @@
 #include "root.h"
 
 #include <globalvars.h>
-#include <logger.h>
-#include <managed/managedhost.h>
-#include <renderdoc.h>
-#include <vulkan/engine.h>
+#include <logmanager.h>
+#include <managed/hostmanager.h>
+#include <renderdocmanager.h>
+#include <vulkan/rendermanager.h>
 
-VmaAllocator* g_allocator;
-NativeEngine* g_engine;
-Logger* g_logger;
-ManagedHost* g_managedHost;
-Renderdoc* g_renderdoc;
+VmaAllocator* g_allocator; // Ugly duckling
+
+RenderManager* g_renderManager;
+LogManager* g_logManager;
+HostManager* g_hostManager;
+RenderdocManager* g_renderdocManager;
 
 void Root::StartUp()
 {
@@ -18,28 +19,28 @@ void Root::StartUp()
 	//		 Should we have a wrapper around VmaAllocator?
 	//		 Should it be part of a 'RenderSystem'?
 
-	g_logger = new Logger();
-	g_logger->StartUp();
+	g_logManager = new LogManager();
+	g_logManager->StartUp();
 
-	g_renderdoc = new Renderdoc();
-	g_renderdoc->StartUp();
+	g_renderdocManager = new RenderdocManager();
+	g_renderdocManager->StartUp();
 
-	g_engine = new NativeEngine();
-	g_engine->StartUp();
+	g_renderManager = new RenderManager();
+	g_renderManager->StartUp();
 
-	g_managedHost = new ManagedHost( L".\\build\\Engine", L"Mocha.Main, Engine" );
-	g_managedHost->StartUp();
+	g_hostManager = new HostManager( L".\\build\\Engine", L"Mocha.Main, Engine" );
+	g_hostManager->StartUp();
 }
 
 void Root::ShutDown()
 {
-	g_managedHost->ShutDown();
-	g_engine->ShutDown();
-	g_renderdoc->ShutDown();
-	g_logger->ShutDown();
+	g_hostManager->ShutDown();
+	g_renderManager->ShutDown();
+	g_renderdocManager->ShutDown();
+	g_logManager->ShutDown();
 }
 
 void Root::Run()
 {
-	g_engine->Run();
+	g_renderManager->Run();
 }

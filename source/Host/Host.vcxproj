@@ -149,11 +149,11 @@
   <ItemGroup>
     <ClCompile Include="game\model.cpp" />
     <ClCompile Include="game\camera.cpp" />
-    <ClCompile Include="logger.cpp" />
+    <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\managedmodel.cpp" />
-    <ClCompile Include="managed\managedhost.cpp" />
-    <ClCompile Include="renderdoc.cpp" />
+    <ClCompile Include="managed\hostmanager.cpp" />
+    <ClCompile Include="renderdocmanager.cpp" />
     <ClCompile Include="root.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
@@ -163,14 +163,14 @@
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="thirdparty\VkBootstrap.cpp" />
-    <ClCompile Include="vulkan\engine.cpp" />
+    <ClCompile Include="vulkan\rendermanager.cpp" />
     <ClCompile Include="vulkan\mesh.cpp" />
     <ClCompile Include="vulkan\pipeline.cpp" />
     <ClCompile Include="vulkan\shadercompiler.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="renderdoc.h" />
+    <ClInclude Include="renderdocmanager.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="vulkan\editor.h" />
@@ -178,10 +178,10 @@
     <ClInclude Include="game\camera.h" />
     <ClInclude Include="game\types.h" />
     <ClInclude Include="globalvars.h" />
-    <ClInclude Include="logger.h" />
+    <ClInclude Include="logmanager.h" />
     <ClInclude Include="game\shader.h" />
     <ClInclude Include="game\managedmodel.h" />
-    <ClInclude Include="managed\managedhost.h" />
+    <ClInclude Include="managed\hostmanager.h" />
     <ClInclude Include="thirdparty\imgui\imconfig.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />
     <ClInclude Include="thirdparty\imgui\imgui_impl_sdl.h" />
@@ -192,7 +192,7 @@
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="thirdparty\renderdoc_app.h" />
     <ClInclude Include="thirdparty\VkBootstrap.h" />
-    <ClInclude Include="vulkan\engine.h" />
+    <ClInclude Include="vulkan\rendermanager.h" />
     <ClInclude Include="vulkan\vkinit.h" />
     <ClInclude Include="vulkan\mesh.h" />
     <ClInclude Include="vulkan\pipeline.h" />

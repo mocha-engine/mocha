@@ -10,10 +10,10 @@
 #include "../window.h"
 
 class Model;
-class ManagedHost;
+class HostManager;
 class Camera;
 
-class NativeEngine : ISubSystem
+class RenderManager : ISubSystem
 {
 private:
 	void InitVulkan();
