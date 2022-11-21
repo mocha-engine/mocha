@@ -376,11 +376,11 @@ void NativeEngine::Render()
 	m_frameNumber++;
 }
 
-void NativeEngine::Run( ManagedHost* managedHost )
+void NativeEngine::Run()
 {
 	bool bQuit = false;
 
-	managedHost->FireEvent( "Event.Game.Load" );
+	g_managedHost->FireEvent( "Event.Game.Load" );
 
 	while ( !bQuit )
 	{
@@ -394,7 +394,7 @@ void NativeEngine::Run( ManagedHost* managedHost )
 		Editor::Draw();
 #endif
 
-		managedHost->Render();
+		g_managedHost->Render();
 		m_camera->Update( m_frameNumber );
 
 		Render();

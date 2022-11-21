@@ -38,3 +38,8 @@ void Root::ShutDown()
 	g_renderdoc->ShutDown();
 	g_logger->ShutDown();
 }
+
+void Root::Run()
+{
+	g_engine->Run();
+}
