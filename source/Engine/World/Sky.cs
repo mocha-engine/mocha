@@ -1,7 +1,4 @@
-﻿using Mocha.Renderer;
-using System.ComponentModel;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 [Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : BaseEntity
