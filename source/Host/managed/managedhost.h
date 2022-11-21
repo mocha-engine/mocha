@@ -10,6 +10,7 @@
 #include <nethost.h>
 #include <spdlog/spdlog.h>
 #include <string>
+#include <subsystem.h>
 #include <tuple>
 
 using string_t = std::basic_string<char_t>;
@@ -30,7 +31,7 @@ namespace HostGlobals
 
 }; // namespace HostGlobals
 
-class ManagedHost
+class ManagedHost : ISubSystem
 {
 private:
 	load_assembly_and_get_function_pointer_fn m_lagfp;
@@ -44,7 +45,9 @@ private:
 public:
 	ManagedHost( std::wstring basePath, std::wstring signature );
 
+	void StartUp();
+	void ShutDown();
+
 	void Render();
-	void Run();
 	void FireEvent( std::string eventName );
 };

@@ -102,7 +102,7 @@ namespace VKInit
 		return pipelineLayoutInfo;
 	}
 
-	inline VkRenderingAttachmentInfo RenderingAttachmentInfo( VkImageView imageView, VkImageLayout imageLayout, VkClearValue clear )
+	inline VkRenderingAttachmentInfo RenderingAttachmentInfo( VkImageView imageView, VkImageLayout imageLayout )
 	{
 		VkRenderingAttachmentInfo renderingAttachmentInfo = {};
 		renderingAttachmentInfo.sType = VK_STRUCTURE_TYPE_RENDERING_ATTACHMENT_INFO;
@@ -113,13 +113,12 @@ namespace VKInit
 		renderingAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 		renderingAttachmentInfo.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
 		renderingAttachmentInfo.imageView = imageView;
-		renderingAttachmentInfo.clearValue = clear;
 
 		return renderingAttachmentInfo;
 	}
 
 	inline VkRenderingInfo RenderingInfo(
-	    VkRenderingAttachmentInfo colorAttachmentInfo, VkRenderingAttachmentInfo depthAttachmentInfo, VkExtent2D extent )
+	    VkRenderingAttachmentInfo* colorAttachmentInfo, VkRenderingAttachmentInfo* depthAttachmentInfo, VkExtent2D extent )
 	{
 		VkRenderingInfo renderInfo = {};
 		renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
@@ -127,27 +126,26 @@ namespace VKInit
 		renderInfo.layerCount = 1;
 		renderInfo.renderArea = VkRect2D{ VkOffset2D{}, extent };
 		renderInfo.colorAttachmentCount = 1;
-		renderInfo.pColorAttachments = &colorAttachmentInfo;
-		renderInfo.pDepthAttachment = &depthAttachmentInfo;
-		renderInfo.pStencilAttachment = &depthAttachmentInfo;
+		renderInfo.pColorAttachments = colorAttachmentInfo;
+		renderInfo.pDepthAttachment = depthAttachmentInfo;
+		renderInfo.pStencilAttachment = depthAttachmentInfo;
 
 		return renderInfo;
 	}
 
-	inline VkSubmitInfo SubmitInfo( VkPipelineStageFlags* waitStage, VkSemaphore* presentSemaphore,
-	    VkSemaphore* renderSemaphore, VkCommandBuffer* commandBuffer )
+	inline VkSubmitInfo SubmitInfo( VkCommandBuffer* commandBuffer )
 	{
 		VkSubmitInfo submit = {};
 		submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 		submit.pNext = nullptr;
 
-		submit.pWaitDstStageMask = waitStage;
+		submit.pWaitDstStageMask = nullptr;
 
-		submit.waitSemaphoreCount = 1;
-		submit.pWaitSemaphores = presentSemaphore;
+		submit.waitSemaphoreCount = 0;
+		submit.pWaitSemaphores = nullptr;
 
-		submit.signalSemaphoreCount = 1;
-		submit.pSignalSemaphores = renderSemaphore;
+		submit.signalSemaphoreCount = 0;
+		submit.pSignalSemaphores = nullptr;
 
 		submit.commandBufferCount = 1;
 		submit.pCommandBuffers = commandBuffer;
@@ -172,14 +170,14 @@ namespace VKInit
 		return presentInfo;
 	}
 
-	inline VkCommandBufferBeginInfo CommandBufferBeginInfo()
+	inline VkCommandBufferBeginInfo CommandBufferBeginInfo( VkCommandBufferUsageFlags flags )
 	{
 		VkCommandBufferBeginInfo cmdBeginInfo = {};
 
 		cmdBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
 		cmdBeginInfo.pNext = nullptr;
 		cmdBeginInfo.pInheritanceInfo = nullptr;
-		cmdBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+		cmdBeginInfo.flags = flags;
 
 		return cmdBeginInfo;
 	}
@@ -243,5 +241,24 @@ namespace VKInit
 		info.stencilTestEnable = VK_FALSE;
 
 		return info;
+	}
+
+	inline VkImageMemoryBarrier ImageMemoryBarrier( VkImageLayout oldLayout, VkImageLayout newLayout, VkImage image )
+	{
+		VkImageMemoryBarrier imageMemoryBarrier = {};
+		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+		imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		imageMemoryBarrier.oldLayout = oldLayout;
+		imageMemoryBarrier.newLayout = newLayout;
+		imageMemoryBarrier.image = image;
+
+		imageMemoryBarrier.subresourceRange = {};
+		imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
+		imageMemoryBarrier.subresourceRange.levelCount = 1;
+		imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
+		imageMemoryBarrier.subresourceRange.layerCount = 1;
+
+		return imageMemoryBarrier;
 	}
 } // namespace VKInit

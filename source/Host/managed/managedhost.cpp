@@ -56,7 +56,6 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 	return ( load_assembly_and_get_function_pointer_fn )load_assembly_and_get_function_pointer;
 }
 
-
 ManagedHost::ManagedHost( std::wstring basePath, std::wstring signature )
 {
 	m_dllPath = basePath + L".dll";
@@ -71,10 +70,12 @@ void ManagedHost::Render()
 	Invoke( "Render" );
 }
 
-void ManagedHost::Run()
+void ManagedHost::StartUp()
 {
-	Invoke( "Run", (void*)&args );
+	Invoke( "Run", ( void* )&args );
 }
+
+void ManagedHost::ShutDown() {}
 
 void ManagedHost::FireEvent( std::string eventName )
 {
