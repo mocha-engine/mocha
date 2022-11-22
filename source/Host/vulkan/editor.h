@@ -24,8 +24,17 @@ namespace Editor
 			ImGui::Text( "Entities:" );
 
 			// List all entities
-			g_entityDictionary->ForEach(
-			    []( std::shared_ptr<BaseEntity> entity ) { ImGui::Text( "Entity: %s", entity->GetName() ); } );
+			g_entityDictionary->ForEach( []( std::shared_ptr<BaseEntity> entity ) {
+				std::string flagStr = "";
+
+				// Get flag string based on entity flags
+				if ( entity->HasFlag( ENTITY_MANAGED ) )
+					flagStr += "M";
+				if ( entity->HasFlag( ENTITY_RENDERABLE ) )
+					flagStr += "R";
+				
+				ImGui::Text( "[%s] %s", flagStr.c_str(), entity->GetName() );
+			} );
 
 			ImGui::End();
 		}
