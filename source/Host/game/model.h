@@ -29,12 +29,9 @@ private:
 
 public:
 	void InitPipelines();
-
 	void UploadTriangleMesh();
-
 	void UploadMesh( Mesh& mesh );
-
 	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
 
-	void Render( Camera* camera, VkCommandBuffer cmd, int frameNumber );
+	void Render( Camera* camera, VkCommandBuffer cmd );
 };

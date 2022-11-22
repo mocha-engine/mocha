@@ -6,6 +6,7 @@
 #include <managed/hostmanager.h>
 #include <renderdocmanager.h>
 #include <vulkan/rendermanager.h>
+#include <edict.h>
 
 //
 // These global variables are all defined in globalvars.h, 
@@ -19,6 +20,7 @@ RenderManager* g_renderManager;
 LogManager* g_logManager;
 HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
+EDict* g_entityDictionary;
 
 void Root::Startup()
 {
@@ -32,6 +34,9 @@ void Root::Startup()
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
 
+	g_entityDictionary = new EDict();
+	g_entityDictionary->Startup();
+
 	g_renderManager = new RenderManager();
 	g_renderManager->Startup();
 
@@ -43,6 +48,7 @@ void Root::Shutdown()
 {
 	g_hostManager->Shutdown();
 	g_renderManager->Shutdown();
+	g_entityDictionary->Shutdown();
 	g_renderdocManager->Shutdown();
 	g_logManager->Shutdown();
 }

@@ -22,7 +22,10 @@
 #endif
 
 #define VMA_IMPLEMENTATION
+#include <baseentity.h>
+#include <edict.h>
 #include <globalvars.h>
+#include <modelentity.h>
 #include <vk_mem_alloc.h>
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
@@ -202,7 +205,7 @@ void RenderManager::InitImGUI()
 	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
 	pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	pool_info.maxSets = 1000;
-	pool_info.poolSizeCount = (uint32_t)std::size( pool_sizes );
+	pool_info.poolSizeCount = ( uint32_t )std::size( pool_sizes );
 	pool_info.pPoolSizes = pool_sizes;
 
 	VkDescriptorPool imguiPool;
@@ -246,10 +249,6 @@ void RenderManager::Startup()
 	InitImGUI();
 
 	m_camera = new Camera();
-
-	m_triangle = new Model();
-	m_triangle->InitPipelines();
-	m_triangle->UploadTriangleMesh();
 
 	m_isInitialized = true;
 }
@@ -327,7 +326,17 @@ void RenderManager::Render()
 
 	// Draw scene
 	vkCmdBeginRendering( cmd, &renderInfo );
-	m_triangle->Render( m_camera, cmd, m_frameNumber );
+
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		// m_triangle->Render( m_camera, cmd, m_frameNumber );
+
+		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+		if ( renderEntity != nullptr )
+		{
+			entity->Render( cmd, m_camera );
+		}
+	} );
+
 	vkCmdEndRendering( cmd );
 
 #ifdef _IMGUI
