@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 [StructLayout( LayoutKind.Sequential )]
 public struct UnmanagedArgs
 {
-	public IntPtr __LogManager_CtorMethodPtr;
+    public IntPtr __LogManager_CtorMethodPtr;
 	public IntPtr __LogManager_StartupMethodPtr;
 	public IntPtr __LogManager_ShutdownMethodPtr;
 	public IntPtr __LogManager_InfoMethodPtr;

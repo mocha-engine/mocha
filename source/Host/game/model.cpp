@@ -147,7 +147,7 @@ bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shader
 	return true;
 }
 
-void Model::Render( Camera* camera, VkCommandBuffer cmd, int frameNumber )
+void Model::Render( Camera* camera, VkCommandBuffer cmd )
 {
 	vkCmdBindPipeline( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
 	VkDeviceSize offset = 0;

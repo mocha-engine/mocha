@@ -1,5 +1,8 @@
 #pragma once
 #ifdef _IMGUI
+#include <baseentity.h>
+#include <edict.h>
+#include <globalvars.h>
 #include <spdlog/spdlog.h>
 #include <thirdparty/imgui/imgui.h>
 
@@ -18,7 +21,12 @@ namespace Editor
 	{
 		if ( ImGui::Begin( "Native" ) )
 		{
-			ImGui::Text( "Hello from Native C++ :3" );
+			ImGui::Text( "Entities:" );
+
+			// List all entities
+			g_entityDictionary->ForEach(
+			    []( std::shared_ptr<BaseEntity> entity ) { ImGui::Text( "Entity: %s", entity->GetName() ); } );
+
 			ImGui::End();
 		}
 	}

@@ -3,6 +3,8 @@
 #include "../vulkan/rendermanager.h"
 #include "globalvars.h"
 
+#include <edict.h>
+#include <modelentity.h>
 #include <spdlog/spdlog.h>
 
 void ManagedModel::SetIndexData( int size, void* data )
@@ -36,5 +38,9 @@ void ManagedModel::Finish()
 	m_model.InitPipelines();
 	m_model.UploadMesh( m_mesh );
 
-	g_renderManager->m_triangle = &m_model;
+	ModelEntity modelEntity = {};
+	modelEntity.SetName( "ManagedModel Entity" );
+	modelEntity.SetModel( m_model );
+
+	g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
 }

@@ -147,12 +147,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="baseentity.cpp" />
+    <ClCompile Include="edict.cpp" />
     <ClCompile Include="game\model.cpp" />
     <ClCompile Include="game\camera.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\managedmodel.cpp" />
     <ClCompile Include="managed\hostmanager.cpp" />
+    <ClCompile Include="modelentity.cpp" />
     <ClCompile Include="renderdocmanager.cpp" />
     <ClCompile Include="root.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -170,7 +173,10 @@
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="baseentity.h" />
     <ClInclude Include="defs.h" />
+    <ClInclude Include="edict.h" />
+    <ClInclude Include="modelentity.h" />
     <ClInclude Include="renderdocmanager.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />

@@ -56,8 +56,7 @@ public:
 	VkFence m_renderFence;
 
 	VmaAllocator m_allocator;
-
-	Model* m_triangle;
+	
 	Camera* m_camera;
 
 	void Startup();
