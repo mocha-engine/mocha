@@ -41,6 +41,8 @@ void ManagedModel::Finish()
 	ModelEntity modelEntity = {};
 	modelEntity.SetName( "ManagedModel Entity" );
 	modelEntity.SetModel( m_model );
+	modelEntity.AddFlag( ENTITY_MANAGED );
+	modelEntity.AddFlag( ENTITY_RENDERABLE );
 
 	g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
 }
