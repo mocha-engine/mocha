@@ -7,33 +7,56 @@ layout (location = 1) in vec3 vNormal;
 layout (location = 2) in vec3 vColor;
 
 layout (location = 0) out vec3 outColor;
+layout (location = 1) out vec3 outNormalWS;
+layout (location = 2) out vec3 outPositionWS;
 
 //push constants block
 layout( push_constant ) uniform constants
 {
 	vec4 data;
+	mat4 model_matrix;
 	mat4 render_matrix;
 } PushConstants;
 
 void main()
 {
-	gl_Position = PushConstants.render_matrix * vec4(vPosition, 1.0f);
+	outPositionWS = vec3(PushConstants.model_matrix * vec4(vPosition, 1.0f));
+	outNormalWS = mat3( transpose( inverse( PushConstants.model_matrix ) ) ) * vNormal;
 	outColor = vColor;
+
+	gl_Position = PushConstants.render_matrix * vec4(vPosition, 1.0f);
 }
 
 #endif
 
 #ifdef FRAGMENT
 
-layout(location = 0) in vec3 fragColor;
+layout(location = 0) in vec3 vColor;
+layout(location = 1) in vec3 vNormalWS;
+layout(location = 2) in vec3 vPositionWS;
 
-//output write
 layout (location = 0) out vec4 outFragColor;
+
+float lambert(vec3 normal, vec3 lightDir)
+{
+	return max(dot(normalize(normal), normalize(lightDir)), 0.0f);
+}
+
+float ambient()
+{
+	return 0.1;
+}
 
 void main()
 {
-	//return red
-	outFragColor = vec4(fragColor,1.0f);
+	vec3 lightPos = vec3(0.0f, -5.0f, 0.0f);
+	vec3 lightDir = normalize(lightPos - vPositionWS);
+
+	float l = lambert(vNormalWS, lightDir) + ambient();
+
+	vec3 fragColor = l.xxx;
+
+	outFragColor = vec4(fragColor, 1.0f);
 }
 
 #endif

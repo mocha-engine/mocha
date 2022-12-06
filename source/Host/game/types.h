@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
 
 struct Vector3
 {
@@ -21,9 +23,19 @@ struct Vector4
 	inline glm::vec4 ToGLM() { return glm::vec4( x, y, z, w ); }
 };
 
+struct Quaternion
+{
+	float x;
+	float y;
+	float z;
+	float w;
+
+	inline glm::quat ToGLM() { return glm::quat( w, x, y, z ); }
+};
+
 struct Transform
 {
 	Vector3 position;
-	Vector4 rotation;
+	Quaternion rotation;
 	Vector3 scale;
 };

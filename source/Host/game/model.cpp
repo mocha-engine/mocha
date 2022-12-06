@@ -153,12 +153,15 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 	vkCmdBindVertexBuffers( cmd, 0, 1, &m_mesh.vertexBuffer.buffer, &offset );
 
 	glm::mat4 model = glm::mat4{ 1.0f };
-	model *= glm::translate( glm::mat4{ 1.0f }, transform.position.ToGLM() );	
+	model *= glm::translate( glm::mat4{ 1.0f }, transform.position.ToGLM() );
+	model *= glm::mat4_cast( transform.rotation.ToGLM() );
+	model *= glm::scale( glm::mat4{ 1.0f }, transform.scale.ToGLM() );
 
-	glm::mat4 meshMatrix = viewProj * model;
+	glm::mat4 renderMatrix = viewProj * model;
 
 	MeshPushConstants constants;
-	constants.renderMatrix = meshMatrix;
+	constants.modelMatrix = model;
+	constants.renderMatrix = renderMatrix;
 
 	vkCmdPushConstants( cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( MeshPushConstants ), &constants );
 

@@ -13,6 +13,7 @@ namespace Entities
 	{
 		BaseEntity baseEntity = {};
 		baseEntity.AddFlag( ENTITY_MANAGED );
+		baseEntity.SetType( "BaseEntity" );
 
 		spdlog::trace( "Created base entity" );
 
@@ -24,6 +25,7 @@ namespace Entities
 		ModelEntity modelEntity = {};
 		modelEntity.AddFlag( ENTITY_MANAGED );
 		modelEntity.AddFlag( ENTITY_RENDERABLE );
+		modelEntity.SetType( "ModelEntity" );
 
 		spdlog::trace( "Created model entity" );
 
@@ -40,7 +42,7 @@ namespace Entities
 		entity->SetTransform( transform );
 	}
 
-	inline void SetRotation( uint32_t handle, Vector4 rotation )
+	inline void SetRotation( uint32_t handle, Quaternion rotation )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -75,7 +77,7 @@ namespace Entities
 		return transform.position;
 	}
 
-	inline Vector4 GetRotation( uint32_t handle )
+	inline Quaternion GetRotation( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
