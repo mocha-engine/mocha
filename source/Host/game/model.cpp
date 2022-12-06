@@ -146,15 +146,16 @@ bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shader
 	return true;
 }
 
-void Model::Render( Camera* camera, VkCommandBuffer cmd )
+void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform )
 {
 	vkCmdBindPipeline( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
 	VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers( cmd, 0, 1, &m_mesh.vertexBuffer.buffer, &offset );
 
-	glm::mat4 vpMatrix = camera->GetProjectionViewMatrix();
 	glm::mat4 model = glm::mat4{ 1.0f };
-	glm::mat4 meshMatrix = vpMatrix * model;
+	model *= glm::translate( glm::mat4{ 1.0f }, transform.position.ToGLM() );	
+
+	glm::mat4 meshMatrix = viewProj * model;
 
 	MeshPushConstants constants;
 	constants.renderMatrix = meshMatrix;

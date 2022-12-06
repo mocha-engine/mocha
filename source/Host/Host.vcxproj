@@ -150,7 +150,6 @@
     <ClCompile Include="baseentity.cpp" />
     <ClCompile Include="edict.cpp" />
     <ClCompile Include="game\model.cpp" />
-    <ClCompile Include="game\camera.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\managedmodel.cpp" />
@@ -183,7 +182,6 @@
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="vulkan\editor.h" />
     <ClInclude Include="game\model.h" />
-    <ClInclude Include="game\camera.h" />
     <ClInclude Include="game\types.h" />
     <ClInclude Include="globalvars.h" />
     <ClInclude Include="logmanager.h" />

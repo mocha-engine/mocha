@@ -22,6 +22,8 @@ HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
 
+Vector3 g_cameraPos;
+
 void Root::Startup()
 {
 	// TODO: How do we start up g_allocator like this?

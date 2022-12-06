@@ -9,6 +9,7 @@ private:
 	Model m_model;
 
 public:
-	void Render( VkCommandBuffer cmd, Camera* camera );
+	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj ) override;
+	
 	void SetModel( Model model );
 };

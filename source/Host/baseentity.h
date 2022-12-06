@@ -1,5 +1,4 @@
 #pragma once
-#include <game/camera.h>
 #include <game/types.h>
 #include <stdint.h>
 #include <string>
@@ -11,9 +10,11 @@ enum EntityFlags : int
 	ENTITY_RENDERABLE = 1 << 1
 };
 
+class Camera;
+
 class BaseEntity
 {
-private:
+protected:
 	std::string m_name;
 	Transform m_transform;
 	int m_flags;
@@ -22,7 +23,7 @@ public:
 	BaseEntity();
 	virtual ~BaseEntity() {}
 
-	virtual void Render( VkCommandBuffer cmd, Camera* camera ){};
+	virtual void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj ){};
 
 	//
 	// Getters & setters

@@ -37,7 +37,7 @@ public class Main
 		Time.UpdateFrom( (float)delta.TotalSeconds );
 
 		world.Update();
-		world.Render();
+
 		LastUpdate = DateTime.Now;
 	}
 

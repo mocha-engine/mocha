@@ -3,6 +3,7 @@
 [Category( "Player" ), Icon( FontAwesome.User )]
 public class Player : ModelEntity
 {
+	// TODO: Physics
 	private float velocity;
 
 	public Player()

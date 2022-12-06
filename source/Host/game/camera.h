@@ -1,18 +1,10 @@
 #pragma once
 #include "types.h"
 
+#include <baseentity.h>
 #include <memory>
 
 //@InteropGen generate class
-class Camera
+class Camera : public BaseEntity
 {
-public:
-	Transform m_transform = {};
-
-	Camera();
-	void SetPosition( Vector3 position );
-	void Update( int m_frameNumber );
-
-	//@InteropGen ignore
-	glm::mat4 GetProjectionViewMatrix();
 };

@@ -14,6 +14,7 @@ public struct UnmanagedArgs
 	public IntPtr __Entities_GetScaleMethodPtr;
 	public IntPtr __Entities_GetNameMethodPtr;
 	public IntPtr __Entities_SetModelMethodPtr;
+	public IntPtr __Entities_SetCameraPositionMethodPtr;
 	public IntPtr __LogManager_CtorMethodPtr;
 	public IntPtr __LogManager_StartupMethodPtr;
 	public IntPtr __LogManager_ShutdownMethodPtr;
@@ -22,8 +23,6 @@ public struct UnmanagedArgs
 	public IntPtr __LogManager_ErrorMethodPtr;
 	public IntPtr __LogManager_TraceMethodPtr;
 	public IntPtr __Camera_CtorMethodPtr;
-	public IntPtr __Camera_SetPositionMethodPtr;
-	public IntPtr __Camera_UpdateMethodPtr;
 	public IntPtr __ManagedModel_SetIndexDataMethodPtr;
 	public IntPtr __ManagedModel_SetVertexDataMethodPtr;
 	public IntPtr __ManagedModel_FinishMethodPtr;

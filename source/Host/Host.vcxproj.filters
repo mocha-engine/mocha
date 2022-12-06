@@ -66,9 +66,6 @@
     <ClCompile Include="vulkan\rendermanager.cpp">
       <Filter>Source Files\Managers</Filter>
     </ClCompile>
-    <ClCompile Include="game\camera.cpp">
-      <Filter>Source Files\Entities</Filter>
-    </ClCompile>
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp">
       <Filter>Source Files\Thirdparty</Filter>
     </ClCompile>
@@ -125,6 +122,9 @@
     <ClInclude Include="generated\editor.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\entities.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,13 +164,7 @@
     <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\*.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\logger.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
@@ -183,12 +177,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\vk_mesh.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\g_shader.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -274,9 +262,6 @@
     </ClInclude>
     <ClInclude Include="vulkan\editor.h">
       <Filter>Header Files\Managed</Filter>
-    </ClInclude>
-    <ClInclude Include="game\camera.h">
-      <Filter>Header Files\Entities</Filter>
     </ClInclude>
     <ClInclude Include="vulkan\mesh.h">
       <Filter>Header Files\Rendering</Filter>

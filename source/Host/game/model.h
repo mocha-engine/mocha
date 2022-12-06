@@ -33,5 +33,5 @@ public:
 	void UploadMesh( Mesh& mesh );
 	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
 
-	void Render( Camera* camera, VkCommandBuffer cmd );
+	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform );
 };

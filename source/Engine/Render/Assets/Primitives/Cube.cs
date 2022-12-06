@@ -87,8 +87,7 @@ partial class Primitives
 
 		public static Model GenerateModel( Material material )
 		{
-			var model = new Model( "internal:cube", Vertices.ToArray(), indices, material );
-			return model;
+			return new Model( "internal:cube", Vertices.ToArray(), indices, material );
 		}
 	}
 }

@@ -25,15 +25,36 @@ namespace Editor
 
 			// List all entities
 			g_entityDictionary->ForEach( []( std::shared_ptr<BaseEntity> entity ) {
-				std::string flagStr = "";
+				std::vector<std::string> flags = {};
 
 				// Get flag string based on entity flags
 				if ( entity->HasFlag( ENTITY_MANAGED ) )
-					flagStr += "M";
+					flags.push_back( "ENTITY_MANAGED" );
 				if ( entity->HasFlag( ENTITY_RENDERABLE ) )
-					flagStr += "R";
-				
-				ImGui::Text( "[%s] %s", flagStr.c_str(), entity->GetName() );
+					flags.push_back( "ENTITY_RENDERABLE" );
+
+				// Join flags together as a comma-separated string
+
+				std::string flagString = "";
+				for ( int i = 0; i < flags.size(); i++ )
+				{
+					flagString += flags[i];
+					if ( i != flags.size() - 1 )
+						flagString += ", ";
+				}
+
+				// Display name
+				if ( ImGui::TreeNode( entity->GetName() ) )
+				{
+					// Basic info
+					ImGui::Text( "\t%s", flagString.c_str() );
+
+					// Display transform
+					auto transform = entity->GetTransform();
+					ImGui::Text( "\tPosition: %f, %f, %f", transform.position.x, transform.position.y, transform.position.z );
+
+					ImGui::TreePop();
+				}
 			} );
 
 			ImGui::End();
