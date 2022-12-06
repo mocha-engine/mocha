@@ -5,7 +5,7 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.Cube ), Title( "Model" )]
 public class Model : Asset
 {
-	private Glue.ManagedModel NativeModel { get; set; }
+	public Glue.ManagedModel NativeModel { get; set; }
 
 	public Material Material { get; set; }
 	public bool IsIndexed { get; private set; }

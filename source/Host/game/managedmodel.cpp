@@ -37,12 +37,9 @@ void ManagedModel::Finish()
 
 	m_model.InitPipelines();
 	m_model.UploadMesh( m_mesh );
+}
 
-	ModelEntity modelEntity = {};
-	modelEntity.SetName( "ManagedModel Entity" );
-	modelEntity.SetModel( m_model );
-	modelEntity.AddFlag( ENTITY_MANAGED );
-	modelEntity.AddFlag( ENTITY_RENDERABLE );
-
-	g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
+Model ManagedModel::GetModel()
+{
+	return m_model;
 }

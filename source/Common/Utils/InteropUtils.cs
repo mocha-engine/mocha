@@ -17,6 +17,10 @@ public static class InteropUtils
 		{
 			return (IntPtr)i;
 		}
+		else if ( obj is uint u )
+		{
+			return (IntPtr)u;
+		}
 		else if ( obj is float f )
 		{
 			return (IntPtr)f;
