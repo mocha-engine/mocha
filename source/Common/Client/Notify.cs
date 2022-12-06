@@ -10,9 +10,9 @@ public static class Notify
 
 		public Notification( string title, string text )
 		{
-			this.Title = title;
-			this.Text = text;
-			this.Lifetime = 0;
+			Title = title;
+			Text = text;
+			Lifetime = 0;
 		}
 	}
 

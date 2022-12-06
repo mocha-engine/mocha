@@ -1,4 +1,5 @@
-﻿global using Vector3 = Mocha.Common.Vector3;
+﻿global using Rotation = Mocha.Common.Rotation;
+global using Vector3 = Mocha.Common.Vector3;
 global using Matrix4x4 = System.Numerics.Matrix4x4;
 global using Vector4 = System.Numerics.Vector4;
 

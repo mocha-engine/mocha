@@ -28,6 +28,7 @@ public struct Vector2 : IEquatable<Vector2>
 	public readonly float LengthSquared => internalVector.LengthSquared();
 
 	public readonly Vector2 Normal => this / Length;
+
 	public void Normalize()
 	{
 		internalVector = new System.Numerics.Vector2( X, Y ) / Length;

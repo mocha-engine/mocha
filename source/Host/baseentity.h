@@ -15,6 +15,7 @@ class Camera;
 class BaseEntity
 {
 protected:
+	std::string m_type;
 	std::string m_name;
 	Transform m_transform;
 	int m_flags;
@@ -38,4 +39,7 @@ public:
 	inline void SetFlags( EntityFlags flags ) { m_flags = flags; }
 	inline void AddFlag( EntityFlags flags ) { m_flags = m_flags | flags; }
 	inline bool HasFlag( EntityFlags flag ) { return ( m_flags & flag ) != 0; }
+
+	inline void SetType( std::string type ) { m_type = type; }
+	inline const char* GetType() { return m_type.c_str(); }
 };

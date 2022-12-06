@@ -15,6 +15,7 @@
 struct MeshPushConstants
 {
 	glm::vec4 data;
+	glm::mat4 modelMatrix;
 	glm::mat4 renderMatrix;
 };
 

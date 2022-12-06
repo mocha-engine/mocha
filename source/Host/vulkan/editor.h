@@ -19,10 +19,8 @@ namespace Editor
 
 	inline void Draw()
 	{
-		if ( ImGui::Begin( "Native" ) )
+		if ( ImGui::Begin( "Entities" ) )
 		{
-			ImGui::Text( "Entities:" );
-
 			// List all entities
 			g_entityDictionary->ForEach( []( std::shared_ptr<BaseEntity> entity ) {
 				std::vector<std::string> flags = {};
@@ -42,18 +40,23 @@ namespace Editor
 					if ( i != flags.size() - 1 )
 						flagString += ", ";
 				}
-
+				
 				// Display name
-				if ( ImGui::TreeNode( entity->GetName() ) )
+				if ( ImGui::CollapsingHeader( entity->GetName() ) )
 				{
 					// Basic info
 					ImGui::Text( "\t%s", flagString.c_str() );
+					ImGui::Text( "\t%s", entity->GetType() );
+					ImGui::Text( "" );
 
 					// Display transform
 					auto transform = entity->GetTransform();
 					ImGui::Text( "\tPosition: %f, %f, %f", transform.position.x, transform.position.y, transform.position.z );
+					ImGui::Text( "\tRotation: %f, %f, %f, %f", transform.rotation.x, transform.rotation.y, transform.rotation.z,
+					    transform.rotation.w );
+					ImGui::Text( "\tScale: %f, %f, %f", transform.scale.x, transform.scale.y, transform.scale.z );
 
-					ImGui::TreePop();
+					ImGui::Text( "" );
 				}
 			} );
 

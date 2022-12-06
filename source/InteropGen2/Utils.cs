@@ -4,34 +4,32 @@ static class Utils
 {
 	public static string GetManagedType( string nativeType )
 	{
-		if ( nativeType == "void" )
-			return nativeType;
-
-		if ( nativeType == "glm::vec2" )
-			return "Vector2";
-
-		if ( nativeType == "glm::vec3" )
-			return "Vector3";
-
-		if ( nativeType == "glm::mat4" )
-			return "Matrix4x4";
-
-		if ( nativeType == "uint32_t" )
-			return "uint";
-
-		if ( nativeType.EndsWith( "*" ) )
+		// Create a dictionary to hold the mapping between native and managed types
+		var lookupTable = new Dictionary<string, string>()
 		{
-			// Pointer
-			return "IntPtr";
-		}
-
-		return nativeType switch
-		{
-			"std::string" => "string",
-
-			_ => nativeType
+			// Native type		Managed type
+			{ "void",           "void" },
+			{ "glm::vec2",      "Vector2" },
+			{ "glm::vec3",      "Vector3" },
+			{ "glm::mat4",      "Matrix4x4" },
+			{ "glm::quat",      "Rotation" },
+			{ "Quaternion",     "Rotation" },
+			{ "uint32_t",       "uint" },
+			{ "std::string",    "string" }
 		};
+
+		// Check if the native type is a pointer
+		if ( nativeType.EndsWith( "*" ) )
+			return "IntPtr";
+
+		// Check if the native type is in the lookup table
+		if ( lookupTable.ContainsKey( nativeType ) )
+			return lookupTable[nativeType];
+
+		// Return the native type if it is not in the lookup table
+		return nativeType;
 	}
+
 
 	public static (StringWriter StringWriter, IndentedTextWriter TextWriter) CreateWriter()
 	{

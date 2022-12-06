@@ -25,8 +25,8 @@ public class BaseEntity : IEntity
 	// TODO
 	public Rotation Rotation
 	{
-		get;
-		set;
+		get => Glue.Entities.GetRotation( NativeHandle );
+		set => Glue.Entities.SetRotation( NativeHandle, value );
 	}
 
 	[HideInInspector]
