@@ -20,7 +20,7 @@ RenderManager* g_renderManager;
 LogManager* g_logManager;
 HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
-EDict* g_entityDictionary;
+EntityManager* g_entityDictionary;
 
 void Root::Startup()
 {
@@ -34,7 +34,7 @@ void Root::Startup()
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
 
-	g_entityDictionary = new EDict();
+	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
 
 	g_renderManager = new RenderManager();

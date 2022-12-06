@@ -17,4 +17,7 @@ public:
 	void SetIndexData( int size, void* data );
 	void SetVertexData( int size, void* data );
 	void Finish();
+
+	//@InteropGen ignore
+	Model GetModel();
 };

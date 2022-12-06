@@ -332,6 +332,9 @@
     <ClInclude Include="baseentity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
+    <ClInclude Include="entities.h">
+      <Filter>Header Files\Entities</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <CopyFileToFolders Include="C:\Program Files\RenderDoc\renderdoc.dll" />

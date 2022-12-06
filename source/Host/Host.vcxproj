@@ -176,6 +176,7 @@
     <ClInclude Include="baseentity.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
+    <ClInclude Include="entities.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="renderdocmanager.h" />
     <ClInclude Include="root.h" />

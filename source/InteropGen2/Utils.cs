@@ -16,6 +16,9 @@ static class Utils
 		if ( nativeType == "glm::mat4" )
 			return "Matrix4x4";
 
+		if ( nativeType == "uint32_t" )
+			return "uint";
+
 		if ( nativeType.EndsWith( "*" ) )
 		{
 			// Pointer
@@ -24,7 +27,7 @@ static class Utils
 
 		return nativeType switch
 		{
-			"std::string" => "[MarshalAs( UnmanagedType.LPStr )] string",
+			"std::string" => "string",
 
 			_ => nativeType
 		};

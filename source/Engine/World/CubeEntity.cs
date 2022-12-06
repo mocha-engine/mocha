@@ -1,22 +1,11 @@
 ﻿namespace Mocha;
 
 [Category( "World" ), Title( "Cube Entity" ), Icon( FontAwesome.Cube )]
-public partial class CubeEntity : BaseEntity
+public partial class CubeEntity : ModelEntity
 {
-	[HideInInspector]
-	public SceneObject SceneObject { get; set; }
-
 	public CubeEntity()
 	{
-		SceneObject = new ModelSceneObject( this )
-		{
-			models = new() { Primitives.Cube.GenerateModel( new Material() ) }
-		};
-	}
-
-	public override void Render()
-	{
-		base.Render();
-		SceneObject.Render();
+		var model = Primitives.Cube.GenerateModel( new Material() );
+		SetModel( model );
 	}
 }

@@ -5,7 +5,7 @@ public class Player : ModelEntity
 {
 	private float velocity;
 
-	public Player() : base( "models/suzanne.mmdl" )
+	public Player()
 	{
 		Scale = new Vector3( 0.025f );
 		Rotation = Rotation.Identity;

@@ -19,7 +19,7 @@ private:
 	int m_flags;
 
 public:
-	inline BaseEntity() { m_name = "Unnamed Entity"; }
+	BaseEntity();
 	virtual ~BaseEntity() {}
 
 	virtual void Render( VkCommandBuffer cmd, Camera* camera ){};

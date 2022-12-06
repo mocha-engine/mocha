@@ -90,7 +90,6 @@ void Model::UploadMesh( Mesh& mesh )
 	//
 	// Index buffer (if we have any indices)
 	//
-
 	if ( m_mesh.indices.size() > 0 )
 	{
 		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
