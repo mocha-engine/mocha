@@ -3,26 +3,24 @@
 [Category( "World" ), Icon( FontAwesome.CloudSun ), Title( "Sky" )]
 public class Sky : BaseEntity
 {
-	[HideInInspector]
-	public SkySceneObject SceneObject { get; set; }
 	private Material Material { get; set; }
 
 	public float SunIntensity
 	{
-		get => SceneObject.SunIntensity;
-		set => SceneObject.SunIntensity = value;
+		get;
+		set;
 	}
 
 	public float PlanetRadius
 	{
-		get => SceneObject.PlanetRadius;
-		set => SceneObject.PlanetRadius = value;
+		get;
+		set;
 	}
 
 	public float AtmosphereRadius
 	{
-		get => SceneObject.AtmosphereRadius;
-		set => SceneObject.AtmosphereRadius = value;
+		get;
+		set;
 	}
 
 	public Sky()
@@ -31,11 +29,6 @@ public class Sky : BaseEntity
 		{
 			Shader = ShaderBuilder.Default.FromMoyaiShader( "shaders/atmosphere.mshdr" ).Build(),
 			UniformBufferType = typeof( SkyUniformBuffer )
-		};
-
-		SceneObject = new SkySceneObject( this )
-		{
-			models = new() { Primitives.Cube.GenerateModel( Material ) }
 		};
 	}
 }

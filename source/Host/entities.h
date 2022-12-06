@@ -3,6 +3,7 @@
 #include <edict.h>
 #include <globalvars.h>
 #include <modelentity.h>
+#include <game/camera.h>
 #include <game/managedmodel.h>
 
 //@InteropGen generate class
@@ -106,5 +107,10 @@ namespace Entities
 		}
 
 		entity->SetModel( model->GetModel() );
+	}
+
+	inline void SetCameraPosition(Vector3 position)
+	{
+		g_cameraPos = position;
 	}
 } // namespace Entities

@@ -7,6 +7,8 @@ class HostManager;
 class LogManager;
 class EntityManager;
 
+struct Vector3;
+
 //
 // Global vars
 //
@@ -19,3 +21,5 @@ extern EntityManager* g_entityDictionary;
 
 extern float g_curTime;
 extern float g_frameTime;
+
+extern Vector3 g_cameraPos;

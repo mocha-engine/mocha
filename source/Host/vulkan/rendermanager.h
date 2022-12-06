@@ -56,8 +56,6 @@ public:
 	VkFence m_renderFence;
 
 	VmaAllocator m_allocator;
-	
-	Camera* m_camera;
 
 	void Startup();
 	void Shutdown();
@@ -68,5 +66,5 @@ public:
 	UploadContext m_uploadContext;
 	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );
 
-	void SetCamera( Camera* camera );
+	glm::mat4x4 CalculateViewProjMatrix();
 };

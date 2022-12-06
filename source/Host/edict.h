@@ -5,6 +5,7 @@
 #include <game/types.h>
 #include <subsystem.h>
 #include <unordered_map>
+#include <memory>
 
 class EntityManager;
 

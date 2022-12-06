@@ -248,8 +248,6 @@ void RenderManager::Startup()
 	InitSyncStructures();
 	InitImGUI();
 
-	m_camera = new Camera();
-
 	m_isInitialized = true;
 }
 
@@ -333,7 +331,7 @@ void RenderManager::Render()
 		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 		if ( renderEntity != nullptr )
 		{
-			entity->Render( cmd, m_camera );
+			entity->Render( cmd, CalculateViewProjMatrix() );
 		}
 	} );
 
@@ -405,7 +403,6 @@ void RenderManager::Run()
 #endif
 
 		g_hostManager->Render();
-		m_camera->Update( m_frameNumber );
 
 		Render();
 	}
@@ -430,7 +427,11 @@ void RenderManager::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&
 	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
 }
 
-void RenderManager::SetCamera( Camera* camera )
+glm::mat4x4 RenderManager::CalculateViewProjMatrix()
 {
-	m_camera = camera;
+	glm::vec3 camPos = g_cameraPos.ToGLM();
+	glm::mat4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+	glm::mat4 projection = glm::perspective( glm::radians( 70.f ), 16.0f / 9.0f, 0.1f, 200.0f );
+
+	return projection * view;
 }
