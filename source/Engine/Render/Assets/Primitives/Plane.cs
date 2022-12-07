@@ -44,8 +44,7 @@ public partial class Primitives
 
 		public static Model GenerateModel( Material material )
 		{
-			var model = new Model( "internal:plane", Vertices, Indices, material );
-			return model;
+			return new Model( "internal:plane", Vertices, Indices, material );
 		}
 	}
 }

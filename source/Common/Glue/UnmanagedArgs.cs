@@ -22,6 +22,8 @@ public struct UnmanagedArgs
 	public IntPtr __LogManager_WarningMethodPtr;
 	public IntPtr __LogManager_ErrorMethodPtr;
 	public IntPtr __LogManager_TraceMethodPtr;
+	public IntPtr __ManagedTexture_SetDataMethodPtr;
+	public IntPtr __ManagedTexture_CtorMethodPtr;
 	public IntPtr __Camera_CtorMethodPtr;
 	public IntPtr __ManagedModel_SetIndexDataMethodPtr;
 	public IntPtr __ManagedModel_SetVertexDataMethodPtr;

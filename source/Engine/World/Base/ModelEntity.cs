@@ -16,4 +16,10 @@ public partial class ModelEntity : BaseEntity
 	{
 		Glue.Entities.SetModel( NativeHandle, model.NativeModel.NativePtr );
 	}
+
+	public void SetModel( string modelPath )
+	{
+		var model = new Model( modelPath );
+		SetModel( model );
+	}
 }

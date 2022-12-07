@@ -3,7 +3,7 @@
 namespace Mocha.Renderer;
 
 [Icon( FontAwesome.Cube ), Title( "Model" )]
-public class Model : Asset
+public partial class Model : Asset
 {
 	public Glue.ManagedModel NativeModel { get; set; }
 
@@ -12,15 +12,18 @@ public class Model : Asset
 
 	private int indexCount;
 
-	public Model( string path, Material material, bool isIndexed )
+	private Model( string path, Material material, bool isIndexed )
 	{
 		Path = path;
 		Material = material;
 		IsIndexed = isIndexed;
 
 		All.Add( this );
+	}
 
-		Material.Shader.OnRecompile += CreateResources;
+	public Model( string path )
+	{
+		LoadFromPath( path );
 	}
 
 	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
@@ -69,11 +72,6 @@ public class Model : Asset
 
 	private void CreateResources()
 	{
-		NativeModel.Finish();
-	}
-
-	public void Render()
-	{
-		// Log.Trace( "Render" );
+		NativeModel.Finish( Material.DiffuseTexture.NativeTexture.NativePtr );
 	}
 }

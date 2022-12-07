@@ -21,6 +21,7 @@ private:
 	void InitCommands();
 	void InitSyncStructures();
 	void InitImGUI();
+	void InitDescriptors();
 
 public:
 	bool m_isInitialized{ false };
@@ -57,6 +58,8 @@ public:
 
 	VmaAllocator m_allocator;
 
+	VkDescriptorPool m_descriptorPool;
+
 	void Startup();
 	void Shutdown();
 	
@@ -65,6 +68,8 @@ public:
 
 	UploadContext m_uploadContext;
 	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );
+
+	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
 
 	glm::mat4x4 CalculateViewProjMatrix();
 };

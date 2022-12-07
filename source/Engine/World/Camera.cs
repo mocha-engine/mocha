@@ -15,7 +15,7 @@ public class Camera : BaseEntity
 
 		Position = newPos;
 
-		Position = new Vector3( 0, 0, -4 );
+		Position = new Vector3( 0, 0, -64 );
 		Glue.Entities.SetCameraPosition( Position );
 	}
 }

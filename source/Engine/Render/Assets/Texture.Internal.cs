@@ -16,36 +16,24 @@ public partial class TextureBuilder
 
 	public static Texture CreateOneTexture()
 	{
-
 		var missingTextureData = new byte[]
 		{
 			255, 255, 255, 255,
 		};
 
-		one = new TextureBuilder()
-			.FromData( missingTextureData, 1, 1 )
-			.WithName( "internal:one" )
-			.Build();
-
-
+		one = new Texture( 1, 1, missingTextureData );
 		return one;
 	}
 
 
 	public static Texture CreateZeroTexture()
 	{
-
 		var missingTextureData = new byte[]
 		{
 			0, 0, 0, 255,
 		};
 
-		zero = new TextureBuilder()
-			.FromData( missingTextureData, 1, 1 )
-			.WithName( "internal:zero" )
-			.Build();
-
-
+		zero = new Texture( 1, 1, missingTextureData );
 		return zero;
 	}
 
@@ -78,12 +66,7 @@ public partial class TextureBuilder
 			0, 0, 0, 255,       // B
 		};
 
-		missingTexture = new TextureBuilder()
-			.FromData( missingTextureData, 4, 4 )
-			.WithName( "internal:missing" )
-			.Build();
-
-
+		missingTexture = new Texture( 4, 4, missingTextureData );
 		return missingTexture;
 	}
 }
