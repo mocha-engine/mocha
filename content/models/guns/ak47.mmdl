@@ -1,0 +1,6 @@
+{
+    "Model": "models/guns/AK-47.fbx",
+    "Materials": [
+        "materials/guns/ak47.mmat"
+    ]
+}

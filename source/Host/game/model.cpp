@@ -34,6 +34,10 @@ void Model::InitPipelines()
 	pipeline_layout_info.pPushConstantRanges = &push_constant;
 	pipeline_layout_info.pushConstantRangeCount = 1;
 
+	VkDescriptorSetLayout setLayouts[] = { m_textureSetLayout };
+	pipeline_layout_info.setLayoutCount = 1;
+	pipeline_layout_info.pSetLayouts = setLayouts;
+
 	VK_CHECK( vkCreatePipelineLayout( device, &pipeline_layout_info, nullptr, &m_pipelineLayout ) );
 
 	m_pipeline = PipelineFactory::begin()
@@ -42,6 +46,45 @@ void Model::InitPipelines()
 	                 .WithVertexDescription( Vertex::GetVertexDescription() )
 	                 .WithLayout( m_pipelineLayout )
 	                 .Build( device, colorFormat, depthFormat );
+}
+
+void Model::InitTextures()
+{
+	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT );
+	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_textureSampler ) );
+
+	VkDescriptorSetAllocateInfo allocInfo =
+	    VKInit::DescriptorSetAllocateInfo( g_renderManager->m_descriptorPool, &m_textureSetLayout, 1 );
+	
+	VK_CHECK( vkAllocateDescriptorSets( g_renderManager->m_device, &allocInfo, &m_textureSet ) );
+	
+	VkDescriptorImageInfo imageInfo = {};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = m_texture.GetImageView();
+	imageInfo.sampler = m_textureSampler;
+	
+	VkWriteDescriptorSet descriptorWrite =
+	    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfo, 0 );
+
+	vkUpdateDescriptorSets( g_renderManager->m_device, 1, &descriptorWrite, 0, nullptr );
+}
+
+void Model::InitDescriptors()
+{
+	VkDevice device = g_renderManager->m_device;
+	VkDescriptorPool descriptorPool = g_renderManager->m_descriptorPool;
+
+	VkDescriptorSetLayoutBinding textureBinding = {};
+	textureBinding.binding = 0;
+	textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	textureBinding.descriptorCount = 1;
+	textureBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	VkDescriptorSetLayoutCreateInfo textureLayoutInfo = VKInit::DescriptorSetLayoutCreateInfo( &textureBinding, 1 );
+	VK_CHECK( vkCreateDescriptorSetLayout( device, &textureLayoutInfo, nullptr, &m_textureSetLayout ) );
+
+	VkDescriptorSetAllocateInfo allocInfo = VKInit::DescriptorSetAllocateInfo( descriptorPool, &m_textureSetLayout, 1 );
+	VK_CHECK( vkAllocateDescriptorSets( device, &allocInfo, &m_textureSet ) );
 }
 
 void Model::UploadTriangleMesh()
@@ -77,9 +120,9 @@ void Model::UploadMesh( Mesh& mesh )
 	//
 	{
 		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-		
-		VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer,
-		    &m_mesh.vertexBuffer.allocation, nullptr ) );
+
+		VK_CHECK( vmaCreateBuffer(
+		    *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.vertexBuffer.buffer, &m_mesh.vertexBuffer.allocation, nullptr ) );
 
 		void* data;
 		vmaMapMemory( *g_allocator, m_mesh.vertexBuffer.allocation, &data );
@@ -93,9 +136,9 @@ void Model::UploadMesh( Mesh& mesh )
 	if ( m_mesh.indices.size() > 0 )
 	{
 		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-		
-		VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.indexBuffer.buffer,
-		    &m_mesh.indexBuffer.allocation, nullptr ) );
+
+		VK_CHECK( vmaCreateBuffer(
+		    *g_allocator, &bufferInfo, &vmaallocInfo, &m_mesh.indexBuffer.buffer, &m_mesh.indexBuffer.allocation, nullptr ) );
 
 		void* data;
 		vmaMapMemory( *g_allocator, m_mesh.indexBuffer.allocation, &data );
@@ -162,16 +205,18 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 	MeshPushConstants constants;
 	constants.modelMatrix = model;
 	constants.renderMatrix = renderMatrix;
+	constants.cameraPos = g_cameraPos.ToGLM();
 
+	vkCmdBindDescriptorSets( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_textureSet, 0, nullptr );
 	vkCmdPushConstants( cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( MeshPushConstants ), &constants );
 
 	if ( m_bHasIndexBuffer )
 	{
 		vkCmdBindIndexBuffer( cmd, m_mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
 		uint32_t indexCount = static_cast<uint32_t>( m_mesh.indices.size() );
-		vkCmdDrawIndexed( cmd, indexCount, 1, 0, 0, 0 );	
+		vkCmdDrawIndexed( cmd, indexCount, 1, 0, 0, 0 );
 	}
-	else 
+	else
 	{
 		uint32_t vertCount = static_cast<uint32_t>( m_mesh.vertices.size() );
 		vkCmdDraw( cmd, vertCount, 1, 0, 0 );

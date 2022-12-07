@@ -3,7 +3,8 @@
     "Mocha.AssetCompiler": {
       "commandName": "Project",
       "commandLineArgs": ".",
-      "workingDirectory": "F:\\Projects\\Mocha\\Content\\"
+      "workingDirectory": "$(SolutionDir)..\\content\\",
+      "remoteDebugEnabled": false
     }
   }
 }

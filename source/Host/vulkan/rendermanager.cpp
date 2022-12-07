@@ -233,6 +233,25 @@ void RenderManager::InitImGUI()
 #endif
 }
 
+void RenderManager::InitDescriptors()
+{
+	VkDescriptorPoolSize poolSizes[] = { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 }, { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 }, { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+
+	VkDescriptorPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.pNext = nullptr;
+	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+	poolInfo.maxSets = 1000;
+	poolInfo.poolSizeCount = ( uint32_t )std::size( poolSizes );
+	poolInfo.pPoolSizes = poolSizes;
+
+	VK_CHECK( vkCreateDescriptorPool( m_device, &poolInfo, nullptr, &m_descriptorPool ) );
+}
+
 void RenderManager::Startup()
 {
 	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
@@ -246,6 +265,7 @@ void RenderManager::Startup()
 	InitSwapchain();
 	InitCommands();
 	InitSyncStructures();
+	InitDescriptors();
 	InitImGUI();
 
 	m_isInitialized = true;
@@ -425,6 +445,23 @@ void RenderManager::ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&
 	vkResetFences( m_device, 1, &m_uploadContext.uploadFence );
 
 	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
+}
+
+AllocatedBuffer RenderManager::CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage )
+{
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.pNext = nullptr;
+
+	bufferInfo.size = allocationSize;
+	bufferInfo.usage = usage;
+
+	VmaAllocationCreateInfo allocInfo = {};
+	allocInfo.usage = memoryUsage;
+
+	AllocatedBuffer buffer;
+	VK_CHECK( vmaCreateBuffer( m_allocator, &bufferInfo, &allocInfo, &buffer.buffer, &buffer.allocation, nullptr ) );
+	return buffer;
 }
 
 glm::mat4x4 RenderManager::CalculateViewProjMatrix()

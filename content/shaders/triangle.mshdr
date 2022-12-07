@@ -5,10 +5,13 @@
 layout (location = 0) in vec3 vPosition;
 layout (location = 1) in vec3 vNormal;
 layout (location = 2) in vec3 vColor;
+layout (location = 3) in vec3 vTexCoord;
 
 layout (location = 0) out vec3 outColor;
 layout (location = 1) out vec3 outNormalWS;
 layout (location = 2) out vec3 outPositionWS;
+layout (location = 3) out vec3 outCameraWS;
+layout (location = 4) out vec3 outTexCoord;
 
 //push constants block
 layout( push_constant ) uniform constants
@@ -16,45 +19,60 @@ layout( push_constant ) uniform constants
 	vec4 data;
 	mat4 model_matrix;
 	mat4 render_matrix;
+	vec3 vCameraPosWS;
 } PushConstants;
 
 void main()
 {
-	outPositionWS = vec3(PushConstants.model_matrix * vec4(vPosition, 1.0f));
+	outPositionWS = vec3( PushConstants.model_matrix * vec4( vPosition, 1.0f ) );
 	outNormalWS = mat3( transpose( inverse( PushConstants.model_matrix ) ) ) * vNormal;
+	outCameraWS = PushConstants.vCameraPosWS;
 	outColor = vColor;
+	outTexCoord = vTexCoord;
 
-	gl_Position = PushConstants.render_matrix * vec4(vPosition, 1.0f);
+	gl_Position = PushConstants.render_matrix * vec4( vPosition, 1.0f );
 }
 
 #endif
 
 #ifdef FRAGMENT
 
-layout(location = 0) in vec3 vColor;
-layout(location = 1) in vec3 vNormalWS;
-layout(location = 2) in vec3 vPositionWS;
+layout (location = 0) in vec3 vColor;
+layout (location = 1) in vec3 vNormalWS;
+layout (location = 2) in vec3 vPositionWS;
+layout (location = 3) in vec3 vCameraWS;
+layout (location = 4) in vec3 vTexCoord;
 
 layout (location = 0) out vec4 outFragColor;
+
+layout (set = 0, binding = 0) uniform sampler2D tex;
 
 float lambert(vec3 normal, vec3 lightDir)
 {
 	return max(dot(normalize(normal), normalize(lightDir)), 0.0f);
 }
 
+float specular(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
+{
+	vec3 halfDir = normalize(lightDir + viewDir);
+	return pow(max(dot(normalize(normal), halfDir), 0.0f), shininess);
+}
+
 float ambient()
 {
-	return 0.1;
+	return 0.05;
 }
 
 void main()
 {
-	vec3 lightPos = vec3(0.0f, -5.0f, 0.0f);
+	vec3 lightPos = vec3(0.0f, 0.0f, -64.0f);
 	vec3 lightDir = normalize(lightPos - vPositionWS);
+	vec3 viewDir = normalize(vCameraWS - vPositionWS);
 
-	float l = lambert(vNormalWS, lightDir) + ambient();
+	float l = lambert(vNormalWS, lightDir) + ambient();// + specular(vNormalWS, lightDir, viewDir, 32.0f);
 
-	vec3 fragColor = l.xxx;
+	vec3 fragColor = texture(tex, vTexCoord.xy).rgb * l;
+	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
 
 	outFragColor = vec4(fragColor, 1.0f);
 }

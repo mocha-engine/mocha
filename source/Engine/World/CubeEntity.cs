@@ -1,23 +1,26 @@
 ﻿namespace Mocha;
 
-[Category( "World" ), Title( "Cube Entity" ), Icon( FontAwesome.Cube )]
-public partial class CubeEntity : ModelEntity
+[Category( "Balls" ), Title( "Test Entity" ), Icon( FontAwesome.Vial )]
+public partial class TestEntity : ModelEntity
 {
-	public CubeEntity()
+	public TestEntity()
 	{
-		// Generate a cube on the fly in C#
-		var model = Primitives.Cube.GenerateModel( new Material() );
-
-		// Pass the model over to C++
-		SetModel( model );
+		SetModel( "models/guns/ak47.mmdl" );
 	}
 
 	public override void Update()
 	{
-		// Adjust our position over time - to make sure Update works
-		Position = new Vector3( MathF.Sin( Time.Now ), MathF.Cos( Time.Now * 2f ), MathF.Sin( Time.Now * 0.5f ) );
+		float time = Time.Now;
 
-		// Adjust our rotation over time
-		Rotation = Rotation.From( Time.Now * 90f, Time.Now * 30f, Time.Now * 10f );
+		//
+		// Spin and move :3
+		//
+		Position = new Vector3( MathF.Sin( time ),
+						 MathF.Cos( time * 2f ),
+						 MathF.Sin( time * 0.5f ) );
+
+		Rotation = Rotation.From( time * 90f,
+						   time * 30f,
+						   time * 10f );
 	}
 }

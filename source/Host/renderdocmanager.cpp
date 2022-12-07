@@ -23,7 +23,7 @@ void RenderdocManager::Startup()
 	}
 
 	int ret = renderdocFunc( eRENDERDOC_API_Version_1_2_0, ( void** )&rdoc_api );
-	rdoc_api->MaskOverlayBits( eRENDERDOC_Overlay_None, 0 );
+	
 	assert( ret == 1 );
 }
 

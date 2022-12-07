@@ -46,12 +46,14 @@ public class BaseEntity : IEntity
 		Rotation = new Rotation( 0, 0, 0, 1 );
 		Scale = new Vector3( 1, 1, 1 );
 
+		var displayInfo = DisplayInfo.For( this );
+		Name = $"[{displayInfo.Category}] {displayInfo.Name} {NativeHandle}";
+
 		Spawn();
 	}
 
 	protected virtual void Spawn()
 	{
-		Name = $"{GetType().Name} {NativeHandle}";
 	}
 
 	protected virtual void CreateNativeEntity()

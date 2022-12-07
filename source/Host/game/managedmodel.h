@@ -1,10 +1,9 @@
 #pragma once
 
-#include "vulkan/mesh.h"
 #include "game/model.h"
+#include "vulkan/mesh.h"
 
-struct Mesh;
-class RenderManager;
+class ManagedTexture;
 
 //@InteropGen generate class
 class ManagedModel
@@ -16,7 +15,7 @@ private:
 public:
 	void SetIndexData( int size, void* data );
 	void SetVertexData( int size, void* data );
-	void Finish();
+	void Finish( ManagedTexture* texture );
 
 	//@InteropGen ignore
 	Model GetModel();

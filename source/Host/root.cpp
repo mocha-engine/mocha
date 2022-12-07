@@ -33,8 +33,8 @@ void Root::Startup()
 	g_logManager = new LogManager();
 	g_logManager->Startup();
 
-	g_renderdocManager = new RenderdocManager();
-	g_renderdocManager->Startup();
+	// g_renderdocManager = new RenderdocManager();
+	// g_renderdocManager->Startup();
 
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
@@ -51,7 +51,7 @@ void Root::Shutdown()
 	g_hostManager->Shutdown();
 	g_renderManager->Shutdown();
 	g_entityDictionary->Shutdown();
-	g_renderdocManager->Shutdown();
+	// g_renderdocManager->Shutdown();
 	g_logManager->Shutdown();
 }
 

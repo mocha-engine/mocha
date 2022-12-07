@@ -117,6 +117,12 @@
     <ClCompile Include="baseentity.cpp">
       <Filter>Source Files\Entities</Filter>
     </ClCompile>
+    <ClCompile Include="managedtexture.cpp">
+      <Filter>Source Files\Managed</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="generated\editor.generated.h">
@@ -158,10 +164,16 @@
     <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\*.h">
+    <ClInclude Include="generated\InteropList.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\*.h">
+    <ClInclude Include="generated\UnmanagedArgs.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\InteropList.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\UnmanagedArgs.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -177,36 +189,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\logger.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\vk_mesh.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\g_shader.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\logger.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\vk_mesh.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\g_shader.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -299,9 +281,6 @@
     <ClInclude Include="logmanager.h">
       <Filter>Header Files\Managers</Filter>
     </ClInclude>
-    <ClInclude Include="game\shader.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="root.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -319,6 +298,12 @@
     </ClInclude>
     <ClInclude Include="entities.h">
       <Filter>Header Files\Entities</Filter>
+    </ClInclude>
+    <ClInclude Include="managedtexture.h">
+      <Filter>Header Files\Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="texture.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

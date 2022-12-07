@@ -6,6 +6,8 @@
 #include <edict.h>
 #include <modelentity.h>
 #include <spdlog/spdlog.h>
+#include <managedtexture.h>
+#include <texture.h>
 
 void ManagedModel::SetIndexData( int size, void* data )
 {
@@ -31,11 +33,15 @@ void ManagedModel::SetVertexData( int size, void* data )
 	m_mesh.vertices.insert( m_mesh.vertices.begin(), vertices, vertices + vertCount );
 }
 
-void ManagedModel::Finish()
+void ManagedModel::Finish( ManagedTexture* texture )
 {
 	spdlog::info( "ManagedModel: built model" );
 
+	m_model.SetTexture( texture->GetTexture() );
+	
+	m_model.InitDescriptors();
 	m_model.InitPipelines();
+	m_model.InitTextures();
 	m_model.UploadMesh( m_mesh );
 }
 
