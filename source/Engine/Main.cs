@@ -33,12 +33,9 @@ public class Main
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		var delta = (DateTime.Now - LastUpdate);
-		Time.UpdateFrom( (float)delta.TotalSeconds );
+		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
 
 		world.Update();
-
-		LastUpdate = DateTime.Now;
 	}
 
 	public delegate void FireEventDelegate( IntPtr ptrEventName );

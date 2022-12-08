@@ -1,10 +1,10 @@
 #pragma once
 #include <baseentity.h>
 #include <edict.h>
-#include <globalvars.h>
-#include <modelentity.h>
 #include <game/camera.h>
 #include <game/managedmodel.h>
+#include <globalvars.h>
+#include <modelentity.h>
 
 //@InteropGen generate class
 namespace Entities
@@ -111,8 +111,18 @@ namespace Entities
 		entity->SetModel( model->GetModel() );
 	}
 
-	inline void SetCameraPosition(Vector3 position)
+	inline void SetCameraPosition( Vector3 position )
 	{
 		g_cameraPos = position;
+	}
+
+	inline float GetCurrentTime()
+	{
+		return g_curTime;
+	}
+
+	inline float GetDeltaTime()
+	{
+		return g_frameTime;
 	}
 } // namespace Entities

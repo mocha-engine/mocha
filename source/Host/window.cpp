@@ -43,7 +43,6 @@ bool Window::Update()
 		{
 			SDL_KeyboardEvent ke = e.key;
 			char c = SDL_GetKeyFromScancode( ke.keysym.scancode );
-			spdlog::info( "Key down: {}", c );
 		}
 
 #ifdef _IMGUI

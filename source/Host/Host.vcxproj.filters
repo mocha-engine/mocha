@@ -123,6 +123,9 @@
     <ClCompile Include="texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="cvarmanager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="generated\editor.generated.h">
@@ -303,6 +306,9 @@
       <Filter>Header Files\Managed</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="cvarmanager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

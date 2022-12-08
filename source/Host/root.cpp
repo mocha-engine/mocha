@@ -22,7 +22,12 @@ HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
 
+float g_curTime;
+float g_frameTime;
 Vector3 g_cameraPos;
+
+StringCVar testStringCVar( "cl_testStr", "Hello, World!", CVarFlags::None, "This is a string" );
+FloatCVar testFloatCVar( "cl_testFloat", 0.0f, CVarFlags::None, "This is a float" );
 
 void Root::Startup()
 {
