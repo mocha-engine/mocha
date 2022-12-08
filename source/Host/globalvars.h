@@ -9,8 +9,6 @@ class EntityManager;
 class CVarManager;
 
 struct Vector3;
-class StringCVar;
-class FloatCVar;
 
 //
 // Global vars
@@ -27,6 +25,3 @@ extern float g_curTime;
 extern float g_frameTime;
 
 extern Vector3 g_cameraPos;
-
-extern StringCVar testStringCVar;
-extern FloatCVar testFloatCVar;
