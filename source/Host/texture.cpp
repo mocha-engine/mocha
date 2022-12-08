@@ -25,7 +25,7 @@ void Texture::SetData( uint32_t width, uint32_t height, void* data, VkFormat ima
 	    VKInit::ImageCreateInfo( imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent );
 	
 	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
 
 	vmaCreateImage( g_renderManager->m_allocator, &imageCreateInfo, &allocInfo, &image.image, &image.allocation, nullptr );
 

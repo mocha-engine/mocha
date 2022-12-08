@@ -13,7 +13,7 @@ public partial class TestEntity : ModelEntity
 		float time = Time.Now;
 
 		//
-		// Spin and move :3
+		// Spin and move
 		//
 		Position = new Vector3( MathF.Sin( time ),
 						 MathF.Cos( time * 2f ),

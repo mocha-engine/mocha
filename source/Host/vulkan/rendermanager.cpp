@@ -27,6 +27,9 @@
 #include <globalvars.h>
 #include <modelentity.h>
 #include <vk_mem_alloc.h>
+#include <cvarmanager.h>
+
+FloatCVar timescale( "timescale", 1.0f, CVarFlags::Cheat, "The speed at which the game world runs." );
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
@@ -440,8 +443,8 @@ void RenderManager::Run()
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<float> frameTime = end - start;
 
-		g_frameTime = frameTime.count();
-		g_curTime += g_frameTime;
+		g_frameTime = frameTime.count() * timescale.GetValue();
+		g_curTime += g_frameTime * timescale.GetValue();
 	}
 }
 

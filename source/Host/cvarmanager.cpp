@@ -20,24 +20,21 @@ void CVarManager::FromString( std::string name, std::string valueStr )
 	assert( Exists( name ) ); // Doesn't exist! Register it first
 	
 	std::stringstream valueStream( valueStr );
+	size_t hash = GetHash( name );
+	CVarEntry& entry = m_cvarEntries[hash];
 
-	if ( valueStream.str().find_first_of( "." ) != std::string::npos )
+	auto& type = entry.m_value.type();
+
+	if ( type == typeid( float ) )
 	{
 		float value;
 		valueStream >> value;
-
-		CVarManager::Instance().SetFloat( name, value );
+		
+		Set<float>( entry.m_name, value );
 	}
-	else if ( valueStream.str() == "true" || valueStream.str() == "false" )
+	else if ( type == typeid( std::string ) )
 	{
-		bool value;
-		valueStream >> std::boolalpha >> value;
-
-		// TODO
-	}
-	else if ( valueStream.str().size() > 0 )
-	{
-		CVarManager::Instance().SetString( name, valueStr );
+		Set<std::string>( entry.m_name, valueStr );
 	}
 }
 

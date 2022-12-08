@@ -1,16 +1,16 @@
 #include "root.h"
 
 #include <defs.h>
+#include <edict.h>
 #include <globalvars.h>
 #include <logmanager.h>
 #include <managed/hostmanager.h>
 #include <renderdocmanager.h>
 #include <vulkan/rendermanager.h>
-#include <edict.h>
 
 //
-// These global variables are all defined in globalvars.h, 
-// because the naming makes more sense (imagine if we 
+// These global variables are all defined in globalvars.h,
+// because the naming makes more sense (imagine if we
 // included Root.h everywhere!)
 //
 
@@ -26,9 +26,6 @@ float g_curTime;
 float g_frameTime;
 Vector3 g_cameraPos;
 
-StringCVar testStringCVar( "cl_testStr", "Hello, World!", CVarFlags::None, "This is a string" );
-FloatCVar testFloatCVar( "cl_testFloat", 0.0f, CVarFlags::None, "This is a float" );
-
 void Root::Startup()
 {
 	// TODO: How do we start up g_allocator like this?
@@ -38,8 +35,10 @@ void Root::Startup()
 	g_logManager = new LogManager();
 	g_logManager->Startup();
 
-	// g_renderdocManager = new RenderdocManager();
-	// g_renderdocManager->Startup();
+#if __ATTACH_RENDERDOC
+	g_renderdocManager = new RenderdocManager();
+	g_renderdocManager->Startup();
+#endif
 
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
@@ -56,7 +55,11 @@ void Root::Shutdown()
 	g_hostManager->Shutdown();
 	g_renderManager->Shutdown();
 	g_entityDictionary->Shutdown();
-	// g_renderdocManager->Shutdown();
+
+#if __ATTACH_RENDERDOC
+	g_renderdocManager->Shutdown();
+#endif
+
 	g_logManager->Shutdown();
 }
 

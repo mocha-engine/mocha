@@ -62,9 +62,9 @@ namespace Editor
 					ImGui::Text( "" );
 				}
 			} );
-
-			ImGui::End();
 		}
+
+		ImGui::End();
 
 		if ( ImGui::Begin(
 		         "Time", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs ) )
@@ -79,9 +79,9 @@ namespace Editor
 
 			const float fps = 1.0f / g_frameTime;
 			ImGui::Text( "FPS: %f", fps );
-
-			ImGui::End();
 		}
+		
+		ImGui::End();
 
 		if ( ImGui::Begin( "Console" ) )
 		{
@@ -152,7 +152,7 @@ namespace Editor
 
 				std::stringstream valueStream( cvarValue );
 
-				if (!CVarManager::Instance().Exists(cvarName))
+				if ( !CVarManager::Instance().Exists( cvarName ) )
 				{
 					spdlog::info( "{} is not a valid command or variable", cvarName );
 				}
@@ -166,12 +166,12 @@ namespace Editor
 					{
 						cvarValue = CVarManager::Instance().ToString( cvarName );
 						spdlog::info( "{} is '{}'", cvarName, cvarValue );
-					}				
+					}
 				}
 			}
-
-			ImGui::End();
 		}
+
+		ImGui::End();
 
 		if ( ImGui::Begin( "CVars" ) )
 		{
@@ -185,9 +185,9 @@ namespace Editor
 					ImGui::Text( "Value: %s", valueStr.c_str() );
 				}
 			} );
-
-			ImGui::End();
 		}
+
+		ImGui::End();
 	}
 } // namespace Editor
 
