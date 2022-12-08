@@ -80,7 +80,7 @@ namespace Editor
 			const float fps = 1.0f / g_frameTime;
 			ImGui::Text( "FPS: %f", fps );
 		}
-		
+
 		ImGui::End();
 
 		if ( ImGui::Begin( "Console" ) )
@@ -154,7 +154,18 @@ namespace Editor
 
 				if ( !CVarManager::Instance().Exists( cvarName ) )
 				{
-					spdlog::info( "{} is not a valid command or variable", cvarName );
+					if ( cvarName == "list" )
+					{
+						CVarManager::Instance().ForEach( []( CVarEntry& cvar ) {
+							std::string valueStr = CVarManager::Instance().ToString( cvar.m_name );
+							std::string typeStr = cvar.m_value.type().name();
+							spdlog::info( "{} - {}: {} ({})", cvar.m_name, cvar.m_description, valueStr, typeStr );
+						} );
+					}
+					else
+					{
+						spdlog::info( "{} is not a valid command or variable", cvarName );
+					}
 				}
 				else
 				{
@@ -169,22 +180,6 @@ namespace Editor
 					}
 				}
 			}
-		}
-
-		ImGui::End();
-
-		if ( ImGui::Begin( "CVars" ) )
-		{
-			CVarManager::Instance().ForEach( []( CVarEntry& cvar ) {
-				if ( ImGui::CollapsingHeader( cvar.m_name.c_str() ) )
-				{
-					std::string valueStr = CVarManager::Instance().ToString( cvar.m_name );
-
-					ImGui::Text( "Name: %s", cvar.m_name.c_str() );
-					ImGui::Text( "Description: %s", cvar.m_description.c_str() );
-					ImGui::Text( "Value: %s", valueStr.c_str() );
-				}
-			} );
 		}
 
 		ImGui::End();
