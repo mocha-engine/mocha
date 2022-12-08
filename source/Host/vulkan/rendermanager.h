@@ -17,6 +17,7 @@ class RenderManager : ISubSystem
 {
 private:
 	void InitVulkan();
+	void InitDeviceProperties();
 	void InitSwapchain();
 	void InitCommands();
 	void InitSyncStructures();
@@ -72,4 +73,6 @@ public:
 	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
 
 	glm::mat4x4 CalculateViewProjMatrix();
+
+	std::string m_deviceName;
 };

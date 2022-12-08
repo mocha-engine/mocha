@@ -6,12 +6,19 @@
 
 LogManager::LogManager() {}
 
+
 void LogManager::Startup()
 {
 	// Setup spdlog
-	auto managed = spdlog::stdout_color_mt( "managed" );
-	auto main = spdlog::stderr_color_mt( "main" );
-	auto renderer = spdlog::stderr_color_mt( "renderer" );
+	auto mochaSink = std::make_shared<MochaSinkMT>();
+	auto managed = std::make_shared<spdlog::logger>( "managed", mochaSink );
+	auto main = std::make_shared<spdlog::logger>( "main", mochaSink );
+	auto renderer = std::make_shared<spdlog::logger>( "renderer", mochaSink );
+
+	spdlog::register_logger( managed );
+	spdlog::register_logger( main );
+	spdlog::register_logger( renderer );
+
 	spdlog::set_default_logger( main );
 	spdlog::set_level( spdlog::level::trace );
 

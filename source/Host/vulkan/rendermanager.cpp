@@ -96,6 +96,14 @@ void RenderManager::InitVulkan()
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
 }
 
+void RenderManager::InitDeviceProperties()
+{
+	VkPhysicalDeviceProperties deviceProperties = {};
+	vkGetPhysicalDeviceProperties( m_chosenGPU, &deviceProperties );
+
+	m_deviceName = deviceProperties.deviceName;
+}
+
 void RenderManager::InitSwapchain()
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
@@ -262,6 +270,7 @@ void RenderManager::Startup()
 	g_renderManager = this;
 	g_allocator = &m_allocator;
 
+	InitDeviceProperties();
 	InitSwapchain();
 	InitCommands();
 	InitSyncStructures();
@@ -414,6 +423,8 @@ void RenderManager::Run()
 	{
 		bQuit = m_window->Update();
 
+		auto start = std::chrono::steady_clock::now();
+
 #ifdef _IMGUI
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
@@ -425,6 +436,12 @@ void RenderManager::Run()
 		g_hostManager->Render();
 
 		Render();
+
+		auto end = std::chrono::steady_clock::now();
+		std::chrono::duration<float> frameTime = end - start;
+
+		g_frameTime = frameTime.count();
+		g_curTime += g_frameTime;
 	}
 }
 

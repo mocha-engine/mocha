@@ -6,8 +6,11 @@ class RenderdocManager;
 class HostManager;
 class LogManager;
 class EntityManager;
+class CVarManager;
 
 struct Vector3;
+class StringCVar;
+class FloatCVar;
 
 //
 // Global vars
@@ -18,8 +21,12 @@ extern LogManager* g_logManager;
 extern HostManager* g_hostManager;
 extern RenderdocManager* g_renderdocManager;
 extern EntityManager* g_entityDictionary;
+extern CVarManager* g_cvarManager;
 
 extern float g_curTime;
 extern float g_frameTime;
 
 extern Vector3 g_cameraPos;
+
+extern StringCVar testStringCVar;
+extern FloatCVar testFloatCVar;

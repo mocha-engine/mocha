@@ -15,6 +15,7 @@ public struct UnmanagedArgs
 	public IntPtr __Entities_GetNameMethodPtr;
 	public IntPtr __Entities_SetModelMethodPtr;
 	public IntPtr __Entities_SetCameraPositionMethodPtr;
+	public IntPtr __Entities_GetDeltaTimeMethodPtr;
 	public IntPtr __LogManager_CtorMethodPtr;
 	public IntPtr __LogManager_StartupMethodPtr;
 	public IntPtr __LogManager_ShutdownMethodPtr;

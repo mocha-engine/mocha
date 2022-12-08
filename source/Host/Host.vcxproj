@@ -148,6 +148,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp" />
+    <ClCompile Include="cvarmanager.cpp" />
     <ClCompile Include="edict.cpp" />
     <ClCompile Include="game\model.cpp" />
     <ClCompile Include="logmanager.cpp" />
@@ -175,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="baseentity.h" />
+    <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
     <ClInclude Include="entities.h" />
