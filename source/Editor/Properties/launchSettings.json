@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "Mocha.Engine": {
-      "commandName": "Project",
-      "workingDirectory": "$(SolutionDir)\\.."
-    }
-  }
-}

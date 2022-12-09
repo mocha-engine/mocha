@@ -128,14 +128,18 @@ namespace Editor
 			if ( ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked( 0 ) )
 				ImGui::SetKeyboardFocusHere( 0 );
 
+			ImVec2 inputPos = ImGui::GetCursorPos();
+			inputPos.x += ImGui::GetWindowPos().x;
+			inputPos.x += ImGui::GetWindowPos().y;
+
 			if ( ImGui::InputText( "##console_input", inputBuf, MAX_INPUT_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue ) )
 				shouldSubmit = true;
-
+			
 			ImGui::SameLine();
 
 			if ( ImGui::Button( "Submit" ) )
 				shouldSubmit = true;
-
+			
 			if ( shouldSubmit )
 			{
 				spdlog::info( "> {}", inputBuf );
@@ -156,7 +160,7 @@ namespace Editor
 				{
 					if ( cvarName == "list" )
 					{
-						CVarManager::Instance().ForEach( []( CVarEntry& cvar ) {
+						CVarManager::Instance().ForEach( cvarValue, []( CVarEntry& cvar ) {
 							std::string valueStr = CVarManager::Instance().ToString( cvar.m_name );
 							std::string typeStr = cvar.m_value.type().name();
 							spdlog::info( "{} - {}: {} ({})", cvar.m_name, cvar.m_description, valueStr, typeStr );

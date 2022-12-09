@@ -143,6 +143,9 @@
     <ClInclude Include="generated\managedmodel.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\managedtexture.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="generated\mesh.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -164,7 +167,10 @@
     <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\*.h">
+    <ClInclude Include="generated\InteropList.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\UnmanagedArgs.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -192,18 +198,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\logger.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\vk_mesh.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="thirdparty\imgui\imgui.h">
