@@ -374,3 +374,4 @@ build/
 *.dxbc
 vcpkg_installed/
 source/Host/tmp
+*.*_c

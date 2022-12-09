@@ -83,6 +83,7 @@ public:
 	void SetFloat( std::string name, float value ) { Set<float>( name, value ); }
 
 	void ForEach( std::function<void( CVarEntry& entry )> func );
+	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );
 
 	bool Exists( std::string name ) { return m_cvarEntries.find( GetHash( name ) ) != m_cvarEntries.end(); }
 };

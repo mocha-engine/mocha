@@ -15,6 +15,24 @@ void CVarManager::ForEach( std::function<void( CVarEntry& entry )> func )
 	}
 }
 
+void CVarManager::ForEach( std::string filter, std::function<void( CVarEntry& entry )> func )
+{
+	std::vector<CVarEntry> matchingEntries = {};
+	
+	for ( auto& item : m_cvarEntries )
+	{
+		if ( item.second.m_name.find( filter ) == std::string::npos )
+			continue;
+
+		matchingEntries.push_back( item.second );
+	}
+
+	for ( auto& entry : matchingEntries )
+	{
+		func( entry );
+	}
+}
+
 void CVarManager::FromString( std::string name, std::string valueStr )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
