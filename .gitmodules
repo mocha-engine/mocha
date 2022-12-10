@@ -4,3 +4,6 @@
 [submodule "source/Host/thirdparty/JoltPhysics"]
 	path = source/Host/thirdparty/JoltPhysics
 	url = https://github.com/jrouwe/JoltPhysics/
+[submodule "source/Host/thirdparty/vk-bootstrap"]
+	path = source/Host/thirdparty/vk-bootstrap
+	url = https://github.com/charles-lunarg/vk-bootstrap
