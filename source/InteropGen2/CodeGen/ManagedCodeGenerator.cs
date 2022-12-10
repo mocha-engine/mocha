@@ -22,7 +22,6 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		// Gather everything we need into nice lists
 		//
 		List<string> decls = new();
-		List<string> defs = new();
 
 		foreach ( var method in sel.Methods )
 		{
@@ -34,7 +33,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
 			var paramAndReturnTypes = parameterTypes.Append( returnType );
-			paramAndReturnTypes = paramAndReturnTypes.Prepend( "IntPtr" ); // Pointer to this class's instance
+
+			if ( !method.IsStatic )
+				paramAndReturnTypes = paramAndReturnTypes.Prepend( "IntPtr" ); // Pointer to this class's instance
 
 			var delegateTypeArguments = string.Join( ", ", paramAndReturnTypes );
 
@@ -45,9 +46,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			// any parameters. The return type is the last type argument passed to
 			// the delegate.
 			//
-			decls.Add( $"private {delegateSignature} _{name};" );
-
-			defs.Add( $"this._{name} = ({delegateSignature})args.__{sel.Name}_{method.Name}MethodPtr;" );
+			decls.Add( $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{sel.Name}_{name}MethodPtr;" );
 		}
 
 		//
@@ -76,16 +75,6 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine( "{" );
 		writer.Indent++;
 
-		writer.WriteLine( "var args = Mocha.Common.Global.UnmanagedArgs;" );
-		writer.WriteLine();
-
-		foreach ( var def in defs )
-		{
-			writer.WriteLine( def );
-		}
-
-		writer.WriteLine();
-
 		var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
 		writer.WriteLine( $"this.instance = this.Ctor( {ctorCallArgs} );" );
 
@@ -102,11 +91,18 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
 
+			if ( method.IsStatic )
+				accessLevel += " static";
+
 			writer.WriteLine( $"{accessLevel} {returnType} {name}( {managedCallParams} ) " );
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
-			var paramsAndInstance = method.Parameters.Prepend( new Variable( "instance", "IntPtr" ) );
+			var paramsAndInstance = method.Parameters;
+
+			if ( !method.IsStatic )
+				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "instance", "IntPtr" ) ).ToList();
+
 			var paramNames = paramsAndInstance.Select( x => "InteropUtils.GetPtr( " + x.Name + " )" );
 			var functionCallArgs = string.Join( ", ", paramNames );
 
@@ -116,7 +112,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			if ( returnType == "string" )
 				writer.Write( "InteropUtils.GetString( " );
 
-			writer.Write( $"this._{name}( {functionCallArgs} )" );
+			writer.Write( $"_{name}( {functionCallArgs} )" );
 
 			if ( returnType == "string" )
 				writer.Write( ")" );
