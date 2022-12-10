@@ -28,22 +28,22 @@ void LogManager::Startup()
 
 void LogManager::Shutdown() {}
 
-void LogManager::Info( std::string str )
+void LogManager::ManagedInfo( std::string str )
 {
 	spdlog::get( "managed" )->info( str );
 }
 
-void LogManager::Warning( std::string str )
+void LogManager::ManagedWarning( std::string str )
 {
 	spdlog::get( "managed" )->warn( str );
 }
 
-void LogManager::Error( std::string str )
+void LogManager::ManagedError( std::string str )
 {
 	spdlog::get( "managed" )->error( str );
 }
 
-void LogManager::Trace( std::string str )
+void LogManager::ManagedTrace( std::string str )
 {
 	spdlog::get( "managed" )->trace( str );
 }

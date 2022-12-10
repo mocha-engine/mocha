@@ -4,12 +4,10 @@ namespace Mocha.Common;
 
 public class Logger
 {
-	public Glue.LogManager? NativeLogger { get; set; }
-
-	public void Trace( object obj ) => NativeLogger?.Trace( obj?.ToString() );
-	public void Info( object obj ) => NativeLogger?.Info( obj?.ToString() );
-	public void Warning( object obj ) => NativeLogger?.Warning( obj?.ToString() );
-	public void Error( object obj ) => NativeLogger?.Error( obj?.ToString() );
+	public void Trace( object obj ) => Glue.LogManager.ManagedTrace( obj?.ToString() );
+	public void Info( object obj ) => Glue.LogManager.ManagedInfo( obj?.ToString() );
+	public void Warning( object obj ) => Glue.LogManager.ManagedWarning( obj?.ToString() );
+	public void Error( object obj ) => Glue.LogManager.ManagedError( obj?.ToString() );
 
 	public struct LogEntry
 	{
@@ -28,7 +26,7 @@ public class Logger
 
 	public List<LogEntry> GetHistory()
 	{
-		var logHistory = NativeLogger.GetLogHistory();
+		var logHistory = Glue.LogManager.GetLogHistory();
 
 		LogEntry[] logEntries = new LogEntry[logHistory.count];
 		var ptr = logHistory.items;
