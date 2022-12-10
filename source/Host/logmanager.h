@@ -41,10 +41,10 @@ public:
 	void Startup();
 	void Shutdown();
 
-	void Info( std::string str );
-	void Warning( std::string str );
-	void Error( std::string str );
-	void Trace( std::string str );
+	static void ManagedInfo( std::string str );
+	static void ManagedWarning( std::string str );
+	static void ManagedError( std::string str );
+	static void ManagedTrace( std::string str );
 
 	std::vector<LogEntry> m_logHistory;
 
