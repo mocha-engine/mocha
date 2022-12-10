@@ -7,7 +7,8 @@ public class Editor
 	static bool hasClicked = false;
 
 	const int MAX_INPUT_LENGTH = 512;
-	static string inputBuf = "";
+	static string consoleInput = "";
+	static string editorInput = "";
 
 	public static void Draw()
 	{
@@ -28,7 +29,7 @@ public class Editor
 
 				ImGui.TableSetupColumn( "Time", 0, 64.0f );
 				ImGui.TableSetupColumn( "Logger", 0, 64.0f );
-				ImGui.TableSetupColumn( "Text", 0, -1f );
+				ImGui.TableSetupColumn( "Text", 0, 512.0f );
 
 				foreach ( var item in Log.GetHistory() )
 				{
@@ -43,7 +44,7 @@ public class Editor
 
 					ImGui.TableNextColumn();
 
-					ImGui.Text( item.message );
+					ImGui.TextWrapped( item.message );
 				}
 
 				ImGui.EndTable();
@@ -51,13 +52,13 @@ public class Editor
 			}
 
 			ImGui.SetNextItemWidth( -60 );
-			inputBuf = ImGui.InputText( "##console_input", inputBuf, MAX_INPUT_LENGTH );
+			consoleInput = ImGui.InputText( "##console_input", consoleInput, MAX_INPUT_LENGTH );
 
 			ImGui.SameLine();
 			if ( ImGui.Button( "Submit" ) )
 			{
-				Log.Trace( $"> {inputBuf}" );
-				inputBuf = "";
+				Log.Trace( $"> {consoleInput}" );
+				consoleInput = "";
 			}
 		}
 
@@ -68,9 +69,15 @@ public class Editor
 	{
 		if ( ImGui.Begin( "Entities" ) )
 		{
+			ImGui.SetNextItemWidth( -1 );
+			editorInput = ImGui.InputText( "##editor_input", editorInput, MAX_INPUT_LENGTH );
+
 			BaseEntity.All.ForEach( x =>
 			{
 				if ( !x.IsValid() )
+					return;
+
+				if ( !string.IsNullOrEmpty( editorInput ) && !x.Name.Contains( editorInput, StringComparison.CurrentCultureIgnoreCase ) )
 					return;
 
 				if ( ImGui.CollapsingHeader( x.Name ) )

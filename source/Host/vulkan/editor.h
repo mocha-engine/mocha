@@ -29,6 +29,11 @@ namespace Editor
 		ImGui::Text( text );
 	};
 
+	inline void TextWrapped( const char* text )
+	{
+		ImGui::TextWrapped( text );
+	};
+
 	inline void TextBold( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mBoldFont );
