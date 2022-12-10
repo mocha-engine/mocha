@@ -35,7 +35,9 @@ private:
 
 	Mesh m_mesh;
 
-	bool m_bHasIndexBuffer;
+	bool m_hasIndexBuffer;
+
+	bool m_isInitialized;
 
 public:
 	void InitDescriptors();

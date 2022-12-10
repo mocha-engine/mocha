@@ -116,6 +116,51 @@ namespace Entities
 		g_cameraPos = position;
 	}
 
+	inline Vector3 GetCameraPosition()
+	{
+		return g_cameraPos;
+	}
+
+	inline void SetCameraRotation( Quaternion rotation )
+	{
+		g_cameraRot = rotation;
+	}
+
+	inline Quaternion GetCameraRotation()
+	{
+		return g_cameraRot;
+	}
+
+	inline void SetCameraFieldOfView( float fov )
+	{
+		g_cameraFov = fov;
+	}
+
+	inline float GetCameraFieldOfView()
+	{
+		return g_cameraFov;
+	}
+
+	inline void SetCameraZNear( float znear )
+	{
+		g_cameraZNear = znear;
+	}
+
+	inline float GetCameraZNear()
+	{
+		return g_cameraZNear;
+	}
+
+	inline void SetCameraZFar( float zfar )
+	{
+		g_cameraZFar = zfar;
+	}
+
+	inline float GetCameraZFar()
+	{
+		return g_cameraZFar;
+	}
+
 	inline float GetCurrentTime()
 	{
 		return g_curTime;

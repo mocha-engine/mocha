@@ -489,7 +489,7 @@ glm::mat4x4 RenderManager::CalculateViewProjMatrix()
 {
 	glm::vec3 camPos = g_cameraPos.ToGLM();
 	glm::mat4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
-	glm::mat4 projection = glm::perspective( glm::radians( 70.f ), 16.0f / 9.0f, 0.1f, 200.0f );
+	glm::mat4 projection = glm::perspective( glm::radians( g_cameraFov ), 16.0f / 9.0f, g_cameraZNear, g_cameraZFar );
 
 	return projection * view;
 }

@@ -55,14 +55,14 @@ void Model::InitTextures()
 
 	VkDescriptorSetAllocateInfo allocInfo =
 	    VKInit::DescriptorSetAllocateInfo( g_renderManager->m_descriptorPool, &m_textureSetLayout, 1 );
-	
+
 	VK_CHECK( vkAllocateDescriptorSets( g_renderManager->m_device, &allocInfo, &m_textureSet ) );
-	
+
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = m_texture.GetImageView();
 	imageInfo.sampler = m_textureSampler;
-	
+
 	VkWriteDescriptorSet descriptorWrite =
 	    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfo, 0 );
 
@@ -145,8 +145,10 @@ void Model::UploadMesh( Mesh& mesh )
 		memcpy( data, m_mesh.indices.data(), m_mesh.indices.size() * sizeof( uint32_t ) );
 		vmaUnmapMemory( *g_allocator, m_mesh.indexBuffer.allocation );
 
-		m_bHasIndexBuffer = true;
+		m_hasIndexBuffer = true;
 	}
+
+	m_isInitialized = true;
 }
 
 bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
@@ -191,6 +193,9 @@ bool Model::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shader
 
 void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform )
 {
+	if ( !m_isInitialized )
+		return;
+
 	vkCmdBindPipeline( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline );
 	VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers( cmd, 0, 1, &m_mesh.vertexBuffer.buffer, &offset );
@@ -210,7 +215,7 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 	vkCmdBindDescriptorSets( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipelineLayout, 0, 1, &m_textureSet, 0, nullptr );
 	vkCmdPushConstants( cmd, m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( MeshPushConstants ), &constants );
 
-	if ( m_bHasIndexBuffer )
+	if ( m_hasIndexBuffer )
 	{
 		vkCmdBindIndexBuffer( cmd, m_mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
 		uint32_t indexCount = static_cast<uint32_t>( m_mesh.indices.size() );
