@@ -12,7 +12,7 @@ public class BaseEntity : IEntity
 
 	public bool IsValid()
 	{
-		return NativeHandle > 0 && NativeHandle < 128;
+		return true;
 	}
 
 	public Vector3 Scale
