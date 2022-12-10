@@ -7,6 +7,7 @@ class HostManager;
 class LogManager;
 class EntityManager;
 class CVarManager;
+class PhysicsManager;
 
 struct Vector3;
 struct Quaternion;
@@ -21,6 +22,7 @@ extern HostManager* g_hostManager;
 extern RenderdocManager* g_renderdocManager;
 extern EntityManager* g_entityDictionary;
 extern CVarManager* g_cvarManager;
+extern PhysicsManager* g_physicsManager;
 
 extern float g_curTime;
 extern float g_frameTime;

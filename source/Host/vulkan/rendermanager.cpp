@@ -16,9 +16,9 @@
 #include <spdlog/spdlog.h>
 
 #ifdef _IMGUI
-#include <thirdparty/imgui/imgui.h>
-#include <thirdparty/imgui/imgui_impl_sdl.h>
-#include <thirdparty/imgui/imgui_impl_vulkan.h>
+#include <imgui/imgui.h>
+#include <imgui/imgui_impl_sdl.h>
+#include <imgui/imgui_impl_vulkan.h>
 #endif
 
 #define VMA_IMPLEMENTATION

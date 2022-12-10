@@ -7,6 +7,7 @@
 #include <managed/hostmanager.h>
 #include <renderdocmanager.h>
 #include <vulkan/rendermanager.h>
+#include <physicsmanager.h>
 
 //
 // These global variables are all defined in globalvars.h,
@@ -21,6 +22,7 @@ LogManager* g_logManager;
 HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
+PhysicsManager* g_physicsManager;
 
 float g_curTime;
 float g_frameTime;
@@ -47,6 +49,9 @@ void Root::Startup()
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
 
+	g_physicsManager = new PhysicsManager();
+	g_physicsManager->Startup();
+
 	g_renderManager = new RenderManager();
 	g_renderManager->Startup();
 
@@ -58,6 +63,7 @@ void Root::Shutdown()
 {
 	g_hostManager->Shutdown();
 	g_renderManager->Shutdown();
+	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
 
 #if __ATTACH_RENDERDOC
