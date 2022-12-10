@@ -2,21 +2,12 @@
 
 namespace Mocha.Renderer;
 
-enum TextureFormat
-{
-	R8G8B8A8_SRGB = 43,
-	BC3_SRGB = 138,
-	BC5_UNORM = 141
-}
-
 [Icon( FontAwesome.Image ), Title( "Texture" )]
-public class Texture : Asset
+public partial class Texture : Asset
 {
 	public uint Width { get; set; }
 	public uint Height { get; set; }
 	public string Type { get; set; }
-
-	public static TextureBuilder Builder => new();
 
 	public Glue.ManagedTexture NativeTexture { get; set; }
 
