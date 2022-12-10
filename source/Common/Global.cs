@@ -9,5 +9,6 @@ namespace Mocha.Common;
 public static class Global
 {
 	public static Logger Log { get; } = new();
+	public static bool IsClient { get; }
 	public static UnmanagedArgs UnmanagedArgs { get; set; }
 }
