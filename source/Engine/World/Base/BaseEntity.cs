@@ -1,11 +1,10 @@
-﻿using Mocha.Common.World;
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Mocha;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
-public class BaseEntity : IEntity
+public class BaseEntity
 {
 	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
 	protected uint NativeHandle { get; set; }

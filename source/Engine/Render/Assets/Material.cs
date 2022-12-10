@@ -5,7 +5,6 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset
 {
-	public Type UniformBufferType { get; set; } = typeof( GenericModelUniformBuffer );
 	public Texture? DiffuseTexture { get; set; } = Texture.One;
 	public Texture? AlphaTexture { get; set; } = Texture.One;
 	public Texture? NormalTexture { get; set; } = Texture.Zero;
