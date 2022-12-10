@@ -6,10 +6,10 @@ namespace Mocha.Renderer;
 public class Material : Asset
 {
 	public Type UniformBufferType { get; set; } = typeof( GenericModelUniformBuffer );
-	public Texture? DiffuseTexture { get; set; } = TextureBuilder.One;
-	public Texture? AlphaTexture { get; set; } = TextureBuilder.One;
-	public Texture? NormalTexture { get; set; } = TextureBuilder.Zero;
-	public Texture? ORMTexture { get; set; } = TextureBuilder.One;
+	public Texture? DiffuseTexture { get; set; } = Texture.One;
+	public Texture? AlphaTexture { get; set; } = Texture.One;
+	public Texture? NormalTexture { get; set; } = Texture.Zero;
+	public Texture? ORMTexture { get; set; } = Texture.One;
 
 	public Material( string path )
 	{

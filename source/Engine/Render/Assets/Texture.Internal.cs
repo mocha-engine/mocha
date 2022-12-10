@@ -3,7 +3,7 @@
 /*
  * Generators for internal textures (missing texture etc.)
  */
-public partial class TextureBuilder
+public partial class Texture
 {
 	private static Texture? zero;
 	public static Texture Zero => zero ?? CreateZeroTexture();
