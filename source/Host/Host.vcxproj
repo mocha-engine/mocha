@@ -72,7 +72,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>Mocha</TargetName>
     <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>

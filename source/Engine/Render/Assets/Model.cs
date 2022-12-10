@@ -2,15 +2,12 @@
 
 namespace Mocha.Renderer;
 
-[Icon( FontAwesome.Cube ), Title( "Model" )]
-public partial class Model : Asset
+public partial class Model : Model<Vertex>
 {
-	public Glue.ManagedModel NativeModel { get; set; }
-
-	public Material Material { get; set; }
-	public bool IsIndexed { get; private set; }
-
-	private int indexCount;
+	public Model( string path )
+	{
+		LoadFromPath( path );
+	}
 
 	private Model( string path, Material material, bool isIndexed )
 	{
@@ -19,11 +16,6 @@ public partial class Model : Asset
 		IsIndexed = isIndexed;
 
 		All.Add( this );
-	}
-
-	public Model( string path )
-	{
-		LoadFromPath( path );
 	}
 
 	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
@@ -37,12 +29,24 @@ public partial class Model : Asset
 		SetupMesh( vertices );
 		CreateResources();
 	}
+}
 
-	private void SetupMesh( Vertex[] vertices )
+[Icon( FontAwesome.Cube ), Title( "Model" )]
+public partial class Model<T> : Asset
+	where T : struct
+{
+	public Glue.ManagedModel NativeModel { get; set; }
+
+	public Material Material { get; set; }
+	public bool IsIndexed { get; protected set; }
+
+	private int indexCount;
+
+	protected void SetupMesh( T[] vertices )
 	{
 		NativeModel = new();
 
-		int strideInBytes = Marshal.SizeOf( typeof( Vertex ) );
+		int strideInBytes = Marshal.SizeOf( typeof( T ) );
 		int sizeInBytes = strideInBytes * vertices.Length;
 
 		unsafe
@@ -54,7 +58,7 @@ public partial class Model : Asset
 		}
 	}
 
-	private void SetupMesh( Vertex[] vertices, uint[] indices )
+	protected void SetupMesh( T[] vertices, uint[] indices )
 	{
 		SetupMesh( vertices );
 
@@ -70,8 +74,18 @@ public partial class Model : Asset
 		}
 	}
 
-	private void CreateResources()
+	protected void CreateResources()
 	{
 		NativeModel.Finish( Material.DiffuseTexture.NativeTexture.NativePtr );
+	}
+
+	public void SetIndices( uint[] indices )
+	{
+		throw new NotImplementedException();
+	}
+
+	public void SetVertices( T[] vertices )
+	{
+		throw new NotImplementedException();
 	}
 }

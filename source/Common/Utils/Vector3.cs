@@ -1,4 +1,6 @@
-﻿namespace Mocha.Common;
+﻿using System.Text;
+
+namespace Mocha.Common;
 
 public struct Vector3 : IEquatable<Vector3>
 {
@@ -133,8 +135,6 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public override int GetHashCode() => HashCode.Combine( internalVector );
 
-	public override string ToString() => internalVector.ToString();
-
 	public System.Numerics.Vector3 GetSystemVector3() => internalVector;
 
 	public static Vector3 OrthoNormalize( Vector3 normal, Vector3 tangent )
@@ -149,5 +149,20 @@ public struct Vector3 : IEquatable<Vector3>
 				this.Y.LerpTo( b.Y, delta ),
 				this.Z.LerpTo( b.Z, delta )
 		);
+	}
+
+	public override string ToString()
+	{
+		var sb = new StringBuilder();
+
+		sb.Append( "( " );
+
+		sb.Append( $"X: {X:G2}, " );
+		sb.Append( $"Y: {Y:G2}, " );
+		sb.Append( $"Z: {Z:G2}" );
+
+		sb.Append( " )" );
+
+		return sb.ToString();
 	}
 }

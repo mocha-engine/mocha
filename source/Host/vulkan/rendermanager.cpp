@@ -434,6 +434,7 @@ void RenderManager::Run()
 		ImGui::NewFrame();
 
 		Editor::Draw();
+		g_hostManager->DrawEditor();
 #endif
 
 		g_hostManager->Render();

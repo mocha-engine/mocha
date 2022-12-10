@@ -38,6 +38,12 @@ public class Main
 		world.Update();
 	}
 
+	[UnmanagedCallersOnly]
+	public static void DrawEditor()
+	{
+		Editor.Draw();
+	}
+
 	public delegate void FireEventDelegate( IntPtr ptrEventName );
 
 	[UnmanagedCallersOnly]

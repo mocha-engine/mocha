@@ -2,7 +2,7 @@
 
 public static class Parser
 {
-	private static bool Debug => true;
+	private static bool Debug => false;
 
 	private static string[] GetLaunchArgs()
 	{
@@ -204,6 +204,16 @@ public static class Parser
 					IsConstructor = true
 				} );
 			}
+		}
+
+		//
+		// Remove all items with duplicate names
+		//
+		for ( int i = 0; i < units.Count; i++ )
+		{
+			var o = units[i];
+			o.Methods = o.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
+			o.Fields = o.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
 		}
 
 		return units;

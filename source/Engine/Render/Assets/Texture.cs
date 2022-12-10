@@ -42,13 +42,8 @@ public class Texture : Asset
 		}
 	}
 
-	public Texture( uint width, uint height, byte[] data )
+	public Texture( uint width, uint height, byte[] data ) : this( width, height )
 	{
-		Width = width;
-		Height = height;
-
-		NativeTexture = new();
-
 		unsafe
 		{
 			fixed ( void* dataPtr = data )
@@ -56,6 +51,14 @@ public class Texture : Asset
 				NativeTexture.SetData( Width, Height, (IntPtr)dataPtr, (int)TextureFormat.R8G8B8A8_SRGB );
 			}
 		}
+	}
+
+	public Texture( uint width, uint height )
+	{
+		Width = width;
+		Height = height;
+
+		NativeTexture = new();
 	}
 
 	internal Texture( string path, string type, int width, int height )

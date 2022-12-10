@@ -23,6 +23,7 @@ public struct UnmanagedArgs
 	public IntPtr __LogManager_WarningMethodPtr;
 	public IntPtr __LogManager_ErrorMethodPtr;
 	public IntPtr __LogManager_TraceMethodPtr;
+	public IntPtr __LogManager_GetLogHistoryMethodPtr;
 	public IntPtr __ManagedTexture_SetDataMethodPtr;
 	public IntPtr __ManagedTexture_CtorMethodPtr;
 	public IntPtr __Camera_CtorMethodPtr;
@@ -31,4 +32,28 @@ public struct UnmanagedArgs
 	public IntPtr __ManagedModel_FinishMethodPtr;
 	public IntPtr __ManagedModel_CtorMethodPtr;
 	public IntPtr __Shader_CtorMethodPtr;
+	public IntPtr __Editor_EndMethodPtr;
+	public IntPtr __Editor_SeparatorMethodPtr;
+	public IntPtr __Editor_TextMethodPtr;
+	public IntPtr __Editor_TextBoldMethodPtr;
+	public IntPtr __Editor_TextSubheadingMethodPtr;
+	public IntPtr __Editor_TextHeadingMethodPtr;
+	public IntPtr __Editor_TextMonospaceMethodPtr;
+	public IntPtr __Editor_TextLightMethodPtr;
+	public IntPtr __Editor_ButtonMethodPtr;
+	public IntPtr __Editor_BeginMethodPtr;
+	public IntPtr __Editor_ShowDemoWindowMethodPtr;
+	public IntPtr __Editor_CollapsingHeaderMethodPtr;
+	public IntPtr __Editor_BeginOverlayMethodPtr;
+	public IntPtr __Editor_GetGPUNameMethodPtr;
+	public IntPtr __Editor_BeginChildMethodPtr;
+	public IntPtr __Editor_EndChildMethodPtr;
+	public IntPtr __Editor_BeginTableMethodPtr;
+	public IntPtr __Editor_EndTableMethodPtr;
+	public IntPtr __Editor_TableSetupColumnMethodPtr;
+	public IntPtr __Editor_TableNextRowMethodPtr;
+	public IntPtr __Editor_TableNextColumnMethodPtr;
+	public IntPtr __Editor_SetNextItemWidthMethodPtr;
+	public IntPtr __Editor_InputTextMethodPtr;
+	public IntPtr __Editor_SameLineMethodPtr;
 }

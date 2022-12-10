@@ -62,7 +62,7 @@ namespace Entities
 		entity->SetTransform( transform );
 	}
 
-	inline void SetName( uint32_t handle, std::string name )
+	inline void SetName( uint32_t handle, const char* name )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 
@@ -93,7 +93,7 @@ namespace Entities
 		return transform.scale;
 	}
 
-	inline std::string GetName( uint32_t handle )
+	inline const char* GetName( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		return entity->GetName();

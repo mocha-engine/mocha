@@ -1,15 +1,25 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <thirdparty/imgui/imgui.h>
+
+struct Vector2
+{
+	float x;
+	float y;
+
+	inline glm::vec2 ToGLM() { return glm::vec2( x, y ); }
+	inline ImVec2 ToImGUI() { return { x, y }; };
+};
 
 struct Vector3
 {
 	float x;
 	float y;
 	float z;
-	
+
 	inline glm::vec3 ToGLM() { return glm::vec3( x, y, z ); }
 };
 

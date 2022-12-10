@@ -17,6 +17,21 @@ struct LogEntry
 	std::string message;
 };
 
+struct LogEntryInterop
+{
+	char* time;
+	char* logger;
+	char* level;
+	char* message;
+};
+
+//@InteropGen generate struct
+struct LogHistory
+{
+	int count;
+	LogEntryInterop* items;
+};
+
 //@InteropGen generate class
 class LogManager : ISubSystem
 {
@@ -32,6 +47,38 @@ public:
 	void Trace( std::string str );
 
 	std::vector<LogEntry> m_logHistory;
+
+	//@InteropGen ignore
+	inline static void CopyString( char** dest, std::string source )
+	{
+		size_t destSize = source.size() + 1;
+		*dest = (char*)malloc( destSize );
+		strcpy_s( *dest, destSize, source.c_str() );		
+	}
+
+	inline static LogHistory GetLogHistory()
+	{
+		LogHistory logHistory = {};
+		logHistory.count = g_logManager->m_logHistory.size();
+
+		logHistory.items = new LogEntryInterop[logHistory.count];
+
+		for ( int i = 0; i < logHistory.count; ++i )
+		{
+			LogEntry logEntry = g_logManager->m_logHistory[i];
+
+			LogEntryInterop logEntryInterop = {};
+
+			CopyString( &logEntryInterop.time, logEntry.time );
+			CopyString( &logEntryInterop.logger, logEntry.logger );
+			CopyString( &logEntryInterop.level, logEntry.level );
+			CopyString( &logEntryInterop.message, logEntry.message );
+
+			logHistory.items[i] = logEntryInterop;
+		}
+		
+		return logHistory;
+	}
 };
 
 template <typename Mutex>
@@ -41,7 +88,7 @@ protected:
 	static std::string TimePointToString( const std::chrono::system_clock::time_point& tp )
 	{
 		const std::time_t t = std::chrono::system_clock::to_time_t( tp );
-		
+
 		std::tm tm;
 		localtime_s( &tm, &t );
 
@@ -66,11 +113,11 @@ protected:
 		std::string message = fmt::format( "{}", msg.payload.begin() );
 
 		// clang-format off
-		LogEntry logEntry = {
+		LogEntry logEntry = { 
 			time,
-			logger,
-			level,
-			message
+		    logger,
+		    level,
+		    message
 		};
 		// clang-format on
 
