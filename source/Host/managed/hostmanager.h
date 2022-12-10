@@ -49,5 +49,6 @@ public:
 	void Shutdown();
 
 	void Render();
+	void DrawEditor();
 	void FireEvent( std::string eventName );
 };

@@ -1,4 +1,6 @@
-﻿namespace Mocha.Common;
+﻿using System.Text;
+
+namespace Mocha.Common;
 
 public partial struct Rotation : IEquatable<Rotation>
 {
@@ -203,11 +205,26 @@ public partial struct Rotation : IEquatable<Rotation>
 			&& W.Equals( rot.W );
 	}
 
-	public override string ToString() => internalQuaternion.ToString();
 	public System.Numerics.Quaternion GetSystemQuaternion() => internalQuaternion;
 
 	public override int GetHashCode()
 	{
 		return base.GetHashCode();
+	}
+
+	public override string ToString()
+	{
+		var sb = new StringBuilder();
+		var euler = ToEulerAngles();
+
+		sb.Append( "( " );
+
+		sb.Append( $"Pitch: {euler.X:G2}, " );
+		sb.Append( $"Yaw: {euler.Y:G2}, " );
+		sb.Append( $"Roll: {euler.Z:G2}" );
+
+		sb.Append( " )" );
+
+		return sb.ToString();
 	}
 }

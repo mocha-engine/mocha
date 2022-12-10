@@ -75,6 +75,11 @@ void HostManager::Startup()
 	Invoke( "Run", ( void* )&args );
 }
 
+void HostManager::DrawEditor()
+{
+	Invoke( "DrawEditor" );
+}
+
 void HostManager::Shutdown() {}
 
 void HostManager::FireEvent( std::string eventName )

@@ -10,6 +10,11 @@ public class BaseEntity : IEntity
 	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
 	protected uint NativeHandle { get; set; }
 
+	public bool IsValid()
+	{
+		return NativeHandle > 0 && NativeHandle < 128;
+	}
+
 	public Vector3 Scale
 	{
 		get => Glue.Entities.GetScale( NativeHandle );

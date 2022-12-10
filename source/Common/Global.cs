@@ -11,4 +11,3 @@ public static class Global
 	public static Logger Log { get; } = new();
 	public static UnmanagedArgs UnmanagedArgs { get; set; }
 }
-

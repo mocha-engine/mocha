@@ -29,6 +29,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
+			if ( returnType == "string" )
+				returnType = "IntPtr"; // Strings are handled specially - they go from pointer to string using InteropUtils.GetString
+
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
 			var paramAndReturnTypes = parameterTypes.Append( returnType );
 			paramAndReturnTypes = paramAndReturnTypes.Prepend( "IntPtr" ); // Pointer to this class's instance
@@ -110,7 +113,15 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			if ( returnType != "void" )
 				writer.Write( "return " );
 
-			writer.WriteLine( $"this._{name}( {functionCallArgs} );" );
+			if ( returnType == "string" )
+				writer.Write( "InteropUtils.GetString( " );
+
+			writer.Write( $"this._{name}( {functionCallArgs} )" );
+
+			if ( returnType == "string" )
+				writer.Write( ")" );
+
+			writer.WriteLine( ";" );
 
 			writer.Indent--;
 			writer.WriteLine( "}" );
@@ -147,6 +158,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		{
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
+
+			if ( returnType == "string" )
+				returnType = "IntPtr"; // Strings are handled specially - they go from pointer to string using InteropUtils.GetString
 
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
 			var paramAndReturnTypes = parameterTypes.Append( returnType );
@@ -197,7 +211,15 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			if ( returnType != "void" )
 				writer.Write( "return " );
 
-			writer.WriteLine( $"_{name}( {functionCallArgs} );" );
+			if ( returnType == "string" )
+				writer.Write( "InteropUtils.GetString( " );
+
+			writer.Write( $"_{name}( {functionCallArgs} )" );
+
+			if ( returnType == "string" )
+				writer.Write( " )" );
+
+			writer.WriteLine( ";" );
 
 			writer.Indent--;
 			writer.WriteLine( "}" );
