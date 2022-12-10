@@ -25,6 +25,10 @@ EntityManager* g_entityDictionary;
 float g_curTime;
 float g_frameTime;
 Vector3 g_cameraPos;
+Quaternion g_cameraRot;
+float g_cameraFov;
+float g_cameraZNear;
+float g_cameraZFar;
 
 void Root::Startup()
 {

@@ -4,7 +4,6 @@ public class World
 {
 	public static World Current { get; set; }
 
-	public Camera? Camera { get; set; }
 	public Sun? Sun { get; set; }
 	public Sky? Sky { get; set; }
 	public Player? Player { get; set; }
@@ -23,7 +22,7 @@ public class World
 	{
 		Log.Trace( $"Setting up entities..." );
 
-		Camera = new Camera();
+		Player = new Player();
 
 		Sun = new Sun()
 		{

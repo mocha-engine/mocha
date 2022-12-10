@@ -1,21 +1,34 @@
 ﻿namespace Mocha;
 
-[Category( "Player" ), Title( "Camera" ), Icon( FontAwesome.Camera )]
-public class Camera : BaseEntity
+public static class Camera
 {
-	public override void Update()
+	public static Vector3 Position
 	{
-		base.Update();
+		get => Glue.Entities.GetCameraPosition();
+		set => Glue.Entities.SetCameraPosition( value );
+	}
 
-		// Set camera position
-		var newPos = new Vector3();
-		newPos.X = MathF.Sin( Time.Now * 3 * 0.5f ) * 4.0f;
-		newPos.Y = MathF.Sin( Time.Now * 2 * 0.5f ) * 4.0f;
-		newPos.Z = MathF.Cos( Time.Now * 1 * 0.5f ) * 4.0f;
+	public static Rotation Rotation
+	{
+		get => Glue.Entities.GetCameraRotation();
+		set => Glue.Entities.SetCameraRotation( value );
+	}
 
-		Position = newPos;
+	public static float FieldOfView
+	{
+		get => Glue.Entities.GetCameraFieldOfView();
+		set => Glue.Entities.SetCameraFieldOfView( value );
+	}
 
-		Position = new Vector3( 0, 0, -64 );
-		Glue.Entities.SetCameraPosition( Position );
+	public static float ZNear
+	{
+		get => Glue.Entities.GetCameraZNear();
+		set => Glue.Entities.SetCameraZNear( value );
+	}
+
+	public static float ZFar
+	{
+		get => Glue.Entities.GetCameraZFar();
+		set => Glue.Entities.SetCameraZFar( value );
 	}
 }

@@ -4,8 +4,6 @@ using ImGui = Glue.Editor;
 
 public class Editor
 {
-	static bool hasClicked = false;
-
 	const int MAX_INPUT_LENGTH = 512;
 	static string consoleInput = "";
 	static string editorInput = "";
@@ -17,6 +15,7 @@ public class Editor
 		DrawEntityWindow();
 		DrawPerformanceWindow();
 		DrawConsoleWindow();
+		DrawCameraWindow();
 	}
 
 	private static void DrawConsoleWindow()
@@ -87,6 +86,20 @@ public class Editor
 					ImGui.Text( $"Scale: {x.Scale}" );
 				}
 			} );
+		}
+
+		ImGui.End();
+	}
+
+	private static void DrawCameraWindow()
+	{
+		if ( ImGui.Begin( "Camera" ) )
+		{
+			ImGui.Text( $"Position: {Camera.Position}" );
+			ImGui.Text( $"Rotation: {Camera.Rotation}" );
+			ImGui.Text( $"Field of View: {Camera.FieldOfView}" );
+			ImGui.Text( $"ZNear: {Camera.ZNear}" );
+			ImGui.Text( $"ZFar: {Camera.ZFar}" );
 		}
 
 		ImGui.End();

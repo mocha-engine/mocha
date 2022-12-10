@@ -9,6 +9,7 @@ class EntityManager;
 class CVarManager;
 
 struct Vector3;
+struct Quaternion;
 
 //
 // Global vars
@@ -25,3 +26,7 @@ extern float g_curTime;
 extern float g_frameTime;
 
 extern Vector3 g_cameraPos;
+extern Quaternion g_cameraRot;
+extern float g_cameraFov;
+extern float g_cameraZNear;
+extern float g_cameraZFar;
