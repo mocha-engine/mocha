@@ -21,9 +21,9 @@ public class Editor
 
 	private static void DrawRaycastTestWindow()
 	{
-		if ( ImGui.Begin( "Raycast Test" ) )
+		if ( ImGui.Begin( "Physics Test" ) )
 		{
-			if ( ImGui.Button( "Raycast" ) )
+			if ( ImGui.Button( "Raycast (log to console)" ) )
 			{
 				var traceResult = Glue.Physics.TraceRay( Camera.Position, Vector3.Zero );
 
@@ -33,6 +33,16 @@ public class Editor
 
 				if ( traceResult.hit )
 					Log.Info( $"Normal {traceResult.normal}" );
+			}
+
+			if ( ImGui.Button( "Spawn a ball" ) )
+			{
+				var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
+				ball.Position = new( 0, 0, 10f );
+				ball.Restitution = 1.0f;
+				ball.Friction = 1.0f;
+				ball.Mass = 10.0f;
+				ball.SetSpherePhysics( 0.5f, false );
 			}
 		}
 
