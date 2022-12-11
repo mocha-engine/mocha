@@ -9,6 +9,24 @@ public partial class ModelEntity : BaseEntity
 		set => Glue.Entities.SetVelocity( NativeHandle, value );
 	}
 
+	public float Mass
+	{
+		get => Glue.Entities.GetMass( NativeHandle );
+		set => Glue.Entities.SetMass( NativeHandle, value );
+	}
+
+	public float Friction
+	{
+		get => Glue.Entities.GetFriction( NativeHandle );
+		set => Glue.Entities.SetFriction( NativeHandle, value );
+	}
+
+	public float Restitution
+	{
+		get => Glue.Entities.GetRestitution( NativeHandle );
+		set => Glue.Entities.SetRestitution( NativeHandle, value );
+	}
+
 	public ModelEntity()
 	{
 	}
