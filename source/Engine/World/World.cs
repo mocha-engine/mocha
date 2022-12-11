@@ -4,10 +4,6 @@ public class World
 {
 	public static World Current { get; set; }
 
-	public Sun? Sun { get; set; }
-	public Sky? Sky { get; set; }
-	public Player? Player { get; set; }
-
 	public World()
 	{
 		Current = this;
@@ -22,15 +18,12 @@ public class World
 	{
 		Log.Trace( $"Setting up entities..." );
 
-		Player = new Player();
+		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
+		floor.Position = new Vector3( 0, 256f, 0 );
 
-		Sun = new Sun()
-		{
-			Position = new( 20, 25, 80 ),
-			Rotation = Rotation.From( 27, 15, 0 )
-		};
+		var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
 
-		_ = new TestEntity();
+		var player = new Player();
 	}
 
 	public void Update()
