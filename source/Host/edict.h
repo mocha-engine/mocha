@@ -3,27 +3,19 @@
 #include <baseentity.h>
 #include <functional>
 #include <game/types.h>
+#include <handlemap.h>
+#include <memory>
 #include <subsystem.h>
 #include <unordered_map>
-#include <memory>
 
-class EntityManager;
-
-class EntityManager : public ISubSystem
+class EntityManager : HandleMap<BaseEntity>, ISubSystem
 {
-private:
-	// A map of entities, indexed by their handle index.
-	std::unordered_map<uint32_t, std::shared_ptr<BaseEntity>> m_entities;
-
-	// The current index to use when inserting a new entity into the map.
-	uint32_t m_entIndex;
-
 public:
 	template <typename T>
 	uint32_t AddEntity( T entity );
 
 	template <typename T>
-	T* GetEntity( uint32_t entityHandle );
+	std::shared_ptr<T> GetEntity( uint32_t entityHandle );
 
 	// Calls the specified function for each entity managed by this EntityManager.
 	// The function should take a std::shared_ptr<BaseEntity> as its argument.
@@ -37,19 +29,18 @@ public:
 };
 
 template <typename T>
-inline T* EntityManager::GetEntity( uint32_t entityHandle )
+inline uint32_t EntityManager::AddEntity( T entity )
 {
-	return static_cast<T*>( m_entities[entityHandle].get() );
+	return AddSpecific<T>( entity );
 }
 
 template <typename T>
-inline uint32_t EntityManager::AddEntity( T entity )
+inline std::shared_ptr<T> EntityManager::GetEntity( uint32_t entityHandle )
 {
-	// Create a shared pointer to the entity.
-	auto entityPtr = std::make_shared<T>( entity );
+	return GetSpecific<T>( entityHandle );
+}
 
-	// Add the entity to the map.
-	m_entities[m_entIndex] = entityPtr;
-	
-	return m_entIndex++;
+inline void EntityManager::ForEach( std::function<void( std::shared_ptr<BaseEntity> entity )> func )
+{
+	HandleMap<BaseEntity>::ForEach( func );
 }

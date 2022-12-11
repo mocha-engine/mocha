@@ -1,6 +1,7 @@
 #pragma once
 #include <Jolt/Jolt.h>
 #include <game/types.h>
+#include <handlemap.h>
 #include <memory>
 #include <modelentity.h>
 #include <spdlog/spdlog.h>
@@ -14,8 +15,12 @@
 #include <Jolt/Physics/Body/BodyActivationListener.h>
 #include <Jolt/Physics/Body/BodyCreationSettings.h>
 #include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
+#include <Jolt/Physics/Collision/CastResult.h>
+#include <Jolt/Physics/Collision/CollisionCollector.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
+#include <Jolt/Physics/Collision/RayCast.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
@@ -57,6 +62,17 @@ struct PhysicsBody
 
 	JPH::BodyID bodyId;
 };
+
+//@InteropGen generate struct
+struct TraceResult
+{
+	bool hit;
+	Vector3 startPosition;
+	Vector3 endPosition;
+	float fraction;
+	Vector3 normal;
+};
+
 // Layer that objects can be in, determines which other objects it can collide with
 // Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
 // layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
@@ -197,13 +213,33 @@ public:
 	}
 };
 
+// Convert Mocha to Jolt Vector3. Accounts for Z-Up / Y-Up swapping
+inline JPH::Vec3 MochaToJoltVec3( Vector3 inVec3 )
+{
+	return JPH::Vec3{ inVec3.x, inVec3.z, inVec3.y };
+}
 
-class PhysicsManager : ISubSystem
+// Convert Jolt to Mocha Vector3. Accounts for Z-Up / Y-Up swapping
+inline Vector3 JoltToMochaVec3( JPH::Vec3 inVec3 )
+{
+	return Vector3{ inVec3.GetX(), inVec3.GetZ(), inVec3.GetY() };
+}
+
+// Convert Jolt to Mocha Quaternion
+inline Quaternion JoltToMochaQuat( JPH::Quat inQuat )
+{
+	return Quaternion{ inQuat.GetX(), inQuat.GetY(), inQuat.GetZ(), inQuat.GetW() };
+}
+
+// Convert Mocha to Jolt Quaternion
+inline JPH::Quat MochaToJoltQuat( Quaternion inQuat )
+{
+	return JPH::Quat{ inQuat.x, inQuat.y, inQuat.z, inQuat.w };
+}
+
+class PhysicsManager : HandleMap<PhysicsBody>, ISubSystem
 {
 private:
-	std::unordered_map<uint32_t, std::shared_ptr<PhysicsBody>> m_bodies;
-	uint32_t m_bodyIndex;
-
 	JPH::TempAllocator* m_tempAllocator;
 	JPH::JobSystem* m_jobSystem;
 	JPH::PhysicsSystem m_physicsSystem;
@@ -220,4 +256,5 @@ public:
 	void Update();
 
 	uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
+	TraceResult TraceRay( Vector3 startPosition, Vector3 endPosition );
 };
