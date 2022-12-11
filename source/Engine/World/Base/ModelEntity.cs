@@ -3,6 +3,12 @@
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
+	public Vector3 Velocity
+	{
+		get => Glue.Entities.GetVelocity( NativeHandle );
+		set => Glue.Entities.SetVelocity( NativeHandle, value );
+	}
+
 	public ModelEntity()
 	{
 	}

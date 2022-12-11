@@ -194,4 +194,28 @@ namespace Entities
 
 		entity->SetSpherePhysics( radius, isStatic );
 	}
+
+	inline void SetVelocity( uint32_t handle, Vector3 velocity )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+		
+		entity->SetVelocity( velocity );
+	}
+
+	inline Vector3 GetVelocity( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return {};
+		}
+
+		return entity->GetVelocity();
+	}
 } // namespace Entities
