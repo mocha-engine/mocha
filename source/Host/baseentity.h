@@ -17,7 +17,9 @@ class BaseEntity
 protected:
 	std::string m_type;
 	std::string m_name;
+
 	Transform m_transform;
+	
 	int m_flags;
 
 public:
