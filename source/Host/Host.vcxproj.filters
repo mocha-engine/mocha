@@ -495,6 +495,9 @@
     <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp">
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClCompile>
+    <ClCompile Include="texturecache.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="generated\editor.generated.h">
@@ -518,13 +521,16 @@
     <ClInclude Include="generated\mesh.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="generated\Physics.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\physicsmanager.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="generated\shader.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\*.h">
@@ -567,9 +573,6 @@
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="edict.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="entities.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="vulkan\editor.h">
@@ -1431,6 +1434,18 @@
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClInclude>
     <ClInclude Include="gitdefs.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="entities.h">
+      <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
+      <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="texturecache.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="handlemap.h">
       <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
