@@ -177,6 +177,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="renderdocmanager.cpp" />
     <ClCompile Include="root.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="texturecache.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -324,13 +325,16 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="edict.h" />
     <ClInclude Include="entities.h" />
     <ClInclude Include="gitdefs.h" />
+    <ClInclude Include="handlemap.h" />
     <ClInclude Include="managedtexture.h" />
     <ClInclude Include="modelentity.h" />
+    <ClInclude Include="Physics.h" />
     <ClInclude Include="physicsmanager.h" />
     <ClInclude Include="renderdocmanager.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="texturecache.h" />
     <ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />
     <ClInclude Include="thirdparty\imgui\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />
