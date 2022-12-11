@@ -110,12 +110,28 @@ void RenderManager::InitDeviceProperties()
 
 void RenderManager::InitSwapchain()
 {
+	CreateSwapchain( GetWindowExtent() );
+}
+
+VkExtent2D RenderManager::GetWindowExtent()
+{
+	int windowWidth, windowHeight;
+	m_window->GetWindowSize( &windowWidth, &windowHeight );
+	VkExtent2D windowExtent = { windowWidth, windowHeight };
+
+	return windowExtent;
+}
+
+void RenderManager::CreateSwapchain( VkExtent2D size )
+{
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
 
 	vkb::Swapchain vkbSwapchain =
-	    swapchainBuilder.set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
+	    swapchainBuilder
+			.set_old_swapchain( m_swapchain )
+			.set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
 	        .set_desired_present_mode( VK_PRESENT_MODE_FIFO_KHR )
-	        .set_desired_extent( m_windowExtent.width, m_windowExtent.height )
+	        .set_desired_extent( size.width, size.height )
 	        .build()
 	        .value();
 
@@ -125,8 +141,8 @@ void RenderManager::InitSwapchain()
 	m_swapchainImageFormat = vkbSwapchain.image_format;
 
 	VkExtent3D depthImageExtent = {
-	    m_windowExtent.width,
-	    m_windowExtent.height,
+	    size.width,
+	    size.height,
 	    1,
 	};
 
@@ -266,7 +282,8 @@ void RenderManager::InitDescriptors()
 
 void RenderManager::Startup()
 {
-	m_window = std::make_unique<Window>( Window( m_windowExtent.width, m_windowExtent.height ) );
+	m_window = std::make_unique<Window>( Window( 1280, 720 ) );
+	m_window->m_onWindowResized = [this]( VkExtent2D newWindowExtents ) { CreateSwapchain( newWindowExtents ); };
 
 	InitVulkan();
 
@@ -319,8 +336,7 @@ void RenderManager::Render()
 
 	// Acquire swapchain image ( 1 second timeout )
 	uint32_t swapchainImageIndex;
-	VK_CHECK( vkAcquireNextImageKHR( m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr,
-	    &swapchainImageIndex ) ); // TODO: Check for VK_ERROR_OUT_OF_DATE_KHR or VK_SUBOPTIMAL_KHR and resize
+	VK_CHECK( vkAcquireNextImageKHR( m_device, m_swapchain, 1000000000, m_presentSemaphore, nullptr, &swapchainImageIndex ) );
 	VK_CHECK( vkResetCommandBuffer( m_commandBuffer, 0 ) );
 
 	// Begin command buffer
@@ -353,7 +369,9 @@ void RenderManager::Render()
 	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
 	depthAttachmentInfo.clearValue = depthClear;
 
-	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, m_windowExtent );
+	VkExtent2D windowExtent = GetWindowExtent();
+
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, windowExtent );
 
 	// Draw scene
 	vkCmdBeginRendering( cmd, &renderInfo );
@@ -376,7 +394,7 @@ void RenderManager::Render()
 	    VKInit::RenderingAttachmentInfo( currentImageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 	uiAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD; // Preserve existing color data (3d scene)
 
-	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, m_windowExtent );
+	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, windowExtent );
 
 	vkCmdBeginRendering( cmd, &imguiRenderInfo );
 	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
@@ -411,8 +429,7 @@ void RenderManager::Render()
 
 	// Present
 	VkPresentInfoKHR presentInfo = VKInit::PresentInfo( &m_swapchain, &m_renderSemaphore, &swapchainImageIndex );
-	VK_CHECK( vkQueuePresentKHR(
-	    m_graphicsQueue, &presentInfo ) ); // TODO: Check for VK_ERROR_OUT_OF_DATE_KHR or VK_SUBOPTIMAL_KHR and resize
+	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
 
 	m_frameNumber++;
 }
@@ -439,7 +456,7 @@ void RenderManager::Run()
 		Editor::Draw();
 		g_hostManager->DrawEditor();
 #endif
-		
+
 		g_hostManager->Render();
 
 		Render();

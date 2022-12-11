@@ -8,10 +8,28 @@ VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorFormat, VkForm
 	viewportState.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
 	viewportState.pNext = nullptr;
 
+	VkViewport viewport = {};
+	viewport.x = 0.0f;
+	viewport.y = 0.0f;
+	viewport.width = 1280.0f;
+	viewport.height = 720.0f;
+	viewport.minDepth = 0.0f;
+	viewport.maxDepth = 1.0f;
+
+	VkRect2D scissor = VkRect2D{ { 0, 0 }, { 1280, 720 } };
+
 	viewportState.viewportCount = 1;
-	viewportState.pViewports = &m_viewport;
+	viewportState.pViewports = &viewport;
 	viewportState.scissorCount = 1;
-	viewportState.pScissors = &m_scissor;
+	viewportState.pScissors = &scissor;
+	
+	VkPipelineDynamicStateCreateInfo dynamicStateInfo = {};
+	std::vector<VkDynamicState> dynamicStates = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+
+	dynamicStateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+	dynamicStateInfo.pNext = nullptr;
+	dynamicStateInfo.dynamicStateCount = 2;
+	dynamicStateInfo.pDynamicStates = dynamicStates.data();
 
 	VkPipelineColorBlendStateCreateInfo colorBlending = {};
 	colorBlending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
@@ -42,7 +60,8 @@ VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorFormat, VkForm
 	pipelineInfo.pRasterizationState = &m_rasterizer;
 	pipelineInfo.pMultisampleState = &m_multisampling;
 	pipelineInfo.pColorBlendState = &colorBlending;
-	pipelineInfo.pDepthStencilState = &m_depthStencil;
+	pipelineInfo.pDepthStencilState = &m_depthStencil;	
+	pipelineInfo.pDynamicState = &dynamicStateInfo;
 	pipelineInfo.layout = m_pipelineLayout;
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;

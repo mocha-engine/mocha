@@ -8,7 +8,7 @@
 void Model::InitPipelines()
 {
 	VkDevice device = g_renderManager->m_device;
-	VkExtent2D windowExtent = g_renderManager->m_windowExtent;
+	VkExtent2D windowExtent = g_renderManager->GetWindowExtent();
 	VkFormat colorFormat = g_renderManager->m_swapchainImageFormat;
 	VkFormat depthFormat = g_renderManager->m_depthFormat;
 
