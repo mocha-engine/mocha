@@ -22,6 +22,7 @@ public static class Parser
 		args.Add( "-x" );
 		args.Add( "c++" );
 		args.Add( "-fparse-all-comments" );
+		args.Add( "-std=c++17" );
 
 		args.AddRange( includeDirs.Select( x => "-I" + x ) );
 
