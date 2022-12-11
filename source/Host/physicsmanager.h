@@ -228,13 +228,13 @@ inline Vector3 JoltToMochaVec3( JPH::Vec3 inVec3 )
 // Convert Jolt to Mocha Quaternion
 inline Quaternion JoltToMochaQuat( JPH::Quat inQuat )
 {
-	return Quaternion{ inQuat.GetX(), inQuat.GetY(), inQuat.GetZ(), inQuat.GetW() };
+	return Quaternion{ inQuat.GetX(), inQuat.GetZ(), inQuat.GetY(), -inQuat.GetW() };
 }
 
 // Convert Mocha to Jolt Quaternion
 inline JPH::Quat MochaToJoltQuat( Quaternion inQuat )
 {
-	return JPH::Quat{ inQuat.x, inQuat.y, inQuat.z, inQuat.w };
+	return JPH::Quat{ inQuat.x, inQuat.z, inQuat.y, -inQuat.w };
 }
 
 class PhysicsManager : HandleMap<PhysicsBody>, ISubSystem
