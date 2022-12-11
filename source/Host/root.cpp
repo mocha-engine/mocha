@@ -49,6 +49,9 @@ void Root::Startup()
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
 
+	// HACK: This goes BEFORE the ctor because we need it before
+	// fields on PhysicsManager get assigned to..
+	PhysicsManager::PreInit();
 	g_physicsManager = new PhysicsManager();
 	g_physicsManager->Startup();
 

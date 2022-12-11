@@ -16,9 +16,9 @@
 #include <spdlog/spdlog.h>
 
 #ifdef _IMGUI
-#include <imgui.h>
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_vulkan.h>
+#include <imgui.h>
 #endif
 
 #define VMA_IMPLEMENTATION
@@ -27,6 +27,7 @@
 #include <edict.h>
 #include <globalvars.h>
 #include <modelentity.h>
+#include <physicsmanager.h>
 #include <vk_mem_alloc.h>
 
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Cheat, "The speed at which the game world runs." );
@@ -428,6 +429,8 @@ void RenderManager::Run()
 
 		auto start = std::chrono::steady_clock::now();
 
+		g_physicsManager->Update();
+
 #ifdef _IMGUI
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
@@ -436,7 +439,7 @@ void RenderManager::Run()
 		Editor::Draw();
 		g_hostManager->DrawEditor();
 #endif
-
+		
 		g_hostManager->Render();
 
 		Render();
@@ -488,7 +491,7 @@ AllocatedBuffer RenderManager::CreateBuffer( size_t allocationSize, VkBufferUsag
 glm::mat4x4 RenderManager::CalculateViewProjMatrix()
 {
 	glm::vec3 camPos = g_cameraPos.ToGLM();
-	glm::mat4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, 1, 0 ) );
+	glm::mat4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, -1, 0 ) );
 	glm::mat4 projection = glm::perspective( glm::radians( g_cameraFov ), 16.0f / 9.0f, g_cameraZNear, g_cameraZFar );
 
 	return projection * view;

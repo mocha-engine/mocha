@@ -1,27 +1,13 @@
 #include "physicsmanager.h"
 
-#include <Jolt/Jolt.h>
-#include <spdlog/spdlog.h>
-
-// Jolt includes
-#include <Jolt/Core/Factory.h>
-#include <Jolt/Core/JobSystemThreadPool.h>
-#include <Jolt/Core/TempAllocator.h>
-#include <Jolt/Physics/Body/BodyActivationListener.h>
-#include <Jolt/Physics/Body/BodyCreationSettings.h>
-#include <Jolt/Physics/Collision/BroadPhase/BroadPhaseLayer.h>
-#include <Jolt/Physics/Collision/ContactListener.h>
-#include <Jolt/Physics/Collision/ObjectLayer.h>
-#include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
-#include <Jolt/Physics/PhysicsSettings.h>
-#include <Jolt/Physics/PhysicsSystem.h>
-#include <Jolt/RegisterTypes.h>
-
 // STL includes
 #include <cstdarg>
+#include <globalvars.h>
 #include <iostream>
 #include <thread>
+
+#include <edict.h>
+#include <modelentity.h>
 
 // Callback for traces
 static void TraceImpl( const char* inFMT, ... )
@@ -189,7 +175,7 @@ public:
 	}
 };
 
-void PhysicsManager::Startup()
+void PhysicsManager::PreInit()
 {
 	// Register allocation hook
 	JPH::RegisterDefaultAllocator();
@@ -203,20 +189,28 @@ void PhysicsManager::Startup()
 
 	// Register all Jolt physics types
 	JPH::RegisterTypes();
+}
+
+PhysicsManager::PhysicsManager()
+{
+	m_bodyIndex = 0;
 
 	// We need a temp allocator for temporary allocations during the physics update. We're
 	// pre-allocating 10 MB to avoid having to do allocations during the physics update.
 	// B.t.w. 10 MB is way too much for this example but it is a typical value you can use.
 	// If you don't want to pre-allocate you can also use TempAllocatorMalloc to fall back to
 	// malloc / free.
-	JPH::TempAllocatorImpl temp_allocator( 10 * 1024 * 1024 );
+	m_tempAllocator = new JPH::TempAllocatorImpl( 10 * 1024 * 1024 );
 
 	// We need a job system that will execute physics jobs on multiple threads. Typically
 	// you would implement the JobSystem interface yourself and let Jolt Physics run on top
 	// of your own job scheduler. JobSystemThreadPool is an example implementation.
-	JPH::JobSystemThreadPool job_system(
-	    JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1 );
+	m_jobSystem =
+	    new JPH::JobSystemThreadPool( JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1 );
+}
 
+void PhysicsManager::Startup()
+{
 	// This is the max amount of rigid bodies that you can add to the physics system. If you try to add more you'll get an
 	// error. Note: This value is low because this is a simple test. For a real project use something in the order of 65536.
 	const JPH::uint cMaxBodies = 1024;
@@ -241,26 +235,25 @@ void PhysicsManager::Startup()
 	BPLayerInterfaceImpl broad_phase_layer_interface;
 
 	// Now we can create the actual physics system.
-	JPH::PhysicsSystem physics_system;
-	physics_system.Init( cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface,
+	m_physicsSystem.Init( cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface,
 	    MyBroadPhaseCanCollide, MyObjectCanCollide );
 
-	// A body activation listener gets notified when bodies activate and go to sleep
-	// Note that this is called from a job so whatever you do here needs to be thread safe.
-	// Registering one is entirely optional.
-	MyBodyActivationListener body_activation_listener;
-	physics_system.SetBodyActivationListener( &body_activation_listener );
+	//// A body activation listener gets notified when bodies activate and go to sleep
+	//// Note that this is called from a job so whatever you do here needs to be thread safe.
+	//// Registering one is entirely optional.
+	//MyBodyActivationListener body_activation_listener;
+	//m_physicsSystem.SetBodyActivationListener( &body_activation_listener );
 
-	// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
-	// Note that this is called from a job so whatever you do here needs to be thread safe.
-	// Registering one is entirely optional.
-	MyContactListener contact_listener;
-	physics_system.SetContactListener( &contact_listener );
+	//// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
+	//// Note that this is called from a job so whatever you do here needs to be thread safe.
+	//// Registering one is entirely optional.
+	//MyContactListener contact_listener;
+	//m_physicsSystem.SetContactListener( &contact_listener );
 
 	// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a
 	// non-locking variant of this. We're going to use the locking version (even though we're not planning to access bodies from
 	// multiple threads)
-	JPH::BodyInterface& body_interface = physics_system.GetBodyInterface();
+	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
 
 	// Next we can create a rigid body to serve as the floor, we make a large box
 	// Create the settings for the collision volume (the shape).
@@ -279,75 +272,86 @@ void PhysicsManager::Startup()
 	    floor_shape, JPH::Vec3( 0.0f, -1.0f, 0.0f ), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING );
 
 	// Create the actual rigid body
-	JPH::Body* floor = body_interface.CreateBody( floor_settings ); // Note that if we run out of bodies this can return nullptr
+	JPH::Body* floor = bodyInterface.CreateBody( floor_settings ); // Note that if we run out of bodies this can return nullptr
 
 	// Add it to the world
-	body_interface.AddBody( floor->GetID(), JPH::EActivation::DontActivate );
+	bodyInterface.AddBody( floor->GetID(), JPH::EActivation::DontActivate );
 
 	// Now create a dynamic body to bounce on the floor
 	// Note that this uses the shorthand version of creating and adding a body to the world
 	JPH::BodyCreationSettings sphere_settings( new JPH::SphereShape( 0.5f ), JPH::Vec3( 0.0f, 2.0f, 0.0f ),
 	    JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING );
-	JPH::BodyID sphere_id = body_interface.CreateAndAddBody( sphere_settings, JPH::EActivation::Activate );
+	sphere_settings.mRestitution = 0.9f;
+	
+	m_sphereId = bodyInterface.CreateAndAddBody( sphere_settings, JPH::EActivation::Activate );
 
 	// Now you can interact with the dynamic body, in this case we're going to give it a velocity.
 	// (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the
 	// physics system)
-	body_interface.SetLinearVelocity( sphere_id, JPH::Vec3( 0.0f, -5.0f, 0.0f ) );
-
-	// We simulate the physics world in discrete time steps. 60 Hz is a good rate to update the physics system.
-	const float cDeltaTime = 1.0f / 60.0f;
+	bodyInterface.SetLinearVelocity( m_sphereId, JPH::Vec3( 0.0f, -5.0f, 0.0f ) );
 
 	// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection
 	// performance (it's pointless here because we only have 2 bodies). You should definitely not call this every frame or when
 	// e.g. streaming in a new level section as it is an expensive operation. Instead insert all new objects in batches instead
 	// of 1 at a time to keep the broad phase efficient.
-	physics_system.OptimizeBroadPhase();
+	// physics_system.OptimizeBroadPhase();
+}
 
-	// Now we're ready to simulate the body, keep simulating until it goes to sleep
-	JPH::uint step = 0;
-	while ( body_interface.IsActive( sphere_id ) )
-	{
-		// Next step
-		++step;
+void PhysicsManager::Shutdown()
+{
+	//// Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at
+	/// any / time.
+	// body_interface.RemoveBody( sphere_id );
 
-		// Output current position and velocity of the sphere
-		JPH::Vec3 position = body_interface.GetCenterOfMassPosition( sphere_id );
-		JPH::Vec3 velocity = body_interface.GetLinearVelocity( sphere_id );
-		spdlog::trace( "Step {}: Position = ({}, {}, {}), Velocity = ({}, {}, {})", step, position.GetX(), position.GetY(),
-		    position.GetZ(), velocity.GetX(), velocity.GetY(), velocity.GetZ() );
+	//// Destroy the sphere. After this the sphere ID is no longer valid.
+	// body_interface.DestroyBody( sphere_id );
 
-		// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the
-		// simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
-		const int cCollisionSteps = 1;
-
-		// If you want more accurate step results you can do multiple sub steps within a collision step. Usually you would set
-		// this to 1.
-		const int cIntegrationSubSteps = 1;
-
-		// Step the world
-		physics_system.Update( cDeltaTime, cCollisionSteps, cIntegrationSubSteps, &temp_allocator, &job_system );
-	}
-
-	// Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at any
-	// time.
-	body_interface.RemoveBody( sphere_id );
-
-	// Destroy the sphere. After this the sphere ID is no longer valid.
-	body_interface.DestroyBody( sphere_id );
-
-	// Remove and destroy the floor
-	body_interface.RemoveBody( floor->GetID() );
-	body_interface.DestroyBody( floor->GetID() );
+	//// Remove and destroy the floor
+	// body_interface.RemoveBody( floor->GetID() );
+	// body_interface.DestroyBody( floor->GetID() );
 
 	// Destroy the factory
 	delete JPH::Factory::sInstance;
 	JPH::Factory::sInstance = nullptr;
 }
 
-void PhysicsManager::Shutdown() {}
+void PhysicsManager::Update()
+{
+	// Next step
+	++m_step;
 
-void PhysicsManager::Update() {}
+	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+
+	if ( !bodyInterface.IsActive( m_sphereId ) )
+		return;
+
+	// Output current position and velocity of the sphere
+	JPH::Vec3 position = bodyInterface.GetCenterOfMassPosition( m_sphereId );
+	JPH::Vec3 velocity = bodyInterface.GetLinearVelocity( m_sphereId );
+
+	/*spdlog::trace( "Step {}: Position = ({}, {}, {}), Velocity = ({}, {}, {})", m_step, position.GetX(), position.GetY(),
+	    position.GetZ(), velocity.GetX(), velocity.GetY(), velocity.GetZ() );*/
+
+	// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the
+	// simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
+	const int cCollisionSteps = 1;
+
+	// If you want more accurate step results you can do multiple sub steps within a collision step. Usually you would set
+	// this to 1.
+	const int cIntegrationSubSteps = 1;
+
+	// Step the world
+	const float timeScale = 1.0f;
+	m_physicsSystem.Update( g_frameTime * timeScale, cCollisionSteps, cIntegrationSubSteps, m_tempAllocator, m_jobSystem );
+	
+	// Proof of concept - assign to static ent handle
+	Transform tx = {};
+	tx.position = { position.GetX(), position.GetY(), position.GetZ() };
+	tx.scale = { 1, 1, 1 }; // Identity
+	tx.rotation = { 0, 0, 0, 1 }; // Identity
+
+	g_entityDictionary->GetEntity<ModelEntity>( 1 )->SetTransform( tx );
+}
 
 uint32_t PhysicsManager::AddBody( PhysicsBody body )
 {

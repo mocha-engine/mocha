@@ -19,7 +19,8 @@ public class World
 		Log.Trace( $"Setting up entities..." );
 
 		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
-		floor.Position = new Vector3( 0, 256f, 0 );
+		floor.Position = new Vector3( 0, -0.5f, 0 );
+		floor.Rotation = Rotation.From( 0, 0, 90f );
 
 		var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
 

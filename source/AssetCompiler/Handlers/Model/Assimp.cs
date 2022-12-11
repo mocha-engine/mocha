@@ -17,7 +17,6 @@ partial class Primitives
 
 			var scene = context.ImportFile( sourcePath,
 				PostProcessSteps.Triangulate
-				| PostProcessSteps.PreTransformVertices
 				| PostProcessSteps.RemoveRedundantMaterials
 				| PostProcessSteps.CalculateTangentSpace
 				| PostProcessSteps.GenerateSmoothNormals
