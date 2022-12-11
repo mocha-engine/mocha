@@ -1,0 +1,8 @@
+{
+	"Model": "core/models/dev/dev_ball.fbx",
+	"Materials": [
+		"core/materials/dev/dev_floor.mmat",
+		"core/materials/dev/dev_wall.mmat",
+		"core/materials/dev/dev_white.mmat"
+	]
+}

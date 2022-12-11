@@ -7,6 +7,11 @@ public partial class ModelEntity : BaseEntity
 	{
 	}
 
+	public ModelEntity( string path )
+	{
+		SetModel( path );
+	}
+
 	protected override void CreateNativeEntity()
 	{
 		NativeHandle = Glue.Entities.CreateModelEntity();
