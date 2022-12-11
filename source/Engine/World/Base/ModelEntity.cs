@@ -27,4 +27,14 @@ public partial class ModelEntity : BaseEntity
 		var model = new Model( modelPath );
 		SetModel( model );
 	}
+
+	public void SetCubePhysics( Vector3 bounds, bool isStatic )
+	{
+		Glue.Entities.SetCubePhysics( NativeHandle, bounds, isStatic );
+	}
+
+	public void SetSpherePhysics( float radius, bool isStatic )
+	{
+		Glue.Entities.SetSpherePhysics( NativeHandle, radius, isStatic );
+	}
 }

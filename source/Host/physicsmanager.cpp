@@ -2,12 +2,10 @@
 
 // STL includes
 #include <cstdarg>
+#include <edict.h>
 #include <globalvars.h>
 #include <iostream>
 #include <thread>
-
-#include <edict.h>
-#include <modelentity.h>
 
 // Callback for traces
 static void TraceImpl( const char* inFMT, ... )
@@ -34,146 +32,6 @@ static bool AssertFailedImpl( const char* inExpression, const char* inMessage, c
 };
 
 #endif // JPH_ENABLE_ASSERTS
-
-// Layer that objects can be in, determines which other objects it can collide with
-// Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
-// layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
-// but only if you do collision testing).
-namespace Layers
-{
-	static constexpr JPH::uint8 NON_MOVING = 0;
-	static constexpr JPH::uint8 MOVING = 1;
-	static constexpr JPH::uint8 NUM_LAYERS = 2;
-}; // namespace Layers
-
-// Function that determines if two object layers can collide
-static bool MyObjectCanCollide( JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2 )
-{
-	switch ( inObject1 )
-	{
-	case Layers::NON_MOVING:
-		return inObject2 == Layers::MOVING; // Non moving only collides with moving
-	case Layers::MOVING:
-		return true; // Moving collides with everything
-	default:
-		assert( false );
-		return false;
-	}
-};
-
-// Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
-// a layer for non-moving and moving objects to avoid having to update a tree full of static objects every frame.
-// You can have a 1-on-1 mapping between object layers and broadphase layers (like in this case) but if you have
-// many object layers you'll be creating many broad phase trees, which is not efficient. If you want to fine tune
-// your broadphase layers define JPH_TRACK_BROADPHASE_STATS and look at the stats reported on the TTY.
-namespace BroadPhaseLayers
-{
-	static constexpr JPH::BroadPhaseLayer NON_MOVING( 0 );
-	static constexpr JPH::BroadPhaseLayer MOVING( 1 );
-	static constexpr JPH::uint NUM_LAYERS( 2 );
-}; // namespace BroadPhaseLayers
-
-// BroadPhaseLayerInterface implementation
-// This defines a mapping between object and broadphase layers.
-class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
-{
-public:
-	BPLayerInterfaceImpl()
-	{
-		// Create a mapping table from object to broad phase layer
-		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
-		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
-	}
-
-	virtual JPH::uint GetNumBroadPhaseLayers() const override { return BroadPhaseLayers::NUM_LAYERS; }
-
-	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer( JPH::ObjectLayer inLayer ) const override
-	{
-		assert( inLayer < Layers::NUM_LAYERS );
-		return mObjectToBroadPhase[inLayer];
-	}
-
-#if defined( JPH_EXTERNAL_PROFILE ) || defined( JPH_PROFILE_ENABLED )
-	virtual const char* GetBroadPhaseLayerName( BroadPhaseLayer inLayer ) const override
-	{
-		switch ( ( BroadPhaseLayer::Type )inLayer )
-		{
-		case ( BroadPhaseLayer::Type )BroadPhaseLayers::NON_MOVING:
-			return "NON_MOVING";
-		case ( BroadPhaseLayer::Type )BroadPhaseLayers::MOVING:
-			return "MOVING";
-		default:
-			JPH_ASSERT( false );
-			return "INVALID";
-		}
-	}
-#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
-
-private:
-	JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
-};
-
-// Function that determines if two broadphase layers can collide
-static bool MyBroadPhaseCanCollide( JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2 )
-{
-	switch ( inLayer1 )
-	{
-	case Layers::NON_MOVING:
-		return inLayer2 == BroadPhaseLayers::MOVING;
-	case Layers::MOVING:
-		return true;
-	default:
-		assert( false );
-		return false;
-	}
-}
-
-// An example contact listener
-class MyContactListener : public JPH::ContactListener
-{
-public:
-	// See: ContactListener
-	virtual JPH::ValidateResult OnContactValidate(
-	    const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::CollideShapeResult& inCollisionResult ) override
-	{
-		spdlog::info( "Contact validate callback" );
-
-		// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
-		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
-	}
-
-	virtual void OnContactAdded( const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
-	    JPH::ContactSettings& ioSettings ) override
-	{
-		spdlog::info( "A contact was added" );
-	}
-
-	virtual void OnContactPersisted( const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
-	    JPH::ContactSettings& ioSettings ) override
-	{
-		spdlog::info( "A contact was persisted" );
-	}
-
-	virtual void OnContactRemoved( const JPH::SubShapeIDPair& inSubShapePair ) override
-	{
-		spdlog::info( "A contact was removed" );
-	}
-};
-
-// An example activation listener
-class MyBodyActivationListener : public JPH::BodyActivationListener
-{
-public:
-	virtual void OnBodyActivated( const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData ) override
-	{
-		spdlog::info( "A body got activated" );
-	}
-
-	virtual void OnBodyDeactivated( const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData ) override
-	{
-		spdlog::info( "A body went to sleep" );
-	}
-};
 
 void PhysicsManager::PreInit()
 {
@@ -230,85 +88,18 @@ void PhysicsManager::Startup()
 	// This value is low because this is a simple test. For a real project use something in the order of 10240.
 	const JPH::uint cMaxContactConstraints = 1024;
 
-	// Create mapping table from object layer to broadphase layer
-	// Note: As this is an interface, PhysicsSystem will take a reference to this so this instance needs to stay alive!
-	BPLayerInterfaceImpl broad_phase_layer_interface;
-
 	// Now we can create the actual physics system.
-	m_physicsSystem.Init( cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, broad_phase_layer_interface,
+	m_physicsSystem.Init( cMaxBodies, cNumBodyMutexes, cMaxBodyPairs, cMaxContactConstraints, m_broadPhaseLayerInterface,
 	    MyBroadPhaseCanCollide, MyObjectCanCollide );
 
-	//// A body activation listener gets notified when bodies activate and go to sleep
-	//// Note that this is called from a job so whatever you do here needs to be thread safe.
-	//// Registering one is entirely optional.
-	//MyBodyActivationListener body_activation_listener;
-	//m_physicsSystem.SetBodyActivationListener( &body_activation_listener );
-
-	//// A contact listener gets notified when bodies (are about to) collide, and when they separate again.
-	//// Note that this is called from a job so whatever you do here needs to be thread safe.
-	//// Registering one is entirely optional.
-	//MyContactListener contact_listener;
-	//m_physicsSystem.SetContactListener( &contact_listener );
-
-	// The main way to interact with the bodies in the physics system is through the body interface. There is a locking and a
-	// non-locking variant of this. We're going to use the locking version (even though we're not planning to access bodies from
-	// multiple threads)
-	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
-
-	// Next we can create a rigid body to serve as the floor, we make a large box
-	// Create the settings for the collision volume (the shape).
-	// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
-	JPH::BoxShapeSettings floor_shape_settings( JPH::Vec3( 100.0f, 1.0f, 100.0f ) );
-
-	// Create the shape
-	JPH::ShapeSettings::ShapeResult floor_shape_result = floor_shape_settings.Create();
-	JPH::ShapeRefC floor_shape =
-	    floor_shape_result
-	        .Get(); // We don't expect an error here, but you can check floor_shape_result for HasError() / GetError()
-
-	// Create the settings for the body itself. Note that here you can also set other properties like the restitution /
-	// friction.
-	JPH::BodyCreationSettings floor_settings(
-	    floor_shape, JPH::Vec3( 0.0f, -1.0f, 0.0f ), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING );
-
-	// Create the actual rigid body
-	JPH::Body* floor = bodyInterface.CreateBody( floor_settings ); // Note that if we run out of bodies this can return nullptr
-
-	// Add it to the world
-	bodyInterface.AddBody( floor->GetID(), JPH::EActivation::DontActivate );
-
-	// Now create a dynamic body to bounce on the floor
-	// Note that this uses the shorthand version of creating and adding a body to the world
-	JPH::BodyCreationSettings sphere_settings( new JPH::SphereShape( 0.5f ), JPH::Vec3( 0.0f, 2.0f, 0.0f ),
-	    JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING );
-	sphere_settings.mRestitution = 0.9f;
-	
-	m_sphereId = bodyInterface.CreateAndAddBody( sphere_settings, JPH::EActivation::Activate );
-
-	// Now you can interact with the dynamic body, in this case we're going to give it a velocity.
-	// (note that if we had used CreateBody then we could have set the velocity straight on the body before adding it to the
-	// physics system)
-	bodyInterface.SetLinearVelocity( m_sphereId, JPH::Vec3( 0.0f, -5.0f, 0.0f ) );
-
-	// Optional step: Before starting the physics simulation you can optimize the broad phase. This improves collision detection
-	// performance (it's pointless here because we only have 2 bodies). You should definitely not call this every frame or when
-	// e.g. streaming in a new level section as it is an expensive operation. Instead insert all new objects in batches instead
-	// of 1 at a time to keep the broad phase efficient.
-	// physics_system.OptimizeBroadPhase();
+	spdlog::info( "Physics system has init" );
 }
 
 void PhysicsManager::Shutdown()
 {
-	//// Remove the sphere from the physics system. Note that the sphere itself keeps all of its state and can be re-added at
-	/// any / time.
 	// body_interface.RemoveBody( sphere_id );
-
-	//// Destroy the sphere. After this the sphere ID is no longer valid.
 	// body_interface.DestroyBody( sphere_id );
-
-	//// Remove and destroy the floor
-	// body_interface.RemoveBody( floor->GetID() );
-	// body_interface.DestroyBody( floor->GetID() );
+	// ...
 
 	// Destroy the factory
 	delete JPH::Factory::sInstance;
@@ -317,20 +108,7 @@ void PhysicsManager::Shutdown()
 
 void PhysicsManager::Update()
 {
-	// Next step
-	++m_step;
-
 	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
-
-	if ( !bodyInterface.IsActive( m_sphereId ) )
-		return;
-
-	// Output current position and velocity of the sphere
-	JPH::Vec3 position = bodyInterface.GetCenterOfMassPosition( m_sphereId );
-	JPH::Vec3 velocity = bodyInterface.GetLinearVelocity( m_sphereId );
-
-	/*spdlog::trace( "Step {}: Position = ({}, {}, {}), Velocity = ({}, {}, {})", m_step, position.GetX(), position.GetY(),
-	    position.GetZ(), velocity.GetX(), velocity.GetY(), velocity.GetZ() );*/
 
 	// If you take larger steps than 1 / 60th of a second you need to do multiple collision steps in order to keep the
 	// simulation stable. Do 1 collision step per 1 / 60th of a second (round up).
@@ -343,17 +121,36 @@ void PhysicsManager::Update()
 	// Step the world
 	const float timeScale = 1.0f;
 	m_physicsSystem.Update( g_frameTime * timeScale, cCollisionSteps, cIntegrationSubSteps, m_tempAllocator, m_jobSystem );
-	
-	// Proof of concept - assign to static ent handle
-	Transform tx = {};
-	tx.position = { position.GetX(), position.GetY(), position.GetZ() };
-	tx.scale = { 1, 1, 1 }; // Identity
-	tx.rotation = { 0, 0, 0, 1 }; // Identity
 
-	g_entityDictionary->GetEntity<ModelEntity>( 1 )->SetTransform( tx );
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+
+		if ( modelEntity == nullptr )
+			return;
+
+		auto physicsHandle = modelEntity->GetPhysicsHandle();
+
+		if ( physicsHandle == UINT32_MAX )
+			return;
+
+		auto body = m_bodies[physicsHandle].get();
+
+		// Get properties & assign them to the model entity's transform.
+		JPH::Vec3 position = bodyInterface.GetCenterOfMassPosition( body->bodyId );
+		JPH::Quat rotation = bodyInterface.GetRotation( body->bodyId );
+		JPH::Vec3 velocity = bodyInterface.GetLinearVelocity( body->bodyId );
+
+		Transform tx = modelEntity->GetTransform();
+
+		// JOLT IS Y-UP! WE ARE Z-UP!
+		tx.position = { position.GetX(), position.GetZ(), position.GetY() };
+		tx.rotation = { rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW() };
+
+		modelEntity->SetTransform( tx );
+	} );
 }
 
-uint32_t PhysicsManager::AddBody( PhysicsBody body )
+uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 {
 	// Create a shared pointer to the body.
 	auto bodyPtr = std::make_shared<PhysicsBody>( body );
@@ -361,10 +158,73 @@ uint32_t PhysicsManager::AddBody( PhysicsBody body )
 	// Add the entity to the map.
 	m_bodies[m_bodyIndex] = bodyPtr;
 
-	return m_bodyIndex++;
-}
+	// Add the body to the physics world
+	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
 
-Transform* PhysicsManager::GetTransform( uint32_t bodyHandle )
-{
-	return &m_bodies[bodyHandle].get()->transform;
+	bool isStatic = body.type == PhysicsType::Static;
+	JPH::EActivation activation = isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
+	JPH::EMotionType motionType = isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
+	JPH::uint8 layer = isStatic ? Layers::NON_MOVING : Layers::MOVING;
+
+	if ( body.shape.shapeType == PhysicsShapeType::Sphere )
+	{
+		// Create the settings for the collision volume (the shape).
+		// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
+		JPH::SphereShapeSettings sphere_shape_settings( body.shape.shapeData.radius );
+
+		// Create the shape
+		JPH::ShapeSettings::ShapeResult sphere_shape_result = sphere_shape_settings.Create();
+		JPH::ShapeRefC sphere_shape =
+		    sphere_shape_result
+		        .Get(); // We don't expect an error here, but you can check sphere_shape_result for HasError() / GetError()
+
+		// Create the settings for the body itself. Note that here you can also set other properties like the restitution /
+		// friction.
+		auto transform = entity->GetTransform();
+
+		// JOLT IS Y-UP! WE ARE Z-UP!
+		auto position = JPH::Vec3( transform.position.x, transform.position.z, transform.position.y );
+		auto rotation = JPH::Quat( transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w );
+
+		JPH::BodyCreationSettings sphere_settings( sphere_shape, position, rotation, motionType, layer );
+
+		sphere_settings.mRestitution = 0.9f;
+
+		// Add it to the world
+		bodyPtr->bodyId = bodyInterface.CreateAndAddBody( sphere_settings, activation );
+	}
+
+	if ( body.shape.shapeType == PhysicsShapeType::Box )
+	{
+		// Create the settings for the collision volume (the shape).
+		// Note that for simple shapes (like boxes) you can also directly construct a BoxShape.
+		
+		// JOLT IS Y-UP! WE ARE Z-UP!
+		auto extents =
+		    JPH::Vec3( body.shape.shapeData.extents.x, body.shape.shapeData.extents.z, body.shape.shapeData.extents.y );
+
+		JPH::BoxShapeSettings box_shape_settings( extents );
+
+		// Create the shape
+		JPH::ShapeSettings::ShapeResult box_shape_result = box_shape_settings.Create();
+		JPH::ShapeRefC box_shape =
+		    box_shape_result
+		        .Get(); // We don't expect an error here, but you can check sphere_shape_result for HasError() / GetError()
+
+		// Create the settings for the body itself. Note that here you can also set other properties like the restitution /
+		// friction.
+		auto transform = entity->GetTransform();
+
+		// JOLT IS Y-UP! WE ARE Z-UP!
+		auto position = JPH::Vec3( transform.position.x, transform.position.z, transform.position.y );
+		auto rotation = JPH::Quat( transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w );
+		JPH::BodyCreationSettings box_settings( box_shape, position, rotation, motionType, layer );
+
+		box_settings.mRestitution = 0.9f;
+
+		// Create the actual rigid body
+		bodyPtr->bodyId = bodyInterface.CreateAndAddBody( box_settings, activation );
+	}
+
+	return m_bodyIndex++;
 }

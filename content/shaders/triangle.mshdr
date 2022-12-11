@@ -65,7 +65,7 @@ float ambient()
 
 void main()
 {
-	vec3 lightPos = vec3(0.0f, 0.0f, -64.0f);
+	vec3 lightPos = vec3(0.0f, 0.0f, 64.0f);
 	vec3 lightDir = normalize(lightPos - vPositionWS);
 	vec3 viewDir = normalize(vCameraWS - vPositionWS);
 

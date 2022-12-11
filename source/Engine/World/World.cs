@@ -19,10 +19,18 @@ public class World
 		Log.Trace( $"Setting up entities..." );
 
 		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
-		floor.Position = new Vector3( 0, -0.5f, 0 );
-		floor.Rotation = Rotation.From( 0, 0, 90f );
+		floor.Position = new Vector3( 0, 0, -0.5f );
+		floor.SetCubePhysics( new Vector3( 19f, 19f, 0.5f ), true );
 
-		var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
+		for ( int x = -4; x < 4; ++x )
+		{
+			for ( int y = -4; y < 4; y++ )
+			{
+				var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
+				ball.Position = new( x, y, 10.0f + (x + y) );
+				ball.SetSpherePhysics( 0.5f, false );
+			}
+		}
 
 		var player = new Player();
 	}

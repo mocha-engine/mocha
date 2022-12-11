@@ -491,8 +491,8 @@ AllocatedBuffer RenderManager::CreateBuffer( size_t allocationSize, VkBufferUsag
 glm::mat4x4 RenderManager::CalculateViewProjMatrix()
 {
 	glm::vec3 camPos = g_cameraPos.ToGLM();
-	glm::mat4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, -1, 0 ) );
-	glm::mat4 projection = glm::perspective( glm::radians( g_cameraFov ), 16.0f / 9.0f, g_cameraZNear, g_cameraZFar );
+	glm::mat4x4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, 0, -1 ) );
+	glm::mat4x4 projection = glm::perspective( glm::radians( g_cameraFov ), 16.0f / 9.0f, g_cameraZNear, g_cameraZFar );
 
 	return projection * view;
 }

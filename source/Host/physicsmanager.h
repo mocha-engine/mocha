@@ -2,6 +2,7 @@
 #include <Jolt/Jolt.h>
 #include <game/types.h>
 #include <memory>
+#include <modelentity.h>
 #include <spdlog/spdlog.h>
 #include <subsystem.h>
 #include <unordered_map>
@@ -53,7 +54,149 @@ struct PhysicsBody
 	Transform transform;
 	float restitution;
 	float friction;
+
+	JPH::BodyID bodyId;
 };
+// Layer that objects can be in, determines which other objects it can collide with
+// Typically you at least want to have 1 layer for moving bodies and 1 layer for static bodies, but you can have more
+// layers if you want. E.g. you could have a layer for high detail collision (which is not used by the physics simulation
+// but only if you do collision testing).
+namespace Layers
+{
+	static constexpr JPH::uint8 NON_MOVING = 0;
+	static constexpr JPH::uint8 MOVING = 1;
+	static constexpr JPH::uint8 NUM_LAYERS = 2;
+}; // namespace Layers
+
+// Function that determines if two object layers can collide
+static bool MyObjectCanCollide( JPH::ObjectLayer inObject1, JPH::ObjectLayer inObject2 )
+{
+	switch ( inObject1 )
+	{
+	case Layers::NON_MOVING:
+		return inObject2 == Layers::MOVING; // Non moving only collides with moving
+	case Layers::MOVING:
+		return true; // Moving collides with everything
+	default:
+		assert( false );
+		return false;
+	}
+};
+
+// Each broadphase layer results in a separate bounding volume tree in the broad phase. You at least want to have
+// a layer for non-moving and moving objects to avoid having to update a tree full of static objects every frame.
+// You can have a 1-on-1 mapping between object layers and broadphase layers (like in this case) but if you have
+// many object layers you'll be creating many broad phase trees, which is not efficient. If you want to fine tune
+// your broadphase layers define JPH_TRACK_BROADPHASE_STATS and look at the stats reported on the TTY.
+namespace BroadPhaseLayers
+{
+	static constexpr JPH::BroadPhaseLayer NON_MOVING( 0 );
+	static constexpr JPH::BroadPhaseLayer MOVING( 1 );
+	static constexpr JPH::uint NUM_LAYERS( 2 );
+}; // namespace BroadPhaseLayers
+
+// BroadPhaseLayerInterface implementation
+// This defines a mapping between object and broadphase layers.
+class BPLayerInterfaceImpl final : public JPH::BroadPhaseLayerInterface
+{
+public:
+	BPLayerInterfaceImpl()
+	{
+		// Create a mapping table from object to broad phase layer
+		mObjectToBroadPhase[Layers::NON_MOVING] = BroadPhaseLayers::NON_MOVING;
+		mObjectToBroadPhase[Layers::MOVING] = BroadPhaseLayers::MOVING;
+	}
+
+	virtual JPH::uint GetNumBroadPhaseLayers() const override { return BroadPhaseLayers::NUM_LAYERS; }
+
+	virtual JPH::BroadPhaseLayer GetBroadPhaseLayer( JPH::ObjectLayer inLayer ) const override
+	{
+		assert( inLayer < Layers::NUM_LAYERS );
+		return mObjectToBroadPhase[inLayer];
+	}
+
+#if defined( JPH_EXTERNAL_PROFILE ) || defined( JPH_PROFILE_ENABLED )
+	virtual const char* GetBroadPhaseLayerName( BroadPhaseLayer inLayer ) const override
+	{
+		switch ( ( BroadPhaseLayer::Type )inLayer )
+		{
+		case ( BroadPhaseLayer::Type )BroadPhaseLayers::NON_MOVING:
+			return "NON_MOVING";
+		case ( BroadPhaseLayer::Type )BroadPhaseLayers::MOVING:
+			return "MOVING";
+		default:
+			JPH_ASSERT( false );
+			return "INVALID";
+		}
+	}
+#endif // JPH_EXTERNAL_PROFILE || JPH_PROFILE_ENABLED
+
+private:
+	JPH::BroadPhaseLayer mObjectToBroadPhase[Layers::NUM_LAYERS];
+};
+
+// Function that determines if two broadphase layers can collide
+static bool MyBroadPhaseCanCollide( JPH::ObjectLayer inLayer1, JPH::BroadPhaseLayer inLayer2 )
+{
+	switch ( inLayer1 )
+	{
+	case Layers::NON_MOVING:
+		return inLayer2 == BroadPhaseLayers::MOVING;
+	case Layers::MOVING:
+		return true;
+	default:
+		assert( false );
+		return false;
+	}
+}
+
+// An example contact listener
+class MyContactListener : public JPH::ContactListener
+{
+public:
+	// See: ContactListener
+	virtual JPH::ValidateResult OnContactValidate(
+	    const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::CollideShapeResult& inCollisionResult ) override
+	{
+		spdlog::info( "Contact validate callback" );
+
+		// Allows you to ignore a contact before it is created (using layers to not make objects collide is cheaper!)
+		return JPH::ValidateResult::AcceptAllContactsForThisBodyPair;
+	}
+
+	virtual void OnContactAdded( const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
+	    JPH::ContactSettings& ioSettings ) override
+	{
+		spdlog::info( "A contact was added" );
+	}
+
+	virtual void OnContactPersisted( const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::ContactManifold& inManifold,
+	    JPH::ContactSettings& ioSettings ) override
+	{
+		spdlog::info( "A contact was persisted" );
+	}
+
+	virtual void OnContactRemoved( const JPH::SubShapeIDPair& inSubShapePair ) override
+	{
+		spdlog::info( "A contact was removed" );
+	}
+};
+
+// An example activation listener
+class MyBodyActivationListener : public JPH::BodyActivationListener
+{
+public:
+	virtual void OnBodyActivated( const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData ) override
+	{
+		spdlog::info( "A body got activated" );
+	}
+
+	virtual void OnBodyDeactivated( const JPH::BodyID& inBodyID, JPH::uint64 inBodyUserData ) override
+	{
+		spdlog::info( "A body went to sleep" );
+	}
+};
+
 
 class PhysicsManager : ISubSystem
 {
@@ -64,10 +207,7 @@ private:
 	JPH::TempAllocator* m_tempAllocator;
 	JPH::JobSystem* m_jobSystem;
 	JPH::PhysicsSystem m_physicsSystem;
-
-	JPH::BodyID m_sphereId;
-
-	JPH::uint m_step = 0;
+	BPLayerInterfaceImpl m_broadPhaseLayerInterface;
 
 public:
 	PhysicsManager();
@@ -79,6 +219,5 @@ public:
 
 	void Update();
 
-	uint32_t AddBody( PhysicsBody body );
-	Transform* GetTransform( uint32_t bodyHandle );
+	uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
 };

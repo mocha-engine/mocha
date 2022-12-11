@@ -3,10 +3,9 @@
 
 #if _WIN32
 #include <Windows.h>
-
-int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
-#else
 int main()
+#else
+int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 #endif
 {
 	auto& root = Root::GetInstance();
