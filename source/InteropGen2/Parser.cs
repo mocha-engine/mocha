@@ -10,7 +10,12 @@ public static class Parser
 		{
 			"C:\\VulkanSDK\\1.3.224.1\\Include",
 			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include",
-			"../Host/"
+			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include\\SDL2",
+			"../Host/",
+			"../Host/ThirdParty/Renderdoc",
+			"../Host/ThirdParty/vk-bootstrap/src",
+			"../Host/ThirdParty/imgui",
+			"../Host/ThirdParty/JoltPhysics",
 		};
 
 		var args = new List<string>();

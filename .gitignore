@@ -376,3 +376,4 @@ vcpkg_installed/
 source/Host/tmp
 *.*_c
 source/Common/Glue/UnmanagedArgs.cs
+source/Host/gitdefs.h
