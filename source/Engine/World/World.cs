@@ -20,7 +20,7 @@ public class World
 
 		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
 		floor.Position = new Vector3( 0, 0, -0.5f );
-		floor.SetCubePhysics( new Vector3( 19f, 19f, 0.5f ), true );
+		floor.SetCubePhysics( new Vector3( 20f, 20f, 0.5f ), true );
 
 		for ( int x = -4; x < 4; ++x )
 		{
