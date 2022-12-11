@@ -3,7 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <thirdparty/imgui/imgui.h>
+#include <imgui.h>
 
 struct Vector2
 {
