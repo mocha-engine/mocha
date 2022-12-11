@@ -26,7 +26,6 @@ public class BaseEntity
 		set => Glue.Entities.SetPosition( NativeHandle, value );
 	}
 
-	// TODO
 	public Rotation Rotation
 	{
 		get => Glue.Entities.GetRotation( NativeHandle );

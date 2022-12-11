@@ -16,6 +16,27 @@ public class Editor
 		DrawPerformanceWindow();
 		DrawConsoleWindow();
 		DrawCameraWindow();
+		DrawRaycastTestWindow();
+	}
+
+	private static void DrawRaycastTestWindow()
+	{
+		if ( ImGui.Begin( "Raycast Test" ) )
+		{
+			if ( ImGui.Button( "Raycast" ) )
+			{
+				var traceResult = Glue.Physics.TraceRay( Camera.Position, Vector3.Zero );
+
+				Log.Info( $"{traceResult.startPosition} -> {traceResult.endPosition}" );
+				Log.Info( $"Fraction {traceResult.fraction}" );
+				Log.Info( $"Hit? {traceResult.hit}" );
+
+				if ( traceResult.hit )
+					Log.Info( $"Normal {traceResult.normal}" );
+			}
+		}
+
+		ImGui.End();
 	}
 
 	private static void DrawConsoleWindow()
@@ -84,6 +105,11 @@ public class Editor
 					ImGui.Text( $"Position: {x.Position}" );
 					ImGui.Text( $"Rotation: {x.Rotation}" );
 					ImGui.Text( $"Scale: {x.Scale}" );
+
+					if ( x is ModelEntity xM )
+					{
+						ImGui.Text( $"Velocity: {xM.Velocity}" );
+					}
 				}
 			} );
 		}
