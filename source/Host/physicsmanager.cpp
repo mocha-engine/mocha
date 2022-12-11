@@ -138,48 +138,44 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 	JPH::EMotionType motionType = isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
 	JPH::uint8 layer = isStatic ? Layers::NON_MOVING : Layers::MOVING;
 
-	if ( body.shape.shapeType == PhysicsShapeType::Sphere )
+	auto transform = entity->GetTransform();
+	auto position = MochaToJoltVec3( transform.position );
+	auto rotation = MochaToJoltQuat( transform.rotation );
+	
+	JPH::ShapeSettings* shapeSettings = nullptr;
+
+	// Shape-specific setup
+	switch ( body.shape.shapeType )
 	{
-		// Create the settings for a sphere, then create and add a rigid body.
-		JPH::SphereShapeSettings sphere_shape_settings( body.shape.shapeData.radius );
+	case PhysicsShapeType::Sphere:
+		shapeSettings = new JPH::SphereShapeSettings( body.shape.shapeData.radius );
+		break;
 
-		JPH::ShapeSettings::ShapeResult sphereShapeResult = sphere_shape_settings.Create();
-		JPH::ShapeRefC sphereShape = sphereShapeResult.Get();
-
-		auto transform = entity->GetTransform();
-
-		auto position = MochaToJoltVec3( transform.position );
-		auto rotation = MochaToJoltQuat( transform.rotation );
-
-		JPH::BodyCreationSettings sphereSettings( sphereShape, position, rotation, motionType, layer );
-
-		sphereSettings.mRestitution = 0.9f;
-
-		// Add it to the world
-		body.bodyId = bodyInterface.CreateAndAddBody( sphereSettings, activation );
-	}
-
-	if ( body.shape.shapeType == PhysicsShapeType::Box )
-	{
-		// Create the settings for a box, then create and add a rigid body.
+	case PhysicsShapeType::Box:
 		auto extents = MochaToJoltVec3( body.shape.shapeData.extents );
 
-		JPH::BoxShapeSettings box_shape_settings( extents );
-
-		JPH::ShapeSettings::ShapeResult boxShapeResult = box_shape_settings.Create();
-		JPH::ShapeRefC boxShape = boxShapeResult.Get();
-
-		auto transform = entity->GetTransform();
-
-		auto position = MochaToJoltVec3( transform.position );
-		auto rotation = MochaToJoltQuat( transform.rotation );
-		JPH::BodyCreationSettings boxSettings( boxShape, position, rotation, motionType, layer );
-
-		boxSettings.mRestitution = 0.9f;
-
-		// Create the actual rigid body
-		body.bodyId = bodyInterface.CreateAndAddBody( boxSettings, activation );
+		shapeSettings = new JPH::BoxShapeSettings( extents );
+		break;
 	}
+
+	// Make a shape, then set up a body
+	JPH::ShapeSettings::ShapeResult shapeResult = shapeSettings->Create();
+	JPH::ShapeRefC shape = shapeResult.Get();
+
+	JPH::BodyCreationSettings bodyCreationSettings( shape, position, rotation, motionType, layer );
+
+	// Assign values from the entity
+	float restitution = entity->GetRestitution();
+	float friction = entity->GetFriction();
+	float mass = entity->GetMass();
+
+	bodyCreationSettings.mRestitution = restitution;
+	bodyCreationSettings.mFriction = friction;
+	bodyCreationSettings.mMassPropertiesOverride = JPH::MassProperties();
+	bodyCreationSettings.mMassPropertiesOverride.mMass = mass;
+
+	// Create the actual rigid body, add it to the world
+	body.bodyId = bodyInterface.CreateAndAddBody( bodyCreationSettings, activation );
 
 	return Add( body );
 }
