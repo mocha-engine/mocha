@@ -1,7 +1,6 @@
 #include "renderdocmanager.h"
 
-#include "thirdparty/renderdoc_app.h"
-
+#include <renderdoc_app.h>
 #include <spdlog/spdlog.h>
 
 void RenderdocManager::Startup()
@@ -23,7 +22,7 @@ void RenderdocManager::Startup()
 	}
 
 	int ret = renderdocFunc( eRENDERDOC_API_Version_1_2_0, ( void** )&rdoc_api );
-	
+
 	assert( ret == 1 );
 }
 

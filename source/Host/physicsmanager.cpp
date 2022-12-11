@@ -147,8 +147,8 @@ class MyContactListener : public JPH::ContactListener
 {
 public:
 	// See: ContactListener
-	virtual JPH::ValidateResult OnContactValidate( const JPH::Body& inBody1, const JPH::Body& inBody2,
-	    JPH::RVec3Arg inBaseOffset, const JPH::CollideShapeResult& inCollisionResult ) override
+	virtual JPH::ValidateResult OnContactValidate(
+	    const JPH::Body& inBody1, const JPH::Body& inBody2, const JPH::CollideShapeResult& inCollisionResult ) override
 	{
 		spdlog::info( "Contact validate callback" );
 
@@ -276,7 +276,7 @@ void PhysicsManager::Startup()
 	// Create the settings for the body itself. Note that here you can also set other properties like the restitution /
 	// friction.
 	JPH::BodyCreationSettings floor_settings(
-	    floor_shape, JPH::RVec3( 0.0f, -1.0f, 0.0f ), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING );
+	    floor_shape, JPH::Vec3( 0.0f, -1.0f, 0.0f ), JPH::Quat::sIdentity(), JPH::EMotionType::Static, Layers::NON_MOVING );
 
 	// Create the actual rigid body
 	JPH::Body* floor = body_interface.CreateBody( floor_settings ); // Note that if we run out of bodies this can return nullptr
@@ -286,7 +286,7 @@ void PhysicsManager::Startup()
 
 	// Now create a dynamic body to bounce on the floor
 	// Note that this uses the shorthand version of creating and adding a body to the world
-	JPH::BodyCreationSettings sphere_settings( new JPH::SphereShape( 0.5f ), JPH::RVec3( 0.0f, 2.0f, 0.0f ),
+	JPH::BodyCreationSettings sphere_settings( new JPH::SphereShape( 0.5f ), JPH::Vec3( 0.0f, 2.0f, 0.0f ),
 	    JPH::Quat::sIdentity(), JPH::EMotionType::Dynamic, Layers::MOVING );
 	JPH::BodyID sphere_id = body_interface.CreateAndAddBody( sphere_settings, JPH::EActivation::Activate );
 
@@ -312,7 +312,7 @@ void PhysicsManager::Startup()
 		++step;
 
 		// Output current position and velocity of the sphere
-		JPH::RVec3 position = body_interface.GetCenterOfMassPosition( sphere_id );
+		JPH::Vec3 position = body_interface.GetCenterOfMassPosition( sphere_id );
 		JPH::Vec3 velocity = body_interface.GetLinearVelocity( sphere_id );
 		spdlog::trace( "Step {}: Position = ({}, {}, {}), Velocity = ({}, {}, {})", step, position.GetX(), position.GetY(),
 		    position.GetZ(), velocity.GetX(), velocity.GetY(), velocity.GetZ() );

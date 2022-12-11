@@ -41,7 +41,7 @@ void Root::Startup()
 	g_logManager = new LogManager();
 	g_logManager->Startup();
 
-#if __ATTACH_RENDERDOC
+#if _RENDERDOC
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
 #endif
@@ -66,7 +66,7 @@ void Root::Shutdown()
 	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
 
-#if __ATTACH_RENDERDOC
+#if _RENDERDOC
 	g_renderdocManager->Shutdown();
 #endif
 

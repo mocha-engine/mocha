@@ -1,13 +1,13 @@
 #include "rendermanager.h"
 
 #include "../managed/hostmanager.h"
-#include "../thirdparty/VkBootstrap.h"
 #include "../window.h"
 #include "mesh.h"
 #include "shadercompiler.h"
 #include "types.h"
 #include "vkinit.h"
 
+#include <VkBootstrap.h>
 #include <defs.h>
 #include <fstream>
 #include <glm/ext.hpp>
@@ -16,18 +16,18 @@
 #include <spdlog/spdlog.h>
 
 #ifdef _IMGUI
-#include <imgui/imgui.h>
-#include <imgui/imgui_impl_sdl.h>
-#include <imgui/imgui_impl_vulkan.h>
+#include <imgui.h>
+#include <backends/imgui_impl_sdl.h>
+#include <backends/imgui_impl_vulkan.h>
 #endif
 
 #define VMA_IMPLEMENTATION
 #include <baseentity.h>
+#include <cvarmanager.h>
 #include <edict.h>
 #include <globalvars.h>
 #include <modelentity.h>
 #include <vk_mem_alloc.h>
-#include <cvarmanager.h>
 
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Cheat, "The speed at which the game world runs." );
 

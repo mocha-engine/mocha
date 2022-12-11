@@ -4,7 +4,7 @@
 #include <globalvars.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <thirdparty/imgui/imgui.h>
+#include <imgui.h>
 #include <vulkan/rendermanager.h>
 
 //@InteropGen generate class

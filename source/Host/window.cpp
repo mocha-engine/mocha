@@ -3,8 +3,8 @@
 #include <defs.h>
 
 #ifdef _IMGUI
-#include <thirdparty/imgui/imgui.h>
-#include <thirdparty/imgui/imgui_impl_sdl.h>
+#include <imgui.h>
+#include <backends/imgui_impl_sdl.h>
 #endif
 
 Window::Window( uint32_t width, uint32_t height )

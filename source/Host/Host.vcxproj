@@ -73,16 +73,18 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
-    <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)ThirdParty\JoltPhysics;$(ProjectDir);$(ProjectDir)ThirdParty;$(IncludePath)</IncludePath>
+    <SourcePath>$(VC_SourcePath)</SourcePath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)build</OutDir>
-    <TargetName>$(ProjectName)</TargetName>
-    <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <OutDir>$(SolutionDir)..\build</OutDir>
+    <TargetName>Mocha</TargetName>
+    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(ProjectDir)ThirdParty\JoltPhysics;$(ProjectDir);$(ProjectDir)ThirdParty;$(IncludePath)</IncludePath>
+    <SourcePath>$(VC_SourcePath)</SourcePath>
+    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,7 +118,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_RENDERDOC;_DEBUG;_CONSOLE;_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -126,6 +128,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
+git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
+
+echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
+git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -145,6 +154,13 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>vulkan-1.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PreBuildEvent>
+      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
+git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
+
+echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
+git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp" />
@@ -161,11 +177,11 @@
     <ClCompile Include="renderdocmanager.cpp" />
     <ClCompile Include="root.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
+    <ClCompile Include="thirdparty\imgui\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_impl_sdl.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_impl_vulkan.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.cpp" />
@@ -294,7 +310,7 @@
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.cpp" />
-    <ClCompile Include="thirdparty\VkBootstrap.cpp" />
+    <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp" />
     <ClCompile Include="vulkan\rendermanager.cpp" />
     <ClCompile Include="vulkan\mesh.cpp" />
     <ClCompile Include="vulkan\pipeline.cpp" />
@@ -307,6 +323,7 @@
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
     <ClInclude Include="entities.h" />
+    <ClInclude Include="gitdefs.h" />
     <ClInclude Include="managedtexture.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="physicsmanager.h" />
@@ -314,6 +331,13 @@
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />
+    <ClInclude Include="thirdparty\imgui\backends\imgui_impl_vulkan.h" />
+    <ClInclude Include="thirdparty\imgui\imgui.h" />
+    <ClInclude Include="thirdparty\imgui\imgui_internal.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
+    <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeToBuffer.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\NodeCodec\NodeCodecQuadTreeHalfFloat.h" />
@@ -382,8 +406,6 @@
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Sphere.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Triangle.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Jolt.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DMat44.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Double3.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DynMatrix.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\EigenValueSymmetric.h" />
@@ -398,7 +420,6 @@
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\MathTypes.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Matrix.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Quat.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Real.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Swizzle.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Trigonometry.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.h" />
@@ -571,6 +592,9 @@
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.h" />
+    <ClInclude Include="thirdparty\Renderdoc\renderdoc_app.h" />
+    <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrap.h" />
+    <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
     <ClInclude Include="vulkan\editor.h" />
     <ClInclude Include="game\model.h" />
     <ClInclude Include="game\types.h" />
@@ -578,16 +602,6 @@
     <ClInclude Include="logmanager.h" />
     <ClInclude Include="game\managedmodel.h" />
     <ClInclude Include="managed\hostmanager.h" />
-    <ClInclude Include="thirdparty\imgui\imconfig.h" />
-    <ClInclude Include="thirdparty\imgui\imgui.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_impl_sdl.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_impl_vulkan.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="thirdparty\renderdoc_app.h" />
-    <ClInclude Include="thirdparty\VkBootstrap.h" />
     <ClInclude Include="vulkan\rendermanager.h" />
     <ClInclude Include="vulkan\vkinit.h" />
     <ClInclude Include="vulkan\mesh.h" />
@@ -596,23 +610,11 @@
     <ClInclude Include="vulkan\types.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
-  <ItemGroup>
-    <CopyFileToFolders Include="C:\Program Files\RenderDoc\renderdoc.dll">
-      <FileType>Document</FileType>
-      <DeploymentContent>true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</DeploymentContent>
-    </CopyFileToFolders>
-  </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Core\JobSystem.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Core\LockFreeHashMap.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\DMat44.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Math\Mat44.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Math\Quat.inl" />
@@ -624,4 +626,7 @@
     <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.inl" />
   </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
 </Project>
