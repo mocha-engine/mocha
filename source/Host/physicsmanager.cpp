@@ -30,8 +30,6 @@ void PhysicsManager::PreInit()
 
 PhysicsManager::PhysicsManager()
 {
-	m_bodyIndex = 0;
-
 	m_tempAllocator = new JPH::TempAllocatorImpl( 10 * 1024 * 1024 );
 
 	// JobSystemThreadPool is an example implementation.
@@ -73,6 +71,26 @@ void PhysicsManager::Update()
 	const int collisionSteps = 4;
 	const int integrationSubSteps = 1;
 
+	// Retrieve velocities that were saved off last frame
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		// Is this a valid entity to do physics stuff on?
+		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+
+		if ( modelEntity == nullptr )
+			return;
+
+		auto physicsHandle = modelEntity->GetPhysicsHandle();
+
+		if ( physicsHandle == UINT32_MAX )
+			return;
+
+		auto body = Get( physicsHandle );
+		auto savedVelocity = modelEntity->GetVelocity();
+
+		JPH::Vec3 velocity = MochaToJoltVec3( savedVelocity );
+		bodyInterface.SetLinearVelocity( body->bodyId, velocity );
+	} );
+
 	// Step the world
 	const float timeScale = 1.0f;
 	m_physicsSystem.Update( g_frameTime * timeScale, collisionSteps, integrationSubSteps, m_tempAllocator, m_jobSystem );
@@ -89,7 +107,7 @@ void PhysicsManager::Update()
 		if ( physicsHandle == UINT32_MAX )
 			return;
 
-		auto body = m_bodies[physicsHandle].get();
+		auto body = Get( physicsHandle );
 
 		// Get properties & assign them to the model entity's transform.
 		JPH::Vec3 position = bodyInterface.GetCenterOfMassPosition( body->bodyId );
@@ -98,23 +116,18 @@ void PhysicsManager::Update()
 
 		Transform tx = modelEntity->GetTransform();
 
-		// JOLT IS Y-UP! WE ARE Z-UP!
-		// TODO: should probably make a MochaToJoltVec3 method that handles this..
-		tx.position = { position.GetX(), position.GetZ(), position.GetY() };
-		tx.rotation = { rotation.GetX(), rotation.GetY(), rotation.GetZ(), rotation.GetW() };
+		tx.position = JoltToMochaVec3( position );
+		tx.rotation = JoltToMochaQuat( rotation );
 
 		modelEntity->SetTransform( tx );
+
+		// Save off velocity so that we can make changes to it if we need to
+		modelEntity->SetVelocity( JoltToMochaVec3( velocity ) );
 	} );
 }
 
 uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 {
-	// Create a shared pointer to the body.
-	auto bodyPtr = std::make_shared<PhysicsBody>( body );
-
-	// Add the entity to the map.
-	m_bodies[m_bodyIndex] = bodyPtr;
-
 	// Add the body to the physics world
 	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
 
@@ -130,48 +143,96 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 		// Create the settings for a sphere, then create and add a rigid body.
 		JPH::SphereShapeSettings sphere_shape_settings( body.shape.shapeData.radius );
 
-		JPH::ShapeSettings::ShapeResult sphere_shape_result = sphere_shape_settings.Create();
-		JPH::ShapeRefC sphere_shape = sphere_shape_result.Get();
+		JPH::ShapeSettings::ShapeResult sphereShapeResult = sphere_shape_settings.Create();
+		JPH::ShapeRefC sphereShape = sphereShapeResult.Get();
 
 		auto transform = entity->GetTransform();
 
-		// JOLT IS Y-UP! WE ARE Z-UP!
-		auto position = JPH::Vec3( transform.position.x, transform.position.z, transform.position.y );
-		auto rotation = JPH::Quat( transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w );
+		auto position = MochaToJoltVec3( transform.position );
+		auto rotation = MochaToJoltQuat( transform.rotation );
 
-		JPH::BodyCreationSettings sphere_settings( sphere_shape, position, rotation, motionType, layer );
+		JPH::BodyCreationSettings sphereSettings( sphereShape, position, rotation, motionType, layer );
 
-		sphere_settings.mRestitution = 0.9f;
+		sphereSettings.mRestitution = 0.9f;
 
 		// Add it to the world
-		bodyPtr->bodyId = bodyInterface.CreateAndAddBody( sphere_settings, activation );
+		body.bodyId = bodyInterface.CreateAndAddBody( sphereSettings, activation );
 	}
 
 	if ( body.shape.shapeType == PhysicsShapeType::Box )
 	{
 		// Create the settings for a box, then create and add a rigid body.
-
-		// JOLT IS Y-UP! WE ARE Z-UP!
-		auto extents =
-		    JPH::Vec3( body.shape.shapeData.extents.x, body.shape.shapeData.extents.z, body.shape.shapeData.extents.y );
+		auto extents = MochaToJoltVec3( body.shape.shapeData.extents );
 
 		JPH::BoxShapeSettings box_shape_settings( extents );
 
-		JPH::ShapeSettings::ShapeResult box_shape_result = box_shape_settings.Create();
-		JPH::ShapeRefC box_shape = box_shape_result.Get();
+		JPH::ShapeSettings::ShapeResult boxShapeResult = box_shape_settings.Create();
+		JPH::ShapeRefC boxShape = boxShapeResult.Get();
 
 		auto transform = entity->GetTransform();
 
-		// JOLT IS Y-UP! WE ARE Z-UP!
-		auto position = JPH::Vec3( transform.position.x, transform.position.z, transform.position.y );
-		auto rotation = JPH::Quat( transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w );
-		JPH::BodyCreationSettings box_settings( box_shape, position, rotation, motionType, layer );
+		auto position = MochaToJoltVec3( transform.position );
+		auto rotation = MochaToJoltQuat( transform.rotation );
+		JPH::BodyCreationSettings boxSettings( boxShape, position, rotation, motionType, layer );
 
-		box_settings.mRestitution = 0.9f;
+		boxSettings.mRestitution = 0.9f;
 
 		// Create the actual rigid body
-		bodyPtr->bodyId = bodyInterface.CreateAndAddBody( box_settings, activation );
+		body.bodyId = bodyInterface.CreateAndAddBody( boxSettings, activation );
 	}
 
-	return m_bodyIndex++;
+	return Add( body );
+}
+
+TraceResult PhysicsManager::TraceRay( Vector3 startPosition, Vector3 endPosition )
+{
+	// Initial trace result properties - we use a lot of these if we don't hit anything.
+	TraceResult traceResult = {};
+	traceResult.startPosition = startPosition;
+	traceResult.endPosition = endPosition;
+	traceResult.fraction = 1.0f;
+
+	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
+
+	// Create ray cast
+	JPH::RayCast ray = {};
+	ray.mOrigin = MochaToJoltVec3( startPosition );
+	ray.mDirection = MochaToJoltVec3( endPosition ) - ray.mOrigin;
+
+	JPH::RayCastSettings rayCastSettings;
+
+	JPH::AllHitCollisionCollector<JPH::CastRayCollector> collector;
+	sceneQuery.CastRay( ray, rayCastSettings, collector );
+
+	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+
+	// Did we hit? If not, bail now
+	if ( !collector.HadHit() )
+	{
+		traceResult.hit = false;
+		return traceResult;
+	}
+
+	// We hit something so let's return some relevant values
+	traceResult.hit = true;
+	collector.Sort();
+
+	std::vector<JPH::RayCastResult> raycastResults( collector.mHits.begin(), collector.mHits.end() );
+	const JPH::RayCastResult& mainResult = raycastResults[0];
+
+	// Calculate end position
+	traceResult.endPosition = JoltToMochaVec3( ray.mOrigin + mainResult.mFraction * ray.mDirection );
+
+	// Hit fraction
+	traceResult.fraction = mainResult.mFraction;
+
+	// Calculate hit normal
+	auto bodyID = mainResult.mBodyID.GetIndexAndSequenceNumber();
+	JPH::BodyLockRead body_lock( m_physicsSystem.GetBodyLockInterface(), mainResult.mBodyID );
+	const JPH::Body& hit_body = body_lock.GetBody();
+
+	traceResult.normal = JoltToMochaVec3(
+	    hit_body.GetWorldSpaceSurfaceNormal( mainResult.mSubShapeID2, MochaToJoltVec3( traceResult.endPosition ) ) );
+
+	return traceResult;
 }
