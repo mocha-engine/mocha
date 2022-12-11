@@ -218,4 +218,76 @@ namespace Entities
 
 		return entity->GetVelocity();
 	}
+
+	inline float GetMass( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return 0.0f;
+		}
+
+		return entity->GetMass();
+	}
+
+	inline float GetFriction( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return 0.0f;
+		}
+
+		return entity->GetFriction();
+	}
+
+	inline float GetRestitution( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return 0.0f;
+		}
+
+		return entity->GetRestitution();
+	}
+
+	inline void SetMass( uint32_t handle, float mass )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetMass( mass );
+	}
+
+	inline void SetFriction( uint32_t handle, float friction )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetFriction( friction );
+	}
+
+	inline void SetRestitution( uint32_t handle, float restitution )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetRestitution( restitution );
+	}
 } // namespace Entities
