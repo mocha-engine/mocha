@@ -11,7 +11,7 @@ public class Player : ModelEntity
 	private void UpdateCamera()
 	{
 		Camera.Rotation = Rotation.Identity;
-		Camera.Position = new Vector3( 0, 2, -4 );
+		Camera.Position = new Vector3( -4, 0, 2 );
 		Camera.FieldOfView = 90f;
 		Camera.ZNear = 0.1f;
 		Camera.ZFar = 1000.0f;

@@ -200,14 +200,14 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 	VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers( cmd, 0, 1, &m_mesh.vertexBuffer.buffer, &offset );
 
-	glm::mat4 model = glm::mat4{ 1.0f };
+	glm::mat4x4 model = glm::mat4{ 1.0f };
 	model *= glm::translate( glm::mat4{ 1.0f }, transform.position.ToGLM() );
 	model *= glm::mat4_cast( transform.rotation.ToGLM() );
 	model *= glm::scale( glm::mat4{ 1.0f }, transform.scale.ToGLM() );
 
-	glm::mat4 renderMatrix = viewProj * model;
+	glm::mat4x4 renderMatrix = viewProj * model;
 
-	MeshPushConstants constants;
+	MeshPushConstants constants = {};
 	constants.modelMatrix = model;
 	constants.renderMatrix = renderMatrix;
 	constants.cameraPos = g_cameraPos.ToGLM();

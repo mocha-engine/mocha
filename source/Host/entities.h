@@ -170,4 +170,28 @@ namespace Entities
 	{
 		return g_frameTime;
 	}
+
+	inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetCubePhysics( bounds, isStatic );
+	}
+
+	inline void SetSpherePhysics( uint32_t handle, float radius, bool isStatic )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetSpherePhysics( radius, isStatic );
+	}
 } // namespace Entities
