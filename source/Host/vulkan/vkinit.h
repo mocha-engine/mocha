@@ -182,7 +182,7 @@ namespace VKInit
 		return cmdBeginInfo;
 	}
 
-	inline VkImageCreateInfo ImageCreateInfo( VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent )
+	inline VkImageCreateInfo ImageCreateInfo( VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent, uint32_t mipLevels )
 	{
 		VkImageCreateInfo imageInfo = {};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -193,7 +193,7 @@ namespace VKInit
 		imageInfo.format = format;
 		imageInfo.extent = extent;
 
-		imageInfo.mipLevels = 1;
+		imageInfo.mipLevels = mipLevels;
 		imageInfo.arrayLayers = 1;
 		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -205,7 +205,7 @@ namespace VKInit
 		return imageInfo;
 	}
 
-	inline VkImageViewCreateInfo ImageViewCreateInfo( VkFormat format, VkImage image, VkImageAspectFlags aspectFlags )
+	inline VkImageViewCreateInfo ImageViewCreateInfo( VkFormat format, VkImage image, VkImageAspectFlags aspectFlags, uint32_t mipLevels )
 	{
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -216,7 +216,7 @@ namespace VKInit
 		viewInfo.format = format;
 
 		viewInfo.subresourceRange.baseMipLevel = 0;
-		viewInfo.subresourceRange.levelCount = 1;
+		viewInfo.subresourceRange.levelCount = mipLevels;
 		viewInfo.subresourceRange.baseArrayLayer = 0;
 		viewInfo.subresourceRange.layerCount = 1;
 
@@ -301,6 +301,13 @@ namespace VKInit
 		info.addressModeU = samplerAddressMode;
 		info.addressModeV = samplerAddressMode;
 		info.addressModeW = samplerAddressMode;
+
+		info.anisotropyEnable = VK_TRUE;
+		info.maxAnisotropy = 16.0f;
+		
+		info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
+		info.minLod = 0.0f;
+		info.maxLod = 5.0f;
 
 		return info;
 	}

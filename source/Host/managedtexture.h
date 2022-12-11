@@ -12,7 +12,7 @@ private:
 	Texture m_texture;
 
 public:
-	void SetData( uint32_t width, uint32_t height, void* data, int format );
+	void SetMipData( uint32_t width, uint32_t height, uint32_t mipCount, uint32_t dataSize, void* data, int format );
 
 	//@InteropGen ignore
 	inline Texture GetTexture() { return m_texture; }

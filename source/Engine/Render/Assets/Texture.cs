@@ -24,11 +24,18 @@ public partial class Texture : Asset
 
 		NativeTexture = new();
 
+		// Flatten mip data into one big buffer
+		List<byte> textureData = new List<byte>();
+		for ( var i = 0; i < mipCount; i++ )
+		{
+			textureData.AddRange( mipData[i] );
+		}
+
 		unsafe
 		{
-			fixed ( void* data = mipData[0] )
+			fixed ( void* data = textureData.ToArray() )
 			{
-				NativeTexture.SetData( Width, Height, (IntPtr)data, (int)TextureFormat.BC3_SRGB );
+				NativeTexture.SetMipData( Width, Height, (uint)mipCount, (uint)textureData.Count(), (IntPtr)data, (int)TextureFormat.BC3_SRGB );
 			}
 		}
 	}
@@ -39,7 +46,7 @@ public partial class Texture : Asset
 		{
 			fixed ( void* dataPtr = data )
 			{
-				NativeTexture.SetData( Width, Height, (IntPtr)dataPtr, (int)TextureFormat.R8G8B8A8_SRGB );
+				NativeTexture.SetMipData( Width, Height, 1, (uint)data.Length, (IntPtr)dataPtr, (int)TextureFormat.R8G8B8A8_SRGB );
 			}
 		}
 	}

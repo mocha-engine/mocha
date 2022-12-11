@@ -76,11 +76,21 @@ void RenderManager::InitVulkan()
 
 	vkb::PhysicalDeviceSelector selector( vkbInstance );
 
-	VkPhysicalDeviceVulkan13Features requiredFeatures = {};
-	requiredFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-	requiredFeatures.pNext = nullptr;
-	requiredFeatures.dynamicRendering = true;
-	selector.set_required_features_13( requiredFeatures );
+	//
+	// Set required VK1.0 features
+	//
+	VkPhysicalDeviceFeatures requiredFeatures = {};
+	requiredFeatures.samplerAnisotropy = VK_TRUE;
+	selector.set_required_features( requiredFeatures );
+
+	//
+	// Set required VK1.3 features
+	//
+	VkPhysicalDeviceVulkan13Features requiredFeatures13 = {};
+	requiredFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
+	requiredFeatures13.pNext = nullptr;
+	requiredFeatures13.dynamicRendering = true;
+	selector.set_required_features_13( requiredFeatures13 );
 
 	vkb::PhysicalDevice physicalDevice = selector.set_minimum_version( 1, 3 ).set_surface( m_surface ).select().value();
 
@@ -149,7 +159,7 @@ void RenderManager::CreateSwapchain( VkExtent2D size )
 	m_depthFormat = VK_FORMAT_D32_SFLOAT_S8_UINT; // Depth & stencil format
 
 	VkImageCreateInfo depthImageInfo =
-	    VKInit::ImageCreateInfo( m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent );
+	    VKInit::ImageCreateInfo( m_depthFormat, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depthImageExtent, 1 );
 
 	VmaAllocationCreateInfo depthAllocInfo = {};
 	depthAllocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -158,7 +168,7 @@ void RenderManager::CreateSwapchain( VkExtent2D size )
 	vmaCreateImage( m_allocator, &depthImageInfo, &depthAllocInfo, &m_depthImage.image, &m_depthImage.allocation, nullptr );
 
 	VkImageViewCreateInfo depthViewInfo =
-	    VKInit::ImageViewCreateInfo( m_depthFormat, m_depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT );
+	    VKInit::ImageViewCreateInfo( m_depthFormat, m_depthImage.image, VK_IMAGE_ASPECT_DEPTH_BIT, 1 );
 
 	VK_CHECK( vkCreateImageView( m_device, &depthViewInfo, nullptr, &m_depthImageView ) );
 }
@@ -344,6 +354,22 @@ void RenderManager::Render()
 	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
 
+	// Get window size ( we use this in a load of places )
+	VkExtent2D windowExtent = GetWindowExtent();
+
+	//
+	// Set viewport & scissor
+	//
+	VkViewport viewport = {};
+	viewport.minDepth = 0.0;
+	viewport.maxDepth = 1.0;
+	viewport.width = windowExtent.width;
+	viewport.height = windowExtent.height;
+
+	VkRect2D scissor = { { 0, 0 }, { windowExtent.width, windowExtent.height } };
+	vkCmdSetScissor( cmd, 0, 1, &scissor );
+	vkCmdSetViewport( cmd, 0, 1, &viewport );
+
 	//
 	// We want to draw the image, so we'll manually transition the layout to
 	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
@@ -369,7 +395,6 @@ void RenderManager::Render()
 	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
 	depthAttachmentInfo.clearValue = depthClear;
 
-	VkExtent2D windowExtent = GetWindowExtent();
 
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, windowExtent );
 

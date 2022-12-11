@@ -50,7 +50,7 @@ void Model::InitPipelines()
 
 void Model::InitTextures()
 {
-	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT );
+	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT );
 	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_textureSampler ) );
 
 	VkDescriptorSetAllocateInfo allocInfo =
