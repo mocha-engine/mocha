@@ -24,11 +24,12 @@ private:
 	void InitImGUI();
 	void InitDescriptors();
 
+	void CreateSwapchain( VkExtent2D size );
+
 public:
 	bool m_isInitialized{ false };
 	int m_frameNumber{ 0 };
-
-	VkExtent2D m_windowExtent{ 1280, 720 };
+	
 	std::unique_ptr<Window> m_window;
 
 	VkInstance m_instance;
@@ -67,6 +68,8 @@ public:
 	void Render();
 	void Run();
 
+	std::string m_deviceName;
+
 	UploadContext m_uploadContext;
 	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );
 
@@ -74,5 +77,5 @@ public:
 
 	glm::mat4x4 CalculateViewProjMatrix();
 
-	std::string m_deviceName;
+	VkExtent2D GetWindowExtent();
 };

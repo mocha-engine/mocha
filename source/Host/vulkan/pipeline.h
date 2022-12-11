@@ -12,9 +12,6 @@ public:
 	VkPipelineVertexInputStateCreateInfo m_vertexInputInfo = {};
 	VkPipelineInputAssemblyStateCreateInfo m_inputAssembly = {};
 
-	VkViewport m_viewport = {};
-	VkRect2D m_scissor = {};
-
 	VkPipelineRasterizationStateCreateInfo m_rasterizer = {};
 	VkPipelineColorBlendAttachmentState m_colorBlendAttachment = {};
 	VkPipelineMultisampleStateCreateInfo m_multisampling = {};
@@ -33,9 +30,6 @@ private:
 	VkPolygonMode m_fillMode = VK_POLYGON_MODE_FILL;
 	VkCullModeFlags m_cullMode = VK_CULL_MODE_NONE;
 
-	VkViewport m_viewport;
-	VkRect2D m_scissor = VkRect2D{ { 0, 0 }, { 1280, 720 } };
-
 	VkPipelineLayout m_layout;
 
 	VertexInputDescription m_vertexDescription;
@@ -46,13 +40,6 @@ public:
 	inline PipelineFactory()
 	{
 		m_layout = {};
-
-		m_viewport.x = 0.0f;
-		m_viewport.y = 0.0f;
-		m_viewport.width = 1280.0f;
-		m_viewport.height = 720.0f;
-		m_viewport.minDepth = 0.0f;
-		m_viewport.maxDepth = 1.0f;
 	}
 
 	inline PipelineFactory WithFragmentShader( VkShaderModule fragmentShader )
@@ -85,18 +72,6 @@ public:
 		return *this;
 	}
 
-	inline PipelineFactory WithViewport( VkViewport viewport )
-	{
-		m_viewport = viewport;
-		return *this;
-	}
-
-	inline PipelineFactory WithScissor( VkRect2D scissor )
-	{
-		m_scissor = scissor;
-		return *this;
-	}
-
 	inline PipelineFactory WithLayout( VkPipelineLayout layout )
 	{
 		m_layout = layout;
@@ -107,8 +82,6 @@ public:
 	{
 		PipelineBuilder builder;
 
-		builder.m_viewport = m_viewport;
-		builder.m_scissor = m_scissor;
 		builder.m_pipelineLayout = m_layout;
 
 		builder.m_rasterizer = VKInit::PipelineRasterizationStateCreateInfo( m_fillMode );
