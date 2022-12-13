@@ -1,7 +1,9 @@
 #pragma once
 #include <any>
+#include <fstream>
 #include <globalvars.h>
 #include <memory>
+#include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 #include <string>
 #include <subsystem.h>
@@ -26,6 +28,8 @@ struct CVarEntry
 {
 	std::string m_name;
 	std::string m_description;
+
+	CVarFlags m_flags;
 
 	std::any m_value;
 };
@@ -57,10 +61,49 @@ private:
 public:
 	friend class StringCVar;
 
+	//
+	// CVarManager is a singleton because it needs creating *as soon as* it's referenced
+	// and not after.
+	//
 	static CVarManager& Instance()
 	{
 		static CVarManager instance;
 		return instance;
+	}
+
+	void Startup()
+	{
+		// Load all archive cvars from disk
+		nlohmann::json cvarArchive;
+
+		std::ifstream cvarFile( "cvars.json" );
+		cvarFile >> cvarArchive;
+
+		for ( auto& [name, value] : cvarArchive.items() )
+		{
+			assert( Exists( name ) ); // Doesn't exist! Register it first
+
+			size_t hash = GetHash( name );
+			CVarEntry& entry = m_cvarEntries[hash];
+
+			if ( entry.m_flags & CVarFlags::Archive )
+				FromString( name, value );
+		}
+	}
+
+	void Shutdown()
+	{
+		// Save all archive cvars to disk
+		nlohmann::json cvarArchive;
+
+		for ( auto& entry : m_cvarEntries )
+		{
+			if ( entry.second.m_flags & CVarFlags::Archive )
+				cvarArchive[entry.second.m_name] = ToString( entry.second.m_name );
+		}
+
+		std::ofstream cvarFile( "cvars.json" );
+		cvarFile << std::setw( 4 ) << cvarArchive << std::endl;
 	}
 
 	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description )
@@ -124,7 +167,7 @@ inline void CVarManager::Register( std::string name, T value, CVarFlags flags, s
 	CVarEntry entry = {};
 	entry.m_name = name;
 	entry.m_description = description;
-
+	entry.m_flags = flags;
 	entry.m_value = value;
 
 	size_t hash = GetHash( name );
@@ -135,7 +178,7 @@ template <typename T>
 inline T CVarManager::Get( std::string name )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
-	
+
 	size_t hash = GetHash( name );
 	CVarEntry& entry = m_cvarEntries[hash];
 

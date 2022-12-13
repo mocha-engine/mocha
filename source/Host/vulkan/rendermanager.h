@@ -25,6 +25,8 @@ private:
 	void InitDescriptors();
 
 	void CreateSwapchain( VkExtent2D size );
+	
+	void CalculateCameraMatrices( glm::mat4x4& viewMatrix, glm::mat4x4& projMatrix );
 
 public:
 	bool m_isInitialized{ false };
@@ -76,6 +78,7 @@ public:
 	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
 
 	glm::mat4x4 CalculateViewProjMatrix();
+	glm::mat4x4 CalculateWorldToScreenMatrix();
 
 	VkExtent2D GetWindowExtent();
 };
