@@ -12,6 +12,7 @@
 #include <glm/glm.hpp>
 #include <spdlog/spdlog.h>
 #include <texture.h>
+#include <vector>
 
 struct MeshPushConstants
 {
@@ -24,31 +25,13 @@ struct MeshPushConstants
 class Model
 {
 private:
-	VkDescriptorSet m_textureSet;
-	VkDescriptorSetLayout m_textureSetLayout;
-
-	VkPipelineLayout m_pipelineLayout;
-	VkPipeline m_pipeline;
-
-	Texture m_texture;
-	VkSampler m_textureSampler;
-
-	Mesh m_mesh;
+	std::vector<Mesh> m_meshes;
 
 	bool m_hasIndexBuffer;
-
 	bool m_isInitialized;
 
 public:
-	void InitDescriptors();
-	void InitPipelines();
-	void InitTextures();
-
-	inline void SetTexture( Texture texture ) { m_texture = texture; }
-	
-	void UploadTriangleMesh();
 	void UploadMesh( Mesh& mesh );
-	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
 
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform );
 };

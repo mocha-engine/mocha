@@ -28,7 +28,7 @@ void Texture::SetMipData(
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
 
-	vmaCreateImage( g_renderManager->m_allocator, &imageCreateInfo, &allocInfo, &image.image, &image.allocation, nullptr );
+	vmaCreateImage( g_renderManager->m_allocator, &imageCreateInfo, &allocInfo, &m_image.image, &m_image.allocation, nullptr );
 
 	g_renderManager->ImmediateSubmit( [&]( VkCommandBuffer cmd ) {
 		VkImageSubresourceRange range;
@@ -43,7 +43,7 @@ void Texture::SetMipData(
 
 		imageBarrier_toTransfer.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 		imageBarrier_toTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		imageBarrier_toTransfer.image = image.image;
+		imageBarrier_toTransfer.image = m_image.image;
 		imageBarrier_toTransfer.subresourceRange = range;
 
 		imageBarrier_toTransfer.srcAccessMask = 0;
@@ -90,7 +90,7 @@ void Texture::SetMipData(
 			mipRegions.push_back( copyRegion );
 		}
 
-		vkCmdCopyBufferToImage( cmd, stagingBuffer.buffer, image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipRegions.size(),
+		vkCmdCopyBufferToImage( cmd, stagingBuffer.buffer, m_image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipRegions.size(),
 		    mipRegions.data() );
 
 		VkImageMemoryBarrier imageBarrier_toReadable = imageBarrier_toTransfer;
@@ -105,8 +105,8 @@ void Texture::SetMipData(
 		    nullptr, 1, &imageBarrier_toReadable );
 	} );
 
-	VkImageViewCreateInfo imageViewInfo = VKInit::ImageViewCreateInfo( imageFormat, image.image, VK_IMAGE_ASPECT_COLOR_BIT, mipCount );
-	vkCreateImageView( g_renderManager->m_device, &imageViewInfo, nullptr, &imageView );
+	VkImageViewCreateInfo imageViewInfo = VKInit::ImageViewCreateInfo( imageFormat, m_image.image, VK_IMAGE_ASPECT_COLOR_BIT, mipCount );
+	vkCreateImageView( g_renderManager->m_device, &imageViewInfo, nullptr, &m_imageView );
 
 	spdlog::info( "Created texture with size {}x{}", width, height );
 }

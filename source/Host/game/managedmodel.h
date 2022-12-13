@@ -9,13 +9,12 @@ class ManagedTexture;
 class ManagedModel
 {
 private:
-	Mesh m_mesh;
 	Model m_model;
 
 public:
-	void SetIndexData( int size, void* data );
-	void SetVertexData( int size, void* data );
-	void Finish( ManagedTexture* texture );
+	// Add a mesh through a vertex buffer and (optionally) a vertex buffer.
+	// The texture specified will be used as the diffuse texture for this mesh.
+	void AddMesh( int vertexSize, void* vertexData, int indexSize, void* indexData, ManagedTexture* diffuseTexture );
 
 	//@InteropGen ignore
 	Model GetModel();

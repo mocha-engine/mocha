@@ -6,28 +6,19 @@ public partial class Model : Model<Vertex>
 {
 	public Model( string path )
 	{
+		All.Add( this );
+
 		LoadFromPath( path );
 	}
 
-	private Model( string path, Material material, bool isIndexed )
+	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path )
 	{
-		Path = path;
-		Material = material;
-		IsIndexed = isIndexed;
-
-		All.Add( this );
+		AddMesh( vertices, indices, material );
 	}
 
-	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path, material, true )
+	public Model( string path, Vertex[] vertices, Material material ) : this( path )
 	{
-		SetupMesh( vertices, indices );
-		CreateResources();
-	}
-
-	public Model( string path, Vertex[] vertices, Material material ) : this( path, material, false )
-	{
-		SetupMesh( vertices );
-		CreateResources();
+		AddMesh( vertices, material );
 	}
 }
 
@@ -37,55 +28,40 @@ public partial class Model<T> : Asset
 {
 	public Glue.ManagedModel NativeModel { get; set; }
 
-	public Material Material { get; set; }
-	public bool IsIndexed { get; protected set; }
-
-	private int indexCount;
-
-	protected void SetupMesh( T[] vertices )
+	public Model()
 	{
 		NativeModel = new();
+	}
 
-		int strideInBytes = Marshal.SizeOf( typeof( T ) );
-		int sizeInBytes = strideInBytes * vertices.Length;
-
+	protected void AddMesh( T[] vertices, Material material )
+	{
 		unsafe
 		{
-			fixed ( void* data = vertices )
+			int vertexStride = Marshal.SizeOf( typeof( T ) );
+			int vertexSize = vertexStride * vertices.Length;
+
+			fixed ( void* vertexData = vertices )
 			{
-				NativeModel.SetVertexData( sizeInBytes, (IntPtr)data );
+				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, 0, IntPtr.Zero, material.DiffuseTexture.NativeTexture.NativePtr );
 			}
 		}
 	}
 
-	protected void SetupMesh( T[] vertices, uint[] indices )
+	protected void AddMesh( T[] vertices, uint[] indices, Material material )
 	{
-		SetupMesh( vertices );
-
-		int strideInBytes = Marshal.SizeOf( typeof( uint ) );
-		int sizeInBytes = strideInBytes * indices.Length;
-
 		unsafe
 		{
-			fixed ( void* data = indices )
+			int vertexStride = Marshal.SizeOf( typeof( T ) );
+			int vertexSize = vertexStride * vertices.Length;
+
+			int indexStride = Marshal.SizeOf( typeof( uint ) );
+			int indexSize = indexStride * indices.Length;
+
+			fixed ( void* vertexData = vertices )
+			fixed ( void* indexData = indices )
 			{
-				NativeModel.SetIndexData( sizeInBytes, (IntPtr)data );
+				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, indexSize, (IntPtr)indexData, material.DiffuseTexture.NativeTexture.NativePtr );
 			}
 		}
-	}
-
-	protected void CreateResources()
-	{
-		NativeModel.Finish( Material.DiffuseTexture.NativeTexture.NativePtr );
-	}
-
-	public void SetIndices( uint[] indices )
-	{
-		throw new NotImplementedException();
-	}
-
-	public void SetVertices( T[] vertices )
-	{
-		throw new NotImplementedException();
 	}
 }
