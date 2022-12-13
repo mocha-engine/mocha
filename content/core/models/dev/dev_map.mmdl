@@ -3,6 +3,9 @@
 	"Materials": [
 		"core/materials/dev/dev_floor.mmat",
 		"core/materials/dev/dev_wall.mmat",
+		"core/materials/dev/dev_white.mmat",
+		"core/materials/dev/dev_floor.mmat",
+		"core/materials/dev/dev_wall.mmat",
 		"core/materials/dev/dev_white.mmat"
 	]
 }
