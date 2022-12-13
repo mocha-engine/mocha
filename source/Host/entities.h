@@ -290,4 +290,52 @@ namespace Entities
 
 		entity->SetRestitution( restitution );
 	}
+
+	inline bool GetIgnoreRigidbodyPosition( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return false;
+		}
+
+		return entity->GetIgnoreRigidbodyPosition();
+	}
+
+	inline bool GetIgnoreRigidbodyRotation( uint32_t handle )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return false;
+		}
+
+		return entity->GetIgnoreRigidbodyRotation();
+	}
+
+	inline void SetIgnoreRigidbodyPosition( uint32_t handle, bool ignore )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetIgnoreRigidbodyPosition( ignore );
+	}
+
+	inline void SetIgnoreRigidbodyRotation( uint32_t handle, bool ignore )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
+		entity->SetIgnoreRigidbodyRotation( ignore );
+	}
 } // namespace Entities
