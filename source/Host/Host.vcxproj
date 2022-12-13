@@ -167,6 +167,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="cvarmanager.cpp" />
     <ClCompile Include="edict.cpp" />
     <ClCompile Include="game\model.cpp" />
+    <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="game\managedmodel.cpp" />
@@ -326,6 +327,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="entities.h" />
     <ClInclude Include="gitdefs.h" />
     <ClInclude Include="handlemap.h" />
+    <ClInclude Include="input.h" />
+    <ClInclude Include="inputmanager.h" />
     <ClInclude Include="managedtexture.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="Physics.h" />

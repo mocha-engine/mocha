@@ -32,6 +32,7 @@ public class Main
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
+		Input.Update();
 		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
 
 		world.Update();

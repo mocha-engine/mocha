@@ -2,48 +2,28 @@
 
 public static partial class Input
 {
-	public enum MouseModes
+	public static bool Left => Glue.Input.IsButtonDown( 1 );
+	public static bool Right => Glue.Input.IsButtonDown( 2 );
+	public static bool Middle => Glue.Input.IsButtonDown( 3 );
+
+	public static bool Button4 => Glue.Input.IsButtonDown( 4 );
+	public static bool Button5 => Glue.Input.IsButtonDown( 5 );
+
+	// TODO: [ConVar.Archive( "mouse_sensitivity", 2.0f, "Player mouse look sensitivity" )]
+	public static float MouseSensitivity { get; set; } = 2.5f;
+
+	public static Vector2 MousePosition => Glue.Input.GetMousePosition();
+	public static Vector2 MouseDelta => Glue.Input.GetMouseDelta();
+
+	public static Rotation Rotation { get; private set; } = Rotation.Identity;
+
+	private static float DegreesPerPixel = 0.1f;
+
+	public static void Update()
 	{
-		Locked,
-		Unlocked
-	}
-
-	public static MouseModes MouseMode { get; set; }
-
-	public static Vector2 MouseDelta { get; set; }
-	public static Vector2 MousePosition { get; set; }
-
-	public static float Forward { get; set; }
-	public static float Left { get; set; }
-	public static float Up { get; set; }
-
-	public static bool MouseLeft { get; set; }
-	public static bool MouseRight { get; set; }
-
-	public static List<InputButton> KeysDown { get; set; } = new();
-	public static List<InputButton> LastKeysDown { get; set; } = new();
-
-	public static unsafe void Update()
-	{
-	}
-
-	private static bool IsKeyPressed( InputButton b ) => KeysDown.Contains( b );
-	private static bool WasKeyPressed( InputButton b ) => LastKeysDown.Contains( b );
-
-	public static bool Pressed( InputButton button )
-	{
-		return IsKeyPressed( button )
-			&& !WasKeyPressed( button );
-	}
-
-	public static bool Down( InputButton button )
-	{
-		return IsKeyPressed( button );
-	}
-
-	public static bool Released( InputButton button )
-	{
-		return !IsKeyPressed( button )
-			&& WasKeyPressed( button );
+		var euler = Rotation.ToEulerAngles();
+		euler.X += MouseDelta.Y * MouseSensitivity * DegreesPerPixel; // Pitch
+		euler.Y += MouseDelta.X * MouseSensitivity * DegreesPerPixel; // Yaw
+		Rotation = Rotation.From( euler.X.Clamp( -89, 89 ), euler.Y, 0 );
 	}
 }
