@@ -21,6 +21,7 @@
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/RayCast.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
@@ -71,6 +72,19 @@ struct TraceResult
 	Vector3 endPosition;
 	float fraction;
 	Vector3 normal;
+};
+
+//@InteropGen generate struct
+struct TraceInfo
+{
+	Vector3 startPosition;
+	Vector3 endPosition;
+
+	bool isBox;
+	Vector3 extents;
+
+	int ignoredEntityCount;
+	uint32_t* ignoredEntityHandles;
 };
 
 // Layer that objects can be in, determines which other objects it can collide with
@@ -213,29 +227,32 @@ public:
 	}
 };
 
-// Convert Mocha to Jolt Vector3. Accounts for Z-Up / Y-Up swapping
-inline JPH::Vec3 MochaToJoltVec3( Vector3 inVec3 )
+namespace JoltConversions
 {
-	return JPH::Vec3{ inVec3.x, inVec3.z, inVec3.y };
-}
+	// Convert Mocha to Jolt Vector3.
+	inline JPH::Vec3 MochaToJoltVec3( Vector3 inVec3 )
+	{
+		return JPH::Vec3{ inVec3.x, inVec3.y, inVec3.z };
+	}
 
-// Convert Jolt to Mocha Vector3. Accounts for Z-Up / Y-Up swapping
-inline Vector3 JoltToMochaVec3( JPH::Vec3 inVec3 )
-{
-	return Vector3{ inVec3.GetX(), inVec3.GetZ(), inVec3.GetY() };
-}
+	// Convert Jolt to Mocha Vector3.
+	inline Vector3 JoltToMochaVec3( JPH::Vec3 inVec3 )
+	{
+		return Vector3{ inVec3.GetX(), inVec3.GetY(), inVec3.GetZ() };
+	}
 
-// Convert Jolt to Mocha Quaternion
-inline Quaternion JoltToMochaQuat( JPH::Quat inQuat )
-{
-	return Quaternion{ inQuat.GetX(), inQuat.GetZ(), inQuat.GetY(), -inQuat.GetW() };
-}
+	// Convert Jolt to Mocha Quaternion
+	inline Quaternion JoltToMochaQuat( JPH::Quat inQuat )
+	{
+		return Quaternion{ inQuat.GetX(), inQuat.GetY(), inQuat.GetZ(), inQuat.GetW() };
+	}
 
-// Convert Mocha to Jolt Quaternion
-inline JPH::Quat MochaToJoltQuat( Quaternion inQuat )
-{
-	return JPH::Quat{ inQuat.x, inQuat.z, inQuat.y, -inQuat.w };
-}
+	// Convert Mocha to Jolt Quaternion
+	inline JPH::Quat MochaToJoltQuat( Quaternion inQuat )
+	{
+		return JPH::Quat{ inQuat.x, inQuat.y, inQuat.z, inQuat.w };
+	}
+}; // namespace JoltConversions
 
 class PhysicsManager : HandleMap<PhysicsBody>, ISubSystem
 {
@@ -244,6 +261,10 @@ private:
 	JPH::JobSystem* m_jobSystem;
 	JPH::PhysicsSystem m_physicsSystem;
 	BPLayerInterfaceImpl m_broadPhaseLayerInterface;
+
+	TraceResult TraceRay( TraceInfo traceInfo );
+	TraceResult TraceBox( TraceInfo traceInfo );
+	bool IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId );
 
 public:
 	PhysicsManager();
@@ -256,5 +277,5 @@ public:
 	void Update();
 
 	uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
-	TraceResult TraceRay( Vector3 startPosition, Vector3 endPosition );
+	TraceResult Trace( TraceInfo traceInfo );
 };

@@ -7,7 +7,7 @@ namespace Mocha;
 public class BaseEntity
 {
 	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
-	protected uint NativeHandle { get; set; }
+	public uint NativeHandle { get; protected set; }
 
 	public bool IsValid()
 	{

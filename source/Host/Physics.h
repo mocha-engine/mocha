@@ -5,8 +5,8 @@
 //@InteropGen generate class
 namespace Physics
 {
-	inline TraceResult TraceRay( Vector3 startPos, Vector3 endPos )
+	inline TraceResult Trace( TraceInfo traceInfo )
 	{
-		return g_physicsManager->TraceRay( startPos, endPos );
+		return g_physicsManager->Trace( traceInfo );
 	}
 }; // namespace Physics
