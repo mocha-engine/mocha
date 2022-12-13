@@ -1,10 +1,12 @@
 #include "window.h"
 
 #include <defs.h>
+#include <globalvars.h>
+#include <inputmanager.h>
 
 #ifdef _IMGUI
-#include <imgui.h>
 #include <backends/imgui_impl_sdl.h>
+#include <imgui.h>
 #endif
 
 Window::Window( uint32_t width, uint32_t height )
@@ -33,6 +35,11 @@ bool Window::Update()
 	SDL_Event e;
 	bool bQuit = false;
 
+	InputState inputState = g_inputManager->GetState();
+	
+	// Clear mouse delta every frame
+	inputState.mouseDelta = { 0, 0 };
+
 	while ( SDL_PollEvent( &e ) != 0 )
 	{
 		if ( e.type == SDL_QUIT )
@@ -52,7 +59,7 @@ bool Window::Update()
 			{
 				auto width = we.data1;
 				auto height = we.data2;
-				
+
 				spdlog::info( "Window was resized to {}x{}", width, height );
 
 				// Push event so that renderer etc. knows we've resized the window
@@ -60,12 +67,32 @@ bool Window::Update()
 				m_onWindowResized( windowExtents );
 			}
 		}
+		else if ( e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP )
+		{
+			SDL_MouseButtonEvent mbe = e.button;
+
+			bool isDown = mbe.state == SDL_PRESSED;
+
+			if ( inputState.buttons.size() <= mbe.button )
+				inputState.buttons.resize( mbe.button + 1 );
+
+			inputState.buttons[mbe.button] = isDown;
+		}
+		else if ( e.type == SDL_MOUSEMOTION )
+		{
+			SDL_MouseMotionEvent mme = e.motion;
+			
+			inputState.mousePosition = { (float)mme.x, (float)mme.y };
+			inputState.mouseDelta = { (float)mme.xrel, (float)mme.yrel };
+		}
 
 #ifdef _IMGUI
 		// Pipe event to imgui too
 		ImGui_ImplSDL2_ProcessEvent( &e );
 #endif
 	}
+
+	g_inputManager->SetState( inputState );
 
 	return false;
 }

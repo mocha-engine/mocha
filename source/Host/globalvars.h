@@ -8,6 +8,7 @@ class LogManager;
 class EntityManager;
 class CVarManager;
 class PhysicsManager;
+class InputManager;
 
 struct Vector3;
 struct Quaternion;
@@ -23,6 +24,7 @@ extern RenderdocManager* g_renderdocManager;
 extern EntityManager* g_entityDictionary;
 extern CVarManager* g_cvarManager;
 extern PhysicsManager* g_physicsManager;
+extern InputManager* g_inputManager;
 
 extern float g_curTime;
 extern float g_frameTime;

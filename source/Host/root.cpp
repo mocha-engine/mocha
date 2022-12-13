@@ -8,6 +8,7 @@
 #include <renderdocmanager.h>
 #include <vulkan/rendermanager.h>
 #include <physicsmanager.h>
+#include <inputmanager.h>
 
 //
 // These global variables are all defined in globalvars.h,
@@ -23,6 +24,7 @@ HostManager* g_hostManager;
 RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
 PhysicsManager* g_physicsManager;
+InputManager* g_inputManager;
 
 float g_curTime;
 float g_frameTime;
@@ -60,6 +62,9 @@ void Root::Startup()
 	g_physicsManager = new PhysicsManager();
 	g_physicsManager->Startup();
 
+	g_inputManager = new InputManager();
+	g_inputManager->Startup();
+
 	g_renderManager = new RenderManager();
 	g_renderManager->Startup();
 
@@ -71,6 +76,7 @@ void Root::Shutdown()
 {
 	g_hostManager->Shutdown();
 	g_renderManager->Shutdown();
+	g_inputManager->Shutdown();
 	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
 
