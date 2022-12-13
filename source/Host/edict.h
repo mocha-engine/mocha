@@ -12,30 +12,31 @@ class EntityManager : HandleMap<BaseEntity>, ISubSystem
 {
 public:
 	template <typename T>
-	uint32_t AddEntity( T entity );
+	Handle AddEntity( T entity );
 
 	template <typename T>
-	std::shared_ptr<T> GetEntity( uint32_t entityHandle );
+	std::shared_ptr<T> GetEntity( Handle entityHandle );
 
-	// Calls the specified function for each entity managed by this EntityManager.
-	// The function should take a std::shared_ptr<BaseEntity> as its argument.
 	void ForEach( std::function<void( std::shared_ptr<BaseEntity> entity )> func );
 
-	// Called when the EntityManager is being started up.
+	template <typename T>
+	void ForEachSpecific( std::function<void( std::shared_ptr<T> entity )> func );
+	
+	void For( std::function<void( Handle handle, std::shared_ptr<BaseEntity> entity )> func );
+
 	void Startup() override;
 
-	// Called when the EntityManager is being shut down.
 	void Shutdown() override;
 };
 
 template <typename T>
-inline uint32_t EntityManager::AddEntity( T entity )
+inline Handle EntityManager::AddEntity( T entity )
 {
 	return AddSpecific<T>( entity );
 }
 
 template <typename T>
-inline std::shared_ptr<T> EntityManager::GetEntity( uint32_t entityHandle )
+inline std::shared_ptr<T> EntityManager::GetEntity( Handle entityHandle )
 {
 	return GetSpecific<T>( entityHandle );
 }
@@ -43,4 +44,23 @@ inline std::shared_ptr<T> EntityManager::GetEntity( uint32_t entityHandle )
 inline void EntityManager::ForEach( std::function<void( std::shared_ptr<BaseEntity> entity )> func )
 {
 	HandleMap<BaseEntity>::ForEach( func );
+}
+
+inline void EntityManager::For( std::function<void( Handle handle, std::shared_ptr<BaseEntity> entity )> func )
+{
+	HandleMap<BaseEntity>::For( func );
+}
+
+template <typename T>
+inline void EntityManager::ForEachSpecific( std::function<void( std::shared_ptr<T> entity )> func )
+{
+	ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		// Can we cast to this?
+		auto derivedEntity = std::dynamic_pointer_cast<T>( entity );
+
+		if ( derivedEntity == nullptr )
+			return;
+
+		func( derivedEntity );
+	} );
 }
