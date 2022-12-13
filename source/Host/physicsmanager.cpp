@@ -167,6 +167,22 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 		shapeSettings = new JPH::BoxShapeSettings( extents );
 		break;
 
+	case PhysicsShapeType::Mesh: {
+		JPH::TriangleList triangleList;
+
+		for ( size_t i = 0; i < body.shape.shapeData.vertices.size(); i += 3 )
+		{
+			auto index1 = JoltConversions::MochaToJoltFloat3( body.shape.shapeData.vertices[i] );
+			auto index2 = JoltConversions::MochaToJoltFloat3( body.shape.shapeData.vertices[i + 1] );
+			auto index3 = JoltConversions::MochaToJoltFloat3( body.shape.shapeData.vertices[i + 2] );
+
+			JPH::Triangle triangle( index1, index2, index3, 0 );
+			triangleList.push_back( triangle );
+		}
+
+		shapeSettings = new JPH::MeshShapeSettings( triangleList );
+		break;
+	}
 	default:
 		spdlog::error( "Unsupported phys shape" );
 		return UINT32_MAX;
@@ -251,7 +267,7 @@ bool PhysicsManager::IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId )
 		if ( traceInfo.ignoredEntityHandles[i] == entHandle )
 			return true;
 	}
-	
+
 	// This body is NOT ignored, we can use it for this trace.
 	return false;
 }

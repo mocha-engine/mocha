@@ -195,7 +195,7 @@ namespace Entities
 		entity->SetSpherePhysics( radius, isStatic );
 	}
 
-	inline void SetVelocity( uint32_t handle, Vector3 velocity )
+	inline void SetMeshPhysics( uint32_t handle, int vertexSize, void* vertexData )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -204,6 +204,26 @@ namespace Entities
 			return;
 		}
 		
+		// Convert data to points
+		Vector3* vertices = ( Vector3* )vertexData;
+		size_t vertCount = vertexSize / sizeof( Vector3 );
+
+		std::vector<Vector3> vertexList = {};
+		vertexList.resize( vertCount );
+		vertexList.insert( vertexList.begin(), vertices, vertices + vertCount );
+
+		entity->SetMeshPhysics( vertexList );
+	}
+
+	inline void SetVelocity( uint32_t handle, Vector3 velocity )
+	{
+		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		if ( entity == nullptr )
+		{
+			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
+			return;
+		}
+
 		entity->SetVelocity( velocity );
 	}
 

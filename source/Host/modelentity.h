@@ -1,6 +1,8 @@
 #pragma once
 #include <baseentity.h>
 #include <game/model.h>
+#include <game/types.h>
+#include <vector>
 #include <vulkan/vulkan.h>
 
 struct PhysicsBody;
@@ -33,6 +35,7 @@ public:
 	//
 	void SetSpherePhysics( float radius, bool isStatic );
 	void SetCubePhysics( Vector3 bounds, bool isStatic );
+	void SetMeshPhysics( std::vector<Vector3> vertices );
 
 	// If this model has no physics, this function will return UINT32_MAX.
 	uint32_t GetPhysicsHandle() { return m_physicsHandle; };
