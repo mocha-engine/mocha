@@ -14,7 +14,7 @@ public class Player : ModelEntity
 	{
 		base.Spawn();
 
-		Position = new Vector3( -4, 0, 4 );
+		Position = new Vector3( 0, 0, 0.5f );
 
 		Restitution = 0.0f;
 		Friction = 1.0f;

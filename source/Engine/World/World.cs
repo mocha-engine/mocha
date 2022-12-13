@@ -19,7 +19,6 @@ public class World
 		Log.Trace( $"Setting up entities..." );
 
 		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
-		floor.Position = new Vector3( -4.0f, 0, 2.0f );
 		floor.Friction = 1.0f;
 		floor.Restitution = 0.0f;
 		floor.Mass = 1000.0f;
