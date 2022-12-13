@@ -30,7 +30,7 @@
 #include <physicsmanager.h>
 #include <vk_mem_alloc.h>
 
-FloatCVar timescale( "timescale", 1.0f, CVarFlags::Cheat, "The speed at which the game world runs." );
+FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
@@ -136,14 +136,12 @@ void RenderManager::CreateSwapchain( VkExtent2D size )
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
 
-	vkb::Swapchain vkbSwapchain =
-	    swapchainBuilder
-			.set_old_swapchain( m_swapchain )
-			.set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
-	        .set_desired_present_mode( VK_PRESENT_MODE_FIFO_KHR )
-	        .set_desired_extent( size.width, size.height )
-	        .build()
-	        .value();
+	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
+	                                  .set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
+	                                  .set_desired_present_mode( VK_PRESENT_MODE_FIFO_KHR )
+	                                  .set_desired_extent( size.width, size.height )
+	                                  .build()
+	                                  .value();
 
 	m_swapchain = vkbSwapchain.swapchain;
 	m_swapchainImages = vkbSwapchain.get_images().value();
@@ -395,7 +393,6 @@ void RenderManager::Render()
 	    VKInit::RenderingAttachmentInfo( m_depthImageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
 	depthAttachmentInfo.clearValue = depthClear;
 
-
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, windowExtent );
 
 	// Draw scene
@@ -530,14 +527,33 @@ AllocatedBuffer RenderManager::CreateBuffer( size_t allocationSize, VkBufferUsag
 	return buffer;
 }
 
-glm::mat4x4 RenderManager::CalculateViewProjMatrix()
+void RenderManager::CalculateCameraMatrices( glm::mat4& viewMatrix, glm::mat4& projMatrix )
 {
 	auto extent = GetWindowExtent();
 	float aspect = ( float )extent.width / ( float )extent.height;
 
-	glm::vec3 camPos = g_cameraPos.ToGLM();
-	glm::mat4x4 view = glm::lookAt( camPos, glm::vec3( 0, 0, 0 ), glm::vec3( 0, 0, -1 ) );
-	glm::mat4x4 projection = glm::perspective( glm::radians( g_cameraFov ), aspect, g_cameraZNear, g_cameraZFar );
+	glm::vec3 up = glm::vec3( 0, 0, -1 );
+	glm::vec3 direction = glm::normalize( glm::rotate( g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = g_cameraPos.ToGLM();
 
-	return projection * view;
+	viewMatrix = glm::lookAt( position, position + direction, up );
+	projMatrix = glm::perspective( glm::radians( g_cameraFov ), aspect, g_cameraZNear, g_cameraZFar );
+}
+
+glm::mat4 RenderManager::CalculateWorldToScreenMatrix()
+{
+	glm::mat4 viewMatrix, projMatrix;
+
+	CalculateCameraMatrices( viewMatrix, projMatrix );
+
+	return projMatrix * viewMatrix;
+}
+
+glm::mat4 RenderManager::CalculateViewProjMatrix()
+{
+	glm::mat4 viewMatrix, projMatrix;
+
+	CalculateCameraMatrices( viewMatrix, projMatrix );
+
+	return projMatrix * viewMatrix;
 }
