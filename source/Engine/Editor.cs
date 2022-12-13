@@ -16,23 +16,44 @@ public class Editor
 		DrawPerformanceWindow();
 		DrawConsoleWindow();
 		DrawCameraWindow();
-		DrawRaycastTestWindow();
+		DrawPhysicsTestWindow();
+		DrawInputWindow();
 	}
 
-	private static void DrawRaycastTestWindow()
+	private static void DrawInputWindow()
+	{
+		if ( ImGui.Begin( "Input" ) )
+		{
+			for ( int i = 1; i < 6; ++i )
+			{
+				ImGui.Text( $"Button {i}: {Glue.Input.IsButtonDown( i )}" );
+			}
+
+			ImGui.Text( $"Mouse position: {Glue.Input.GetMousePosition()}" );
+			ImGui.Text( $"Mouse delta: {Glue.Input.GetMouseDelta()}" );
+		}
+
+		ImGui.End();
+	}
+
+	private static void DrawPhysicsTestWindow()
 	{
 		if ( ImGui.Begin( "Physics Test" ) )
 		{
 			if ( ImGui.Button( "Raycast (log to console)" ) )
 			{
-				var traceResult = Glue.Physics.TraceRay( Camera.Position, Vector3.Zero );
+				var localPlayer = Player.Local;
 
-				Log.Info( $"{traceResult.startPosition} -> {traceResult.endPosition}" );
-				Log.Info( $"Fraction {traceResult.fraction}" );
-				Log.Info( $"Hit? {traceResult.hit}" );
+				var tr = Cast.Ray( localPlayer.EyeRay, 100f )
+					.Ignore( localPlayer )
+					.Run();
 
-				if ( traceResult.hit )
-					Log.Info( $"Normal {traceResult.normal}" );
+				Log.Info( $"{tr.startPosition} -> {tr.endPosition}" );
+				Log.Info( $"Fraction {tr.fraction}" );
+				Log.Info( $"Hit? {tr.hit}" );
+
+				if ( tr.hit )
+					Log.Info( $"Normal {tr.normal}" );
 			}
 
 			if ( ImGui.Button( "Spawn a ball" ) )

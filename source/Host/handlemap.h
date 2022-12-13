@@ -32,8 +32,12 @@ protected:
 	Handle AddSpecific( T1 object );
 
 	// Calls the specified function for each object managed by this HandleMap.
-	// The function should take a std::unique_ptr <T> as its argument.
+	// The function should take a std::unique_ptr<T> as its argument.
 	void ForEach( std::function<void( std::shared_ptr<T> object )> func );
+
+	// Calls the specified function for each object managed by this HandleMap.
+	// The function should take a Handle and a std::unique_ptr<T> as its arguments.
+	void For( std::function<void( Handle handle, std::shared_ptr<T> object )> func );
 };
 
 template <typename T>
@@ -89,5 +93,16 @@ inline void HandleMap<T>::ForEach( std::function<void( std::shared_ptr<T> object
 	for ( const auto& [handle, object] : m_objects )
 	{
 		func( object );
+	}
+}
+
+// Calls the specified function for each object managed by this HandleMap.
+// The function should take a Handle as its argument.
+template <typename T>
+inline void HandleMap<T>::For( std::function<void( Handle handle, std::shared_ptr<T> object )> func )
+{
+	for ( const auto& [handle, object] : m_objects )
+	{
+		func( handle, object );
 	}
 }

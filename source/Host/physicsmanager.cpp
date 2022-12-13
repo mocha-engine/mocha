@@ -48,6 +48,8 @@ void PhysicsManager::Startup()
 	m_physicsSystem.Init( maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints, m_broadPhaseLayerInterface,
 	    MyBroadPhaseCanCollide, MyObjectCanCollide );
 
+	m_physicsSystem.SetGravity( JPH::Vec3( 0, 0, -9.8f ) );
+
 	spdlog::info( "Physics system has init" );
 }
 
@@ -87,7 +89,7 @@ void PhysicsManager::Update()
 		auto body = Get( physicsHandle );
 		auto savedVelocity = modelEntity->GetVelocity();
 
-		JPH::Vec3 velocity = MochaToJoltVec3( savedVelocity );
+		JPH::Vec3 velocity = JoltConversions::MochaToJoltVec3( savedVelocity );
 		bodyInterface.SetLinearVelocity( body->bodyId, velocity );
 	} );
 
@@ -139,9 +141,9 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 	JPH::uint8 layer = isStatic ? Layers::NON_MOVING : Layers::MOVING;
 
 	auto transform = entity->GetTransform();
-	auto position = MochaToJoltVec3( transform.position );
-	auto rotation = MochaToJoltQuat( transform.rotation );
-	
+	auto position = JoltConversions::MochaToJoltVec3( transform.position );
+	auto rotation = JoltConversions::MochaToJoltQuat( transform.rotation );
+
 	JPH::ShapeSettings* shapeSettings = nullptr;
 
 	// Shape-specific setup
@@ -152,10 +154,13 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 		break;
 
 	case PhysicsShapeType::Box:
-		auto extents = MochaToJoltVec3( body.shape.shapeData.extents );
-
+		auto extents = JoltConversions::MochaToJoltVec3( body.shape.shapeData.extents );
 		shapeSettings = new JPH::BoxShapeSettings( extents );
 		break;
+
+	default:
+		spdlog::error( "Unsupported phys shape" );
+		return UINT32_MAX;
 	}
 
 	// Make a shape, then set up a body
@@ -180,20 +185,85 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 	return Add( body );
 }
 
-TraceResult PhysicsManager::TraceRay( Vector3 startPosition, Vector3 endPosition )
+TraceResult PhysicsManager::Trace( TraceInfo traceInfo )
+{
+	if ( traceInfo.isBox )
+		return TraceBox( traceInfo );
+
+	return TraceRay( traceInfo );
+}
+
+bool PhysicsManager::IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId )
+{
+	//
+	// We need to do the following steps:
+	// 1: JPH body -> physicsmanager handle
+	// 2: physicsmanager handle -> entity handle
+	// 3: entity handle == traceInfo.ignoredEntityList[i]?
+	//
+
+	//
+	// Step 1: find physmanager handle
+	//
+	Handle physHandle = UINT32_MAX;
+	For( [&]( Handle handle, std::shared_ptr<PhysicsBody> object ) {
+		if ( object->bodyId == bodyId )
+			physHandle = handle;
+	} );
+
+	// Did we find one?
+	if ( physHandle == UINT32_MAX )
+		return true;
+
+	//
+	// Step 2: find entity handle
+	//
+	Handle entHandle = UINT32_MAX;
+	g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
+		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+
+		if ( modelEntity == nullptr )
+			return;
+
+		if ( modelEntity->GetPhysicsHandle() == physHandle )
+			entHandle = handle;
+	} );
+
+	// Did we find one?
+	if ( entHandle == UINT32_MAX )
+		return true;
+
+	//
+	// Step 3: check if physics handle is part of the ignored list
+	//
+	for ( size_t i = 0; i < traceInfo.ignoredEntityCount; i++ )
+	{
+		// Is this an ignored entity?
+		if ( traceInfo.ignoredEntityHandles[i] == entHandle )
+			return true;
+	}
+	
+	// This body is NOT ignored, we can use it for this trace.
+	return false;
+}
+
+TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 {
 	// Initial trace result properties - we use a lot of these if we don't hit anything.
 	TraceResult traceResult = {};
-	traceResult.startPosition = startPosition;
-	traceResult.endPosition = endPosition;
+	traceResult.startPosition = traceInfo.startPosition;
+	traceResult.endPosition = traceInfo.endPosition;
 	traceResult.fraction = 1.0f;
 
 	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
 
+	auto origin = JoltConversions::MochaToJoltVec3( traceInfo.startPosition );
+	auto direction = JoltConversions::MochaToJoltVec3( traceInfo.endPosition ) - origin;
+
 	// Create ray cast
 	JPH::RayCast ray = {};
-	ray.mOrigin = MochaToJoltVec3( startPosition );
-	ray.mDirection = MochaToJoltVec3( endPosition ) - ray.mOrigin;
+	ray.mOrigin = origin;
+	ray.mDirection = direction;
 
 	JPH::RayCastSettings rayCastSettings;
 
@@ -202,33 +272,62 @@ TraceResult PhysicsManager::TraceRay( Vector3 startPosition, Vector3 endPosition
 
 	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
 
-	// Did we hit? If not, bail now
+	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
 	{
 		traceResult.hit = false;
 		return traceResult;
 	}
 
-	// We hit something so let's return some relevant values
-	traceResult.hit = true;
+	// We might have hit something, let's do some filtering
 	collector.Sort();
 
 	std::vector<JPH::RayCastResult> raycastResults( collector.mHits.begin(), collector.mHits.end() );
-	const JPH::RayCastResult& mainResult = raycastResults[0];
 
-	// Calculate end position
-	traceResult.endPosition = JoltToMochaVec3( ray.mOrigin + mainResult.mFraction * ray.mDirection );
+	// Find the first raycast result that matches our parameters
+	for ( size_t i = 0; i < raycastResults.size(); i++ )
+	{
+		const JPH::RayCastResult& result = raycastResults[i];
 
-	// Hit fraction
-	traceResult.fraction = mainResult.mFraction;
+		auto bodyID = result.mBodyID.GetIndexAndSequenceNumber();
+		JPH::BodyLockRead bodyLock( m_physicsSystem.GetBodyLockInterface(), result.mBodyID );
+		const JPH::Body& hitBody = bodyLock.GetBody();
 
-	// Calculate hit normal
-	auto bodyID = mainResult.mBodyID.GetIndexAndSequenceNumber();
-	JPH::BodyLockRead body_lock( m_physicsSystem.GetBodyLockInterface(), mainResult.mBodyID );
-	const JPH::Body& hit_body = body_lock.GetBody();
+		// Is this body ignored in the trace filter?
+		if ( IsBodyIgnored( traceInfo, result.mBodyID ) )
+			continue;
 
-	traceResult.normal = JoltToMochaVec3(
-	    hit_body.GetWorldSpaceSurfaceNormal( mainResult.mSubShapeID2, MochaToJoltVec3( traceResult.endPosition ) ) );
+		//
+		// We got this far - that means that the entity we've hit is valid and
+		// not part of the ignored list. Let's return some relevant values.
+		//
+		traceResult.hit = true;
+
+		// Calculate end position
+		traceResult.endPosition = JoltConversions::JoltToMochaVec3( ray.mOrigin + result.mFraction * ray.mDirection );
+
+		// Hit fraction
+		traceResult.fraction = result.mFraction;
+
+		// Calculate hit normal
+		traceResult.normal = JoltConversions::JoltToMochaVec3( hitBody.GetWorldSpaceSurfaceNormal(
+		    result.mSubShapeID2, JoltConversions::MochaToJoltVec3( traceResult.endPosition ) ) );
+
+		return traceResult;
+	}
+
+	return traceResult;
+}
+
+TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
+{
+	// Initial trace result properties - we use a lot of these if we don't hit anything.
+	TraceResult traceResult = {};
+	traceResult.startPosition = traceInfo.startPosition;
+	traceResult.endPosition = traceInfo.endPosition;
+	traceResult.fraction = 1.0f;
+
+	// TODO
 
 	return traceResult;
 }

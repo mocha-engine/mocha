@@ -9,5 +9,5 @@
 #define MANAGED_CLASS					L"Mocha.Main, Engine"
 
 #define ENGINE_NAME						"Mocha"
-#define GAME_NAME						"SpaceGame (" ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES(GIT_BRANCH) ")"
+#define GAME_NAME						"SpaceGame [Prototype] - " ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
 // clang-format on
