@@ -27,6 +27,18 @@ public partial class ModelEntity : BaseEntity
 		set => Glue.Entities.SetRestitution( NativeHandle, value );
 	}
 
+	public bool IgnoreRigidbodyRotation
+	{
+		get => Glue.Entities.GetIgnoreRigidbodyRotation( NativeHandle );
+		set => Glue.Entities.SetIgnoreRigidbodyRotation( NativeHandle, value );
+	}
+
+	public bool IgnoreRigidbodyPosition
+	{
+		get => Glue.Entities.GetIgnoreRigidbodyPosition( NativeHandle );
+		set => Glue.Entities.SetIgnoreRigidbodyPosition( NativeHandle, value );
+	}
+
 	public ModelEntity()
 	{
 	}
