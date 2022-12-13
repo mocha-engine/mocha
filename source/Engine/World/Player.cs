@@ -24,6 +24,8 @@ public class Player : ModelEntity
 		SetCubePhysics( new Vector3( 0.25f, 0.25f, 0.75f ), false );
 	}
 
+	bool rightLastFrame = false;
+
 	public override void Update()
 	{
 		UpdateCamera();
@@ -32,6 +34,23 @@ public class Player : ModelEntity
 		{
 			Velocity += (Input.Rotation.Forward * Time.Delta * 10f).WithZ( 0 );
 		}
+
+		//
+		// Spawn some balls when right clicking
+		//
+		if ( Input.Right && !rightLastFrame )
+		{
+			var tr = Cast.Ray( EyeRay, 10f ).Ignore( this ).Run();
+
+			var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
+			ball.Position = tr.endPosition + tr.normal * 1.0f;
+			ball.Restitution = 1.0f;
+			ball.Friction = 1.0f;
+			ball.Mass = 10.0f;
+			ball.SetSpherePhysics( 0.5f, false );
+		}
+
+		rightLastFrame = Input.Right;
 	}
 
 	private void UpdateCamera()

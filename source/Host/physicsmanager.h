@@ -24,6 +24,7 @@
 #include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/Shape/MeshShape.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
@@ -37,13 +38,16 @@ enum PhysicsType
 enum PhysicsShapeType
 {
 	Box,
-	Sphere
+	Sphere,
+	Mesh
 };
 
 struct PhysicsShapeData
 {
 	float radius;
 	Vector3 extents;
+
+	std::vector<Vector3> vertices;
 };
 
 struct PhysicsShape
@@ -236,6 +240,12 @@ namespace JoltConversions
 	inline JPH::Vec3 MochaToJoltVec3( Vector3 inVec3 )
 	{
 		return JPH::Vec3{ inVec3.x, inVec3.y, inVec3.z };
+	}
+
+	// Convert Mocha Vector3 to Jolt Float3.
+	inline JPH::Float3 MochaToJoltFloat3(Vector3 inVec3)
+	{
+		return JPH::Float3{ inVec3.x, inVec3.y, inVec3.z };
 	}
 
 	// Convert Jolt to Mocha Vector3.

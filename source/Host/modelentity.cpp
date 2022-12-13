@@ -48,3 +48,21 @@ void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
 
 	m_physicsHandle = g_physicsManager->AddBody( this, body );
 }
+
+void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
+{
+	PhysicsBody body = {};
+
+	body.friction = 1.0f;
+	body.restitution = 1.0f;
+
+	body.transform = m_transform;
+	body.type = PhysicsType::Static;
+
+	body.shape = {};
+	body.shape.shapeData = {};
+	body.shape.shapeData.vertices = vertices;
+	body.shape.shapeType = PhysicsShapeType::Mesh;
+
+	m_physicsHandle = g_physicsManager->AddBody( this, body );
+}

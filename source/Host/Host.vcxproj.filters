@@ -498,12 +498,19 @@
     <ClCompile Include="texturecache.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="inputmanager.cpp" />
+    <ClCompile Include="material.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="generated\editor.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\entities.generated.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generated\input.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -531,9 +538,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\*.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
@@ -1447,6 +1451,11 @@
     </ClInclude>
     <ClInclude Include="handlemap.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h" />
+    <ClInclude Include="inputmanager.h" />
+    <ClInclude Include="material.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

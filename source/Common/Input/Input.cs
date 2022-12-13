@@ -3,8 +3,8 @@
 public static partial class Input
 {
 	public static bool Left => Glue.Input.IsButtonDown( 1 );
-	public static bool Right => Glue.Input.IsButtonDown( 2 );
-	public static bool Middle => Glue.Input.IsButtonDown( 3 );
+	public static bool Middle => Glue.Input.IsButtonDown( 2 );
+	public static bool Right => Glue.Input.IsButtonDown( 3 );
 
 	public static bool Button4 => Glue.Input.IsButtonDown( 4 );
 	public static bool Button5 => Glue.Input.IsButtonDown( 5 );
