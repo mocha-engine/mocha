@@ -4,48 +4,48 @@
 #include "globalvars.h"
 
 #include <edict.h>
+#include <managedtexture.h>
 #include <modelentity.h>
 #include <spdlog/spdlog.h>
-#include <managedtexture.h>
 #include <texture.h>
 
-void ManagedModel::SetIndexData( int size, void* data )
+void ManagedModel::AddMesh( int vertexSize, void* vertexData, int indexSize, void* indexData, ManagedTexture* diffuseTexture )
 {
-	spdlog::info( "ManagedModel: Received {} index bytes", size );
+	assert( vertexSize > 0 ); // Vertex buffer is not optional
 
-	// Convert data to indices
-	uint32_t* indices = ( uint32_t* )data;
-	size_t indexCount = size / sizeof( uint32_t );
+	Material material( diffuseTexture->GetTexture() );
 
-	m_mesh.indices.resize( indexCount );
-	m_mesh.indices.insert( m_mesh.indices.begin(), indices, indices + indexCount );
-}
+	Mesh mesh = {};
+	mesh.material = material;
 
-void ManagedModel::SetVertexData( int size, void* data )
-{
-	spdlog::info( "ManagedModel: Received {} vertex bytes", size );
+	// Vertex buffer
+	spdlog::info( "ManagedModel: Received {} vertex bytes", vertexSize );
 
 	// Convert data to vertices
-	Vertex* vertices = ( Vertex* )data;
-	size_t vertCount = size / sizeof( Vertex );
+	Vertex* vertices = ( Vertex* )vertexData;
+	size_t vertCount = vertexSize / sizeof( Vertex );
 
-	m_mesh.vertices.resize( vertCount );
-	m_mesh.vertices.insert( m_mesh.vertices.begin(), vertices, vertices + vertCount );
-}
+	mesh.vertices.resize( vertCount );
+	mesh.vertices.insert( mesh.vertices.begin(), vertices, vertices + vertCount );
 
-void ManagedModel::Finish( ManagedTexture* texture )
-{
-	spdlog::info( "ManagedModel: built model" );
+	// Index buffer, optional
+	if ( indexSize > 0 )
+	{
+		spdlog::info( "ManagedModel: Received {} index bytes", indexSize );
 
-	m_model.SetTexture( texture->GetTexture() );
-	
-	m_model.InitDescriptors();
-	m_model.InitPipelines();
-	m_model.InitTextures();
-	m_model.UploadMesh( m_mesh );
+		// Convert data to indices
+		uint32_t* indices = ( uint32_t* )indexData;
+		size_t indexCount = indexSize / sizeof( uint32_t );
+
+		mesh.indices.resize( indexCount );
+		mesh.indices.insert( mesh.indices.begin(), indices, indices + indexCount );
+	}
+
+	m_model.UploadMesh( mesh );
 }
 
 Model ManagedModel::GetModel()
 {
+	spdlog::info( "ManagedModel: finish model" );
 	return m_model;
 }

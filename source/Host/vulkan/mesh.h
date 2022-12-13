@@ -2,6 +2,7 @@
 #include "types.h"
 
 #include <glm/glm.hpp>
+#include <material.h>
 #include <vector>
 
 struct VertexInputDescription
@@ -29,4 +30,6 @@ struct Mesh
 	std::vector<uint32_t> indices;
 	AllocatedBuffer vertexBuffer;
 	AllocatedBuffer indexBuffer;
+
+	Material material;
 };

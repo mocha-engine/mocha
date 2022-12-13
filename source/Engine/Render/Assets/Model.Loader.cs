@@ -77,12 +77,8 @@ partial class Model
 			}
 
 			Path = path;
-			IsIndexed = true;
-			Material = new Material( materialPath );
-			SetupMesh( vertices.ToArray(), indices.ToArray() );
-			CreateResources();
-
-			return;
+			var material = new Material( materialPath );
+			AddMesh( vertices.ToArray(), indices.ToArray(), material );
 		}
 	}
 
