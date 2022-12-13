@@ -34,9 +34,14 @@ float g_cameraZFar;
 
 void Root::Startup()
 {
+	//
 	// TODO: How do we start up g_allocator like this?
 	//		 Should we have a wrapper around VmaAllocator?
 	//		 Should it be part of a 'RenderSystem'?
+	//
+
+	// HACK: CvarManager needs to start up before *everything*
+	CVarManager::Instance().Startup();
 
 	g_logManager = new LogManager();
 	g_logManager->Startup();
@@ -74,6 +79,9 @@ void Root::Shutdown()
 #endif
 
 	g_logManager->Shutdown();
+
+	// HACK: CvarManager needs to shut down before *everything*
+	CVarManager::Instance().Shutdown();
 }
 
 void Root::Run()
