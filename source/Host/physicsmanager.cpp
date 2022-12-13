@@ -118,13 +118,22 @@ void PhysicsManager::Update()
 
 		Transform tx = modelEntity->GetTransform();
 
-		tx.position = JoltToMochaVec3( position );
-		tx.rotation = JoltToMochaQuat( rotation );
+		if ( !modelEntity->GetIgnoreRigidbodyPosition() )
+			tx.position = JoltConversions::JoltToMochaVec3( position );
+		else
+			bodyInterface.SetPosition(
+			    body->bodyId, JoltConversions::MochaToJoltVec3( tx.position ), JPH::EActivation::Activate );
+
+		if ( !modelEntity->GetIgnoreRigidbodyRotation() )
+			tx.rotation = JoltConversions::JoltToMochaQuat( rotation );
+		else
+			bodyInterface.SetRotation(
+			    body->bodyId, JoltConversions::MochaToJoltQuat( tx.rotation ), JPH::EActivation::Activate );
 
 		modelEntity->SetTransform( tx );
 
 		// Save off velocity so that we can make changes to it if we need to
-		modelEntity->SetVelocity( JoltToMochaVec3( velocity ) );
+		modelEntity->SetVelocity( JoltConversions::JoltToMochaVec3( velocity ) );
 	} );
 }
 

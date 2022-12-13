@@ -20,6 +20,9 @@ private:
 	float m_mass = 10.0f;
 	float m_restitution = 0.5f;
 
+	bool m_ignoreRigidbodyRotation;
+	bool m_ignoreRigidbodyPosition;
+
 public:
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj ) override;
 
@@ -45,4 +48,10 @@ public:
 
 	float GetRestitution() { return m_restitution; }
 	void SetRestitution( float restitution ) { m_restitution = restitution; }
+
+	bool GetIgnoreRigidbodyRotation() { return m_ignoreRigidbodyRotation; }
+	void SetIgnoreRigidbodyRotation( bool ignore ) { m_ignoreRigidbodyRotation = ignore; }
+
+	bool GetIgnoreRigidbodyPosition() { return m_ignoreRigidbodyPosition; }
+	void SetIgnoreRigidbodyPosition( bool ignore ) { m_ignoreRigidbodyPosition = ignore; }
 };

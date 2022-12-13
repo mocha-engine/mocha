@@ -61,6 +61,9 @@ struct PhysicsBody
 	float restitution;
 	float friction;
 
+	bool ignoreRotation;
+	bool ignorePosition;
+
 	JPH::BodyID bodyId;
 };
 
