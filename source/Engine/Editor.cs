@@ -49,15 +49,15 @@ public class Editor
 					.Ignore( localPlayer )
 					.Run();
 
-				Log.Info( $"{tr.startPosition} -> {tr.endPosition}" );
-				Log.Info( $"Fraction {tr.fraction}" );
-				Log.Info( $"Hit? {tr.hit}" );
+				Log.Info( $"{tr.StartPosition} -> {tr.EndPosition}" );
+				Log.Info( $"Fraction {tr.Fraction}" );
+				Log.Info( $"Hit? {tr.Hit}" );
 
-				if ( tr.hit )
-					Log.Info( $"Normal {tr.normal}" );
+				if ( tr.Hit )
+					Log.Info( $"Normal {tr.Normal}" );
 			}
 
-			if ( ImGui.Button( "Spawn a ball" ) )
+			if ( ImGui.Button( "Spawn a ball at 0,0,10" ) )
 			{
 				var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
 				ball.Position = new( 0, 0, 10f );

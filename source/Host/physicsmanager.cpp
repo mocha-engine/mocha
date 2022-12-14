@@ -73,7 +73,7 @@ void PhysicsManager::Update()
 	const int collisionSteps = 4;
 	const int integrationSubSteps = 1;
 
-	// Retrieve velocities that were saved off last frame
+	// Retrieve properties that were saved off last frame
 	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
@@ -88,9 +88,16 @@ void PhysicsManager::Update()
 
 		auto body = Get( physicsHandle );
 		auto savedVelocity = modelEntity->GetVelocity();
+		auto savedTransform = modelEntity->GetTransform();
 
 		JPH::Vec3 velocity = JoltConversions::MochaToJoltVec3( savedVelocity );
 		bodyInterface.SetLinearVelocity( body->bodyId, velocity );
+
+		bodyInterface.SetPosition(
+		    body->bodyId, JoltConversions::MochaToJoltVec3( savedTransform.position ), JPH::EActivation::DontActivate );
+
+		bodyInterface.SetRotation(
+		    body->bodyId, JoltConversions::MochaToJoltQuat( savedTransform.rotation ), JPH::EActivation::DontActivate );
 	} );
 
 	// Step the world
@@ -122,18 +129,19 @@ void PhysicsManager::Update()
 			tx.position = JoltConversions::JoltToMochaVec3( position );
 		else
 			bodyInterface.SetPosition(
-			    body->bodyId, JoltConversions::MochaToJoltVec3( tx.position ), JPH::EActivation::Activate );
+			    body->bodyId, JoltConversions::MochaToJoltVec3( tx.position ), JPH::EActivation::DontActivate );
 
 		if ( !modelEntity->GetIgnoreRigidbodyRotation() )
 			tx.rotation = JoltConversions::JoltToMochaQuat( rotation );
 		else
 			bodyInterface.SetRotation(
-			    body->bodyId, JoltConversions::MochaToJoltQuat( tx.rotation ), JPH::EActivation::Activate );
+			    body->bodyId, JoltConversions::MochaToJoltQuat( tx.rotation ), JPH::EActivation::DontActivate );
 
 		modelEntity->SetTransform( tx );
 
 		// Save off velocity so that we can make changes to it if we need to
-		modelEntity->SetVelocity( JoltConversions::JoltToMochaVec3( velocity ) );
+		if ( body->type == PhysicsType::Dynamic )
+			modelEntity->SetVelocity( JoltConversions::JoltToMochaVec3( velocity ) );
 	} );
 }
 
@@ -220,51 +228,15 @@ TraceResult PhysicsManager::Trace( TraceInfo traceInfo )
 
 bool PhysicsManager::IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId )
 {
-	//
-	// We need to do the following steps:
-	// 1: JPH body -> physicsmanager handle
-	// 2: physicsmanager handle -> entity handle
-	// 3: entity handle == traceInfo.ignoredEntityList[i]?
-	//
+	Handle entityHandle = FindEntityHandleForBodyId( bodyId );
 
 	//
-	// Step 1: find physmanager handle
-	//
-	Handle physHandle = UINT32_MAX;
-	For( [&]( Handle handle, std::shared_ptr<PhysicsBody> object ) {
-		if ( object->bodyId == bodyId )
-			physHandle = handle;
-	} );
-
-	// Did we find one?
-	if ( physHandle == UINT32_MAX )
-		return true;
-
-	//
-	// Step 2: find entity handle
-	//
-	Handle entHandle = UINT32_MAX;
-	g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
-		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
-
-		if ( modelEntity == nullptr )
-			return;
-
-		if ( modelEntity->GetPhysicsHandle() == physHandle )
-			entHandle = handle;
-	} );
-
-	// Did we find one?
-	if ( entHandle == UINT32_MAX )
-		return true;
-
-	//
-	// Step 3: check if physics handle is part of the ignored list
+	// Check if physics handle is part of the ignored list
 	//
 	for ( size_t i = 0; i < traceInfo.ignoredEntityCount; i++ )
 	{
 		// Is this an ignored entity?
-		if ( traceInfo.ignoredEntityHandles[i] == entHandle )
+		if ( traceInfo.ignoredEntityHandles[i] == entityHandle )
 			return true;
 	}
 
@@ -272,14 +244,50 @@ bool PhysicsManager::IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId )
 	return false;
 }
 
+uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
+{
+	//
+	// We need to do the following steps:
+	// 1: JPH body -> physicsmanager handle
+	// 2: physicsmanager handle -> entity handle
+	//
+
+	//
+	// Step 1: find physmanager handle
+	//
+	uint32_t physicsHandle = UINT32_MAX;
+	For( [&]( Handle handle, std::shared_ptr<PhysicsBody> object ) {
+		if ( object->bodyId == bodyId )
+			physicsHandle = handle;
+	} );
+
+	// Did we find one?
+	if ( physicsHandle == UINT32_MAX )
+		return UINT32_MAX;
+
+	//
+	// Step 2: find entity handle
+	//
+	uint32_t entityHandle = UINT32_MAX;
+	g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
+		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+
+		if ( modelEntity == nullptr )
+			return;
+
+		if ( modelEntity->GetPhysicsHandle() == physicsHandle )
+			entityHandle = handle;
+	} );
+
+	// Did we find one?
+	if ( entityHandle == UINT32_MAX )
+		return UINT32_MAX;
+
+	return entityHandle;
+}
+
 TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 {
-	// Initial trace result properties - we use a lot of these if we don't hit anything.
-	TraceResult traceResult = {};
-	traceResult.startPosition = traceInfo.startPosition;
-	traceResult.endPosition = traceInfo.endPosition;
-	traceResult.fraction = 1.0f;
-
 	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
 
 	auto origin = JoltConversions::MochaToJoltVec3( traceInfo.startPosition );
@@ -300,8 +308,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
 	{
-		traceResult.hit = false;
-		return traceResult;
+		return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
 	}
 
 	// We might have hit something, let's do some filtering
@@ -326,6 +333,8 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 		// We got this far - that means that the entity we've hit is valid and
 		// not part of the ignored list. Let's return some relevant values.
 		//
+		TraceResult traceResult = {};
+		traceResult.startPosition = traceInfo.startPosition;
 		traceResult.hit = true;
 
 		// Calculate end position
@@ -338,21 +347,96 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 		traceResult.normal = JoltConversions::JoltToMochaVec3( hitBody.GetWorldSpaceSurfaceNormal(
 		    result.mSubShapeID2, JoltConversions::MochaToJoltVec3( traceResult.endPosition ) ) );
 
+		// Hit entity
+		traceResult.entityHandle = FindEntityHandleForBodyId( result.mBodyID );
+
+		// Started solid
+		traceResult.startedSolid = traceResult.fraction == 0.0f;
+
+		// Ended solid
+		// TODO: Replace with allSolid
+		traceResult.endedSolid = false;
+
 		return traceResult;
 	}
 
-	return traceResult;
+	return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
 }
 
 TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 {
-	// Initial trace result properties - we use a lot of these if we don't hit anything.
-	TraceResult traceResult = {};
-	traceResult.startPosition = traceInfo.startPosition;
-	traceResult.endPosition = traceInfo.endPosition;
-	traceResult.fraction = 1.0f;
+	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
 
-	// TODO
+	auto origin = JoltConversions::MochaToJoltVec3( traceInfo.startPosition );
+	auto direction = JoltConversions::MochaToJoltVec3( traceInfo.endPosition ) - origin;
 
-	return traceResult;
+	// Create ray cast
+	JPH::BoxShape boxShape( JoltConversions::MochaToJoltVec3( traceInfo.extents ) );
+	JPH::ShapeCast shapeCast( &boxShape, JPH::Vec3::sReplicate( 1.0f ), JPH::Mat44::sTranslation( origin ), direction );
+
+	JPH::ShapeCastSettings shapeCastSettings;
+
+	JPH::AllHitCollisionCollector<JPH::CastShapeCollector> collector;
+	sceneQuery.CastShape( shapeCast, shapeCastSettings, collector );
+
+	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+
+	// Did we hit anything at all? If not, bail now
+	if ( !collector.HadHit() )
+	{
+		return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
+	}
+
+	// We might have hit something, let's do some filtering
+	collector.Sort();
+
+	std::vector<JPH::ShapeCastResult> shapeCastResults( collector.mHits.begin(), collector.mHits.end() );
+
+	// Find the first raycast result that matches our parameters
+	for ( size_t i = 0; i < shapeCastResults.size(); i++ )
+	{
+		const JPH::ShapeCastResult& result = shapeCastResults[i];
+
+		auto bodyID = result.mBodyID2.GetIndexAndSequenceNumber();
+		JPH::BodyLockRead bodyLock( m_physicsSystem.GetBodyLockInterface(), result.mBodyID2 );
+		const JPH::Body& hitBody = bodyLock.GetBody();
+
+		// Is this body ignored in the trace filter?
+		if ( IsBodyIgnored( traceInfo, result.mBodyID2 ) )
+			continue;
+
+		//
+		// We got this far - that means that the entity we've hit is valid and
+		// not part of the ignored list. Let's return some relevant values.
+		//
+		TraceResult traceResult = {};
+		traceResult.startPosition = traceInfo.startPosition;
+		traceResult.hit = true;
+
+		// Calculate end position
+		traceResult.endPosition = JoltConversions::JoltToMochaVec3(
+		    shapeCast.mCenterOfMassStart.GetTranslation() + result.mFraction * shapeCast.mDirection );
+
+		// Hit fraction
+		traceResult.fraction = result.mFraction;
+
+		// Calculate hit normal
+		traceResult.normal = JoltConversions::JoltToMochaVec3( -result.mPenetrationAxis.Normalized() );
+
+		// Hit entity
+		traceResult.entityHandle = FindEntityHandleForBodyId( result.mBodyID2 );
+
+		// Started solid
+		traceResult.startedSolid = result.mPenetrationDepth > 0.025f && traceResult.fraction == 0.0f;
+
+		// Ended solid
+		// TODO: Replace with allSolid
+		traceResult.endedSolid = false;
+
+		traceResult.boobies = FindEntityHandleForBodyId( result.mBodyID2 );
+
+		return traceResult;
+	}
+
+	return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
 }

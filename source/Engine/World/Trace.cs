@@ -24,12 +24,24 @@ public class Cast
 		return trace;
 	}
 
+	public static Cast Box( Vector3 startPosition, Vector3 endPosition, Vector3 halfExtents )
+	{
+		var trace = new Cast();
+		trace.info.startPosition = startPosition;
+		trace.info.endPosition = endPosition;
+
+		trace.info.isBox = true;
+		trace.info.extents = halfExtents;
+
+		return trace;
+	}
+
 	public Cast()
 	{
 		info = new();
 	}
 
-	public Cast WithExtents( Vector3 extents )
+	public Cast WithHalfExtents( Vector3 extents )
 	{
 		info.isBox = true;
 		info.extents = extents;
@@ -43,7 +55,7 @@ public class Cast
 		return this;
 	}
 
-	public Glue.TraceResult Run()
+	public TraceResult Run()
 	{
 		var traceInfo = info;
 		traceInfo.ignoredEntityCount = IgnoredEntities.Count;
@@ -57,6 +69,6 @@ public class Cast
 		}
 
 		var result = Glue.Physics.Trace( traceInfo );
-		return result;
+		return TraceResult.From( result );
 	}
 }

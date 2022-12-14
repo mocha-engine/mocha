@@ -79,6 +79,10 @@ struct TraceResult
 	Vector3 endPosition;
 	float fraction;
 	Vector3 normal;
+	bool startedSolid;
+	bool endedSolid;
+	uint32_t entityHandle;
+	uint32_t boobies;
 };
 
 //@InteropGen generate struct
@@ -274,6 +278,8 @@ private:
 	JPH::JobSystem* m_jobSystem;
 	JPH::PhysicsSystem m_physicsSystem;
 	BPLayerInterfaceImpl m_broadPhaseLayerInterface;
+
+	uint32_t FindEntityHandleForBodyId( JPH::BodyID bodyId );
 
 	TraceResult TraceRay( TraceInfo traceInfo );
 	TraceResult TraceBox( TraceInfo traceInfo );
