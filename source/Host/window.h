@@ -9,6 +9,7 @@ class Window
 {
 private:
 	struct SDL_Window* m_window{ nullptr };
+	bool m_captureMouse;
 
 public:
 	Window( uint32_t width, uint32_t height );
