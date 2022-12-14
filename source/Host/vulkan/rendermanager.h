@@ -23,6 +23,7 @@ private:
 	void InitSyncStructures();
 	void InitImGUI();
 	void InitDescriptors();
+	void InitSamplers();
 
 	void CreateSwapchain( VkExtent2D size );
 	
@@ -31,6 +32,9 @@ private:
 public:
 	bool m_isInitialized{ false };
 	int m_frameNumber{ 0 };
+
+	VkSampler m_pointSampler;
+	VkSampler m_anisoSampler;
 	
 	std::unique_ptr<Window> m_window;
 
