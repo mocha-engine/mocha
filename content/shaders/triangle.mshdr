@@ -1,5 +1,21 @@
 #version 450
 
+//push constants block
+layout( push_constant ) uniform constants
+{
+	vec4 data;
+
+	mat4 model_matrix;
+
+	mat4 render_matrix;
+
+	vec3 vCameraPosWS;
+	float pad0;
+
+	float flTime;
+	vec3 pad1;
+} PushConstants;
+
 #ifdef VERTEX
 
 layout (location = 0) in vec3 vPosition;
@@ -12,15 +28,6 @@ layout (location = 1) out vec3 outNormalWS;
 layout (location = 2) out vec3 outPositionWS;
 layout (location = 3) out vec3 outCameraWS;
 layout (location = 4) out vec3 outTexCoord;
-
-//push constants block
-layout( push_constant ) uniform constants
-{
-	vec4 data;
-	mat4 model_matrix;
-	mat4 render_matrix;
-	vec3 vCameraPosWS;
-} PushConstants;
 
 void main()
 {
@@ -60,18 +67,32 @@ float specular(vec3 normal, vec3 lightDir, vec3 viewDir, float shininess)
 
 float ambient()
 {
-	return 0.05;
+	return 0.01;
 }
 
 void main()
 {
-	vec3 lightPos = vec3(0.0f, 0.0f, 64.0f);
+	vec3 lightPos = vec3(
+		sin( PushConstants.flTime ) * 4.0f,
+		cos( PushConstants.flTime ) * 4.0f,
+		4.0f
+	);
+
 	vec3 lightDir = normalize(lightPos - vPositionWS);
 	vec3 viewDir = normalize(vCameraWS - vPositionWS);
 
-	float l = lambert(vNormalWS, lightDir) + ambient();// + specular(vNormalWS, lightDir, viewDir, 32.0f);
+	float ambient = ambient();
+	float diffuse = lambert(vNormalWS, lightDir);
+	float specular = specular(vNormalWS, lightDir, viewDir, 32.0f);
 
-	vec3 fragColor = texture(tex, vTexCoord.xy).rgb * l;
+	float distance = length( lightPos - vPositionWS );
+	float attenuation = 1.0f / (distance * distance);
+	diffuse *= attenuation;
+	specular *= attenuation;
+
+	float l = ambient + diffuse + specular;
+
+	vec3 fragColor = texture(tex, vTexCoord.xy * vec2(-1, 1)).rgb * l;
 	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
 
 	outFragColor = vec4(fragColor, 1.0f);
