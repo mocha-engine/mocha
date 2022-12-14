@@ -9,6 +9,8 @@
 #include <imgui.h>
 #endif
 
+
+
 Window::Window( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
@@ -39,6 +41,8 @@ bool Window::Update()
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
+
+	SDL_SetRelativeMouseMode( m_captureMouse ? SDL_TRUE : SDL_FALSE );
 
 	while ( SDL_PollEvent( &e ) != 0 )
 	{
@@ -84,6 +88,9 @@ bool Window::Update()
 				inputState.keys.resize( scanCode + 1 );
 
 			inputState.keys[scanCode] = isDown;
+
+			if ( kbe.keysym.scancode == SDL_SCANCODE_F10 && isDown )
+				m_captureMouse = !m_captureMouse;
 		}
 		else if ( e.type == SDL_MOUSEMOTION )
 		{
