@@ -7,33 +7,42 @@ public class Player : ModelEntity
 	public static Player Local => BaseEntity.All.OfType<Player>().First();
 
 	private Vector3 PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
+	public Vector3 PlayerHalfExtents => PlayerBounds / 2f;
 
-	public Vector3 EyePosition => Position + Vector3.Up * (PlayerBounds / 2f).Z;
+	public Vector3 EyePosition => Position + Vector3.Up * PlayerHalfExtents.Z;
 	public Rotation EyeRotation => Input.Rotation;
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );
+
+	private QuakeWalkController WalkController { get; set; }
+
+	public bool IsGrounded => WalkController.IsGrounded;
+	public BaseEntity GroundEntity => WalkController.GroundEntity;
 
 	protected override void Spawn()
 	{
 		base.Spawn();
-
-		Position = new Vector3( 0, 0, 2.0f );
 
 		Restitution = 0.0f;
 		Friction = 1.0f;
 		Mass = 100f;
 		IgnoreRigidbodyRotation = true;
 
-		SetCubePhysics( PlayerBounds / 2f, false );
+		Respawn();
 	}
 
 	bool rightLastFrame = false;
 
+	public void Respawn()
+	{
+		WalkController = new( this );
+		Velocity = Vector3.Zero;
+		Position = new Vector3( 0, 0, 2.0f );
+	}
+
 	public override void Update()
 	{
 		UpdateCamera();
-
-		var wishDir = Input.Rotation * Input.Direction;
-		Velocity += (wishDir * Time.Delta * 10f).WithZ( 0 );
+		WalkController.Update();
 
 		//
 		// Spawn some balls when right clicking

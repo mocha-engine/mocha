@@ -18,6 +18,7 @@ public class Editor
 		DrawCameraWindow();
 		DrawPhysicsTestWindow();
 		DrawInputWindow();
+		DrawPlayerWindow();
 	}
 
 	private static void DrawInputWindow()
@@ -32,6 +33,24 @@ public class Editor
 
 			ImGui.Text( $"Direction: {Input.Direction}" );
 			ImGui.Text( $"Rotation: {Input.Rotation}" );
+		}
+
+		ImGui.End();
+	}
+
+	private static void DrawPlayerWindow()
+	{
+		if ( ImGui.Begin( "Player" ) )
+		{
+			if ( ImGui.Button( "Respawn Player" ) )
+			{
+				Player.Local.Respawn();
+			}
+
+			ImGui.Text( $"Player is grounded: {Player.Local.IsGrounded}" );
+			ImGui.Text( $"Ground Entity: {Player.Local.GroundEntity?.Name ?? "None"}" );
+			ImGui.Text( $"Player velocity: {Player.Local.Velocity}" );
+			ImGui.Text( $"Player position: {Player.Local.Position}" );
 		}
 
 		ImGui.End();
