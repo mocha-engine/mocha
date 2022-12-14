@@ -36,7 +36,7 @@ bool Window::Update()
 	bool bQuit = false;
 
 	InputState inputState = g_inputManager->GetState();
-	
+
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
 
@@ -45,11 +45,6 @@ bool Window::Update()
 		if ( e.type == SDL_QUIT )
 		{
 			return true;
-		}
-		else if ( e.type == SDL_KEYDOWN )
-		{
-			SDL_KeyboardEvent ke = e.key;
-			char c = SDL_GetKeyFromScancode( ke.keysym.scancode );
 		}
 		else if ( e.type == SDL_WINDOWEVENT )
 		{
@@ -78,12 +73,24 @@ bool Window::Update()
 
 			inputState.buttons[mbe.button] = isDown;
 		}
+		else if ( e.type == SDL_KEYDOWN || e.type == SDL_KEYUP )
+		{
+			SDL_KeyboardEvent kbe = e.key;
+
+			bool isDown = kbe.state == SDL_PRESSED;
+			int scanCode = kbe.keysym.scancode;
+
+			if ( inputState.keys.size() <= scanCode )
+				inputState.keys.resize( scanCode + 1 );
+
+			inputState.keys[scanCode] = isDown;
+		}
 		else if ( e.type == SDL_MOUSEMOTION )
 		{
 			SDL_MouseMotionEvent mme = e.motion;
-			
-			inputState.mousePosition = { (float)mme.x, (float)mme.y };
-			inputState.mouseDelta = { (float)mme.xrel, (float)mme.yrel };
+
+			inputState.mousePosition = { ( float )mme.x, ( float )mme.y };
+			inputState.mouseDelta = { ( float )mme.xrel, ( float )mme.yrel };
 		}
 
 #ifdef _IMGUI

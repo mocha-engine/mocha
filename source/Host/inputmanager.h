@@ -28,6 +28,7 @@ public:
 	void SetState( InputState newState );
 
 	bool IsButtonDown( int button );
+	bool IsKeyDown( int key );
 	Vector2 GetMousePosition();
 	Vector2 GetMouseDelta();
 };

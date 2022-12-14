@@ -504,42 +504,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="generated\editor.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\entities.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\input.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\logmanager.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\managedmodel.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\managedtexture.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\mesh.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\Physics.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\physicsmanager.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\shader.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
