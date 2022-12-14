@@ -78,6 +78,7 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		constants.modelMatrix = model;
 		constants.renderMatrix = renderMatrix;
 		constants.cameraPos = g_cameraPos.ToGLM();
+		constants.time = g_curTime;
 
 		vkCmdBindDescriptorSets(
 		    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1, &mesh.material.m_textureSet, 0, nullptr );
