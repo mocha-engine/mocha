@@ -1,7 +1,7 @@
 #pragma once
+#include <cvarmanager.h>
 #include <globalvars.h>
 #include <inputmanager.h>
-#include <cvarmanager.h>
 
 //@InteropGen generate class
 namespace Input
@@ -19,5 +19,10 @@ namespace Input
 	inline Vector2 GetMouseDelta()
 	{
 		return g_inputManager->GetMouseDelta();
+	}
+
+	inline bool IsKeyDown( int key )
+	{
+		return g_inputManager->IsKeyDown( key );
 	}
 } // namespace Input

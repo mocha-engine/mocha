@@ -159,6 +159,11 @@ public partial class ModelEntity : BaseEntity
 			}
 		}
 
+		//
+		// Reverse winding order
+		//
+		vertexList.Reverse();
+
 		unsafe
 		{
 			int vertexStride = Marshal.SizeOf( typeof( Vector3 ) );

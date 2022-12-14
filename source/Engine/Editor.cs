@@ -24,13 +24,14 @@ public class Editor
 	{
 		if ( ImGui.Begin( "Input" ) )
 		{
-			for ( int i = 1; i < 6; ++i )
-			{
-				ImGui.Text( $"Button {i}: {Glue.Input.IsButtonDown( i )}" );
-			}
+			ImGui.Text( $"Left click: {Input.Left}" );
+			ImGui.Text( $"Right click: {Input.Right}" );
 
-			ImGui.Text( $"Mouse position: {Glue.Input.GetMousePosition()}" );
-			ImGui.Text( $"Mouse delta: {Glue.Input.GetMouseDelta()}" );
+			ImGui.Text( $"Mouse position: {Input.MousePosition}" );
+			ImGui.Text( $"Mouse delta: {Input.MouseDelta}" );
+
+			ImGui.Text( $"Direction: {Input.Direction}" );
+			ImGui.Text( $"Rotation: {Input.Rotation}" );
 		}
 
 		ImGui.End();

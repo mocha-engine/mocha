@@ -23,6 +23,14 @@ bool InputManager::IsButtonDown( int button )
 	return m_inputState.buttons[button];
 }
 
+bool InputManager::IsKeyDown( int key )
+{
+	if ( m_inputState.keys.size() <= key )
+		m_inputState.keys.resize( key + 1 );
+
+	return m_inputState.keys[key];
+}
+
 Vector2 InputManager::GetMousePosition()
 {
 	return m_inputState.mousePosition;
