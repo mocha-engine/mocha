@@ -23,6 +23,8 @@ public static partial class Input
 
 	private static bool IsKeyDown( InputButton key ) => Glue.Input.IsKeyDown( (int)key );
 
+	public static bool Jump => IsKeyDown( InputButton.KeySpace );
+
 	public static void Update()
 	{
 		//
