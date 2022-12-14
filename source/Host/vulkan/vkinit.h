@@ -182,7 +182,8 @@ namespace VKInit
 		return cmdBeginInfo;
 	}
 
-	inline VkImageCreateInfo ImageCreateInfo( VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent, uint32_t mipLevels )
+	inline VkImageCreateInfo ImageCreateInfo(
+	    VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent, uint32_t mipLevels )
 	{
 		VkImageCreateInfo imageInfo = {};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -205,7 +206,8 @@ namespace VKInit
 		return imageInfo;
 	}
 
-	inline VkImageViewCreateInfo ImageViewCreateInfo( VkFormat format, VkImage image, VkImageAspectFlags aspectFlags, uint32_t mipLevels )
+	inline VkImageViewCreateInfo ImageViewCreateInfo(
+	    VkFormat format, VkImage image, VkImageAspectFlags aspectFlags, uint32_t mipLevels )
 	{
 		VkImageViewCreateInfo viewInfo = {};
 		viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -290,7 +292,7 @@ namespace VKInit
 	}
 
 	inline VkSamplerCreateInfo SamplerCreateInfo(
-	    VkFilter filters, VkSamplerAddressMode samplerAddressMode /*= VK_SAMPLER_ADDRESS_MODE_REPEAT*/ )
+	    VkFilter filters, VkSamplerAddressMode samplerAddressMode, bool anisoEnabled = false )
 	{
 		VkSamplerCreateInfo info = {};
 		info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -302,9 +304,9 @@ namespace VKInit
 		info.addressModeV = samplerAddressMode;
 		info.addressModeW = samplerAddressMode;
 
-		info.anisotropyEnable = VK_TRUE;
-		info.maxAnisotropy = 16.0f;
-		
+		info.anisotropyEnable = anisoEnabled;
+		info.maxAnisotropy = anisoEnabled ? 16.0f : 0.0f;
+
 		info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 		info.minLod = 0.0f;
 		info.maxLod = 5.0f;

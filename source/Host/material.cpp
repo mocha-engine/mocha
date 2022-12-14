@@ -26,13 +26,10 @@ void Material::CreateDescriptors()
 	VkDescriptorSetLayoutCreateInfo textureLayoutInfo = VKInit::DescriptorSetLayoutCreateInfo( &textureBinding, 1 );
 	VK_CHECK( vkCreateDescriptorSetLayout( device, &textureLayoutInfo, nullptr, &m_textureSetLayout ) );
 
-	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT );
-	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_sampler ) );
-
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = m_diffuseTexture.GetImageView();
-	imageInfo.sampler = m_sampler;
+	imageInfo.sampler = g_renderManager->m_anisoSampler;
 
 	VkDescriptorSetAllocateInfo allocInfo =
 	    VKInit::DescriptorSetAllocateInfo( g_renderManager->m_descriptorPool, &m_textureSetLayout, 1 );

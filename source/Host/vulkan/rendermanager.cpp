@@ -288,6 +288,15 @@ void RenderManager::InitDescriptors()
 	VK_CHECK( vkCreateDescriptorPool( m_device, &poolInfo, nullptr, &m_descriptorPool ) );
 }
 
+void RenderManager::InitSamplers()
+{
+	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
+	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_anisoSampler ) );
+
+	samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT );
+	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_pointSampler ) );
+}
+
 void RenderManager::Startup()
 {
 	m_window = std::make_unique<Window>( Window( 1280, 720 ) );
@@ -304,6 +313,7 @@ void RenderManager::Startup()
 	InitCommands();
 	InitSyncStructures();
 	InitDescriptors();
+	InitSamplers();
 	InitImGUI();
 
 	m_isInitialized = true;
