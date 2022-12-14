@@ -113,7 +113,7 @@ public struct Vector3 : IEquatable<Vector3>
 		return false;
 	}
 
-	public bool Equals( Vector3 other ) => Equals( other );
+	public bool Equals( Vector3 other ) => internalVector.Equals( other.internalVector );
 
 	public static Vector3 Cross( Vector3 a, Vector3 b ) => new Vector3( a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X );
 
@@ -132,6 +132,17 @@ public struct Vector3 : IEquatable<Vector3>
 	public readonly Vector3 WithX( float x_ ) => new Vector3( x_, Y, Z );
 	public readonly Vector3 WithY( float y_ ) => new Vector3( X, y_, Z );
 	public readonly Vector3 WithZ( float z_ ) => new Vector3( X, Y, z_ );
+
+	public static float GetAngle( Vector3 a, Vector3 b )
+	{
+		float dot = a.Dot( b );
+		dot /= (a.Length * b.Length);
+
+		float rad = MathF.Acos( dot );
+		float angle = MathX.RadiansToDegrees( rad );
+
+		return angle;
+	}
 
 	public override int GetHashCode() => HashCode.Combine( internalVector );
 
@@ -157,9 +168,9 @@ public struct Vector3 : IEquatable<Vector3>
 
 		sb.Append( "( " );
 
-		sb.Append( $"X: {X:G2}, " );
-		sb.Append( $"Y: {Y:G2}, " );
-		sb.Append( $"Z: {Z:G2}" );
+		sb.Append( $"X: {X}, " );
+		sb.Append( $"Y: {Y}, " );
+		sb.Append( $"Z: {Z}" );
 
 		sb.Append( " )" );
 
