@@ -17,9 +17,16 @@
 struct MeshPushConstants
 {
 	glm::vec4 data;
+
 	glm::mat4 modelMatrix;
+
 	glm::mat4 renderMatrix;
+
 	glm::vec3 cameraPos;
+	float pad0;
+
+	float time;
+	float pad1;
 };
 
 class Model
