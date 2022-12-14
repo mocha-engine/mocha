@@ -4,7 +4,7 @@ using System.Reflection;
 namespace Mocha;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
-public class BaseEntity
+public class BaseEntity : IEntity
 {
 	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
 	public uint NativeHandle { get; protected set; }
@@ -64,7 +64,6 @@ public class BaseEntity
 		NativeHandle = Glue.Entities.CreateBaseEntity();
 	}
 
-	public virtual void Render() { }
 	public virtual void Update() { }
 	public virtual void Delete()
 	{
