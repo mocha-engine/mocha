@@ -44,7 +44,7 @@ public class Player : ModelEntity
 
 			var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
 			ball.Name = "My Ball";
-			ball.Position = tr.endPosition + tr.normal * 1.0f;
+			ball.Position = tr.EndPosition + tr.Normal * 1.0f;
 			ball.Restitution = 1.0f;
 			ball.Friction = 1.0f;
 			ball.Mass = 10.0f;
