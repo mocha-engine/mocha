@@ -1,6 +1,18 @@
 #pragma once
 #include <vk_mem_alloc.h>
 
+enum RenderDebugViews
+{
+	NONE = 0,
+	DIFFUSE = 1,
+	NORMAL = 2,
+	AMBIENTOCCLUSION = 3,
+	METALNESS = 4,
+	ROUGHNESS = 5,
+
+	OTHER = 63
+};
+
 class RenderManager;
 class RenderdocManager;
 class HostManager;
@@ -34,3 +46,5 @@ extern Quaternion g_cameraRot;
 extern float g_cameraFov;
 extern float g_cameraZNear;
 extern float g_cameraZFar;
+
+extern RenderDebugViews g_debugView;

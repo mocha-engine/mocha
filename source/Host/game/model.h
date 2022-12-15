@@ -23,10 +23,9 @@ struct MeshPushConstants
 	glm::mat4 renderMatrix;
 
 	glm::vec3 cameraPos;
-	float pad0;
-
 	float time;
-	float pad1;
+
+	glm::vec4 vLightInfoWS[4];
 };
 
 class Model

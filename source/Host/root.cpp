@@ -1,3 +1,4 @@
+// #define _RENDERDOC 1
 #include "root.h"
 
 #include <defs.h>
@@ -33,6 +34,7 @@ Quaternion g_cameraRot;
 float g_cameraFov;
 float g_cameraZNear;
 float g_cameraZFar;
+RenderDebugViews g_debugView;
 
 void Root::Startup()
 {

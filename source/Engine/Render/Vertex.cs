@@ -10,6 +10,6 @@ public struct Vertex
 	public Vector3 Color { get; set; }
 	public Vector2 UV { get; set; }
 
-	// public Vector3 Tangent { get; set; }
-	// public Vector3 Bitangent { get; set; }
+	public Vector3 Tangent { get; set; }
+	public Vector3 Bitangent { get; set; }
 }

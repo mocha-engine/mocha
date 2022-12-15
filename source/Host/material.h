@@ -1,4 +1,5 @@
 #pragma once
+#include <vector>
 #include <texture.h>
 #include <vulkan/types.h>
 
@@ -13,14 +14,16 @@ private:
 
 public:
 	Texture m_diffuseTexture;
+	Texture m_normalTexture;
+	Texture m_ambientOcclusionTexture;
+	Texture m_metalnessTexture;
+	Texture m_roughnessTexture;
+
 	VkDescriptorSet m_textureSet;
 	VkDescriptorSetLayout m_textureSetLayout;
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
-
-	// This is defined for shit reasons
-	// TODO: get rid
-	Material(){};
-
-	Material( Texture diffuseTexture );
+	
+	Material( Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
+	    Texture roughnessTexture );
 };

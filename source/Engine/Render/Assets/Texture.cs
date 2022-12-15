@@ -35,7 +35,11 @@ public partial class Texture : Asset
 		{
 			fixed ( void* data = textureData.ToArray() )
 			{
-				NativeTexture.SetMipData( Width, Height, (uint)mipCount, (uint)textureData.Count(), (IntPtr)data, (int)TextureFormat.BC3_SRGB );
+				TextureFormat format = TextureFormat.BC3_SRGB;
+				if ( path.Contains( "normal" ) )
+					format = TextureFormat.BC5_UNORM;
+
+				NativeTexture.SetMipData( Width, Height, (uint)mipCount, (uint)textureData.Count(), (IntPtr)data, (int)format );
 			}
 		}
 	}

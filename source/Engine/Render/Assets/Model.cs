@@ -42,7 +42,7 @@ public partial class Model<T> : Asset
 
 			fixed ( void* vertexData = vertices )
 			{
-				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, 0, IntPtr.Zero, material.DiffuseTexture.NativeTexture.NativePtr );
+				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, 0, IntPtr.Zero, material.NativeMaterial.NativePtr );
 			}
 		}
 	}
@@ -60,7 +60,7 @@ public partial class Model<T> : Asset
 			fixed ( void* vertexData = vertices )
 			fixed ( void* indexData = indices )
 			{
-				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, indexSize, (IntPtr)indexData, material.DiffuseTexture.NativeTexture.NativePtr );
+				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, indexSize, (IntPtr)indexData, material.NativeMaterial.NativePtr );
 			}
 		}
 	}

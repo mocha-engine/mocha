@@ -8,17 +8,68 @@ public class Editor
 	static string consoleInput = "";
 	static string editorInput = "";
 
+	static bool drawEntityWindow = false;
+	static bool drawConsoleWindow = false;
+	static bool drawCameraWindow = false;
+	static bool drawPhysicsTestWindow = false;
+	static bool drawInputWindow = false;
+	static bool drawPlayerWindow = false;
+
 	public static void Draw()
 	{
-		ImGui.ShowDemoWindow();
+		DrawMenuBar();
+		DrawPerformanceOverlay();
 
-		DrawEntityWindow();
-		DrawPerformanceWindow();
-		DrawConsoleWindow();
-		DrawCameraWindow();
-		DrawPhysicsTestWindow();
-		DrawInputWindow();
-		DrawPlayerWindow();
+		if ( drawEntityWindow )
+			DrawEntityWindow();
+
+		if ( drawConsoleWindow )
+			DrawConsoleWindow();
+
+		if ( drawCameraWindow )
+			DrawCameraWindow();
+
+		if ( drawPhysicsTestWindow )
+			DrawPhysicsTestWindow();
+
+		if ( drawInputWindow )
+			DrawInputWindow();
+
+		if ( drawPlayerWindow )
+			DrawPlayerWindow();
+	}
+
+	private static void DrawMenuBar()
+	{
+		if ( ImGui.BeginMainMenuBar() )
+		{
+			if ( ImGui.BeginMenu( "Window" ) )
+			{
+				if ( ImGui.MenuItem( "Entities" ) )
+					drawEntityWindow = !drawEntityWindow;
+
+				if ( ImGui.MenuItem( "Console" ) )
+					drawConsoleWindow = !drawConsoleWindow;
+
+				if ( ImGui.MenuItem( "Camera" ) )
+					drawCameraWindow = !drawCameraWindow;
+
+				if ( ImGui.MenuItem( "Physics Test" ) )
+					drawPhysicsTestWindow = !drawPhysicsTestWindow;
+
+				if ( ImGui.MenuItem( "Input" ) )
+					drawInputWindow = !drawInputWindow;
+
+				if ( ImGui.MenuItem( "Player" ) )
+					drawPlayerWindow = !drawPlayerWindow;
+
+				ImGui.EndMenu();
+			}
+
+			ImGui.RenderViewDropdown();
+		}
+
+		ImGui.EndMainMenuBar();
 	}
 
 	private static void DrawInputWindow()
@@ -182,7 +233,7 @@ public class Editor
 		ImGui.End();
 	}
 
-	private static void DrawPerformanceWindow()
+	private static void DrawPerformanceOverlay()
 	{
 		if ( ImGui.BeginOverlay( "Time" ) )
 		{

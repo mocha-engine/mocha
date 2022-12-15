@@ -4,19 +4,16 @@
 #include "globalvars.h"
 
 #include <edict.h>
-#include <managedtexture.h>
+#include <managedmaterial.h>
 #include <modelentity.h>
 #include <spdlog/spdlog.h>
 #include <texture.h>
 
-void ManagedModel::AddMesh( int vertexSize, void* vertexData, int indexSize, void* indexData, ManagedTexture* diffuseTexture )
+void ManagedModel::AddMesh( int vertexSize, void* vertexData, int indexSize, void* indexData, ManagedMaterial* managedMaterial )
 {
 	assert( vertexSize > 0 ); // Vertex buffer is not optional
 
-	Material material( diffuseTexture->GetTexture() );
-
-	Mesh mesh = {};
-	mesh.material = material;
+	Mesh mesh( managedMaterial->GetMaterial() );
 
 	// Vertex buffer
 	spdlog::info( "ManagedModel: Received {} vertex bytes", vertexSize );

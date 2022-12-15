@@ -5,9 +5,14 @@
 #include <vulkan/rendermanager.h>
 #include <vulkan/vkinit.h>
 
-Material::Material( Texture diffuseTexture )
+Material::Material( Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
+    Texture roughnessTexture )
 {
 	m_diffuseTexture = diffuseTexture;
+	m_normalTexture = normalTexture;
+	m_ambientOcclusionTexture = ambientOcclusionTexture;
+	m_metalnessTexture = metalnessTexture;
+	m_roughnessTexture = roughnessTexture;
 
 	CreateResources();
 }
@@ -17,29 +22,51 @@ void Material::CreateDescriptors()
 	VkDevice device = g_renderManager->m_device;
 	VkDescriptorPool descriptorPool = g_renderManager->m_descriptorPool;
 
-	VkDescriptorSetLayoutBinding textureBinding = {};
-	textureBinding.binding = 0;
-	textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	textureBinding.descriptorCount = 1;
-	textureBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+	std::vector<Texture> textures = {
+	    m_diffuseTexture, m_normalTexture, m_ambientOcclusionTexture, m_metalnessTexture, m_roughnessTexture };
 
-	VkDescriptorSetLayoutCreateInfo textureLayoutInfo = VKInit::DescriptorSetLayoutCreateInfo( &textureBinding, 1 );
+	std::vector<VkDescriptorSetLayoutBinding> textureBindings = {};
+
+	for ( int i = 0; i < textures.size(); ++i )
+	{
+		VkDescriptorSetLayoutBinding textureBinding = {};
+		textureBinding.binding = i;
+		textureBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		textureBinding.descriptorCount = 1;
+		textureBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+		textureBindings.push_back( textureBinding );
+	}
+
+	VkDescriptorSetLayoutCreateInfo textureLayoutInfo =
+	    VKInit::DescriptorSetLayoutCreateInfo( textureBindings.data(), textureBindings.size() );
 	VK_CHECK( vkCreateDescriptorSetLayout( device, &textureLayoutInfo, nullptr, &m_textureSetLayout ) );
-
-	VkDescriptorImageInfo imageInfo = {};
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = m_diffuseTexture.GetImageView();
-	imageInfo.sampler = g_renderManager->m_anisoSampler;
 
 	VkDescriptorSetAllocateInfo allocInfo =
 	    VKInit::DescriptorSetAllocateInfo( g_renderManager->m_descriptorPool, &m_textureSetLayout, 1 );
 
 	VK_CHECK( vkAllocateDescriptorSets( g_renderManager->m_device, &allocInfo, &m_textureSet ) );
 
-	VkWriteDescriptorSet descriptorWrite =
-	    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfo, 0 );
+	std::vector<VkDescriptorImageInfo> imageInfos = {};
+	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
 
-	vkUpdateDescriptorSets( g_renderManager->m_device, 1, &descriptorWrite, 0, nullptr );
+	for ( int i = 0; i < textures.size(); ++i )
+	{
+		Texture texture = textures[i];
+
+		VkDescriptorImageInfo imageInfo = {};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = textures[i].GetImageView();
+		imageInfo.sampler = g_renderManager->m_pointSampler;
+
+		imageInfos.push_back( imageInfo );
+	}
+
+	for ( int i = 0; i < textures.size(); ++i )
+		descriptorWrites.push_back(
+		    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfos[i], i ) );
+
+	vkUpdateDescriptorSets( g_renderManager->m_device, descriptorWrites.size(), descriptorWrites.data(), 0, nullptr );
 }
 
 void Material::CreatePipeline()
@@ -66,7 +93,7 @@ void Material::CreatePipeline()
 
 	push_constant.offset = 0;
 	push_constant.size = sizeof( MeshPushConstants );
-	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
 
 	pipeline_layout_info.pPushConstantRanges = &push_constant;
 	pipeline_layout_info.pushConstantRangeCount = 1;

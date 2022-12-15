@@ -14,6 +14,9 @@ public partial class Texture
 	private static Texture? missingTexture;
 	public static Texture MissingTexture => missingTexture ?? CreateMissingTexture();
 
+	private static Texture? normal;
+	public static Texture Normal => normal ?? CreateNormalTexture();
+
 	public static Texture CreateOneTexture()
 	{
 		var missingTextureData = new byte[]
@@ -25,7 +28,6 @@ public partial class Texture
 		return one;
 	}
 
-
 	public static Texture CreateZeroTexture()
 	{
 		var missingTextureData = new byte[]
@@ -35,6 +37,17 @@ public partial class Texture
 
 		zero = new Texture( 1, 1, missingTextureData );
 		return zero;
+	}
+
+	public static Texture CreateNormalTexture()
+	{
+		var normalTextureData = new byte[]
+		{
+			0, 0, 255, 255
+		};
+
+		normal = new Texture( 1, 1, normalTextureData );
+		return normal;
 	}
 
 	public static Texture CreateMissingTexture()
