@@ -6,6 +6,6 @@ partial class QuakeWalkController
 	{
 		// STUB
 		//return;
-		Log.Trace( text );
+		// Log.Trace( text );
 	}
 }

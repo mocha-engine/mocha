@@ -5,10 +5,13 @@ namespace Mocha.Renderer;
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset
 {
-	public Texture? DiffuseTexture { get; set; } = Texture.One;
-	public Texture? AlphaTexture { get; set; } = Texture.One;
-	public Texture? NormalTexture { get; set; } = Texture.Zero;
-	public Texture? ORMTexture { get; set; } = Texture.One;
+	public Texture? DiffuseTexture { get; set; } = Texture.MissingTexture;
+	public Texture? NormalTexture { get; set; } = Texture.Normal;
+	public Texture? AmbientOcclusionTexture { get; set; } = Texture.One;
+	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
+	public Texture? RoughnessTexture { get; set; } = Texture.One;
+
+	public Glue.ManagedMaterial NativeMaterial { get; }
 
 	public Material( string path )
 	{
@@ -21,9 +24,29 @@ public class Material : Asset
 		var fileBytes = FileSystem.Game.ReadAllBytes( path );
 		var materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
 
-		var diffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
+		if ( !string.IsNullOrEmpty( materialFormat.Data.DiffuseTexture ) )
+			DiffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
+
+		if ( !string.IsNullOrEmpty( materialFormat.Data.NormalTexture ) )
+			NormalTexture = new Texture( materialFormat.Data.NormalTexture );
+
+		if ( !string.IsNullOrEmpty( materialFormat.Data.AmbientOcclusionTexture ) )
+			AmbientOcclusionTexture = new Texture( materialFormat.Data.AmbientOcclusionTexture );
+
+		if ( !string.IsNullOrEmpty( materialFormat.Data.MetalnessTexture ) )
+			MetalnessTexture = new Texture( materialFormat.Data.MetalnessTexture );
+
+		if ( !string.IsNullOrEmpty( materialFormat.Data.RoughnessTexture ) )
+			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture );
+
+		NativeMaterial = new(
+			DiffuseTexture.NativeTexture.NativePtr,
+			NormalTexture.NativeTexture.NativePtr,
+			AmbientOcclusionTexture.NativeTexture.NativePtr,
+			MetalnessTexture.NativeTexture.NativePtr,
+			RoughnessTexture.NativeTexture.NativePtr
+		);
 
 		Path = path;
-		DiffuseTexture = diffuseTexture;
 	}
 }

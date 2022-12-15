@@ -79,11 +79,29 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		constants.renderMatrix = renderMatrix;
 		constants.cameraPos = g_cameraPos.ToGLM();
 		constants.time = g_curTime;
+		constants.data.x = ( int )g_debugView;
+
+		std::vector<Vector3> lightPositions = {};
+		lightPositions.push_back( { 0, 4, 4 } );
+		lightPositions.push_back( { 4, 0, 4 } );
+		lightPositions.push_back( { 0, -4, 4 } );
+		lightPositions.push_back( { -4, 0, 4 } );
+
+		std::vector<glm::vec4> packedLightInfo = {};
+		for ( int i = 0; i < 4; ++i )
+		{
+			packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 10.0f } );
+		}
+
+		constants.vLightInfoWS[0] = packedLightInfo[0];
+		constants.vLightInfoWS[1] = packedLightInfo[1];
+		constants.vLightInfoWS[2] = packedLightInfo[2];
+		constants.vLightInfoWS[3] = packedLightInfo[3];
 
 		vkCmdBindDescriptorSets(
 		    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1, &mesh.material.m_textureSet, 0, nullptr );
 		vkCmdPushConstants(
-		    cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof( MeshPushConstants ), &constants );
+		    cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof( MeshPushConstants ), &constants );
 
 		if ( m_hasIndexBuffer )
 		{

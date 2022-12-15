@@ -97,7 +97,9 @@ bool Window::Update()
 			SDL_MouseMotionEvent mme = e.motion;
 
 			inputState.mousePosition = { ( float )mme.x, ( float )mme.y };
-			inputState.mouseDelta = { ( float )mme.xrel, ( float )mme.yrel };
+
+			if ( m_captureMouse )
+				inputState.mouseDelta = { ( float )mme.xrel, ( float )mme.yrel };
 		}
 
 #ifdef _IMGUI

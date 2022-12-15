@@ -2,9 +2,9 @@
 #include <baseentity.h>
 #include <edict.h>
 #include <globalvars.h>
+#include <imgui.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <imgui.h>
 #include <vulkan/rendermanager.h>
 
 //@InteropGen generate class
@@ -71,6 +71,31 @@ namespace Editor
 		ImGui::PopStyleColor();
 	}
 
+	inline bool BeginMainMenuBar()
+	{
+		return ImGui::BeginMainMenuBar();
+	}
+
+	inline bool MenuItem( const char* text )
+	{
+		return ImGui::MenuItem( text );
+	}
+
+	inline bool BeginMenu( const char* text )
+	{
+		return ImGui::BeginMenu( text );
+	}
+
+	inline void EndMenu()
+	{
+		return ImGui::EndMenu();
+	}
+
+	inline void EndMainMenuBar()
+	{
+		ImGui::EndMainMenuBar();
+	}
+
 	inline bool Button( const char* text )
 	{
 		return ImGui::Button( text );
@@ -96,7 +121,9 @@ namespace Editor
 		bool b = ImGui::Begin(
 		    name, nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs );
 
-		ImGui::SetWindowPos( { 16, 16 } );
+		auto workPos = ImGui::GetMainViewport()->WorkPos;
+
+		ImGui::SetWindowPos( { workPos.x + 16, workPos.y + 16 } );
 		ImGui::SetWindowSize( { -1, -1 } );
 
 		return b;
@@ -160,11 +187,40 @@ namespace Editor
 		ImGui::SameLine();
 	}
 
+	inline void RenderViewDropdown()
+	{
+		if ( ImGui::BeginMenu( "Debug View" ) )
+		{
+			if ( ImGui::MenuItem( "None" ) )
+				g_debugView = RenderDebugViews::NONE;
+
+			if ( ImGui::MenuItem( "Diffuse" ) )
+				g_debugView = RenderDebugViews::DIFFUSE;
+
+			if ( ImGui::MenuItem( "Normal" ) )
+				g_debugView = RenderDebugViews::NORMAL;
+
+			if ( ImGui::MenuItem( "Ambient Occlusion" ) )
+				g_debugView = RenderDebugViews::AMBIENTOCCLUSION;
+
+			if ( ImGui::MenuItem( "Metalness" ) )
+				g_debugView = RenderDebugViews::METALNESS;
+
+			if ( ImGui::MenuItem( "Roughness" ) )
+				g_debugView = RenderDebugViews::ROUGHNESS;
+
+			if ( ImGui::MenuItem( "Other" ) )
+				g_debugView = RenderDebugViews::OTHER;			
+
+			ImGui::EndMenu();
+		}
+	}
+
 	//@InteropGen ignore
 	inline void Draw() {} // Do nothing - we're re-writing this in C#
 
 	//@InteropGen ignore
-	//inline void Draw()
+	// inline void Draw()
 	//{
 	//	if ( ImGui::Begin( "Entities" ) )
 	//	{
