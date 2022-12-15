@@ -14,7 +14,7 @@ public class TextureCompiler : BaseCompiler
 		BcEncoder encoder = new BcEncoder();
 
 		encoder.OutputOptions.GenerateMipMaps = true;
-		encoder.OutputOptions.Quality = CompressionQuality.Fast;
+		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
 		encoder.OutputOptions.Format = compressionFormat;
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
@@ -58,7 +58,7 @@ public class TextureCompiler : BaseCompiler
 		// Change compression format based on normal map
 		for ( int i = 0; i < textureFormat.MipCount; ++i )
 		{
-			if ( path.Contains( "Normal" ) )
+			if ( path.Contains( "normal" ) )
 			{
 				// Do not compress
 				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
