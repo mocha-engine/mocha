@@ -1,0 +1,7 @@
+{
+    "DiffuseTexture": "materials/pbr/metal_color.mtex",
+    "NormalTexture": "materials/pbr/metal_normal.mtex",
+    "AmbientOcclusionTexture": "materials/pbr/metal_ao.mtex",
+    "MetalnessTexture": "materials/pbr/metal_metal.mtex",
+    "RoughnessTexture": "materials/pbr/metal_rough.mtex"
+}
