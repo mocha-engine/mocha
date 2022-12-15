@@ -1,0 +1,6 @@
+{
+    "DiffuseTexture": "materials/pbr/brick_color.mtex",
+    "NormalTexture": "materials/pbr/brick_normal.mtex",
+    "AmbientOcclusionTexture": "materials/pbr/brick_ao.mtex",
+    "RoughnessTexture": "materials/pbr/brick_rough.mtex"
+}

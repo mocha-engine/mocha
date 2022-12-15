@@ -1,0 +1,5 @@
+{
+    "DiffuseTexture": "materials/pbr/wood_color.mtex",
+    "NormalTexture": "materials/pbr/wood_normal.mtex",
+    "RoughnessTexture": "materials/pbr/wood_rough.mtex"
+}

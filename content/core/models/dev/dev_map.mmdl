@@ -2,10 +2,10 @@
 	"Model": "core/models/dev/dev_map.fbx",
 	"Materials": [
 		"core/materials/dev/dev_floor.mmat",
-		"core/materials/dev/dev_wall.mmat",
-		"core/materials/dev/dev_white.mmat",
-		"core/materials/dev/dev_wall.mmat",
-		"core/materials/dev/dev_wall.mmat",
-		"core/materials/dev/dev_white.mmat"
+		"materials/pbr/brick.mmat",
+		"core/materials/dev/dev_floor.mmat",
+		"materials/pbr/brick.mmat",
+		"materials/pbr/brick.mmat",
+		"core/materials/dev/dev_floor.mmat"
 	]
 }
