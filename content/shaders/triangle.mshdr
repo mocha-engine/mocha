@@ -192,6 +192,7 @@ vec3 sampleTexture( sampler2D target )
 
 void main()
 {
+	// Collect material properties
 	vec3 albedo = sampleTexture( diffuseTexture );
 	float metallic = sampleTexture( metalnessTexture ).r;
 	float roughness = sampleTexture( roughnessTexture ).r;
@@ -200,10 +201,9 @@ void main()
 	vec3 vNormalTS = sampleTexture( normalTexture );
 	vNormalTS = vNormalTS * 2.0 - 1.0;
 
+	// If we don't have a normal map, use the vertex normal
 	if ( vNormalTS.z > 0 )
-	{
 		vNormalTS = vs_out.vNormalTS;
-	}
 
 	// Recalculate Z axis - BC5 stomps it
 	vNormalTS.z = sqrt( 1.0 - vNormalTS.x * vNormalTS.x - vNormalTS.y * vNormalTS.y );
@@ -220,9 +220,11 @@ void main()
 		float flLightIntensity = vs_out.vLightInfoTS[i].w;
 
 		color += calculateLighting( roughness, metallic, albedo, vLightPosTS, flLightIntensity, viewDir, vNormalTS );
-	} 
+	}
 
 	vec3 fragColor = ambient + color;
+
+	// Ambient occlusion
 	fragColor *= ao;
 
 	// Gamma correction
