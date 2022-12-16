@@ -5,14 +5,16 @@
 #include <vulkan/rendermanager.h>
 #include <vulkan/vkinit.h>
 
-Material::Material( Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
-    Texture roughnessTexture )
+Material::Material( VertexInputDescription vertexInputDescription, Texture diffuseTexture, Texture normalTexture,
+    Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture )
 {
 	m_diffuseTexture = diffuseTexture;
 	m_normalTexture = normalTexture;
 	m_ambientOcclusionTexture = ambientOcclusionTexture;
 	m_metalnessTexture = metalnessTexture;
 	m_roughnessTexture = roughnessTexture;
+
+	m_vertexInputDescription = vertexInputDescription;
 
 	CreateResources();
 }
@@ -109,7 +111,7 @@ void Material::CreatePipeline()
 	m_pipeline = PipelineFactory::begin()
 	                 .WithFragmentShader( triangleFragShader )
 	                 .WithVertexShader( triangleVertexShader )
-	                 .WithVertexDescription( Vertex::GetVertexDescription() )
+	                 .WithVertexDescription( m_vertexInputDescription )
 	                 .WithLayout( m_pipelineLayout )
 	                 .Build( device, colorFormat, depthFormat );
 }

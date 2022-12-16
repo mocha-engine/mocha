@@ -39,13 +39,22 @@ public class Material : Asset
 		if ( !string.IsNullOrEmpty( materialFormat.Data.RoughnessTexture ) )
 			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture );
 
-		NativeMaterial = new(
-			DiffuseTexture.NativeTexture.NativePtr,
-			NormalTexture.NativeTexture.NativePtr,
-			AmbientOcclusionTexture.NativeTexture.NativePtr,
-			MetalnessTexture.NativeTexture.NativePtr,
-			RoughnessTexture.NativeTexture.NativePtr
-		);
+		unsafe
+		{
+			fixed ( void* attributes = Vertex.VertexAttributes )
+			{
+				NativeMaterial = new(
+					Vertex.VertexAttributes.Length,
+					(IntPtr)attributes,
+
+					DiffuseTexture.NativeTexture.NativePtr,
+					NormalTexture.NativeTexture.NativePtr,
+					AmbientOcclusionTexture.NativeTexture.NativePtr,
+					MetalnessTexture.NativeTexture.NativePtr,
+					RoughnessTexture.NativeTexture.NativePtr
+				);
+			}
+		}
 
 		Path = path;
 	}

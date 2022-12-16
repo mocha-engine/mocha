@@ -23,8 +23,7 @@ public partial class Model : Model<Vertex>
 }
 
 [Icon( FontAwesome.Cube ), Title( "Model" )]
-public partial class Model<T> : Asset
-	where T : struct
+public partial class Model<T> : Asset where T : struct
 {
 	public Glue.ManagedModel NativeModel { get; set; }
 
@@ -42,7 +41,7 @@ public partial class Model<T> : Asset
 
 			fixed ( void* vertexData = vertices )
 			{
-				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, 0, IntPtr.Zero, material.NativeMaterial.NativePtr );
+				NativeModel.AddMesh( vertices.Length, vertexSize, (IntPtr)vertexData, 0, 0, IntPtr.Zero, material.NativeMaterial.NativePtr );
 			}
 		}
 	}
@@ -60,7 +59,7 @@ public partial class Model<T> : Asset
 			fixed ( void* vertexData = vertices )
 			fixed ( void* indexData = indices )
 			{
-				NativeModel.AddMesh( vertexSize, (IntPtr)vertexData, indexSize, (IntPtr)indexData, material.NativeMaterial.NativePtr );
+				NativeModel.AddMesh( vertices.Length, vertexSize, (IntPtr)vertexData, indices.Length, indexSize, (IntPtr)indexData, material.NativeMaterial.NativePtr );
 			}
 		}
 	}

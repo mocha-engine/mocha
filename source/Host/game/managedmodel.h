@@ -14,7 +14,8 @@ private:
 public:
 	// Add a mesh through a vertex buffer and (optionally) a vertex buffer.
 	// The texture specified will be used as the diffuse texture for this mesh.
-	void AddMesh( int vertexSize, void* vertexData, int indexSize, void* indexData, ManagedMaterial* material );
+	void AddMesh( int vertexCount, int vertexSize, void* vertexData, int indexCount, int indexSize, void* indexData,
+	    ManagedMaterial* material );
 
 	//@InteropGen ignore
 	Model GetModel();
