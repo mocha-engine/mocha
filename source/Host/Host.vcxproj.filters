@@ -527,12 +527,6 @@
     <ClInclude Include="generated\UnmanagedArgs.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="modelentity.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -1425,6 +1419,9 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="input.h">
+      <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering.h">
       <Filter>Managed</Filter>
     </ClInclude>
   </ItemGroup>

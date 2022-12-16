@@ -3,6 +3,14 @@
 #include <texture.h>
 #include <vulkan/types.h>
 
+struct VertexInputDescription
+{
+	std::vector<VkVertexInputBindingDescription> bindings;
+	std::vector<VkVertexInputAttributeDescription> attributes;
+
+	VkPipelineVertexInputStateCreateFlags flags = 0;
+};
+
 class Material
 {
 private:
@@ -23,7 +31,9 @@ public:
 	VkDescriptorSetLayout m_textureSetLayout;
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
+
+	VertexInputDescription m_vertexInputDescription;
 	
-	Material( Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
+	Material( VertexInputDescription vertexInputDescription, Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
 	    Texture roughnessTexture );
 };

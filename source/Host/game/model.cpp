@@ -11,7 +11,7 @@ void Model::UploadMesh( Mesh& mesh )
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.pNext = nullptr;
 
-	bufferInfo.size = mesh.vertices.size() * sizeof( Vertex );
+	bufferInfo.size = mesh.verticesSize;
 
 	VmaAllocationCreateInfo vmaallocInfo = {};
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
@@ -27,15 +27,16 @@ void Model::UploadMesh( Mesh& mesh )
 
 		void* data;
 		vmaMapMemory( *g_allocator, mesh.vertexBuffer.allocation, &data );
-		memcpy( data, mesh.vertices.data(), mesh.vertices.size() * sizeof( Vertex ) );
+		memcpy( data, mesh.vertexData.get(), mesh.verticesSize );
 		vmaUnmapMemory( *g_allocator, mesh.vertexBuffer.allocation );
 	}
 
 	//
 	// Index buffer (optional)
 	//
-	if ( mesh.indices.size() > 0 )
+	if ( mesh.indicesSize > 0 )
 	{
+		bufferInfo.size = mesh.indicesSize;
 		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
 		VK_CHECK( vmaCreateBuffer(
@@ -43,7 +44,7 @@ void Model::UploadMesh( Mesh& mesh )
 
 		void* data;
 		vmaMapMemory( *g_allocator, mesh.indexBuffer.allocation, &data );
-		memcpy( data, mesh.indices.data(), mesh.indices.size() * sizeof( uint32_t ) );
+		memcpy( data, mesh.indexData.get(), mesh.indicesSize );
 		vmaUnmapMemory( *g_allocator, mesh.indexBuffer.allocation );
 
 		m_hasIndexBuffer = true;
@@ -100,19 +101,17 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 
 		vkCmdBindDescriptorSets(
 		    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1, &mesh.material.m_textureSet, 0, nullptr );
-		vkCmdPushConstants(
-		    cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof( MeshPushConstants ), &constants );
+		vkCmdPushConstants( cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+		    sizeof( MeshPushConstants ), &constants );
 
 		if ( m_hasIndexBuffer )
 		{
 			vkCmdBindIndexBuffer( cmd, mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
-			uint32_t indexCount = static_cast<uint32_t>( mesh.indices.size() );
-			vkCmdDrawIndexed( cmd, indexCount, 1, 0, 0, 0 );
+			vkCmdDrawIndexed( cmd, mesh.indexCount, 1, 0, 0, 0 );
 		}
 		else
 		{
-			uint32_t vertCount = static_cast<uint32_t>( mesh.vertices.size() );
-			vkCmdDraw( cmd, vertCount, 1, 0, 0 );
+			vkCmdDraw( cmd, mesh.vertexCount, 1, 0, 0 );
 		}
 	}
 }

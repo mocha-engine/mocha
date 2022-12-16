@@ -338,6 +338,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="physics.h" />
     <ClInclude Include="physicsmanager.h" />
     <ClInclude Include="renderdocmanager.h" />
+    <ClInclude Include="rendering.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
