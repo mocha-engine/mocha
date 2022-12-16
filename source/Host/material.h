@@ -1,6 +1,6 @@
 #pragma once
-#include <vector>
 #include <texture.h>
+#include <vector>
 #include <vulkan/types.h>
 
 struct VertexInputDescription
@@ -27,13 +27,15 @@ public:
 	Texture m_metalnessTexture;
 	Texture m_roughnessTexture;
 
+	std::string m_shaderPath;
+
 	VkDescriptorSet m_textureSet;
 	VkDescriptorSetLayout m_textureSetLayout;
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
 
 	VertexInputDescription m_vertexInputDescription;
-	
-	Material( VertexInputDescription vertexInputDescription, Texture diffuseTexture, Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture,
-	    Texture roughnessTexture );
+
+	Material( std::string shaderPath, VertexInputDescription vertexInputDescription, Texture diffuseTexture,
+	    Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture );
 };

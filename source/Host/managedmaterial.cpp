@@ -1,8 +1,8 @@
 #include "managedmaterial.h"
 
-ManagedMaterial::ManagedMaterial( uint32_t vertexAttributeCount, void* vertexAttributes, ManagedTexture* diffuseTexture,
-    ManagedTexture* normalTexture, ManagedTexture* ambientOcclusionTexture, ManagedTexture* metalnessTexture,
-    ManagedTexture* roughnessTexture )
+ManagedMaterial::ManagedMaterial( const char* shaderPath, uint32_t vertexAttributeCount, void* vertexAttributes,
+    ManagedTexture* diffuseTexture, ManagedTexture* normalTexture, ManagedTexture* ambientOcclusionTexture,
+    ManagedTexture* metalnessTexture, ManagedTexture* roughnessTexture )
 {
 	m_diffuseTexture = diffuseTexture->GetTexture();
 	m_normalTexture = normalTexture->GetTexture();
@@ -10,13 +10,15 @@ ManagedMaterial::ManagedMaterial( uint32_t vertexAttributeCount, void* vertexAtt
 	m_metalnessTexture = metalnessTexture->GetTexture();
 	m_roughnessTexture = roughnessTexture->GetTexture();
 
+	m_shaderPath = std::string( shaderPath );
+
 	m_vertexInputDescription = CreateVertexDescription( vertexAttributeCount, vertexAttributes );
 }
 
 Material ManagedMaterial::GetMaterial()
 {
-	return Material( m_vertexInputDescription, m_diffuseTexture, m_normalTexture, m_ambientOcclusionTexture, m_metalnessTexture,
-	    m_roughnessTexture );
+	return Material( m_shaderPath, m_vertexInputDescription, m_diffuseTexture, m_normalTexture, m_ambientOcclusionTexture,
+	    m_metalnessTexture, m_roughnessTexture );
 }
 
 VkFormat ManagedMaterial::GetVulkanFormat( VertexAttributeFormat format )

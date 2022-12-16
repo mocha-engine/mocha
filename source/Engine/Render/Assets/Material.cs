@@ -15,6 +15,9 @@ public class Material : Asset
 
 	public Material( string path )
 	{
+		// TODO: Hook up to filesystem
+		const string DefaultShaderPath = "content/core/shaders/pbr.mshdr";
+
 		if ( !FileSystem.Game.Exists( path ) )
 		{
 			Log.Warning( $"Material '{path}' does not exist" );
@@ -44,7 +47,8 @@ public class Material : Asset
 			fixed ( void* attributes = Vertex.VertexAttributes )
 			{
 				NativeMaterial = new(
-					Vertex.VertexAttributes.Length,
+					DefaultShaderPath,
+					(uint)Vertex.VertexAttributes.Length,
 					(IntPtr)attributes,
 
 					DiffuseTexture.NativeTexture.NativePtr,
