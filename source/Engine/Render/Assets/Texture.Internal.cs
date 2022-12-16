@@ -39,6 +39,8 @@ public partial class Texture
 		return zero;
 	}
 
+	// TODO: Change this so that the alpha is zero, and then use the vertex normal
+	//		 when alpha is < 255
 	public static Texture CreateNormalTexture()
 	{
 		var normalTextureData = new byte[]

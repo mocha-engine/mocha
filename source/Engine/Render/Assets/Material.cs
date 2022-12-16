@@ -13,6 +13,9 @@ public class Material : Asset
 
 	public Glue.ManagedMaterial NativeMaterial { get; }
 
+	/// <summary>
+	/// Loads a material from an MMAT (compiled) file.
+	/// </summary>
 	public Material( string path )
 	{
 		// TODO: Hook up to filesystem
@@ -61,5 +64,37 @@ public class Material : Asset
 		}
 
 		Path = path;
+	}
+
+	/// <summary>
+	/// Creates a material.
+	/// </summary>
+	public Material( string shaderPath, VertexAttribute[] vertexAttributes, Texture? diffuseTexture = null,
+		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
+		Texture? roughnessTexture = null )
+	{
+		DiffuseTexture = diffuseTexture ?? Texture.MissingTexture;
+		NormalTexture = normalTexture ?? Texture.Normal;
+		AmbientOcclusionTexture = ambientOcclusionTexture ?? Texture.One;
+		MetalnessTexture = metalnessTexture ?? Texture.Zero;
+		RoughnessTexture = roughnessTexture ?? Texture.One;
+
+		unsafe
+		{
+			fixed ( void* attributes = vertexAttributes )
+			{
+				NativeMaterial = new(
+					shaderPath,
+					(uint)vertexAttributes.Length,
+					(IntPtr)attributes,
+
+					DiffuseTexture.NativeTexture.NativePtr,
+					NormalTexture.NativeTexture.NativePtr,
+					AmbientOcclusionTexture.NativeTexture.NativePtr,
+					MetalnessTexture.NativeTexture.NativePtr,
+					RoughnessTexture.NativeTexture.NativePtr
+				);
+			}
+		}
 	}
 }

@@ -7,10 +7,12 @@ public partial class Texture : Asset
 {
 	public uint Width { get; set; }
 	public uint Height { get; set; }
-	public string Type { get; set; }
 
 	public Glue.ManagedTexture NativeTexture { get; set; }
 
+	/// <summary>
+	/// Loads a texture from an MTEX (compiled) file.
+	/// </summary>
 	public Texture( string path )
 	{
 		var fileBytes = FileSystem.Game.ReadAllBytes( path );
@@ -44,6 +46,9 @@ public partial class Texture : Asset
 		}
 	}
 
+	/// <summary>
+	/// Creates a texture with a specified size, containing RGBA data.
+	/// </summary>
 	public Texture( uint width, uint height, byte[] data ) : this( width, height )
 	{
 		unsafe
@@ -55,6 +60,9 @@ public partial class Texture : Asset
 		}
 	}
 
+	/// <summary>
+	/// Creates a blank (no data) texture with a specified size
+	/// </summary>
 	public Texture( uint width, uint height )
 	{
 		Width = width;
@@ -63,10 +71,9 @@ public partial class Texture : Asset
 		NativeTexture = new();
 	}
 
-	internal Texture( string path, string type, int width, int height )
+	internal Texture( string path, int width, int height )
 	{
 		Path = path;
-		Type = type;
 		Width = (uint)width;
 		Height = (uint)height;
 

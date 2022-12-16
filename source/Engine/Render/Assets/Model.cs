@@ -4,6 +4,9 @@ namespace Mocha.Renderer;
 
 public partial class Model : Model<Vertex>
 {
+	/// <summary>
+	/// Loads a model from an MMDL (compiled) file.
+	/// </summary>
 	public Model( string path )
 	{
 		All.Add( this );
@@ -11,11 +14,17 @@ public partial class Model : Model<Vertex>
 		LoadFromPath( path );
 	}
 
+	/// <summary>
+	/// Creates an indexed model from a given set of vertices and indices.
+	/// </summary>
 	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path )
 	{
 		AddMesh( vertices, indices, material );
 	}
 
+	/// <summary>
+	/// Creates a basic model from a given set of vertices.
+	/// </summary>
 	public Model( string path, Vertex[] vertices, Material material ) : this( path )
 	{
 		AddMesh( vertices, material );
