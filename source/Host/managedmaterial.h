@@ -18,14 +18,16 @@ private:
 
 	VertexInputDescription m_vertexInputDescription;
 
+	std::string m_shaderPath;
+
 	size_t GetSizeOf( VertexAttributeFormat format );
 	VertexInputDescription CreateVertexDescription( uint32_t size, void* data );
 	VkFormat GetVulkanFormat( VertexAttributeFormat format );
 
 public:
-	ManagedMaterial( uint32_t vertexAttributeCount, void* vertexAttributes, ManagedTexture* diffuseTexture,
-	    ManagedTexture* normalTexture, ManagedTexture* ambientOcclusionTexture, ManagedTexture* metalnessTexture,
-	    ManagedTexture* roughnessTexture );
+	ManagedMaterial( const char* shaderPath, uint32_t vertexAttributeCount, void* vertexAttributes,
+	    ManagedTexture* diffuseTexture, ManagedTexture* normalTexture, ManagedTexture* ambientOcclusionTexture,
+	    ManagedTexture* metalnessTexture, ManagedTexture* roughnessTexture );
 
 	//@InteropGen ignore
 	Material GetMaterial();

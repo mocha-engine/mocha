@@ -5,16 +5,17 @@
 #include <vulkan/rendermanager.h>
 #include <vulkan/vkinit.h>
 
-Material::Material( VertexInputDescription vertexInputDescription, Texture diffuseTexture, Texture normalTexture,
-    Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture )
+Material::Material( std::string shaderPath, VertexInputDescription vertexInputDescription, Texture diffuseTexture,
+    Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture )
 {
+	m_shaderPath = shaderPath;
+	m_vertexInputDescription = vertexInputDescription;
+
 	m_diffuseTexture = diffuseTexture;
 	m_normalTexture = normalTexture;
 	m_ambientOcclusionTexture = ambientOcclusionTexture;
 	m_metalnessTexture = metalnessTexture;
 	m_roughnessTexture = roughnessTexture;
-
-	m_vertexInputDescription = vertexInputDescription;
 
 	CreateResources();
 }
@@ -79,16 +80,12 @@ void Material::CreatePipeline()
 	VkFormat depthFormat = g_renderManager->m_depthFormat;
 
 	VkShaderModule triangleFragShader;
-	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
-	{
+	if ( LoadShaderModule( m_shaderPath.c_str(), VK_SHADER_STAGE_FRAGMENT_BIT, &triangleFragShader ) )
 		spdlog::info( "Frag shader compiled successfully" );
-	}
 
 	VkShaderModule triangleVertexShader;
-	if ( LoadShaderModule( "content/shaders/triangle.mshdr", VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
-	{
+	if ( LoadShaderModule( m_shaderPath.c_str(), VK_SHADER_STAGE_VERTEX_BIT, &triangleVertexShader ) )
 		spdlog::info( "Vert shader compiled successfully" );
-	}
 
 	VkPipelineLayoutCreateInfo pipeline_layout_info = VKInit::PipelineLayoutCreateInfo();
 	VkPushConstantRange push_constant = {};
