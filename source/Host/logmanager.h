@@ -27,7 +27,6 @@ struct LogEntryInterop
 	char* message;
 };
 
-//@InteropGen generate struct
 struct LogHistory
 {
 	int count;

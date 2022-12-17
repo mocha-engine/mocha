@@ -57,7 +57,7 @@ public partial class ModelEntity : BaseEntity
 
 	public void SetModel( Model model )
 	{
-		Glue.Entities.SetModel( NativeHandle, model.NativeModel.NativePtr );
+		Glue.Entities.SetModel( NativeHandle, model.NativeModel );
 	}
 
 	public void SetModel( string modelPath )

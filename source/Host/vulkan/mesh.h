@@ -2,20 +2,15 @@
 #include "types.h"
 
 #include <glm/glm.hpp>
+#include <managedtypes.h>
 #include <material.h>
 #include <vector>
 
 struct Mesh
 {
-	int verticesSize;
-	std::shared_ptr<void> vertexData;
+	InteropStruct vertices;
+	InteropStruct indices;
 
-	int indicesSize;
-	std::shared_ptr<void> indexData;
-
-	int vertexCount;
-	int indexCount;
-	
 	AllocatedBuffer vertexBuffer;
 	AllocatedBuffer indexBuffer;
 
@@ -23,6 +18,13 @@ struct Mesh
 
 	Mesh( Material _material )
 	    : material( _material )
+	{
+	}
+
+	Mesh( InteropStruct _vertices, InteropStruct _indices, Material _material )
+	    : material( _material )
+	    , indices( _indices )
+	    , vertices( _vertices )
 	{
 	}
 };

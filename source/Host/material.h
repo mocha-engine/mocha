@@ -3,6 +3,21 @@
 #include <vector>
 #include <vulkan/types.h>
 
+enum VertexAttributeFormat
+{
+	Int,
+	Float,
+	Float2,
+	Float3,
+	Float4
+};
+
+struct VertexAttribute
+{
+	const char* name;
+	int format;
+};
+
 struct VertexInputDescription
 {
 	std::vector<VkVertexInputBindingDescription> bindings;
@@ -11,6 +26,7 @@ struct VertexInputDescription
 	VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
+//@InteropGen generate class
 class Material
 {
 private:
@@ -20,13 +36,12 @@ private:
 	void CreateResources();
 	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
 
-public:
-	Texture m_diffuseTexture;
-	Texture m_normalTexture;
-	Texture m_ambientOcclusionTexture;
-	Texture m_metalnessTexture;
-	Texture m_roughnessTexture;
+	size_t GetSizeOf( VertexAttributeFormat format );
+	VertexInputDescription CreateVertexDescription( std::vector<VertexAttribute> vertexAttributes );
+	VkFormat GetVulkanFormat( VertexAttributeFormat format );
 
+public:
+	std::vector<Texture> m_textures;
 	std::string m_shaderPath;
 
 	VkDescriptorSet m_textureSet;
@@ -36,6 +51,5 @@ public:
 
 	VertexInputDescription m_vertexInputDescription;
 
-	Material( std::string shaderPath, VertexInputDescription vertexInputDescription, Texture diffuseTexture,
-	    Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture );
+	Material( const char* shaderPath, InteropStruct vertexAttributes, InteropStruct textures );
 };

@@ -12,6 +12,8 @@ public partial class QuakeWalkController
 {
 	private Vector3 Impulse { get; set; }
 
+	public bool Crouching { get; private set; }
+	public bool Sprinting { get; private set; }
 	private bool Walking { get; set; }
 	private bool GroundPlane { get; set; }
 
@@ -54,11 +56,20 @@ public partial class QuakeWalkController
 	{
 		if ( SpeedLimit > 0f )
 		{
-			if ( Velocity.Length > SpeedLimit )
+			if ( Velocity.WithZ( 0 ).Length > SpeedLimit )
 			{
-				Velocity = Velocity.Normal * SpeedLimit;
+				Velocity = (Velocity.Normal * SpeedLimit).WithZ( Velocity.Z );
 			}
 		}
+
+		// update duck
+		CheckCrouch();
+
+		// update sprint
+		CheckSprint();
+
+		// set player eye height
+		UpdateEyePosition();
 
 		// update velocity based on any impulse applied
 		UpdateVelocity();
@@ -86,6 +97,24 @@ public partial class QuakeWalkController
 
 		// set groundentity
 		TraceToGround();
+	}
+
+	private void CheckSprint()
+	{
+		Sprinting = !Crouching && Input.Sprint;
+	}
+
+	private void CheckCrouch()
+	{
+		Crouching = Input.Crouch;
+	}
+
+	private void UpdateEyePosition()
+	{
+		if ( Crouching )
+			Player.LocalEyePosition = Vector3.Up * 1.8f * 0.15f;
+		else
+			Player.LocalEyePosition = Vector3.Up * 1.8f * 0.5f;
 	}
 
 	private Vector3 ClipVelocity( Vector3 inVec, Vector3 normal, float overbounce )
@@ -143,9 +172,6 @@ public partial class QuakeWalkController
 
 	private void Accelerate( Vector3 wishDir, float wishSpeed, float maxSpeed, float accel )
 	{
-		if ( maxSpeed > 0 && wishSpeed > maxSpeed )
-			wishSpeed = maxSpeed;
-
 		float currentspeed = Velocity.Dot( wishDir );
 		float addspeed = wishSpeed - currentspeed;
 
@@ -219,6 +245,12 @@ public partial class QuakeWalkController
 		if ( !IsGrounded )
 			return AirSpeed;
 
+		if ( Sprinting )
+			return Speed * 1.5f;
+
+		if ( Crouching )
+			return Speed * 0.5f;
+
 		return Speed;
 	}
 
@@ -235,7 +267,7 @@ public partial class QuakeWalkController
 		float vel = Velocity.Length;
 		Velocity = ClipVelocity( Velocity, GroundTrace.Normal, Overclip );
 
-		// Don't decreate velocity when going up or down a slope
+		// Don't decrease velocity when going up or down a slope
 		Velocity = Velocity.Normal;
 		Velocity *= vel;
 

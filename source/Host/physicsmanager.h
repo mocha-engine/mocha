@@ -71,7 +71,6 @@ struct PhysicsBody
 	JPH::BodyID bodyId;
 };
 
-//@InteropGen generate struct
 struct TraceResult
 {
 	bool hit;
@@ -85,7 +84,6 @@ struct TraceResult
 	uint32_t boobies;
 };
 
-//@InteropGen generate struct
 struct TraceInfo
 {
 	Vector3 startPosition;

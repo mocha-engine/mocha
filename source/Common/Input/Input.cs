@@ -24,6 +24,8 @@ public static partial class Input
 	private static bool IsKeyDown( InputButton key ) => Glue.Input.IsKeyDown( (int)key );
 
 	public static bool Jump => IsKeyDown( InputButton.KeySpace );
+	public static bool Crouch => IsKeyDown( InputButton.KeyControl );
+	public static bool Sprint => IsKeyDown( InputButton.KeyShift );
 
 	public static void Update()
 	{

@@ -18,6 +18,9 @@ public class Player : ModelEntity
 	public bool IsGrounded => WalkController.IsGrounded;
 	public BaseEntity GroundEntity => WalkController.GroundEntity;
 
+	public Vector3 LocalEyePosition { get; set; }
+	public Rotation LocalEyeRotation { get; set; }
+
 	protected override void Spawn()
 	{
 		base.Spawn();
@@ -63,11 +66,40 @@ public class Player : ModelEntity
 		rightLastFrame = Input.Right;
 	}
 
+	float lastHeight = 1.8f;
+	float lastFov = 90f;
+
 	private void UpdateCamera()
 	{
+		//
+		// Rotation
+		//
 		Camera.Rotation = EyeRotation;
-		Camera.Position = EyePosition;
-		Camera.FieldOfView = 90f;
+
+		//
+		// Position
+		//
+		Camera.Position = Position + LocalEyePosition;
+
+		// Smooth out z-axis so that stairs, crouching are not sudden changes
+		Camera.Position = Camera.Position.WithZ( lastHeight.LerpTo( Camera.Position.Z, 10f * Time.Delta ) );
+		lastHeight = Camera.Position.Z;
+
+		//
+		// Field of view
+		//
+		float targetFov = 90f;
+
+		// Interpolate velocity when sprinting
+		if ( WalkController.Sprinting && Velocity.WithZ( 0 ).Length > 1.0f )
+			targetFov = 100f;
+
+		Camera.FieldOfView = lastFov.LerpTo( targetFov, 10 * Time.Delta );
+		lastFov = Camera.FieldOfView;
+
+		//
+		// Z planes
+		//
 		Camera.ZNear = 0.01f;
 		Camera.ZFar = 1000.0f;
 	}

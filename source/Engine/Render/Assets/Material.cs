@@ -11,7 +11,7 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
-	public Glue.ManagedMaterial NativeMaterial { get; }
+	public Glue.Material NativeMaterial { get; }
 
 	/// <summary>
 	/// Loads a material from an MMAT (compiled) file.
@@ -45,23 +45,20 @@ public class Material : Asset
 		if ( !string.IsNullOrEmpty( materialFormat.Data.RoughnessTexture ) )
 			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture );
 
-		unsafe
+		var textures = new List<Glue.Texture>()
 		{
-			fixed ( void* attributes = Vertex.VertexAttributes )
-			{
-				NativeMaterial = new(
-					DefaultShaderPath,
-					(uint)Vertex.VertexAttributes.Length,
-					(IntPtr)attributes,
+			DiffuseTexture.NativeTexture,
+			NormalTexture.NativeTexture,
+			AmbientOcclusionTexture.NativeTexture,
+			MetalnessTexture.NativeTexture,
+			RoughnessTexture.NativeTexture
+		};
 
-					DiffuseTexture.NativeTexture.NativePtr,
-					NormalTexture.NativeTexture.NativePtr,
-					AmbientOcclusionTexture.NativeTexture.NativePtr,
-					MetalnessTexture.NativeTexture.NativePtr,
-					RoughnessTexture.NativeTexture.NativePtr
-				);
-			}
-		}
+		NativeMaterial = new(
+			DefaultShaderPath,
+			Vertex.VertexAttributes.ToInterop(),
+			textures.ToInterop()
+		);
 
 		Path = path;
 	}
@@ -79,22 +76,19 @@ public class Material : Asset
 		MetalnessTexture = metalnessTexture ?? Texture.Zero;
 		RoughnessTexture = roughnessTexture ?? Texture.One;
 
-		unsafe
+		var textures = new List<Glue.Texture>()
 		{
-			fixed ( void* attributes = vertexAttributes )
-			{
-				NativeMaterial = new(
-					shaderPath,
-					(uint)vertexAttributes.Length,
-					(IntPtr)attributes,
+			DiffuseTexture.NativeTexture,
+			NormalTexture.NativeTexture,
+			AmbientOcclusionTexture.NativeTexture,
+			MetalnessTexture.NativeTexture,
+			RoughnessTexture.NativeTexture
+		};
 
-					DiffuseTexture.NativeTexture.NativePtr,
-					NormalTexture.NativeTexture.NativePtr,
-					AmbientOcclusionTexture.NativeTexture.NativePtr,
-					MetalnessTexture.NativeTexture.NativePtr,
-					RoughnessTexture.NativeTexture.NativePtr
-				);
-			}
-		}
+		NativeMaterial = new(
+			shaderPath,
+			vertexAttributes.ToInterop(),
+			textures.ToInterop()
+		);
 	}
 }

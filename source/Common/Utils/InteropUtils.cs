@@ -14,6 +14,10 @@ public static class InteropUtils
 		{
 			return GetPtr( arr.GetNative() );
 		}
+		else if ( obj is INativeGlue native )
+		{
+			return native.NativePtr;
+		}
 		else if ( obj is string str )
 		{
 			return Marshal.StringToCoTaskMemUTF8( str );
@@ -66,20 +70,34 @@ public class InteropArray<T> : IInteropArray
 
 	public static InteropArray<T> FromArray( T[] array )
 	{
+		bool isNativeGlue = typeof( T ).GetInterfaces().Contains( typeof( INativeGlue ) );
+
+		int stride, size;
+
 		var s = new InteropArray<T>();
 		s.NativeStruct = new();
 
-		int stride = Marshal.SizeOf( typeof( T ) );
-		int size = stride * array.Length;
+		if ( isNativeGlue )
+			stride = Marshal.SizeOf( typeof( IntPtr ) );
+		else
+			stride = Marshal.SizeOf( typeof( T ) );
+
+		size = stride * array.Length;
 
 		s.NativeStruct.count = array.Length;
 		s.NativeStruct.size = size;
 
 		unsafe
 		{
-			fixed ( void* data = array )
+			if ( isNativeGlue )
 			{
-				s.NativeStruct.data = (IntPtr)data;
+				fixed ( void* data = array.Select( x => (x as INativeGlue).NativePtr ).ToArray() )
+					s.NativeStruct.data = (IntPtr)data;
+			}
+			else
+			{
+				fixed ( void* data = array )
+					s.NativeStruct.data = (IntPtr)data;
 			}
 		}
 

@@ -24,6 +24,8 @@ static class Utils
 			{ "char **",        "ref string" },
 			{ "char*",          "string" },
 			{ "char *",         "string" },
+			{ "void*",          "/* TODO */ IntPtr" }, // Mark as TODO because we shouldn't be doing this
+			{ "void *",         "/* TODO */ IntPtr" }, // Mark as TODO because we shouldn't be doing this
 
 			// STL
 			{ "std::string",    "/* UNSUPPORTED */ string" },
@@ -36,7 +38,7 @@ static class Utils
 
 			// Custom
 			{ "Quaternion",     "Rotation" },
-			{ "InteropStruct",  "IInteropArray" }
+			{ "InteropStruct",  "IInteropArray" },
 		};
 
 		// Check if the native type is a reference
@@ -49,7 +51,7 @@ static class Utils
 
 		// Check if the native type is a pointer
 		if ( nativeType.EndsWith( "*" ) )
-			return "IntPtr";
+			return GetManagedType( nativeType[..^1].Trim() ); // We'll return the basic type, because we handle pointers on the C# side now
 
 		// Return the native type if it is not in the lookup table
 		return nativeType;

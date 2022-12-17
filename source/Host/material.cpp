@@ -2,20 +2,24 @@
 
 #include <game/model.h>
 #include <globalvars.h>
+#include <rendering.h>
 #include <vulkan/rendermanager.h>
 #include <vulkan/vkinit.h>
 
-Material::Material( std::string shaderPath, VertexInputDescription vertexInputDescription, Texture diffuseTexture,
-    Texture normalTexture, Texture ambientOcclusionTexture, Texture metalnessTexture, Texture roughnessTexture )
+Material::Material( const char* shaderPath, InteropStruct vertexAttributes, InteropStruct textures )
 {
-	m_shaderPath = shaderPath;
-	m_vertexInputDescription = vertexInputDescription;
+	auto texturePtrs = GetData<Texture*>( textures );
+	m_textures = std::vector<Texture>( textures.count );
+	
+	for ( int i = 0; i < textures.count; i++ )
+	{
+		m_textures[i] = Texture( *texturePtrs[i] );
+	}
+	
+	m_shaderPath = std::string( shaderPath );
 
-	m_diffuseTexture = diffuseTexture;
-	m_normalTexture = normalTexture;
-	m_ambientOcclusionTexture = ambientOcclusionTexture;
-	m_metalnessTexture = metalnessTexture;
-	m_roughnessTexture = roughnessTexture;
+	auto attributes = GetData<VertexAttribute>( vertexAttributes );
+	m_vertexInputDescription = CreateVertexDescription( attributes );
 
 	CreateResources();
 }
@@ -25,12 +29,9 @@ void Material::CreateDescriptors()
 	VkDevice device = g_renderManager->m_device;
 	VkDescriptorPool descriptorPool = g_renderManager->m_descriptorPool;
 
-	std::vector<Texture> textures = {
-	    m_diffuseTexture, m_normalTexture, m_ambientOcclusionTexture, m_metalnessTexture, m_roughnessTexture };
-
 	std::vector<VkDescriptorSetLayoutBinding> textureBindings = {};
 
-	for ( int i = 0; i < textures.size(); ++i )
+	for ( int i = 0; i < m_textures.size(); ++i )
 	{
 		VkDescriptorSetLayoutBinding textureBinding = {};
 		textureBinding.binding = i;
@@ -53,19 +54,19 @@ void Material::CreateDescriptors()
 	std::vector<VkDescriptorImageInfo> imageInfos = {};
 	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
 
-	for ( int i = 0; i < textures.size(); ++i )
+	for ( int i = 0; i < m_textures.size(); ++i )
 	{
-		Texture texture = textures[i];
+		Texture texture = m_textures[i];
 
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textures[i].GetImageView();
+		imageInfo.imageView = texture.GetImageView();
 		imageInfo.sampler = g_renderManager->m_pointSampler;
 
 		imageInfos.push_back( imageInfo );
 	}
 
-	for ( int i = 0; i < textures.size(); ++i )
+	for ( int i = 0; i < m_textures.size(); ++i )
 		descriptorWrites.push_back(
 		    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfos[i], i ) );
 
@@ -157,4 +158,89 @@ bool Material::LoadShaderModule( const char* filePath, VkShaderStageFlagBits sha
 
 	*outShaderModule = shaderModule;
 	return true;
+}
+
+VkFormat Material::GetVulkanFormat( VertexAttributeFormat format )
+{
+	switch ( format )
+	{
+	case VertexAttributeFormat::Int:
+		return VK_FORMAT_R32_SINT;
+		break;
+	case VertexAttributeFormat::Float:
+		return VK_FORMAT_R32_SFLOAT;
+		break;
+	case VertexAttributeFormat::Float2:
+		return VK_FORMAT_R32G32_SFLOAT;
+		break;
+	case VertexAttributeFormat::Float3:
+		return VK_FORMAT_R32G32B32_SFLOAT;
+		break;
+	case VertexAttributeFormat::Float4:
+		return VK_FORMAT_R32G32B32A32_SFLOAT;
+		break;
+	}
+
+	return VK_FORMAT_UNDEFINED;
+}
+
+size_t Material::GetSizeOf( VertexAttributeFormat format )
+{
+	switch ( format )
+	{
+	case VertexAttributeFormat::Int:
+		return sizeof( int );
+		break;
+	case VertexAttributeFormat::Float:
+		return sizeof( float );
+		break;
+	case VertexAttributeFormat::Float2:
+		return sizeof( float ) * 2;
+		break;
+	case VertexAttributeFormat::Float3:
+		return sizeof( float ) * 3;
+		break;
+	case VertexAttributeFormat::Float4:
+		return sizeof( float ) * 4;
+		break;
+	}
+
+	return 0;
+}
+
+VertexInputDescription Material::CreateVertexDescription( std::vector<VertexAttribute> vertexAttributes )
+{
+	// Calculate stride size
+	size_t stride = 0;
+	for ( int i = 0; i < vertexAttributes.size(); ++i )
+	{
+		stride += GetSizeOf( ( VertexAttributeFormat )vertexAttributes[i].format );
+	}
+
+	VertexInputDescription description = {};
+
+	VkVertexInputBindingDescription mainBinding = {};
+	mainBinding.binding = 0;
+	mainBinding.stride = stride;
+	mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	description.bindings.push_back( mainBinding );
+
+	size_t offset = 0;
+
+	for ( int i = 0; i < vertexAttributes.size(); ++i )
+	{
+		auto attribute = vertexAttributes[i];
+
+		VkVertexInputAttributeDescription positionAttribute = {};
+		positionAttribute.binding = 0;
+		positionAttribute.location = i;
+		positionAttribute.format = GetVulkanFormat( ( VertexAttributeFormat )attribute.format );
+		positionAttribute.offset = offset;
+		description.attributes.push_back( positionAttribute );
+
+		offset += GetSizeOf( ( VertexAttributeFormat )attribute.format );
+	}
+
+	return description;
 }
