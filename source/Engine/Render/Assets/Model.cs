@@ -1,6 +1,4 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha.Renderer;
 
 public partial class Model : Model<Vertex>
 {
@@ -43,33 +41,11 @@ public partial class Model<T> : Asset where T : struct
 
 	protected void AddMesh( T[] vertices, Material material )
 	{
-		unsafe
-		{
-			int vertexStride = Marshal.SizeOf( typeof( T ) );
-			int vertexSize = vertexStride * vertices.Length;
-
-			fixed ( void* vertexData = vertices )
-			{
-				NativeModel.AddMesh( vertices.Length, vertexSize, (IntPtr)vertexData, 0, 0, IntPtr.Zero, material.NativeMaterial.NativePtr );
-			}
-		}
+		NativeModel.AddMesh( vertices.ToInterop(), new uint[0].ToInterop(), material.NativeMaterial.NativePtr );
 	}
 
 	protected void AddMesh( T[] vertices, uint[] indices, Material material )
 	{
-		unsafe
-		{
-			int vertexStride = Marshal.SizeOf( typeof( T ) );
-			int vertexSize = vertexStride * vertices.Length;
-
-			int indexStride = Marshal.SizeOf( typeof( uint ) );
-			int indexSize = indexStride * indices.Length;
-
-			fixed ( void* vertexData = vertices )
-			fixed ( void* indexData = indices )
-			{
-				NativeModel.AddMesh( vertices.Length, vertexSize, (IntPtr)vertexData, indices.Length, indexSize, (IntPtr)indexData, material.NativeMaterial.NativePtr );
-			}
-		}
+		NativeModel.AddMesh( vertices.ToInterop(), indices.ToInterop(), material.NativeMaterial.NativePtr );
 	}
 }

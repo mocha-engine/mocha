@@ -86,34 +86,52 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		{
 			writer.WriteLine();
 
+			//
+			// Gather function signature
+			//
+			// Call parameters as comma-separated string
 			var managedCallParams = string.Join( ", ", method.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 			var name = method.Name;
 			var returnType = Utils.GetManagedType( method.ReturnType );
+
+			// If this is a ctor or dtor, we don't want to be able to call the method manually
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
 
 			if ( method.IsStatic )
 				accessLevel += " static";
 
+			// Write function signature
 			writer.WriteLine( $"{accessLevel} {returnType} {name}( {managedCallParams} ) " );
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
+			//
+			// Gather function body
+			//
 			var paramsAndInstance = method.Parameters;
 
+			// We need to pass the instance in if this is not a static method
 			if ( !method.IsStatic )
 				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "instance", "IntPtr" ) ).ToList();
 
+			// Gather function call arguments. Make sure that we're passing in a pointer for everything
 			var paramNames = paramsAndInstance.Select( x => "InteropUtils.GetPtr( " + x.Name + " )" );
+
+			// Function call arguments as comma-separated string
 			var functionCallArgs = string.Join( ", ", paramNames );
 
+			// If we want to return a value:
 			if ( returnType != "void" )
 				writer.Write( "return " );
 
+			// This is a pretty dumb and HACKy way of handling strings
 			if ( returnType == "string" )
 				writer.Write( "InteropUtils.GetString( " );
 
+			// Call the function..
 			writer.Write( $"_{name}( {functionCallArgs} )" );
 
+			// Finish string
 			if ( returnType == "string" )
 				writer.Write( ")" );
 

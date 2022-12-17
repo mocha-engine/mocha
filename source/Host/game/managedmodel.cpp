@@ -9,30 +9,29 @@
 #include <spdlog/spdlog.h>
 #include <texture.h>
 
-void ManagedModel::AddMesh( int vertexCount, int vertexSize, void* vertexData, int indexCount, int indexSize, void* indexData,
-    ManagedMaterial* material )
+void ManagedModel::AddMesh( InteropStruct vertices, InteropStruct indices, ManagedMaterial* material )
 {
-	assert( vertexSize > 0 ); // Vertex buffer is not optional
+	assert( vertices.size > 0 ); // Vertex buffer is not optional
 
 	Mesh mesh( material->GetMaterial() );
 
 	// Vertex buffer
-	spdlog::info( "ManagedModel: Received {} vertex bytes", vertexSize );
+	spdlog::info( "ManagedModel: Received {} vertex bytes", vertices.size );
 
-	mesh.verticesSize = vertexSize;
-	mesh.vertexData = std::shared_ptr<void>( vertexData );
+	mesh.verticesSize = vertices.size;
+	mesh.vertexData = std::shared_ptr<void>( vertices.data );
 
 	// Index buffer, optional
-	if ( indexSize > 0 )
+	if ( indices.size > 0 )
 	{
-		spdlog::info( "ManagedModel: Received {} index bytes", indexSize );
+		spdlog::info( "ManagedModel: Received {} index bytes", indices.size );
 
-		mesh.indicesSize = indexSize;
-		mesh.indexData = std::shared_ptr<void>( indexData );
+		mesh.indicesSize = indices.size;
+		mesh.indexData = std::shared_ptr<void>( indices.data );
 	}
 
-	mesh.indexCount = indexCount;
-	mesh.vertexCount = vertexCount;
+	mesh.indexCount = indices.count;
+	mesh.vertexCount = vertices.count;
 
 	m_model.UploadMesh( mesh );
 }

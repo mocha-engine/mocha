@@ -9,6 +9,8 @@
 #include <string>
 #include <subsystem.h>
 
+#define MAX_LOG_MESSAGES 128
+
 struct LogEntry
 {
 	std::string time;
@@ -52,8 +54,8 @@ public:
 	inline static void CopyString( char** dest, std::string source )
 	{
 		size_t destSize = source.size() + 1;
-		*dest = (char*)malloc( destSize );
-		strcpy_s( *dest, destSize, source.c_str() );		
+		*dest = ( char* )malloc( destSize );
+		strcpy_s( *dest, destSize, source.c_str() );
 	}
 
 	inline static LogHistory GetLogHistory()
@@ -76,7 +78,7 @@ public:
 
 			logHistory.items[i] = logEntryInterop;
 		}
-		
+
 		return logHistory;
 	}
 };
@@ -122,6 +124,10 @@ protected:
 		// clang-format on
 
 		g_logManager->m_logHistory.push_back( logEntry );
+
+		// If we have more than 128 messages in the log history, start getting rid
+		if ( g_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+			g_logManager->m_logHistory.erase( g_logManager->m_logHistory.begin() );
 	}
 
 	void flush_() override { std::cout << std::flush; }

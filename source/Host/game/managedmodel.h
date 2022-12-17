@@ -2,6 +2,7 @@
 
 #include "game/model.h"
 #include "vulkan/mesh.h"
+#include <managedtypes.h>
 
 class ManagedMaterial;
 
@@ -14,8 +15,7 @@ private:
 public:
 	// Add a mesh through a vertex buffer and (optionally) a vertex buffer.
 	// The texture specified will be used as the diffuse texture for this mesh.
-	void AddMesh( int vertexCount, int vertexSize, void* vertexData, int indexCount, int indexSize, void* indexData,
-	    ManagedMaterial* material );
+	void AddMesh( InteropStruct vertices, InteropStruct indices, ManagedMaterial* material );
 
 	//@InteropGen ignore
 	Model GetModel();

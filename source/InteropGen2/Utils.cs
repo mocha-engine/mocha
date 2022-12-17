@@ -26,7 +26,7 @@ static class Utils
 			{ "char *",         "string" },
 
 			// STL
-			{ "std::string",    "string" },
+			{ "std::string",    "/* UNSUPPORTED */ string" },
 
 			// GLM
 			{ "glm::vec2",      "Vector2" },
@@ -36,6 +36,7 @@ static class Utils
 
 			// Custom
 			{ "Quaternion",     "Rotation" },
+			{ "InteropStruct",  "IInteropArray" }
 		};
 
 		// Check if the native type is a reference
