@@ -1,8 +1,10 @@
 #pragma once
 #include <algorithm>
+#include <managedtypes.h>
 #include <spdlog/spdlog.h>
 #include <vulkan/types.h>
 
+//@InteropGen generate class
 class Texture
 {
 private:
@@ -16,8 +18,11 @@ private:
 	}
 
 public:
-	void SetMipData( uint32_t width, uint32_t height, uint32_t mipCount, uint32_t dataSize, void* data, VkFormat imageFormat );
+	void SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropStruct mipData, int imageFormat );
 
+	//@InteropGen ignore
 	inline AllocatedImage GetImage() { return m_image; }
+
+	//@InteropGen ignore
 	inline VkImageView GetImageView() { return m_imageView; }
 };

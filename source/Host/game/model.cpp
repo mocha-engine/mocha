@@ -3,6 +3,7 @@
 #include "../vulkan/types.h"
 
 #include <globalvars.h>
+#include <managedtypes.h>
 #include <vulkan/rendermanager.h>
 
 void Model::UploadMesh( Mesh& mesh )
@@ -11,7 +12,7 @@ void Model::UploadMesh( Mesh& mesh )
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.pNext = nullptr;
 
-	bufferInfo.size = mesh.verticesSize;
+	bufferInfo.size = mesh.vertices.size;
 
 	VmaAllocationCreateInfo vmaallocInfo = {};
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
@@ -27,16 +28,16 @@ void Model::UploadMesh( Mesh& mesh )
 
 		void* data;
 		vmaMapMemory( *g_allocator, mesh.vertexBuffer.allocation, &data );
-		memcpy( data, mesh.vertexData.get(), mesh.verticesSize );
+		memcpy( data, mesh.vertices.data, mesh.vertices.size );
 		vmaUnmapMemory( *g_allocator, mesh.vertexBuffer.allocation );
 	}
 
 	//
 	// Index buffer (optional)
 	//
-	if ( mesh.indicesSize > 0 )
+	if ( mesh.indices.size > 0 )
 	{
-		bufferInfo.size = mesh.indicesSize;
+		bufferInfo.size = mesh.indices.size;
 		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
 		VK_CHECK( vmaCreateBuffer(
@@ -44,7 +45,7 @@ void Model::UploadMesh( Mesh& mesh )
 
 		void* data;
 		vmaMapMemory( *g_allocator, mesh.indexBuffer.allocation, &data );
-		memcpy( data, mesh.indexData.get(), mesh.indicesSize );
+		memcpy( data, mesh.indices.data, mesh.indices.size );
 		vmaUnmapMemory( *g_allocator, mesh.indexBuffer.allocation );
 
 		m_hasIndexBuffer = true;
@@ -53,6 +54,12 @@ void Model::UploadMesh( Mesh& mesh )
 	m_meshes.push_back( mesh );
 
 	m_isInitialized = true;
+}
+
+void Model::AddMesh( InteropStruct vertices, InteropStruct indices, Material* material )
+{
+	Mesh mesh( vertices, indices, *material );
+	UploadMesh( mesh );
 }
 
 void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform )
@@ -107,11 +114,11 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		if ( m_hasIndexBuffer )
 		{
 			vkCmdBindIndexBuffer( cmd, mesh.indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
-			vkCmdDrawIndexed( cmd, mesh.indexCount, 1, 0, 0, 0 );
+			vkCmdDrawIndexed( cmd, mesh.indices.count, 1, 0, 0, 0 );
 		}
 		else
 		{
-			vkCmdDraw( cmd, mesh.vertexCount, 1, 0, 0 );
+			vkCmdDraw( cmd, mesh.vertices.count, 1, 0, 0 );
 		}
 	}
 }

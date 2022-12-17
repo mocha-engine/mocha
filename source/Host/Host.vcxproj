@@ -170,9 +170,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="game\managedmodel.cpp" />
-    <ClCompile Include="managedmaterial.cpp" />
-    <ClCompile Include="managedtexture.cpp" />
     <ClCompile Include="managed\hostmanager.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="modelentity.cpp" />
@@ -331,15 +328,13 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="handlemap.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
-    <ClInclude Include="managedmaterial.h" />
-    <ClInclude Include="managedtexture.h" />
     <ClInclude Include="managedtypes.h" />
+    <ClInclude Include="managedwrappers.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="physicsmanager.h" />
     <ClInclude Include="renderdocmanager.h" />
-    <ClInclude Include="rendering.h" />
     <ClInclude Include="root.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
@@ -613,7 +608,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="game\types.h" />
     <ClInclude Include="globalvars.h" />
     <ClInclude Include="logmanager.h" />
-    <ClInclude Include="game\managedmodel.h" />
     <ClInclude Include="managed\hostmanager.h" />
     <ClInclude Include="vulkan\rendermanager.h" />
     <ClInclude Include="vulkan\vkinit.h" />

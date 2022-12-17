@@ -4,17 +4,16 @@
 #include <vulkan/rendermanager.h>
 #include <vulkan/vkinit.h>
 
-void Texture::SetMipData(
-    uint32_t width, uint32_t height, uint32_t mipCount, uint32_t dataSize, void* data, VkFormat imageFormat )
+void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropStruct mipData, int imageFormat )
 {
-	VkDeviceSize imageSize = dataSize;
+	VkDeviceSize imageSize = mipData.size;
 
 	AllocatedBuffer stagingBuffer =
 	    g_renderManager->CreateBuffer( imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
 
 	void* mappedData;
 	vmaMapMemory( g_renderManager->m_allocator, stagingBuffer.allocation, &mappedData );
-	memcpy( mappedData, data, static_cast<size_t>( imageSize ) );
+	memcpy( mappedData, mipData.data, static_cast<size_t>( imageSize ) );
 	vmaUnmapMemory( g_renderManager->m_allocator, stagingBuffer.allocation );
 
 	VkExtent3D imageExtent;
@@ -23,7 +22,7 @@ void Texture::SetMipData(
 	imageExtent.depth = 1;
 
 	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo(
-	    imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
+	    ( VkFormat )imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
@@ -90,8 +89,8 @@ void Texture::SetMipData(
 			mipRegions.push_back( copyRegion );
 		}
 
-		vkCmdCopyBufferToImage( cmd, stagingBuffer.buffer, m_image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipRegions.size(),
-		    mipRegions.data() );
+		vkCmdCopyBufferToImage( cmd, stagingBuffer.buffer, m_image.image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
+		    mipRegions.size(), mipRegions.data() );
 
 		VkImageMemoryBarrier imageBarrier_toReadable = imageBarrier_toTransfer;
 
@@ -105,7 +104,8 @@ void Texture::SetMipData(
 		    nullptr, 1, &imageBarrier_toReadable );
 	} );
 
-	VkImageViewCreateInfo imageViewInfo = VKInit::ImageViewCreateInfo( imageFormat, m_image.image, VK_IMAGE_ASPECT_COLOR_BIT, mipCount );
+	VkImageViewCreateInfo imageViewInfo =
+	    VKInit::ImageViewCreateInfo( ( VkFormat )imageFormat, m_image.image, VK_IMAGE_ASPECT_COLOR_BIT, mipCount );
 	vkCreateImageView( g_renderManager->m_device, &imageViewInfo, nullptr, &m_imageView );
 
 	spdlog::info( "Created texture with size {}x{}", width, height );

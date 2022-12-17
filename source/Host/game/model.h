@@ -28,16 +28,19 @@ struct MeshPushConstants
 	glm::vec4 vLightInfoWS[4];
 };
 
+//@InteropGen generate class
 class Model
 {
 private:
 	std::vector<Mesh> m_meshes;
+	void UploadMesh( Mesh& mesh );
 
 	bool m_hasIndexBuffer;
 	bool m_isInitialized;
 
 public:
-	void UploadMesh( Mesh& mesh );
+	void AddMesh( InteropStruct vertices, InteropStruct indices, Material* material );
 
+	//@InteropGen ignore
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform );
 };

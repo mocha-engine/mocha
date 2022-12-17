@@ -2,7 +2,6 @@
 #include <baseentity.h>
 #include <edict.h>
 #include <game/camera.h>
-#include <game/managedmodel.h>
 #include <globalvars.h>
 #include <modelentity.h>
 
@@ -99,7 +98,7 @@ namespace Entities
 		return entity->GetName();
 	}
 
-	inline void SetModel( uint32_t handle, ManagedModel* model )
+	inline void SetModel( uint32_t handle, Model model )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -108,7 +107,7 @@ namespace Entities
 			return;
 		}
 
-		entity->SetModel( model->GetModel() );
+		entity->SetModel( model );
 	}
 
 	inline void SetCameraPosition( Vector3 position )

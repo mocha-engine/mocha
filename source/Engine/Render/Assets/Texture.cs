@@ -8,7 +8,7 @@ public partial class Texture : Asset
 	public uint Width { get; set; }
 	public uint Height { get; set; }
 
-	public Glue.ManagedTexture NativeTexture { get; set; }
+	public Glue.Texture NativeTexture { get; set; }
 
 	/// <summary>
 	/// Loads a texture from an MTEX (compiled) file.
@@ -33,17 +33,11 @@ public partial class Texture : Asset
 			textureData.AddRange( mipData[i] );
 		}
 
-		unsafe
-		{
-			fixed ( void* data = textureData.ToArray() )
-			{
-				TextureFormat format = TextureFormat.BC3_SRGB;
-				if ( path.Contains( "normal" ) )
-					format = TextureFormat.BC5_UNORM;
+		TextureFormat format = TextureFormat.BC3_SRGB;
+		if ( path.Contains( "normal" ) )
+			format = TextureFormat.BC5_UNORM;
 
-				NativeTexture.SetMipData( Width, Height, (uint)mipCount, (uint)textureData.Count(), (IntPtr)data, (int)format );
-			}
-		}
+		NativeTexture.SetData( Width, Height, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}
 
 	/// <summary>
@@ -51,13 +45,7 @@ public partial class Texture : Asset
 	/// </summary>
 	public Texture( uint width, uint height, byte[] data ) : this( width, height )
 	{
-		unsafe
-		{
-			fixed ( void* dataPtr = data )
-			{
-				NativeTexture.SetMipData( Width, Height, 1, (uint)data.Length, (IntPtr)dataPtr, (int)TextureFormat.R8G8B8A8_SRGB );
-			}
-		}
+		NativeTexture.SetData( Width, Height, 1, data.ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
 	}
 
 	/// <summary>

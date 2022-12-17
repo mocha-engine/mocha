@@ -31,6 +31,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			if ( returnType == "string" )
 				returnType = "IntPtr"; // Strings are handled specially - they go from pointer to string using InteropUtils.GetString
 
+			if ( method.IsConstructor || method.IsDestructor )
+				returnType = "IntPtr"; // Ctor/dtor handled specially too
+
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
 			var paramAndReturnTypes = parameterTypes.Append( returnType );
 
@@ -52,7 +55,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		//
 		// Write shit
 		//
-		writer.WriteLine( $"public unsafe class {sel.Name}" );
+		writer.WriteLine( $"public unsafe class {sel.Name} : INativeGlue" );
 		writer.WriteLine( "{" );
 		writer.Indent++;
 
@@ -92,7 +95,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			// Call parameters as comma-separated string
 			var managedCallParams = string.Join( ", ", method.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 			var name = method.Name;
-			var returnType = Utils.GetManagedType( method.ReturnType );
+
+			// We return a pointer to the created object if it's a ctor/dtor, but otherwise we'll do auto-conversions to our managed types
+			var returnType = (method.IsConstructor || method.IsDestructor) ? "IntPtr" : Utils.GetManagedType( method.ReturnType );
 
 			// If this is a ctor or dtor, we don't want to be able to call the method manually
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";

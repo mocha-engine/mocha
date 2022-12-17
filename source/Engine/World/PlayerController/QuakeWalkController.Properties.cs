@@ -32,5 +32,5 @@ partial class QuakeWalkController
 
 	public static float Overclip { get; set; } = 1.001f;
 
-	public static float SpeedLimit { get; set; } = -1;
+	public static float SpeedLimit { get; set; } = 8.0f;
 }
