@@ -166,16 +166,20 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="baseentity.cpp" />
     <ClCompile Include="cvarmanager.cpp" />
     <ClCompile Include="edict.cpp" />
-    <ClCompile Include="game\model.cpp" />
+    <ClCompile Include="hostmanager.cpp" />
     <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="managed\hostmanager.cpp" />
     <ClCompile Include="material.cpp" />
+    <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="model.cpp" />
     <ClCompile Include="modelentity.cpp" />
     <ClCompile Include="physicsmanager.cpp" />
+    <ClCompile Include="pipeline.cpp" />
     <ClCompile Include="renderdocmanager.cpp" />
+    <ClCompile Include="rendermanager.cpp" />
     <ClCompile Include="root.cpp" />
+    <ClCompile Include="shadercompiler.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="texturecache.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
@@ -312,10 +316,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.cpp" />
     <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp" />
-    <ClCompile Include="vulkan\rendermanager.cpp" />
-    <ClCompile Include="vulkan\mesh.cpp" />
-    <ClCompile Include="vulkan\pipeline.cpp" />
-    <ClCompile Include="vulkan\shadercompiler.cpp" />
     <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -323,19 +323,27 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
+    <ClInclude Include="editor.h" />
     <ClInclude Include="entities.h" />
+    <ClInclude Include="game_types.h" />
     <ClInclude Include="gitdefs.h" />
     <ClInclude Include="handlemap.h" />
+    <ClInclude Include="hostmanager.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="managedtypes.h" />
     <ClInclude Include="managedwrappers.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="physics.h" />
     <ClInclude Include="physicsmanager.h" />
+    <ClInclude Include="pipeline.h" />
     <ClInclude Include="renderdocmanager.h" />
+    <ClInclude Include="rendermanager.h" />
     <ClInclude Include="root.h" />
+    <ClInclude Include="shadercompiler.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="texturecache.h" />
@@ -603,18 +611,10 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="thirdparty\Renderdoc\renderdoc_app.h" />
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrap.h" />
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
-    <ClInclude Include="vulkan\editor.h" />
-    <ClInclude Include="game\model.h" />
-    <ClInclude Include="game\types.h" />
+    <ClInclude Include="vkinit.h" />
+    <ClInclude Include="vk_types.h" />
     <ClInclude Include="globalvars.h" />
     <ClInclude Include="logmanager.h" />
-    <ClInclude Include="managed\hostmanager.h" />
-    <ClInclude Include="vulkan\rendermanager.h" />
-    <ClInclude Include="vulkan\vkinit.h" />
-    <ClInclude Include="vulkan\mesh.h" />
-    <ClInclude Include="vulkan\pipeline.h" />
-    <ClInclude Include="vulkan\shadercompiler.h" />
-    <ClInclude Include="vulkan\types.h" />
     <ClInclude Include="window.h" />
   </ItemGroup>
   <ItemGroup>

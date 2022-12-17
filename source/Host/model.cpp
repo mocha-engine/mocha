@@ -1,10 +1,9 @@
 #include "model.h"
 
-#include "../vulkan/types.h"
-
 #include <globalvars.h>
 #include <managedtypes.h>
-#include <vulkan/rendermanager.h>
+#include <vk_types.h>
+#include <rendermanager.h>
 
 void Model::UploadMesh( Mesh& mesh )
 {

@@ -1,13 +1,11 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <vector>
 #include <functional>
+#include <glm/glm.hpp>
 #include <subsystem.h>
-
-// Vulkan types
-#include "types.h"
-#include "../window.h"
+#include <vector>
+#include <vk_types.h>
+#include <window.h>
 
 class Model;
 class HostManager;
@@ -26,7 +24,7 @@ private:
 	void InitSamplers();
 
 	void CreateSwapchain( VkExtent2D size );
-	
+
 	void CalculateCameraMatrices( glm::mat4x4& viewMatrix, glm::mat4x4& projMatrix );
 
 public:
@@ -35,7 +33,7 @@ public:
 
 	VkSampler m_pointSampler;
 	VkSampler m_anisoSampler;
-	
+
 	std::unique_ptr<Window> m_window;
 
 	VkInstance m_instance;
@@ -70,14 +68,14 @@ public:
 
 	void Startup();
 	void Shutdown();
-	
+
 	void Render();
 	void Run();
 
 	std::string m_deviceName;
 
 	UploadContext m_uploadContext;
-	void ImmediateSubmit( std::function<void ( VkCommandBuffer cmd )>&& function );
+	void ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function );
 
 	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
 

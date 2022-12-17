@@ -3,7 +3,7 @@
 #include <SDL2/SDL_vulkan.h>
 #include <functional>
 #include <spdlog/spdlog.h>
-#include <vulkan/types.h>
+#include <vk_types.h>
 
 class Window
 {

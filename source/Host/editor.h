@@ -3,9 +3,9 @@
 #include <edict.h>
 #include <globalvars.h>
 #include <imgui.h>
+#include <rendermanager.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
-#include <vulkan/rendermanager.h>
 
 //@InteropGen generate class
 namespace Editor
@@ -210,7 +210,7 @@ namespace Editor
 				g_debugView = RenderDebugViews::ROUGHNESS;
 
 			if ( ImGui::MenuItem( "Other" ) )
-				g_debugView = RenderDebugViews::OTHER;			
+				g_debugView = RenderDebugViews::OTHER;
 
 			ImGui::EndMenu();
 		}

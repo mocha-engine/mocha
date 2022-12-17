@@ -1,10 +1,10 @@
 #include "material.h"
 
-#include <game/model.h>
+#include <model.h>
 #include <globalvars.h>
 #include <rendering.h>
-#include <vulkan/rendermanager.h>
-#include <vulkan/vkinit.h>
+#include <rendermanager.h>
+#include <vkinit.h>
 
 Material::Material( const char* shaderPath, InteropStruct vertexAttributes, InteropStruct textures )
 {
