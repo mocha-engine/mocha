@@ -5,7 +5,7 @@ public partial class TestEntity : ModelEntity
 {
 	public TestEntity()
 	{
-		SetModel( Primitives.Cube.GenerateModel( new Material( "core/materials/dev/dev_wall.mmat" ) ) );
+		SetModel( ProceduralMeshes.Cube.GenerateModel( new Material( "core/materials/dev/dev_wall.mmat" ) ) );
 	}
 
 	public override void Update()

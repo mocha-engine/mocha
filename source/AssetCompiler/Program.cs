@@ -132,7 +132,11 @@ public static class Program
 
 		if ( GetCompiler( fileExtension, out var compiler ) )
 		{
-			var destFile = compiler.CompileFile( path );
+			var destFile = compiler?.CompileFile( path );
+
+			if ( destFile == null )
+				throw new Exception( "Failed to compile?" );
+
 			Log.Compiled( destFile );
 		}
 	}

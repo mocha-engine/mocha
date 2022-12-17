@@ -88,7 +88,7 @@ partial class Model
 		if ( !FileSystem.Game.Exists( path ) )
 		{
 			Log.Warning( $"No texture '{path}'" );
-			return null;
+			return Texture.MissingTexture;
 		}
 
 		using var _ = new Stopwatch( $"{typeName}: {path} texture load" );

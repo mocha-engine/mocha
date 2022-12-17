@@ -1,7 +1,6 @@
 ﻿namespace Mocha.Renderer;
 
-[Obsolete( "Should be removed or at least moved somewhere else - this is incomplete and doesn't make sense here" )]
-partial class Primitives
+partial class ProceduralMeshes
 {
 	public static class Cube
 	{
