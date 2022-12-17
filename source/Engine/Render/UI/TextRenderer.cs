@@ -11,6 +11,7 @@ public class TextureStitcher
 
 	public void AddTexture( Vector2 pos, Vector2 offset, Vector2 size, Texture texture )
 	{
+		Texture.Copy( (uint)offset.X, (uint)offset.Y, (uint)pos.X, (uint)pos.Y, (uint)size.X, (uint)size.Y, texture );
 	}
 
 	public void AddTexture( Vector2 pos, Texture texture )

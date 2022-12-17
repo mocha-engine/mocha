@@ -61,7 +61,7 @@ void Material::CreateDescriptors()
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.imageView = texture.GetImageView();
-		imageInfo.sampler = g_renderManager->m_pointSampler;
+		imageInfo.sampler = g_renderManager->m_anisoSampler;
 
 		imageInfos.push_back( imageInfo );
 	}

@@ -15,8 +15,7 @@
 //
 // Uniforms
 //
-layout( set = 0, binding = 0 ) uniform texture2D g_tAtlas;
-layout( set = 0, binding = 1 ) uniform sampler g_sSampler;
+layout( set = 0, binding = 0 ) uniform sampler2D g_tAtlas;
 
 struct VS_OUT {
     vec3 vPositionWS;
@@ -102,9 +101,9 @@ layout( location = 8 ) flat in int fs_flags;
 //
 layout( location = 0 ) out vec4 fragColor;
 
-vec4 GetTextureSample( texture2D tex )
+vec4 GetTextureSample( sampler2D tex )
 {
-    return texture( sampler2D( tex, g_sSampler ), fs_in.vTexCoords );
+    return texture( tex, fs_in.vTexCoords );
 }
 
 float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
