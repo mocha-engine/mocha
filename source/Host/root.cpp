@@ -1,4 +1,4 @@
-// #define _RENDERDOC 1
+#define _RENDERDOC 1
 #include "root.h"
 
 #include <defs.h>

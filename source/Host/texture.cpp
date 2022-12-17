@@ -110,3 +110,60 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 
 	spdlog::info( "Created texture with size {}x{}", width, height );
 }
+
+void Texture::Copy( uint32_t srcX, uint32_t srcY, uint32_t dstX, uint32_t dstY, uint32_t width, uint32_t height, Texture* src )
+{
+	g_renderManager->ImmediateSubmit( [&]( VkCommandBuffer cmd ) {
+		VkImageSubresourceLayers srcSubresource = {};
+		srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		srcSubresource.mipLevel = 0;
+		srcSubresource.baseArrayLayer = 0;
+		srcSubresource.layerCount = 1;
+
+		VkImageSubresourceLayers dstSubresource = srcSubresource;
+
+		VkOffset3D srcOffset = { ( int32_t )srcX, ( int32_t )srcY, 0 };
+		VkOffset3D dstOffset = { ( int32_t )dstX, ( int32_t )dstY, 0 };
+
+		VkExtent3D extent = { width, height, 1 };
+
+		VkImageCopy region = {};
+		region.srcSubresource = srcSubresource;
+		region.srcOffset = srcOffset;
+		region.dstSubresource = dstSubresource;
+		region.dstOffset = dstOffset;
+		region.extent = extent;
+
+		vkCmdCopyImage( cmd, src->m_image.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_image.image,
+		    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region );
+	} );
+}
+
+void Texture::Blit( uint32_t srcX, uint32_t srcY, uint32_t dstX, uint32_t dstY, uint32_t width, uint32_t height, Texture* src )
+{
+	g_renderManager->ImmediateSubmit( [&]( VkCommandBuffer cmd ) {
+		VkImageSubresourceLayers srcSubresource = {};
+		srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		srcSubresource.mipLevel = 0;
+		srcSubresource.baseArrayLayer = 0;
+		srcSubresource.layerCount = 1;
+
+		VkImageSubresourceLayers dstSubresource = srcSubresource;
+
+		VkOffset3D srcOffset = { ( int32_t )srcX, ( int32_t )srcY, 0 };
+		VkOffset3D dstOffset = { ( int32_t )dstX, ( int32_t )dstY, 0 };
+
+		VkExtent3D extent = { width, height, 1 };
+
+		VkImageBlit region = {};
+		region.srcSubresource = srcSubresource;
+		region.srcOffsets[0] = srcOffset;
+		region.srcOffsets[1] = { srcOffset.x + ( int32_t )width, srcOffset.y + ( int32_t )height, 1 };
+		region.dstSubresource = dstSubresource;
+		region.dstOffsets[0] = dstOffset;
+		region.dstOffsets[1] = { dstOffset.x + ( int32_t )width, dstOffset.y + ( int32_t )height, 1 };
+
+		vkCmdBlitImage( cmd, src->m_image.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_image.image,
+		    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region, VK_FILTER_NEAREST );
+	} );
+}

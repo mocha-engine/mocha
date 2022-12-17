@@ -9,6 +9,7 @@ public partial class Texture : Asset
 	public uint Height { get; set; }
 
 	public Glue.Texture NativeTexture { get; set; }
+	public Vector2 Size => new Vector2( Width, Height );
 
 	/// <summary>
 	/// Loads a texture from an MTEX (compiled) file.
@@ -36,6 +37,8 @@ public partial class Texture : Asset
 		TextureFormat format = TextureFormat.BC3_SRGB;
 		if ( path.Contains( "normal" ) )
 			format = TextureFormat.BC5_UNORM;
+		else if ( path.Contains( "fonts" ) )
+			format = TextureFormat.R8G8B8A8_SRGB;
 
 		NativeTexture.SetData( Width, Height, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}
@@ -57,6 +60,7 @@ public partial class Texture : Asset
 		Height = height;
 
 		NativeTexture = new();
+		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
 	}
 
 	internal Texture( string path, int width, int height )
@@ -66,6 +70,12 @@ public partial class Texture : Asset
 		Height = (uint)height;
 
 		All.Add( this );
+	}
+
+	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )
+	{
+		// TODO: This actually just blits because copying does not ignore texture format differences. Is this a performance issue?
+		NativeTexture.Blit( srcX, srcY, dstX, dstY, width, height, src.NativeTexture );
 	}
 
 	public void Delete()

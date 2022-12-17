@@ -55,7 +55,7 @@ public partial class ModelEntity : BaseEntity
 		NativeHandle = Glue.Entities.CreateModelEntity();
 	}
 
-	public void SetModel( Model model )
+	public void SetModel( IModel model )
 	{
 		Glue.Entities.SetModel( NativeHandle, model.NativeModel );
 	}

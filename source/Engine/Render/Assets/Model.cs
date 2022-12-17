@@ -30,7 +30,7 @@ public partial class Model : Model<Vertex>
 }
 
 [Icon( FontAwesome.Cube ), Title( "Model" )]
-public partial class Model<T> : Asset where T : struct
+public partial class Model<T> : Asset, IModel where T : struct
 {
 	public Glue.Model NativeModel { get; set; }
 
@@ -48,4 +48,9 @@ public partial class Model<T> : Asset where T : struct
 	{
 		NativeModel.AddMesh( vertices.ToInterop(), indices.ToInterop(), material.NativeMaterial );
 	}
+}
+
+public interface IModel
+{
+	Glue.Model NativeModel { get; set; }
 }

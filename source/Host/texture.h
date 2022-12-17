@@ -19,6 +19,8 @@ private:
 
 public:
 	void SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropArray mipData, int imageFormat );
+	void Copy( uint32_t srcX, uint32_t srcY, uint32_t dstX, uint32_t dstY, uint32_t width, uint32_t height, Texture* src );
+	void Blit( uint32_t srcX, uint32_t srcY, uint32_t dstX, uint32_t dstY, uint32_t width, uint32_t height, Texture* src );
 
 	//@InteropGen ignore
 	inline AllocatedImage GetImage() { return m_image; }

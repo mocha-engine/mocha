@@ -1,4 +1,7 @@
-﻿namespace Mocha;
+﻿using Mocha.Engine.Editor;
+using Mocha.Renderer.UI;
+
+namespace Mocha;
 
 public class World
 {
@@ -18,12 +21,18 @@ public class World
 	{
 		Log.Trace( $"Setting up entities..." );
 
+		var editor = new EditorInstance();
+
+		return;
+
 		var floor = new ModelEntity( "core/models/dev/dev_map.mmdl" );
 		floor.Position = new( 0.0f, 10.0f, 0.0f );
 		floor.Friction = 1.0f;
 		floor.Restitution = 0.0f;
 		floor.Mass = 1000.0f;
 		floor.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
+
+		var ui = new PanelRenderer();
 
 		//for ( int x = -4; x < 4; ++x )
 		//{
@@ -43,6 +52,7 @@ public class World
 
 	public void Update()
 	{
+		EditorInstance.Instance.Render();
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
 }

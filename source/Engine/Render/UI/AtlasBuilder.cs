@@ -11,7 +11,7 @@ public class AtlasBuilder
 	private uint RowHeight = 0;
 	private Vector2 Cursor = new();
 
-	private const uint Size = 8192;
+	private const uint Size = 4096;
 
 	public AtlasBuilder()
 	{
@@ -40,7 +40,7 @@ public class AtlasBuilder
 		//
 		Point2 pos = new Point2( (int)Cursor.X, (int)Cursor.Y );
 
-		// ...
+		Texture.Copy( 0, 0, (uint)pos.X, (uint)pos.Y, texture.Width, texture.Height, texture );
 
 		TextureCache.Add( (pos, texture) );
 		Cursor.X += texture.Width;

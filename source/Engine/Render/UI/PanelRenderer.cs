@@ -1,17 +1,19 @@
 ﻿namespace Mocha.Renderer.UI;
 
 [Icon( FontAwesome.Square ), Title( "UI" )]
-public partial class PanelRenderer
+public partial class PanelRenderer : ModelEntity
 {
 	public AtlasBuilder AtlasBuilder { get; set; }
 	private Material Material { get; set; }
-	private Model Model { get; set; }
+	private UIModel Model { get; set; }
+
+	private bool IsDirty { get; set; }
 
 	public PanelRenderer()
 	{
 		AtlasBuilder = new();
 
-		Material = new( "core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes );
+		Material = new( "content/core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes, AtlasBuilder.Texture );
 	}
 
 	public void NewFrame()
@@ -39,7 +41,7 @@ public partial class PanelRenderer
 			var tx = x;
 			position *= 2.0f;
 			position.X -= 1.0f;
-			position.Y = 1.0f - position.Y;
+			position.Y -= 1.0f;
 
 			tx.Position = position;
 			tx.TexCoords = texCoords;
@@ -60,5 +62,7 @@ public partial class PanelRenderer
 
 		Vertices.AddRange( vertices );
 		RectCount++;
+
+		IsDirty = true;
 	}
 }
