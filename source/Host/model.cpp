@@ -55,7 +55,7 @@ void Model::UploadMesh( Mesh& mesh )
 	m_isInitialized = true;
 }
 
-void Model::AddMesh( InteropStruct vertices, InteropStruct indices, Material* material )
+void Model::AddMesh( InteropArray vertices, InteropArray indices, Material* material )
 {
 	Mesh mesh( vertices, indices, *material );
 	UploadMesh( mesh );

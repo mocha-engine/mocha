@@ -51,5 +51,5 @@ public:
 
 	VertexInputDescription m_vertexInputDescription;
 
-	Material( const char* shaderPath, InteropStruct vertexAttributes, InteropStruct textures );
+	Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures );
 };

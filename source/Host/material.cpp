@@ -1,24 +1,24 @@
 #include "material.h"
 
-#include <model.h>
 #include <globalvars.h>
+#include <model.h>
 #include <rendering.h>
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Material::Material( const char* shaderPath, InteropStruct vertexAttributes, InteropStruct textures )
+Material::Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures )
 {
-	auto texturePtrs = GetData<Texture*>( textures );
+	auto texturePtrs = textures.GetData<Texture*>();
 	m_textures = std::vector<Texture>( textures.count );
-	
+
 	for ( int i = 0; i < textures.count; i++ )
 	{
 		m_textures[i] = Texture( *texturePtrs[i] );
 	}
-	
+
 	m_shaderPath = std::string( shaderPath );
 
-	auto attributes = GetData<VertexAttribute>( vertexAttributes );
+	auto attributes = vertexAttributes.GetData<VertexAttribute>();
 	m_vertexInputDescription = CreateVertexDescription( attributes );
 
 	CreateResources();

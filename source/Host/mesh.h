@@ -8,8 +8,8 @@
 
 struct Mesh
 {
-	InteropStruct vertices;
-	InteropStruct indices;
+	InteropArray vertices;
+	InteropArray indices;
 
 	AllocatedBuffer vertexBuffer;
 	AllocatedBuffer indexBuffer;
@@ -21,7 +21,7 @@ struct Mesh
 	{
 	}
 
-	Mesh( InteropStruct _vertices, InteropStruct _indices, Material _material )
+	Mesh( InteropArray _vertices, InteropArray _indices, Material _material )
 	    : material( _material )
 	    , indices( _indices )
 	    , vertices( _vertices )

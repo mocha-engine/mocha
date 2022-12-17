@@ -24,8 +24,8 @@ static class Utils
 			{ "char **",        "ref string" },
 			{ "char*",          "string" },
 			{ "char *",         "string" },
-			{ "void*",          "/* TODO */ IntPtr" }, // Mark as TODO because we shouldn't be doing this
-			{ "void *",         "/* TODO */ IntPtr" }, // Mark as TODO because we shouldn't be doing this
+			{ "void*",          "IntPtr" },
+			{ "void *",         "IntPtr" },
 
 			// STL
 			{ "std::string",    "/* UNSUPPORTED */ string" },
