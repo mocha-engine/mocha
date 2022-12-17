@@ -26,25 +26,25 @@ namespace Editor
 
 	inline void Text( const char* text )
 	{
-		ImGui::Text( text );
+		ImGui::Text( "%s", text );
 	};
 
 	inline void TextWrapped( const char* text )
 	{
-		ImGui::TextWrapped( text );
+		ImGui::TextWrapped( "%s", text );
 	};
 
 	inline void TextBold( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mBoldFont );
-		ImGui::Text( text );
+		Text( text );
 		// ImGui::PopFont();
 	};
 
 	inline void TextSubheading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mSubheadingFont );
-		ImGui::Text( text );
+		Text( text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		// ImGui::PopFont();
 	};
@@ -52,7 +52,7 @@ namespace Editor
 	inline void TextHeading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mHeadingFont );
-		ImGui::Text( text );
+		Text( text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		// ImGui::PopFont();
 	};
@@ -60,14 +60,14 @@ namespace Editor
 	inline void TextMonospace( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mMonospaceFont );
-		ImGui::Text( text );
+		Text( text );
 		// ImGui::PopFont();
 	};
 
 	inline void TextLight( const char* text )
 	{
 		ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 1, 1, 1, 0.75f ) );
-		ImGui::Text( text );
+		Text( text );
 		ImGui::PopStyleColor();
 	}
 

@@ -54,7 +54,7 @@ public static class InteropUtils
 
 	internal static string GetString( IntPtr strPtr )
 	{
-		return Marshal.PtrToStringUTF8( strPtr );
+		return Marshal.PtrToStringUTF8( strPtr ) ?? "UNKNOWN";
 	}
 }
 
