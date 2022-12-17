@@ -333,6 +333,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="managedmaterial.h" />
     <ClInclude Include="managedtexture.h" />
+    <ClInclude Include="managedtypes.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="physics.h" />
