@@ -1,19 +1,18 @@
 #include "rendermanager.h"
 
-#include "../managed/hostmanager.h"
-#include "../window.h"
-#include "mesh.h"
-#include "shadercompiler.h"
-#include "types.h"
-#include "vkinit.h"
-
 #include <VkBootstrap.h>
 #include <defs.h>
 #include <fstream>
 #include <glm/ext.hpp>
+#include <hostmanager.h>
 #include <iostream>
 #include <memory>
+#include <mesh.h>
+#include <shadercompiler.h>
 #include <spdlog/spdlog.h>
+#include <vk_types.h>
+#include <vkinit.h>
+#include <window.h>
 
 #ifdef _IMGUI
 #include <backends/imgui_impl_sdl.h>

@@ -1,7 +1,7 @@
 #pragma once
 #include <baseentity.h>
-#include <game/model.h>
-#include <game/types.h>
+#include <model.h>
+#include <game_types.h>
 #include <vector>
 #include <vulkan/vulkan.h>
 

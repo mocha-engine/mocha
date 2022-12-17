@@ -1,7 +1,7 @@
 #pragma once
 #include <baseentity.h>
 #include <edict.h>
-#include <game/camera.h>
+#include <camera.h>
 #include <globalvars.h>
 #include <modelentity.h>
 

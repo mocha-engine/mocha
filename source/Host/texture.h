@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <managedtypes.h>
 #include <spdlog/spdlog.h>
-#include <vulkan/types.h>
+#include <vk_types.h>
 
 //@InteropGen generate class
 class Texture

@@ -48,17 +48,8 @@
     <ClCompile Include="modelentity.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\rendermanager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="window.cpp">
       <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="vulkan\shadercompiler.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="managed\hostmanager.cpp">
-      <Filter>Managed</Filter>
     </ClCompile>
     <ClCompile Include="physicsmanager.cpp">
       <Filter>Physics</Filter>
@@ -495,11 +486,23 @@
     <ClCompile Include="material.cpp">
       <Filter>Rendering\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\pipeline.cpp">
+    <ClCompile Include="shadercompiler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="vulkan\mesh.cpp">
+    <ClCompile Include="rendermanager.cpp">
       <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="pipeline.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>Rendering\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="hostmanager.cpp">
+      <Filter>Managed</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -524,26 +527,8 @@
     <ClInclude Include="edict.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\editor.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\rendermanager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\shadercompiler.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\types.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan\vkinit.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="window.h">
       <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="managed\hostmanager.h">
-      <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="physicsmanager.h">
       <Filter>Physics</Filter>
@@ -555,9 +540,6 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="subsystem.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="game\types.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="logmanager.h">
@@ -1400,11 +1382,35 @@
     <ClInclude Include="material.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\pipeline.h">
+    <ClInclude Include="vkinit.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan\mesh.h">
+    <ClInclude Include="vk_types.h">
       <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="shadercompiler.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="rendermanager.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="pipeline.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Rendering\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="game_types.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="hostmanager.h">
+      <Filter>Managed</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

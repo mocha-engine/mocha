@@ -1,6 +1,6 @@
 #pragma once
-#include "types.h"
 
+#include <game_types.h>
 #include <glm/glm.hpp>
 #include <managedtypes.h>
 #include <material.h>

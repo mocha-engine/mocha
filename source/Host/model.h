@@ -1,18 +1,19 @@
 #pragma once
-#include "../vulkan/mesh.h"
-#include "../vulkan/pipeline.h"
-#include "../vulkan/shadercompiler.h"
-#include "../vulkan/types.h"
-#include "../vulkan/vkinit.h"
+
 #include "camera.h"
-#include "types.h"
 
 #include <fstream>
+#include <game_types.h>
 #include <glm/ext.hpp>
 #include <glm/glm.hpp>
+#include <mesh.h>
+#include <pipeline.h>
+#include <shadercompiler.h>
 #include <spdlog/spdlog.h>
 #include <texture.h>
 #include <vector>
+#include <vk_types.h>
+#include <vkinit.h>
 
 struct MeshPushConstants
 {

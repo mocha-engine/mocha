@@ -1,5 +1,5 @@
 #pragma once
-#include <game/types.h>
+#include <game_types.h>
 #include <stdint.h>
 #include <string>
 #include <vulkan/vulkan.h>

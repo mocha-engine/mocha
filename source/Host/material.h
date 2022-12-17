@@ -1,7 +1,7 @@
 #pragma once
 #include <texture.h>
 #include <vector>
-#include <vulkan/types.h>
+#include <vk_types.h>
 
 enum VertexAttributeFormat
 {

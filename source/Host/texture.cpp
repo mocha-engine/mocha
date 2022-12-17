@@ -1,8 +1,8 @@
 #include "texture.h"
 
 #include <globalvars.h>
-#include <vulkan/rendermanager.h>
-#include <vulkan/vkinit.h>
+#include <rendermanager.h>
+#include <vkinit.h>
 
 void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropStruct mipData, int imageFormat )
 {

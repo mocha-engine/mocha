@@ -5,9 +5,9 @@
 #include <edict.h>
 #include <globalvars.h>
 #include <logmanager.h>
-#include <managed/hostmanager.h>
+#include <hostmanager.h>
 #include <renderdocmanager.h>
-#include <vulkan/rendermanager.h>
+#include <rendermanager.h>
 #include <physicsmanager.h>
 #include <inputmanager.h>
 

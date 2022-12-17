@@ -1,10 +1,9 @@
 #pragma once
 
-#include "../generated/UnmanagedArgs.generated.h"
-
 #include <Windows.h>
 #include <assert.h>
 #include <coreclr_delegates.h>
+#include <generated/UnmanagedArgs.generated.h>
 #include <hostfxr.h>
 #include <iostream>
 #include <nethost.h>
@@ -31,7 +30,7 @@ namespace HostGlobals
 
 }; // namespace HostGlobals
 
-class ManagedHost : ISubSystem
+class HostManager : ISubSystem
 {
 private:
 	load_assembly_and_get_function_pointer_fn m_lagfp;
@@ -43,11 +42,12 @@ private:
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
 
 public:
-	ManagedHost( std::wstring basePath, std::wstring signature );
+	HostManager( std::wstring basePath, std::wstring signature );
 
-	void StartUp();
-	void ShutDown();
+	void Startup();
+	void Shutdown();
 
 	void Render();
+	void DrawEditor();
 	void FireEvent( std::string eventName );
 };
