@@ -40,7 +40,7 @@ private:
 	bool m_isInitialized;
 
 public:
-	void AddMesh( InteropStruct vertices, InteropStruct indices, Material* material );
+	void AddMesh( InteropArray vertices, InteropArray indices, Material* material );
 
 	//@InteropGen ignore
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform );
