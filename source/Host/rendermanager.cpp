@@ -350,6 +350,15 @@ void RenderManager::Render()
 	ImGui::Render();
 #endif
 
+	// Get window size ( we use this in a load of places )
+	VkExtent2D windowExtent = GetWindowExtent();
+
+	if ( windowExtent.width < 1 || windowExtent.height < 1 )
+	{
+		// Do not render if we can't render to anything..
+		return;
+	}
+
 	// Wait until we can render ( 1 second timeout )
 	VK_CHECK( vkWaitForFences( m_device, 1, &m_renderFence, true, 1000000000 ) );
 	VK_CHECK( vkResetFences( m_device, 1, &m_renderFence ) );
@@ -363,9 +372,6 @@ void RenderManager::Render()
 	VkCommandBuffer cmd = m_commandBuffer;
 	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
-
-	// Get window size ( we use this in a load of places )
-	VkExtent2D windowExtent = GetWindowExtent();
 
 	//
 	// Set viewport & scissor
@@ -463,6 +469,16 @@ void RenderManager::Render()
 
 	// Present
 	VkPresentInfoKHR presentInfo = VKInit::PresentInfo( &m_swapchain, &m_renderSemaphore, &swapchainImageIndex );
+
+	// We COULD have minimized the window between start and end.. so check again
+	windowExtent = GetWindowExtent();
+
+	if ( windowExtent.width < 1 || windowExtent.height < 1 )
+	{
+		// Do not render if we can't render to anything..
+		return;
+	}
+
 	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
 
 	m_frameNumber++;
