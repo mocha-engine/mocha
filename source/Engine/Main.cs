@@ -34,6 +34,7 @@ public class Main
 	{
 		Input.Update();
 		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
+		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
 
 		world.Update();
 	}

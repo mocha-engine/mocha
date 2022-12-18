@@ -21,7 +21,20 @@ internal class VerticalLayout : BaseLayout
 		if ( stretch )
 		{
 			var calculatedRect = widget.RelativeBounds;
+
 			calculatedRect.Width = CalculatedSize.X - (Margin.X * 2.0f);
+
+			widget.Bounds = calculatedRect;
+		}
+		else if ( Center )
+		{
+			// Calculate center position
+			var calculatedRect = widget.RelativeBounds;
+
+			var center = Bounds.Center;
+			calculatedRect.X = center.X;
+			calculatedRect.X -= calculatedRect.Width / 2.0f;
+
 			widget.Bounds = calculatedRect;
 		}
 	}

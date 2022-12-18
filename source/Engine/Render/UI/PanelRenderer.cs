@@ -13,7 +13,7 @@ public partial class PanelRenderer : ModelEntity
 	{
 		AtlasBuilder = new();
 
-		Material = new( "content/core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes, AtlasBuilder.Texture );
+		Material = new( "content/core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes, AtlasBuilder.Texture, sampler: Sampler.Anisotropic );
 	}
 
 	public void NewFrame()

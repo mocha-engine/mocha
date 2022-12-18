@@ -1,11 +1,13 @@
 #pragma once
 #include <baseentity.h>
+#include <defs.h>
 #include <edict.h>
 #include <globalvars.h>
 #include <imgui.h>
 #include <rendermanager.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <vulkan/vulkan.h>
 
 //@InteropGen generate class
 namespace Editor
@@ -214,6 +216,17 @@ namespace Editor
 
 			ImGui::EndMenu();
 		}
+	}
+
+	inline Vector2 GetWindowSize()
+	{
+		VkExtent2D extent = g_renderManager->GetWindowExtent();
+		return { ( float )extent.width, ( float )extent.height };
+	}
+
+	inline const char* GetVersionName()
+	{
+		return VERSION_NAME;
 	}
 
 	//@InteropGen ignore

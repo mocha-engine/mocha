@@ -7,6 +7,7 @@ internal class BaseLayout
 	public List<BaseLayout> Layouts { get; } = new();
 	protected List<(bool Stretch, Widget Widget)> Widgets { get; } = new();
 	public bool Visible { get; set; } = true;
+	public bool Center { get; set; } = false;
 	public float Spacing { get; set; } = 0;
 	public Vector2 Margin { get; set; } = 0;
 
@@ -44,7 +45,7 @@ internal class BaseLayout
 
 	}
 
-	public T Add<T>( T widget, bool stretch = true ) where T : Widget
+	public T Add<T>( T widget, bool stretch = false ) where T : Widget
 	{
 		widget.Layout = this;
 

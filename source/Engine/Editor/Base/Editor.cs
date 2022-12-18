@@ -2,12 +2,11 @@
 
 internal partial class EditorInstance
 {
-	public bool Debug { get; set; } = true;
+	public bool Debug { get; set; } = false;
 
 	internal static EditorInstance Instance { get; private set; }
 
-	private List<Window> Windows = new();
-	private bool IsRendering = true;
+	private List<Menu> Menus = new();
 
 	internal EditorInstance()
 	{
@@ -16,45 +15,15 @@ internal partial class EditorInstance
 
 		Graphics.Init();
 
-		Windows.Add( new DemoWindow
-		{
-			Bounds = new Rectangle( 128, 128, 500, 650 ),
-			Focused = true,
-			Dock = Dock.Left,
-			Title = "Demo Window"
-		} );
-
-		Windows.Add( new IconWindow
-		{
-			Bounds = new Rectangle( 0, 0, 1500, 1080 ),
-			Dock = Dock.Bottom,
-			Title = "Asset Browser"
-		} );
-
-		Windows.Add( new OutlinerWindow
-		{
-			Bounds = new Rectangle( 0, 0, 1500, 1080 ),
-			Dock = Dock.Right,
-			Title = "Outliner"
-		} );
+		Menus.Add( new MainMenu() );
 	}
 
 	internal void Render()
 	{
-		if ( IsRendering )
-		{
-			UpdateWidgets();
-		}
+		UpdateWidgets();
 
 		Graphics.PanelRenderer.NewFrame();
-
-		if ( IsRendering )
-		{
-			Graphics.DrawRect( new Rectangle( 0, Screen.Size ), MathX.GetColor( "#1e1f21" ) );
-			RenderWidgets();
-		}
-
-		RenderPerformanceOverlay();
+		RenderWidgets();
 	}
 
 	internal void RenderWidgets()
@@ -83,7 +52,7 @@ internal partial class EditorInstance
 
 				Graphics.DrawRectUnfilled( widget.Bounds, Colors.Red, thickness );
 
-				var textBounds = new Rectangle( Input.MousePosition + 16, 128 );
+				var textBounds = new Rectangle( Input.MousePosition + 16, 256 );
 				Graphics.DrawTextWithShadow( textBounds, $"{widget}:" );
 
 				textBounds.Y += 20f;
@@ -126,63 +95,5 @@ internal partial class EditorInstance
 		{
 			widget.Update();
 		}
-	}
-
-	internal string GetCurrentTheme()
-	{
-		if ( ITheme.Current is LightTheme )
-			return "Default Light Theme";
-		if ( ITheme.Current is DarkTheme )
-			return "Default Dark Theme";
-		if ( ITheme.Current is TestTheme )
-			return "2012";
-
-		return "???";
-	}
-
-	internal void SwitchTheme( int newSelection )
-	{
-		Log.Trace( newSelection );
-
-		if ( newSelection == 0 )
-			ITheme.Current = new DarkTheme();
-		else if ( newSelection == 1 )
-			ITheme.Current = new LightTheme();
-		else
-			ITheme.Current = new TestTheme();
-
-		Windows.ForEach( x => x.CreateUI() );
-	}
-
-	internal string GetCurrentDebug()
-	{
-		if ( Debug )
-			return "Debug Enabled";
-
-		return "Debug Disabled";
-	}
-
-	internal void SwitchDebug( int newSelection )
-	{
-		Log.Trace( newSelection );
-
-		if ( newSelection == 0 )
-			Debug = false;
-		else if ( newSelection == 1 )
-			Debug = true;
-	}
-
-	internal void RenderPerformanceOverlay()
-	{
-		var framerate = 1.000f / Time.Delta;
-		var text = $"FPS: {framerate.CeilToInt()}";
-
-		var size = Graphics.MeasureText( text, 16 ) + 20;
-		var position = new Vector2( (Screen.Size.X - size.X) / 2f, 8 );
-
-		var bounds = new Rectangle( position, size );
-
-		Graphics.DrawRect( bounds, ITheme.Current.BackgroundColor, RoundingFlags.All );
-		Graphics.DrawText( bounds.Shrink( 8 ), text, 16 );
 	}
 }

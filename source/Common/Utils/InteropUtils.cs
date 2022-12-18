@@ -38,6 +38,10 @@ public static class InteropUtils
 		{
 			return b ? new IntPtr( 1 ) : IntPtr.Zero;
 		}
+		else if ( obj is Sampler s )
+		{
+			return GetPtr( (int)s );
+		}
 		else if ( obj.GetType().IsValueType )
 		{
 			var ptr = Marshal.AllocHGlobal( Marshal.SizeOf( obj ) );

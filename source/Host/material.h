@@ -3,6 +3,12 @@
 #include <vector>
 #include <vk_types.h>
 
+enum Sampler
+{
+	Anisotropic,
+	Point
+};
+
 enum VertexAttributeFormat
 {
 	Int,
@@ -48,8 +54,9 @@ public:
 	VkDescriptorSetLayout m_textureSetLayout;
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
+	Sampler m_sampler;
 
 	VertexInputDescription m_vertexInputDescription;
 
-	Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures );
+	Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler );
 };

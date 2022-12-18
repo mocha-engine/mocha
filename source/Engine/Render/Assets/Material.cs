@@ -57,7 +57,8 @@ public class Material : Asset
 		NativeMaterial = new(
 			DefaultShaderPath,
 			Vertex.VertexAttributes.ToInterop(),
-			textures.ToInterop()
+			textures.ToInterop(),
+			Sampler.Point
 		);
 
 		Path = path;
@@ -68,7 +69,7 @@ public class Material : Asset
 	/// </summary>
 	public Material( string shaderPath, VertexAttribute[] vertexAttributes, Texture? diffuseTexture = null,
 		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
-		Texture? roughnessTexture = null )
+		Texture? roughnessTexture = null, Sampler sampler = Sampler.Point )
 	{
 		DiffuseTexture = diffuseTexture ?? Texture.MissingTexture;
 		NormalTexture = normalTexture ?? Texture.Normal;
@@ -88,7 +89,8 @@ public class Material : Asset
 		NativeMaterial = new(
 			shaderPath,
 			vertexAttributes.ToInterop(),
-			textures.ToInterop()
+			textures.ToInterop(),
+			sampler
 		);
 	}
 }

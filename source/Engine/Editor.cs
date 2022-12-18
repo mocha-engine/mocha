@@ -8,6 +8,7 @@ public class Editor
 	static string consoleInput = "";
 	static string editorInput = "";
 
+	static bool drawPerformanceWindow = false;
 	static bool drawEntityWindow = false;
 	static bool drawConsoleWindow = false;
 	static bool drawCameraWindow = false;
@@ -18,7 +19,9 @@ public class Editor
 	public static void Draw()
 	{
 		DrawMenuBar();
-		DrawPerformanceOverlay();
+
+		if ( drawPerformanceWindow )
+			DrawPerformanceOverlay();
 
 		if ( drawEntityWindow )
 			DrawEntityWindow();
@@ -45,6 +48,9 @@ public class Editor
 		{
 			if ( ImGui.BeginMenu( "Window" ) )
 			{
+				if ( ImGui.MenuItem( "Performance" ) )
+					drawPerformanceWindow = !drawPerformanceWindow;
+
 				if ( ImGui.MenuItem( "Entities" ) )
 					drawEntityWindow = !drawEntityWindow;
 

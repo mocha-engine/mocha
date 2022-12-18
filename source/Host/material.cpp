@@ -6,7 +6,7 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Material::Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures )
+Material::Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler )
 {
 	auto texturePtrs = textures.GetData<Texture*>();
 	m_textures = std::vector<Texture>( textures.count );
@@ -20,6 +20,8 @@ Material::Material( const char* shaderPath, InteropArray vertexAttributes, Inter
 
 	auto attributes = vertexAttributes.GetData<VertexAttribute>();
 	m_vertexInputDescription = CreateVertexDescription( attributes );
+
+	m_sampler = sampler;
 
 	CreateResources();
 }
@@ -61,7 +63,8 @@ void Material::CreateDescriptors()
 		VkDescriptorImageInfo imageInfo = {};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 		imageInfo.imageView = texture.GetImageView();
-		imageInfo.sampler = g_renderManager->m_anisoSampler;
+		imageInfo.sampler =
+		    m_sampler == Sampler::Anisotropic ? g_renderManager->m_anisoSampler : g_renderManager->m_pointSampler;
 
 		imageInfos.push_back( imageInfo );
 	}
