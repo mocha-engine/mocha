@@ -21,5 +21,16 @@ public:
 	bool Update();
 
 	inline SDL_Window* GetSDLWindow() { return m_window; }
-	inline void GetWindowSize( int* outW, int* outH ) { SDL_GetWindowSize( m_window, outW, outH ); }
+	inline void GetWindowSize( int* outW, int* outH ) 
+	{ 
+		if ( ( SDL_GetWindowFlags( m_window ) & SDL_WINDOW_MINIMIZED ) == 0 )
+		{
+			SDL_GetWindowSize( m_window, outW, outH );
+		}
+		else
+		{
+			*outW = 0;
+			*outH = 0;
+		}
+	}
 };
