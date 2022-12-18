@@ -15,6 +15,7 @@
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -56,5 +57,10 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
 	</ItemGroup>
+	
+	<PropertyGroup>
+		<PreserveCompilationReferences>true</PreserveCompilationReferences>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+	</PropertyGroup>
 
 </Project>
