@@ -1,8 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Mocha.Renderer.UI;
+namespace Mocha.UI;
 
-partial class PanelRenderer
+partial class UIEntity
 {
 	private UIVertex[] RectVertices => new UIVertex[]
 	{

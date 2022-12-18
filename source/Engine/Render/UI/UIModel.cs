@@ -1,6 +1,6 @@
-﻿using static Mocha.Renderer.UI.PanelRenderer;
+﻿using static Mocha.UI.UIEntity;
 
-namespace Mocha.Renderer.UI;
+namespace Mocha.UI;
 
 public partial class UIModel : Model<UIVertex>
 {

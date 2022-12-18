@@ -1,4 +1,4 @@
-﻿namespace Mocha.Renderer.UI;
+﻿namespace Mocha.UI;
 
 [Flags]
 public enum GraphicsFlags

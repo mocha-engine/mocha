@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Image : Widget
 {

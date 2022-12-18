@@ -1,5 +1,5 @@
-﻿using Mocha.Engine.Editor;
-using Mocha.Renderer.UI;
+﻿
+using Mocha.UI;
 
 namespace Mocha;
 
@@ -28,15 +28,14 @@ public class World
 		map.Mass = 1000.0f;
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
-		var ui = new PanelRenderer();
-		var editor = new EditorInstance();
+		var ui = new UIManager();
 
 		var player = new Player();
 	}
 
 	public void Update()
 	{
-		EditorInstance.Instance.Render();
+		UIManager.Instance.Render();
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
 }

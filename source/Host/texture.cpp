@@ -21,8 +21,8 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 	imageExtent.height = height;
 	imageExtent.depth = 1;
 
-	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo(
-	    ( VkFormat )imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
+	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo( ( VkFormat )imageFormat,
+	    VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;

@@ -1,6 +1,6 @@
-﻿namespace Mocha.Renderer.UI;
+﻿namespace Mocha.UI;
 
-partial class PanelRenderer
+partial class UIEntity
 {
 	public override void Update()
 	{

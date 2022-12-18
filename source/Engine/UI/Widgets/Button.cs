@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Button : Widget
 {
@@ -20,12 +20,12 @@ internal class Button : Widget
 
 	internal override void Render()
 	{
-		Vector4 colorA = ITheme.Current.ButtonBgA;
-		Vector4 colorB = ITheme.Current.ButtonBgB;
+		Vector4 colorA = Theme.ButtonBgA;
+		Vector4 colorB = Theme.ButtonBgB;
 
-		Vector4 border = ITheme.Current.Border;
+		Vector4 border = Theme.Border;
 
-		Graphics.DrawShadow( Bounds, 2f, ITheme.Current.ShadowOpacity );
+		Graphics.DrawShadow( Bounds, 2f, Theme.ShadowOpacity );
 		Graphics.DrawRect( Bounds, border, RoundingFlags.All );
 
 		if ( InputFlags.HasFlag( PanelInputFlags.MouseDown ) )
@@ -36,7 +36,7 @@ internal class Button : Widget
 		else
 		{
 			var b = Bounds.Shrink( 1f );
-			Graphics.DrawRect( b, ITheme.Current.ButtonBgA * 1.25f, RoundingFlags.All );
+			Graphics.DrawRect( b, Theme.ButtonBgA * 1.25f, RoundingFlags.All );
 			float d = 1f;
 			b.Height -= d;
 			b.Y += d;

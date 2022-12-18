@@ -1,21 +1,28 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
-internal partial class EditorInstance
+internal partial class UIManager
 {
-	public bool Debug { get; set; } = false;
+	public bool Debug { get; set; } = true;
 
-	internal static EditorInstance Instance { get; private set; }
+	internal static UIManager Instance { get; private set; }
 
-	private List<Menu> Menus = new();
+	private Menu MainMenu { get; }
+	private Menu? SubMenu { get; set; }
 
-	internal EditorInstance()
+	internal UIManager()
 	{
 		Event.Register( this );
 		Instance = this;
 
 		Graphics.Init();
 
-		Menus.Add( new MainMenu() );
+		MainMenu = new MainMenu();
+	}
+
+	public static void SetSubMenu( Menu? menu )
+	{
+		Instance.SubMenu?.Delete();
+		Instance.SubMenu = menu;
 	}
 
 	internal void Render()
@@ -41,7 +48,7 @@ internal partial class EditorInstance
 
 		foreach ( var layout in BaseLayout.All )
 		{
-			Graphics.DrawRectUnfilled( layout.Bounds, Colors.Green, 1f );
+			Graphics.DrawRectUnfilled( layout.Bounds, Theme.Green, 1f );
 		}
 
 		foreach ( var widget in widgets )
@@ -50,9 +57,9 @@ internal partial class EditorInstance
 			{
 				float thickness = widget.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
 
-				Graphics.DrawRectUnfilled( widget.Bounds, Colors.Red, thickness );
+				Graphics.DrawRectUnfilled( widget.Bounds, Theme.Red, thickness );
 
-				var textBounds = new Rectangle( Input.MousePosition + 16, 256 );
+				var textBounds = new Rectangle( Input.MousePosition + 16, 512 );
 				Graphics.DrawTextWithShadow( textBounds, $"{widget}:" );
 
 				textBounds.Y += 20f;
@@ -63,7 +70,7 @@ internal partial class EditorInstance
 				{
 					thickness = parent.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
 
-					Graphics.DrawRectUnfilled( parent.Bounds, Colors.Blue, thickness );
+					Graphics.DrawRectUnfilled( parent.Bounds, Theme.Blue, thickness );
 					parent = parent.Parent;
 				}
 			}
