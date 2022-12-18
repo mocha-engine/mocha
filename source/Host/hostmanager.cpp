@@ -27,6 +27,7 @@ bool HostGlobals::LoadHostFxr()
 	void* lib = load_library( buffer );
 	init_fptr = ( hostfxr_initialize_for_runtime_config_fn )get_export( lib, "hostfxr_initialize_for_runtime_config" );
 	get_delegate_fptr = ( hostfxr_get_runtime_delegate_fn )get_export( lib, "hostfxr_get_runtime_delegate" );
+	set_property_fptr = ( hostfxr_set_runtime_property_value_fn )get_export( lib, "hostfxr_set_runtime_property_value" );
 	close_fptr = ( hostfxr_close_fn )get_export( lib, "hostfxr_close" );
 
 	return ( init_fptr && get_delegate_fptr && close_fptr );
@@ -46,6 +47,27 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 		close_fptr( cxt );
 		return nullptr;
 	}
+
+	// Get current working directory
+	char_t cwd[MAX_PATH];
+	DWORD cwd_len = GetCurrentDirectoryW( MAX_PATH, cwd );
+	if ( cwd_len == 0 )
+	{
+		spdlog::error( "Failed to get current directory" );
+		close_fptr( cxt );
+		return nullptr;
+	}
+	
+	// Add "build" to cwd
+	std::wstring buildPath = cwd;
+	buildPath += L"\\build";
+
+	// Set CoreCLR properties
+	set_property_fptr( cxt, L"APP_CONTEXT_BASE_DIRECTORY", buildPath.c_str() );
+	set_property_fptr( cxt, L"APP_PATHS", buildPath.c_str() );
+	set_property_fptr( cxt, L"APP_NI_PATHS", buildPath.c_str() );
+	set_property_fptr( cxt, L"NATIVE_DLL_SEARCH_DIRECTORIES", buildPath.c_str() );
+	set_property_fptr( cxt, L"PLATFORM_RESOURCE_ROOTS", buildPath.c_str() );
 
 	// Get the load assembly function pointer
 	rc = get_delegate_fptr( cxt, hdt_load_assembly_and_get_function_pointer, &load_assembly_and_get_function_pointer );

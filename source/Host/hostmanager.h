@@ -21,6 +21,7 @@ namespace HostGlobals
 	// Globals to hold hostfxr exports
 	inline hostfxr_initialize_for_runtime_config_fn init_fptr;
 	inline hostfxr_get_runtime_delegate_fn get_delegate_fptr;
+	inline hostfxr_set_runtime_property_value_fn set_property_fptr;
 	inline hostfxr_close_fn close_fptr;
 
 	void* load_library( const char_t* path );
