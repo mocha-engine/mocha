@@ -56,3 +56,8 @@ public class TestTheme : ITheme
 
 	public float ShadowOpacity { get; } = 0.1f;
 }
+
+public static class Theme
+{
+	public const string Font = "micross";
+}

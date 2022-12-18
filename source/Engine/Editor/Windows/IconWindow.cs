@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Engine.Editor;
 
-internal class IconWindow : Window
+internal class IconWindow : Menu
 {
 	private void AddFiles( string directory )
 	{

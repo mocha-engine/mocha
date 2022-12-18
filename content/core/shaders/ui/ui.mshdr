@@ -139,12 +139,15 @@ void main()
             float b = texSample.b;
             
             float median = max(min(r, g), min(max(r, g), b));
-            float signed_dist = median - 0.5;
+            float signed_dist = median;
 
-            float mul = fs_in.vPanelSize.y / 12.0;
+            float mul = fs_in.vPanelSize.y / 4.0;
             signed_dist *= mul;
 
-            opacity = clamp( signed_dist + 0.5, 0.0, 1.0 );
+            if ( (fs_flags & HighDistMul) == HighDistMul )
+                signed_dist /= 2.0;
+
+            opacity = clamp( signed_dist, 0.0, 1.0 );
         }
         
         fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );

@@ -299,7 +299,10 @@ void RenderManager::InitSamplers()
 void RenderManager::Startup()
 {
 	m_window = std::make_unique<Window>( Window( 1280, 720 ) );
-	m_window->m_onWindowResized = [this]( VkExtent2D newWindowExtents ) { CreateSwapchain( newWindowExtents ); };
+	m_window->m_onWindowResized = [this]( VkExtent2D newWindowExtents ) {
+		g_hostManager->FireEvent( "Event.Window.Resized" );
+		CreateSwapchain( newWindowExtents );
+	};
 
 	InitVulkan();
 

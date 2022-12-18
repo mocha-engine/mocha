@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Engine.Editor;
 
-internal class OutlinerWindow : Window
+internal class OutlinerWindow : Menu
 {
 	public override void CreateUI()
 	{

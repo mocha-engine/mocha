@@ -142,8 +142,6 @@ partial class Graphics
 				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
 				fontData = fontAwesome.Data;
 				fontTexture = fontAwesome.Texture;
-
-				x += 32;
 			}
 
 			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
@@ -198,17 +196,17 @@ partial class Graphics
 
 	public static Vector2 MeasureText( string text, float fontSize = 12 )
 	{
-		return MeasureText( text, "qaz", fontSize );
+		return MeasureText( text, Theme.Font, fontSize );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, float fontSize = 12 )
 	{
-		DrawText( bounds, text, "qaz", fontSize );
+		DrawText( bounds, text, Theme.Font, fontSize );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
 	{
-		DrawText( bounds, text, "qaz", fontSize, color );
+		DrawText( bounds, text, Theme.Font, fontSize, color );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize )
@@ -227,12 +225,12 @@ partial class Graphics
 
 	public static void DrawTextWithShadow( Rectangle bounds, string text, float fontSize = 12 )
 	{
-		DrawTextWithShadow( bounds, text, "qaz", fontSize );
+		DrawTextWithShadow( bounds, text, Theme.Font, fontSize );
 	}
 
 	public static void DrawTextWithShadow( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
 	{
-		DrawTextWithShadow( bounds, text, "qaz", fontSize, color );
+		DrawTextWithShadow( bounds, text, Theme.Font, fontSize, color );
 	}
 
 	public static void DrawTextWithShadow( Rectangle bounds, string text, string fontFamily, float fontSize )
@@ -312,7 +310,7 @@ partial class Graphics
 	public static void DrawCharacter( Rectangle bounds, Texture texture, Rectangle atlasBounds, Vector4 color )
 	{
 		var flags = GraphicsFlags.UseSdf;
-		if ( bounds.Size.Length > 16f )
+		if ( bounds.Size.Length > 20f )
 			flags |= GraphicsFlags.HighDistMul;
 
 		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
