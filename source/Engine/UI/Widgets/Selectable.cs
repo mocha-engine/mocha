@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Selectable : Button
 {
@@ -13,7 +13,7 @@ internal class Selectable : Button
 		Vector4 colorA = new( 0, 0, 0, 0.1f );
 		Vector4 colorB = new( 0, 0, 0, 0.2f );
 
-		Vector4 border = ITheme.Current.Border;
+		Vector4 border = Theme.Border;
 
 		if ( InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
 		{
@@ -30,7 +30,7 @@ internal class Selectable : Button
 			}
 			else
 			{
-				Graphics.DrawRect( Bounds.Shrink( new( 1f, 4f ) ), Colors.Accent );
+				Graphics.DrawRect( Bounds.Shrink( new( 1f, 4f ) ), Theme.Accent );
 				Graphics.DrawRect( Bounds.Shrink( new( 1f, 4f ) ),
 					colorA * 0.5f,
 					colorB * 0.5f,

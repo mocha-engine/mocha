@@ -1,6 +1,4 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 [Flags]
 public enum RoundingFlags
@@ -20,7 +18,7 @@ public enum RoundingFlags
 
 public static partial class Graphics
 {
-	internal static PanelRenderer PanelRenderer { get; set; }
+	internal static UIEntity PanelRenderer { get; set; }
 
 	private static GraphicsFlags GetRoundedGraphicsFlags( RoundingFlags roundingFlags )
 	{

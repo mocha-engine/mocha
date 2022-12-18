@@ -1,6 +1,4 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 partial class Graphics
 {
@@ -142,6 +140,8 @@ partial class Graphics
 				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
 				fontData = fontAwesome.Data;
 				fontTexture = fontAwesome.Texture;
+
+				x += 4;
 			}
 
 			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
@@ -211,7 +211,7 @@ partial class Graphics
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize )
 	{
-		DrawText( bounds, text, fontFamily, fontSize, ITheme.Current.TextColor );
+		DrawText( bounds, text, fontFamily, fontSize, Theme.TextColor );
 	}
 
 	public static void DrawTextWithShadow( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
@@ -235,7 +235,7 @@ partial class Graphics
 
 	public static void DrawTextWithShadow( Rectangle bounds, string text, string fontFamily, float fontSize )
 	{
-		DrawTextWithShadow( bounds, text, fontFamily, fontSize, ITheme.Current.TextColor );
+		DrawTextWithShadow( bounds, text, fontFamily, fontSize, Theme.TextColor );
 	}
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
@@ -304,6 +304,12 @@ partial class Graphics
 			}
 
 			x += (float)glyph.Advance * fontSize;
+
+			// HACK HACK cont.
+			if ( c > FontAwesome.IconMin )
+			{
+				x += 4;
+			}
 		}
 	}
 

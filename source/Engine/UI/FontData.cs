@@ -1,5 +1,5 @@
 ﻿using System.Text.Json.Serialization;
-namespace Mocha.Engine.Editor;
+namespace Mocha.UI;
 
 public class Font
 {

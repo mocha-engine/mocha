@@ -1,13 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
-
-internal enum Dock
-{
-	None,
-	Left,
-	Right,
-	Bottom,
-	Top
-}
+﻿namespace Mocha.UI;
 
 internal class Menu : Widget
 {
@@ -39,6 +30,13 @@ internal class Menu : Widget
 			CreateUI();
 			IsDirty = false;
 		}
+
+		var colorA = Theme.BackgroundColor;
+		colorA.W = 0f;
+		var colorB = Theme.BackgroundColor;
+		colorB.W = 1f;
+
+		Graphics.DrawRect( RootLayout.Bounds, colorA, colorB );
 	}
 
 	[Event.Window.Resized]

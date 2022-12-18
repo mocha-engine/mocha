@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Widget
 {
@@ -9,6 +9,9 @@ internal class Widget
 
 	public BaseLayout Layout { get; set; }
 	public Widget? Parent { get; set; }
+	public List<Widget> Children => All.Where( x => x.Parent == this ).ToList();
+	public List<BaseLayout> Layouts => BaseLayout.All.Where( x => x.Parent == this ).ToList();
+
 	public int ZIndex { get => (Parent?.ZIndex ?? 0) + zIndex; set => zIndex = value; }
 	public bool Visible { get => (Parent?.Visible ?? true) && visible; set => visible = value; }
 
@@ -40,6 +43,9 @@ internal class Widget
 		OnDelete();
 		Layout?.Remove( this );
 		All?.Remove( this );
+
+		Children.ForEach( x => x.Delete() );
+		Layouts.ForEach( x => x.Delete() );
 	}
 
 	internal virtual void Render()

@@ -1,7 +1,7 @@
-﻿namespace Mocha.Renderer.UI;
+﻿namespace Mocha.UI;
 
 [Icon( FontAwesome.Square ), Title( "UI" )]
-public partial class PanelRenderer : ModelEntity
+public partial class UIEntity : ModelEntity
 {
 	public AtlasBuilder AtlasBuilder { get; set; }
 	private Material Material { get; set; }
@@ -9,10 +9,9 @@ public partial class PanelRenderer : ModelEntity
 
 	private bool IsDirty { get; set; }
 
-	public PanelRenderer()
+	public UIEntity()
 	{
 		AtlasBuilder = new();
-
 		Material = new( "content/core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes, AtlasBuilder.Texture, sampler: Sampler.Anisotropic );
 	}
 

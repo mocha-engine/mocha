@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Dropdown : Button
 {
@@ -64,16 +64,16 @@ internal class Dropdown : Button
 
 		var iconBackgroundBounds = new Rectangle( iconBounds.X - 8, iconBounds.Y, 0, 0 ).Expand( 6 );
 		iconBackgroundBounds.Size = new( 40, 28 );
-		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.ButtonBgB * 0.1f, RoundingFlags.Right );
+		Graphics.DrawRect( iconBackgroundBounds, Theme.ButtonBgB * 0.1f, RoundingFlags.Right );
 
 		iconBackgroundBounds.Height = Bounds.Height;
 		iconBackgroundBounds.Y = Bounds.Y;
 		iconBackgroundBounds = iconBackgroundBounds.Shrink( 1f );
 		iconBackgroundBounds.X -= 1;
 		iconBackgroundBounds.Width = 1f;
-		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.Border );
+		Graphics.DrawRect( iconBackgroundBounds, Theme.Border );
 		iconBackgroundBounds.X -= 1;
-		Graphics.DrawRect( iconBackgroundBounds, ITheme.Current.ButtonBgA );
+		Graphics.DrawRect( iconBackgroundBounds, Theme.ButtonBgA );
 
 		foreach ( Selectable? option in options )
 		{
@@ -99,15 +99,15 @@ internal class Dropdown : Button
 
 		if ( DrawOptions )
 		{
-			Vector4 colorA = ITheme.Current.ButtonBgA;
-			Vector4 colorB = ITheme.Current.ButtonBgB;
-			Vector4 border = ITheme.Current.Border;
+			Vector4 colorA = Theme.ButtonBgA;
+			Vector4 colorB = Theme.ButtonBgB;
+			Vector4 border = Theme.Border;
 
 			var optionBounds = Bounds;
 			optionBounds.Position += new Vector2( 0, GetDesiredSize().Y - 1 );
 			optionBounds.Size = optionBounds.Size.WithY( GetDesiredSize().Y * options.Count );
 
-			Graphics.DrawShadow( optionBounds, 4f, ITheme.Current.ShadowOpacity );
+			Graphics.DrawShadow( optionBounds, 4f, Theme.ShadowOpacity );
 			Graphics.DrawRect( optionBounds, border, RoundingFlags.Bottom );
 			Graphics.DrawRect( optionBounds.Shrink( 1f ),
 					colorA,
@@ -125,9 +125,9 @@ internal class Dropdown : Button
 					var b = Bounds.Shrink( 10f );
 					b.Y = option.Bounds.Y;
 					b.Height = 1f;
-					Graphics.DrawRect( b, ITheme.Current.ButtonBgB, RoundingFlags.All );
+					Graphics.DrawRect( b, Theme.ButtonBgB, RoundingFlags.All );
 					b.Y += 1f;
-					Graphics.DrawRect( b, ITheme.Current.ButtonBgA, RoundingFlags.All );
+					Graphics.DrawRect( b, Theme.ButtonBgA, RoundingFlags.All );
 				}
 			}
 

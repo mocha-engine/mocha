@@ -1,4 +1,4 @@
-﻿namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 
 internal class Label : Widget
 {
@@ -14,7 +14,7 @@ internal class Label : Widget
 		}
 	}
 
-	public Vector4 Color { get; set; } = ITheme.Current.TextColor;
+	public Vector4 Color { get; set; } = Theme.TextColor;
 	public float FontSize { get; set; } = 12;
 	public string FontFamily { get; set; } = Theme.Font;
 

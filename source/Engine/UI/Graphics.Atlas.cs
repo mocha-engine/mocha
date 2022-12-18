@@ -1,6 +1,4 @@
-﻿using Mocha.Renderer.UI;
-
-namespace Mocha.Engine.Editor;
+﻿namespace Mocha.UI;
 partial class Graphics
 {
 	internal static Texture UITexture { get; set; }
