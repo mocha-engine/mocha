@@ -57,6 +57,9 @@ void Model::UploadMesh( Mesh& mesh )
 
 void Model::AddMesh( InteropArray vertices, InteropArray indices, Material* material )
 {
+	if ( vertices.size == 0 )
+		return;
+
 	Mesh mesh( vertices, indices, *material );
 	UploadMesh( mesh );
 }
