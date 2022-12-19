@@ -29,6 +29,11 @@ public static partial class Event
 		events.AddRange( attributes );
 	}
 
+	public static void Unregister( object obj )
+	{
+		events.RemoveAll( x => x.Object == obj );
+	}
+
 	public static void RegisterStatics()
 	{
 		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes() )

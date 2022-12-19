@@ -19,6 +19,7 @@ internal class Menu : Widget
 
 	internal void Clear()
 	{
+		DeleteChildren();
 		RootLayout?.Delete();
 		RootLayout = null;
 	}
@@ -31,12 +32,10 @@ internal class Menu : Widget
 			IsDirty = false;
 		}
 
-		var colorA = Theme.BackgroundColor;
-		colorA.W = 0f;
-		var colorB = Theme.BackgroundColor;
-		colorB.W = 1f;
+		var color = Theme.BackgroundColor;
+		color.W = 0.75f;
 
-		Graphics.DrawRect( RootLayout.Bounds, colorA, colorB );
+		Graphics.DrawRect( RootLayout.Bounds, color );
 	}
 
 	[Event.Window.Resized]

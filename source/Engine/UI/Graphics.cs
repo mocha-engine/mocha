@@ -109,12 +109,15 @@ public static partial class Graphics
 	internal static void DrawTexture( Rectangle bounds, Texture texture, Vector4 tint, GraphicsFlags flags = GraphicsFlags.UseRawImage )
 	{
 		var texturePos = PanelRenderer.AtlasBuilder.AddOrGetTexture( texture );
-		var textureSize = texture.Size;
+		var textureSize = PanelRenderer.AtlasBuilder.Texture.Size;
 
 		var texBounds = new Rectangle( texturePos, texture.Size );
 
 		// Convert to [0..1] normalized space
 		texBounds /= textureSize;
+
+		// Flip y axis
+		texBounds.Y = 1.0f - texBounds.Y;
 
 		PanelRenderer.AddRectangle( bounds, texBounds, screenPxRange: 0, tint, tint, tint, tint, flags );
 	}

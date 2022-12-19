@@ -15,10 +15,10 @@ internal class Label : Widget
 	}
 
 	public Vector4 Color { get; set; } = Theme.TextColor;
-	public float FontSize { get; set; } = 12;
+	public float FontSize { get; set; } = Theme.FontSize;
 	public string FontFamily { get; set; } = Theme.Font;
 
-	internal Label( string text, float fontSize = 12, string fontFamily = Theme.Font ) : base()
+	internal Label( string text, float fontSize = Theme.FontSize, string fontFamily = Theme.Font ) : base()
 	{
 		FontSize = fontSize;
 		Text = text;

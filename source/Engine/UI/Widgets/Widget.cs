@@ -14,6 +14,7 @@ internal class Widget
 
 	public int ZIndex { get => (Parent?.ZIndex ?? 0) + zIndex; set => zIndex = value; }
 	public bool Visible { get => (Parent?.Visible ?? true) && visible; set => visible = value; }
+	public bool IsDeleted { get; set; }
 
 	public PanelInputFlags InputFlags { get; set; }
 
@@ -41,9 +42,17 @@ internal class Widget
 	internal void Delete()
 	{
 		OnDelete();
+
+		IsDeleted = true;
 		Layout?.Remove( this );
 		All?.Remove( this );
+		Event.Unregister( this );
 
+		DeleteChildren();
+	}
+
+	internal void DeleteChildren()
+	{
 		Children.ForEach( x => x.Delete() );
 		Layouts.ForEach( x => x.Delete() );
 	}

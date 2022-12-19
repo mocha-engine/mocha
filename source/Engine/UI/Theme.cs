@@ -2,7 +2,9 @@
 
 static class Theme
 {
-	public const string Font = "micross";
+	public const string Font = "sourcesanspro";
+	public const float FontSize = 14;
+	public const float ShadowOpacity = 0.25f;
 
 	public static Vector4 TransparentGray { get; } = MathX.GetColor( "#77ABB2BF" );
 
@@ -19,6 +21,4 @@ static class Theme
 	public static Vector4 ButtonBgA { get; } = MathX.GetColor( "#53595b" );
 	public static Vector4 ButtonBgB { get; } = MathX.GetColor( "#3b3e42" );
 	public static Vector4 Border { get; } = MathX.GetColor( "#551a1c20" );
-
-	public static float ShadowOpacity { get; } = 0.5f;
 }

@@ -4,7 +4,7 @@ internal class Button : Widget
 {
 	public Action OnClick;
 	public Vector2 TextAnchor = new Vector2( 0.5f, 0.5f );
-	private Vector2 Padding => new Vector2( 20, 15 );
+	private Vector2 Padding => new Vector2( 20, 20 );
 
 	public string Text { get; set; } = "";
 
@@ -65,7 +65,7 @@ internal class Button : Widget
 		var labelBounds = Bounds;
 		labelBounds.X = Bounds.X + ((Bounds.Width - (Padding.X * 2.0f) - Graphics.MeasureText( Text ).X) * TextAnchor.X);
 		labelBounds.X += Padding.X;
-		labelBounds.Y = Bounds.Y + (Padding.Y) - 8;
+		labelBounds.Y = Bounds.Y + (Padding.Y) - 10;
 
 		Graphics.DrawText( labelBounds, Text );
 	}
