@@ -15,6 +15,7 @@ public class Editor
 	static bool drawPhysicsTestWindow = false;
 	static bool drawInputWindow = false;
 	static bool drawPlayerWindow = false;
+	static bool drawViewmodelWindow = false;
 
 	public static void Draw()
 	{
@@ -40,6 +41,41 @@ public class Editor
 
 		if ( drawPlayerWindow )
 			DrawPlayerWindow();
+
+		if ( drawViewmodelWindow )
+			DrawViewmodelWindow();
+	}
+
+	private static void DrawViewmodelWindow()
+	{
+		if ( ImGui.Begin( "Viewmodel" ) )
+		{
+			var player = Player.Local;
+			var viewModel = player.ViewModel;
+
+			void DrawOffset( ref ViewModelOffset offset )
+			{
+				offset.Position = ImGui.DragFloat3( $"Position##{offset.GetHashCode()}", offset.Position );
+				offset.EulerRotation = ImGui.DragFloat3( $"Rotation##{offset.GetHashCode()}", offset.EulerRotation );
+			}
+
+			foreach ( var key in viewModel.Offsets.Keys )
+			{
+				var offset = viewModel.Offsets[key];
+
+				if ( ImGui.CollapsingHeader( key ) )
+				{
+					var offsetCopy = offset;
+
+					DrawOffset( ref offsetCopy );
+
+					viewModel.Offsets[key] = offsetCopy;
+				}
+			}
+
+		}
+
+		ImGui.End();
 	}
 
 	private static void DrawMenuBar()
@@ -68,6 +104,9 @@ public class Editor
 
 				if ( ImGui.MenuItem( "Player" ) )
 					drawPlayerWindow = !drawPlayerWindow;
+
+				if ( ImGui.MenuItem( "Viewmodel" ) )
+					drawViewmodelWindow = !drawViewmodelWindow;
 
 				ImGui.EndMenu();
 			}

@@ -2,7 +2,7 @@
 
 static class Theme
 {
-	public const string Font = "sourcesanspro";
+	public const string Font = "Inter-Regular";
 	public const float FontSize = 14;
 	public const float ShadowOpacity = 0.25f;
 

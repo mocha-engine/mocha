@@ -1,4 +1,6 @@
-﻿namespace Mocha.UI;
+﻿using Mocha.Common.Serialization;
+
+namespace Mocha.UI;
 
 partial class Graphics
 {
@@ -91,8 +93,10 @@ partial class Graphics
 		}
 
 		var loadedFont = new CachedFont();
-		loadedFont.Texture = new Texture( $"core/fonts/baked/{fontName}.mtex" );
-		loadedFont.Data = FileSystem.Game.Deserialize<Font.Data>( $"core/fonts/baked/{fontName}.json" );
+		loadedFont.Texture = new Texture( $"core/fonts/{fontName}.mtex" );
+
+		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/{fontName}.mfnt" );
+		loadedFont.Data = Serializer.Deserialize<MochaFile<Font.Data>>( fileBytes ).Data;
 
 		return CachedFonts[fontName] = loadedFont;
 	}

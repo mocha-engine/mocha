@@ -13,13 +13,15 @@ public class Player : ModelEntity
 	public Rotation EyeRotation => Input.Rotation;
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );
 
-	private QuakeWalkController WalkController { get; set; }
+	public QuakeWalkController WalkController { get; private set; }
 
 	public bool IsGrounded => WalkController.IsGrounded;
 	public BaseEntity GroundEntity => WalkController.GroundEntity;
 
 	public Vector3 LocalEyePosition { get; set; }
 	public Rotation LocalEyeRotation { get; set; }
+
+	public ViewModel ViewModel { get; set; }
 
 	protected override void Spawn()
 	{
@@ -29,6 +31,8 @@ public class Player : ModelEntity
 		Friction = 1.0f;
 		Mass = 100f;
 		IgnoreRigidbodyRotation = true;
+
+		ViewModel = new();
 
 		Respawn();
 	}
@@ -45,6 +49,7 @@ public class Player : ModelEntity
 	public override void Update()
 	{
 		UpdateCamera();
+
 		WalkController.Update();
 
 		//
@@ -60,6 +65,7 @@ public class Player : ModelEntity
 			ball.Restitution = 1.0f;
 			ball.Friction = 1.0f;
 			ball.Mass = 10.0f;
+
 			ball.SetSpherePhysics( 0.5f, false );
 		}
 

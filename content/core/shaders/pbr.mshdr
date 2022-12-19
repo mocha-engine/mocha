@@ -187,7 +187,7 @@ float ambient()
 
 vec3 sampleTexture( sampler2D target )
 {
-	return texture( target, vs_out.vTexCoord.xy * vec2( -1, 1 ) ).rgb;
+	return texture( target, vs_out.vTexCoord.xy ).rgb;
 }
 
 void main()
@@ -201,7 +201,7 @@ void main()
 	vec3 vNormalTS = sampleTexture( normalTexture );
 	vNormalTS = vNormalTS * 2.0 - 1.0;
 
-	// If we don't have a normal map, use the vertex normal
+	// If we don't have a normal map, use the vertex normal ( calculated in tangent space )
 	if ( vNormalTS.z > 0 )
 		vNormalTS = vs_out.vNormalTS;
 

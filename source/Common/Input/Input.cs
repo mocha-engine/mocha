@@ -17,7 +17,7 @@ public static partial class Input
 
 	public static Rotation Rotation { get; private set; } = Rotation.Identity;
 
-	private static float DegreesPerPixel = 10.0f;
+	private static float DegreesPerPixel = 20.0f;
 
 	public static Vector3 Direction { get; private set; }
 

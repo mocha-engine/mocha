@@ -39,6 +39,16 @@ public class BaseEntity : IEntity
 		set => Glue.Entities.SetName( NativeHandle, value );
 	}
 
+	public bool IsViewModel
+	{
+		set => Glue.Entities.SetViewmodel( NativeHandle, value );
+	}
+
+	public bool IsUI
+	{
+		set => Glue.Entities.SetUI( NativeHandle, value );
+	}
+
 	public BaseEntity()
 	{
 		All.Add( this );
