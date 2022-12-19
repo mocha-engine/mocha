@@ -308,7 +308,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
 	{
-		return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
+		return TraceResult::Empty( traceInfo.startPosition, traceInfo.endPosition );
 	}
 
 	// We might have hit something, let's do some filtering
@@ -360,7 +360,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 		return traceResult;
 	}
 
-	return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
+	return TraceResult::Empty( traceInfo.startPosition, traceInfo.endPosition );
 }
 
 TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
@@ -384,7 +384,7 @@ TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
 	{
-		return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
+		return TraceResult::Empty( traceInfo.startPosition, traceInfo.endPosition );
 	}
 
 	// We might have hit something, let's do some filtering
@@ -433,10 +433,8 @@ TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 		// TODO: Replace with allSolid
 		traceResult.endedSolid = false;
 
-		traceResult.boobies = FindEntityHandleForBodyId( result.mBodyID2 );
-
 		return traceResult;
 	}
 
-	return TraceResult{ false, traceInfo.startPosition, traceInfo.endPosition, 1.0f, -1, false, false };
+	return TraceResult::Empty( traceInfo.startPosition, traceInfo.endPosition );
 }

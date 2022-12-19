@@ -13,7 +13,7 @@ public struct TraceResult
 	public bool startedSolid;
 	public bool endedSolid;
 	public uint entityHandle;
-	public uint boobies;
+	public uint pad0;
 }
 
 [StructLayout( LayoutKind.Sequential )]
