@@ -46,7 +46,7 @@ internal class SettingsMenu : SubMenu
 		RootLayout.Add( new Label( $"Master Volume" ) );
 		RootLayout.Add( new Button( "100" ), true );
 
-		RootLayout.AddSpacing( Screen.Size.Y / 2f - 230 );
+		RootLayout.AddSpacing( Screen.Size.Y / 2f - 250f );
 
 		RootLayout.Add( new Button( $"{FontAwesome.FloppyDisk} Save" ), true );
 	}
