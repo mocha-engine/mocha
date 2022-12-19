@@ -11,8 +11,13 @@ public partial class UIEntity : ModelEntity
 
 	public UIEntity()
 	{
+		IsUI = true;
 		AtlasBuilder = new();
-		Material = new( "content/core/shaders/ui/ui.mshdr", UIVertex.VertexAttributes, AtlasBuilder.Texture, sampler: Sampler.Anisotropic );
+		Material = new( "content/core/shaders/ui/ui.mshdr",
+				 UIVertex.VertexAttributes,
+				 AtlasBuilder.Texture,
+				 sampler: Sampler.Anisotropic,
+				 ignoreDepth: true );
 	}
 
 	public void NewFrame()

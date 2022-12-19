@@ -22,6 +22,7 @@ public class FileSystem
 			case ".mmdl":
 			case ".mmat":
 			case ".mtex":
+			case ".mfnt":
 				path += "_c"; // Load compiled assets
 				break;
 		}

@@ -135,6 +135,31 @@ public partial struct Rotation : IEquatable<Rotation>
 		return result;
 	}
 
+	public static Vector3 operator *( Vector3 v, Rotation r )
+	{
+		return r * v;
+	}
+
+	public static Rotation operator *( Rotation a, float b )
+	{
+		return new Rotation( a.X * b, a.Y * b, a.Z * b, a.W * b );
+	}
+
+	public static Rotation operator -( Rotation a, Rotation b )
+	{
+		return new Rotation( a.X - b.X, a.Y - b.Y, a.Z - b.Z, a.W - b.W );
+	}
+
+	public static Rotation operator +( Rotation a, Rotation b )
+	{
+		return new Rotation( a.X + b.X, a.Y + b.Y, a.Z + b.Z, a.W + b.W );
+	}
+
+	public static Rotation operator -( Rotation a )
+	{
+		return new Rotation( -a.X, -a.Y, -a.Z, -a.W );
+	}
+
 	private static bool IsEqualUsingDot( float dot )
 	{
 		return dot > 1.0f - float.Epsilon;
@@ -219,12 +244,51 @@ public partial struct Rotation : IEquatable<Rotation>
 
 		sb.Append( "( " );
 
-		sb.Append( $"Pitch: {euler.X:G2}, " );
-		sb.Append( $"Yaw: {euler.Y:G2}, " );
-		sb.Append( $"Roll: {euler.Z:G2}" );
+		sb.Append( $"Pitch: {euler.X}, " );
+		sb.Append( $"Yaw: {euler.Y}" );
+		sb.Append( $"Roll: {euler.Z}" );
 
 		sb.Append( " )" );
 
 		return sb.ToString();
+	}
+
+	public Rotation LerpTo( Rotation b, float t )
+	{
+		return Rotation.Lerp( this, b, t );
+	}
+
+	private static Rotation Slerp( Rotation a, Rotation b, float t )
+	{
+		// Calculate the dot product of the quaternions
+		var dot = Rotation.Dot( a, b );
+
+		// Clamp the dot product to the range [-1, 1]
+		dot = dot.Clamp( -1, 1 );
+
+		// If the dot product is negative, negate one of the quaternions to ensure that we interpolate
+		// in the shortest possible arc.
+		if ( dot < 0 )
+		{
+			b = -b;
+			dot = -dot;
+		}
+
+		// Calculate the angle between the quaternions
+		var theta = MathF.Acos( dot ) * t;
+
+		// Calculate the interpolated quaternion
+		var q = (b - a * dot).Normal;
+		return a * MathF.Cos( theta ) + q * MathF.Sin( theta );
+	}
+
+	public static Rotation Lerp( Rotation a, Rotation b, float t )
+	{
+		return Slerp( a, b, t );
+	}
+
+	public static Rotation From( Vector3 eulerAngles )
+	{
+		return From( eulerAngles.X, eulerAngles.Y, eulerAngles.Z );
 	}
 }
