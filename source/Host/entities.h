@@ -1,7 +1,7 @@
 #pragma once
 #include <baseentity.h>
-#include <edict.h>
 #include <camera.h>
+#include <edict.h>
 #include <globalvars.h>
 #include <modelentity.h>
 
@@ -29,6 +29,28 @@ namespace Entities
 		spdlog::trace( "Created model entity" );
 
 		return g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
+	}
+
+	inline void SetViewmodel( uint32_t handle, bool isViewmodel )
+	{
+		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto transform = entity->GetTransform();
+
+		if ( isViewmodel )
+			entity->AddFlag( ENTITY_VIEWMODEL );
+		else
+			entity->RemoveFlag( ENTITY_VIEWMODEL );
+	}
+
+	inline void SetUI( uint32_t handle, bool isUI )
+	{
+		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto transform = entity->GetTransform();
+
+		if ( isUI )
+			entity->AddFlag( ENTITY_UI );
+		else
+			entity->RemoveFlag( ENTITY_UI );
 	}
 
 	inline void SetPosition( uint32_t handle, Vector3 position )
@@ -202,7 +224,7 @@ namespace Entities
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
 			return;
 		}
-		
+
 		// Convert data to points
 		Vector3* vertices = ( Vector3* )vertexData;
 		size_t vertCount = vertexSize / sizeof( Vector3 );

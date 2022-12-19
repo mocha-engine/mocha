@@ -7,7 +7,9 @@
 enum EntityFlags : int
 {
 	ENTITY_MANAGED = 1 << 0,
-	ENTITY_RENDERABLE = 1 << 1
+	ENTITY_RENDERABLE = 1 << 1,
+	ENTITY_VIEWMODEL = 1 << 2,
+	ENTITY_UI = 1 << 3,
 };
 
 class Camera;
@@ -40,6 +42,7 @@ public:
 	inline EntityFlags GetFlags() { return ( EntityFlags )m_flags; }
 	inline void SetFlags( EntityFlags flags ) { m_flags = flags; }
 	inline void AddFlag( EntityFlags flags ) { m_flags = m_flags | flags; }
+	inline void RemoveFlag( EntityFlags flags ) { m_flags = m_flags & ~flags; }
 	inline bool HasFlag( EntityFlags flag ) { return ( m_flags & flag ) != 0; }
 
 	inline void SetType( std::string type ) { m_type = type; }

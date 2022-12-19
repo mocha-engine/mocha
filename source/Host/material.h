@@ -55,8 +55,9 @@ public:
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
 	Sampler m_sampler;
+	bool m_ignoreDepth;
 
 	VertexInputDescription m_vertexInputDescription;
 
-	Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler );
+	Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler, bool ignoreDepth );
 };

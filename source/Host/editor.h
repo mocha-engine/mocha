@@ -229,6 +229,13 @@ namespace Editor
 		return VERSION_NAME;
 	}
 
+	inline Vector3 DragFloat3( const char* name, Vector3 value )
+	{
+		float v[3] = { value.x, value.y, value.z };
+		ImGui::DragFloat3( name, v );
+		return { v[0], v[1], v[2] };
+	}
+
 	//@InteropGen ignore
 	inline void Draw() {} // Do nothing - we're re-writing this in C#
 

@@ -80,7 +80,7 @@ public:
 	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
 
 	glm::mat4x4 CalculateViewProjMatrix();
-	glm::mat4x4 CalculateWorldToScreenMatrix();
+	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
 	VkExtent2D GetWindowExtent();
 };

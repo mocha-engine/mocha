@@ -6,7 +6,8 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Material::Material( const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler )
+Material::Material(
+    const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler, bool ignoreDepth )
 {
 	auto texturePtrs = textures.GetData<Texture*>();
 	m_textures = std::vector<Texture>( textures.count );
@@ -22,6 +23,7 @@ Material::Material( const char* shaderPath, InteropArray vertexAttributes, Inter
 	m_vertexInputDescription = CreateVertexDescription( attributes );
 
 	m_sampler = sampler;
+	m_ignoreDepth = ignoreDepth;
 
 	CreateResources();
 }
@@ -114,6 +116,7 @@ void Material::CreatePipeline()
 	                 .WithVertexShader( triangleVertexShader )
 	                 .WithVertexDescription( m_vertexInputDescription )
 	                 .WithLayout( m_pipelineLayout )
+	                 .WithDepthInfo( !m_ignoreDepth, !m_ignoreDepth )
 	                 .Build( device, colorFormat, depthFormat );
 }
 

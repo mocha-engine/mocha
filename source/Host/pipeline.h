@@ -1,9 +1,8 @@
 #pragma once
-#include <vkinit.h>
 #include <mesh.h>
-#include <vk_types.h>
-
 #include <vector>
+#include <vk_types.h>
+#include <vkinit.h>
 
 class PipelineBuilder
 {
@@ -29,6 +28,8 @@ private:
 
 	VkPolygonMode m_fillMode = VK_POLYGON_MODE_FILL;
 	VkCullModeFlags m_cullMode = VK_CULL_MODE_NONE;
+	bool m_depthRead = true;
+	bool m_depthWrite = true;
 
 	VkPipelineLayout m_layout;
 
@@ -37,10 +38,7 @@ private:
 public:
 	inline static PipelineFactory begin() { return PipelineFactory(); }
 
-	inline PipelineFactory()
-	{
-		m_layout = {};
-	}
+	inline PipelineFactory() { m_layout = {}; }
 
 	inline PipelineFactory WithFragmentShader( VkShaderModule fragmentShader )
 	{
@@ -78,6 +76,13 @@ public:
 		return *this;
 	}
 
+	inline PipelineFactory WithDepthInfo( bool depthRead, bool depthWrite )
+	{
+		m_depthRead = depthRead;
+		m_depthWrite = depthWrite;
+		return *this;
+	}
+
 	inline VkPipeline Build( VkDevice device, VkFormat colorFormat, VkFormat depthFormat )
 	{
 		PipelineBuilder builder;
@@ -99,7 +104,7 @@ public:
 		builder.m_vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( m_vertexDescription.bindings.size() );
 
 		builder.m_inputAssembly = VKInit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
-		builder.m_depthStencil = VKInit::DepthStencilCreateInfo( true, true, VK_COMPARE_OP_LESS_OR_EQUAL );
+		builder.m_depthStencil = VKInit::DepthStencilCreateInfo( m_depthRead, m_depthWrite, VK_COMPARE_OP_LESS_OR_EQUAL );
 
 		return builder.Build( device, colorFormat, depthFormat );
 	}
