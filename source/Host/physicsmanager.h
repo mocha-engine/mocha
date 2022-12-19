@@ -21,10 +21,10 @@
 #include <Jolt/Physics/Collision/ContactListener.h>
 #include <Jolt/Physics/Collision/ObjectLayer.h>
 #include <Jolt/Physics/Collision/RayCast.h>
-#include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
-#include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>
+#include <Jolt/Physics/Collision/Shape/SphereShape.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
 #include <Jolt/Physics/PhysicsSettings.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 #include <Jolt/RegisterTypes.h>
@@ -80,8 +80,17 @@ struct TraceResult
 	Vector3 normal;
 	bool startedSolid;
 	bool endedSolid;
+	uint32_t pad0;
 	uint32_t entityHandle;
-	uint32_t boobies;
+
+	static TraceResult Empty( Vector3 _startPosition, Vector3 _endPosition )
+	{
+		TraceResult result = { false, _startPosition, _endPosition, 1.0f, -1, false, false };
+		
+		result.entityHandle = UINT32_MAX;
+
+		return result;
+	}
 };
 
 struct TraceInfo
@@ -245,7 +254,7 @@ namespace JoltConversions
 	}
 
 	// Convert Mocha Vector3 to Jolt Float3.
-	inline JPH::Float3 MochaToJoltFloat3(Vector3 inVec3)
+	inline JPH::Float3 MochaToJoltFloat3( Vector3 inVec3 )
 	{
 		return JPH::Float3{ inVec3.x, inVec3.y, inVec3.z };
 	}
