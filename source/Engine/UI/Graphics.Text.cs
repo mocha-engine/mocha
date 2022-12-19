@@ -194,17 +194,17 @@ partial class Graphics
 		return size * scale;
 	}
 
-	public static Vector2 MeasureText( string text, float fontSize = 12 )
+	public static Vector2 MeasureText( string text, float fontSize = Theme.FontSize )
 	{
 		return MeasureText( text, Theme.Font, fontSize );
 	}
 
-	public static void DrawText( Rectangle bounds, string text, float fontSize = 12 )
+	public static void DrawText( Rectangle bounds, string text, float fontSize = Theme.FontSize )
 	{
 		DrawText( bounds, text, Theme.Font, fontSize );
 	}
 
-	public static void DrawText( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
+	public static void DrawText( Rectangle bounds, string text, Vector4 color, float fontSize = Theme.FontSize )
 	{
 		DrawText( bounds, text, Theme.Font, fontSize, color );
 	}
@@ -223,12 +223,12 @@ partial class Graphics
 		DrawText( bounds, text, fontFamily, fontSize, new Vector4( 1, 1, 1, 1 ) );
 	}
 
-	public static void DrawTextWithShadow( Rectangle bounds, string text, float fontSize = 12 )
+	public static void DrawTextWithShadow( Rectangle bounds, string text, float fontSize = Theme.FontSize )
 	{
 		DrawTextWithShadow( bounds, text, Theme.Font, fontSize );
 	}
 
-	public static void DrawTextWithShadow( Rectangle bounds, string text, Vector4 color, float fontSize = 12 )
+	public static void DrawTextWithShadow( Rectangle bounds, string text, Vector4 color, float fontSize = Theme.FontSize )
 	{
 		DrawTextWithShadow( bounds, text, Theme.Font, fontSize, color );
 	}

@@ -63,10 +63,7 @@ internal class Dropdown : Button
 		Graphics.DrawText( iconBounds, FontAwesome.CircleChevronDown );
 
 		var iconBackgroundBounds = new Rectangle( iconBounds.X - 8, iconBounds.Y, 0, 0 ).Expand( 6 );
-		iconBackgroundBounds.Size = new( 40, 28 );
-		Graphics.DrawRect( iconBackgroundBounds, Theme.ButtonBgB * 0.1f, RoundingFlags.Right );
-
-		iconBackgroundBounds.Height = Bounds.Height;
+		iconBackgroundBounds.Size = new( 40, Bounds.Height );
 		iconBackgroundBounds.Y = Bounds.Y;
 		iconBackgroundBounds = iconBackgroundBounds.Shrink( 1f );
 		iconBackgroundBounds.X -= 1;
