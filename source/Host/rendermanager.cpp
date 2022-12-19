@@ -416,13 +416,39 @@ void RenderManager::Render()
 	// Draw scene
 	vkCmdBeginRendering( cmd, &renderInfo );
 
-	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
-		// m_triangle->Render( m_camera, cmd, m_frameNumber );
+	auto viewProjMatrix = CalculateViewProjMatrix();
+	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
 
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 		if ( renderEntity != nullptr )
 		{
-			entity->Render( cmd, CalculateViewProjMatrix() );
+			if ( !renderEntity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) && !renderEntity->HasFlag( EntityFlags::ENTITY_UI ) )
+				entity->Render( cmd, viewProjMatrix );
+		}
+	} );
+
+	//
+	// Render viewmodels
+	//	
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+		if ( renderEntity != nullptr )
+		{
+			if ( renderEntity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) )
+				entity->Render( cmd, viewmodelViewProjMatrix );
+		}
+	} );
+
+	//
+	// Render UI last
+	//
+	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
+		if ( renderEntity != nullptr )
+		{
+			if ( renderEntity->HasFlag( EntityFlags::ENTITY_UI ) )
+				entity->Render( cmd, viewProjMatrix );
 		}
 	} );
 
@@ -568,11 +594,19 @@ void RenderManager::CalculateCameraMatrices( glm::mat4& viewMatrix, glm::mat4& p
 	projMatrix = glm::perspective( glm::radians( g_cameraFov ), aspect, g_cameraZNear, g_cameraZFar );
 }
 
-glm::mat4 RenderManager::CalculateWorldToScreenMatrix()
+glm::mat4 RenderManager::CalculateViewmodelViewProjMatrix()
 {
 	glm::mat4 viewMatrix, projMatrix;
 
-	CalculateCameraMatrices( viewMatrix, projMatrix );
+	auto extent = GetWindowExtent();
+	float aspect = ( float )extent.width / ( float )extent.height;
+
+	glm::vec3 up = glm::vec3( 0, 0, -1 );
+	glm::vec3 direction = glm::normalize( glm::rotate( g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = g_cameraPos.ToGLM();
+
+	viewMatrix = glm::lookAt( position, position + direction, up );
+	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, g_cameraZNear, g_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }
@@ -581,7 +615,15 @@ glm::mat4 RenderManager::CalculateViewProjMatrix()
 {
 	glm::mat4 viewMatrix, projMatrix;
 
-	CalculateCameraMatrices( viewMatrix, projMatrix );
+	auto extent = GetWindowExtent();
+	float aspect = ( float )extent.width / ( float )extent.height;
+
+	glm::vec3 up = glm::vec3( 0, 0, -1 );
+	glm::vec3 direction = glm::normalize( glm::rotate( g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = g_cameraPos.ToGLM();
+
+	viewMatrix = glm::lookAt( position, position + direction, up );
+	projMatrix = glm::perspective( glm::radians( g_cameraFov ), aspect, g_cameraZNear, g_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }

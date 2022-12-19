@@ -11,10 +11,40 @@ private:
 	AllocatedImage m_image;
 	VkImageView m_imageView;
 
-	inline void CalcMipSize( uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, uint32_t* outWidth, uint32_t* outHeight )
+	inline int GetTexelSize( VkFormat format )
+	{
+		switch ( format )
+		{
+		case VkFormat::VK_FORMAT_R8G8B8A8_SRGB:
+		case VkFormat::VK_FORMAT_R8G8B8A8_UNORM:
+			return 4;
+			break;
+		case VkFormat::VK_FORMAT_BC3_SRGB_BLOCK:
+		case VkFormat::VK_FORMAT_BC3_UNORM_BLOCK:
+			return 1;
+			break;
+		case VkFormat::VK_FORMAT_BC5_UNORM_BLOCK:
+		case VkFormat::VK_FORMAT_BC5_SNORM_BLOCK:
+			return 1;
+			break;
+		}
+
+		assert( false && "Format is not supported." ); // Format is not supported
+		return -1;
+	}
+
+	inline void GetMipDimensions(
+	    uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, uint32_t* outWidth, uint32_t* outHeight )
 	{
 		*outWidth = inWidth >> mipLevel;
 		*outHeight = inHeight >> mipLevel;
+	}
+
+	inline int CalcMipSize( uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, VkFormat format )
+	{
+		uint32_t outWidth, outHeight;
+		GetMipDimensions( inWidth, inHeight, mipLevel, &outWidth, &outHeight );
+		return outWidth * outHeight * GetTexelSize( format );
 	}
 
 public:

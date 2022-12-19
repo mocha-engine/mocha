@@ -4,9 +4,15 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropArray mipData, int imageFormat )
+void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, InteropArray mipData, int _imageFormat )
 {
-	VkDeviceSize imageSize = mipData.size;
+	VkFormat imageFormat = ( VkFormat )_imageFormat;
+	VkDeviceSize imageSize = 0;
+	
+	for ( int i = 0; i < mipCount; ++i )
+	{
+		imageSize += CalcMipSize( width, height, i, imageFormat );
+	}
 
 	AllocatedBuffer stagingBuffer =
 	    g_renderManager->CreateBuffer( imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
@@ -21,8 +27,8 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 	imageExtent.height = height;
 	imageExtent.depth = 1;
 
-	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo( ( VkFormat )imageFormat,
-	    VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
+	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo(
+	    imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, mipCount );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
@@ -65,14 +71,14 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 			{
 				// Calculate the width & height of this mip
 				uint32_t mipWidth, mipHeight;
-				CalcMipSize( width, height, i, &mipWidth, &mipHeight );
-				bufferOffset += mipWidth * mipHeight;
+				GetMipDimensions( width, height, i, &mipWidth, &mipHeight );
+				bufferOffset += CalcMipSize( width, height, i, imageFormat );
 			}
 
 			spdlog::trace( "Offset for mip {} on texture size {}x{} is {}", mip, width, height, bufferOffset );
 
 			VkExtent3D mipExtent;
-			CalcMipSize( width, height, mip, &mipExtent.width, &mipExtent.height );
+			GetMipDimensions( width, height, mip, &mipExtent.width, &mipExtent.height );
 			mipExtent.depth = 1;
 
 			VkBufferImageCopy copyRegion = {};
