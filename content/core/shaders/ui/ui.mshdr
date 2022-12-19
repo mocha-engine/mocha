@@ -141,12 +141,12 @@ void main()
             float median = max(min(r, g), min(max(r, g), b));
             float signed_dist = median;
 
-            float mul = fs_in.vPanelSize.y / 4.0;
-            signed_dist *= mul;
+            float mul = fs_in.vPanelSize.y / 2.0;
 
             if ( (fs_flags & HighDistMul) == HighDistMul )
-                signed_dist /= 2.0;
+                mul = fs_in.vPanelSize.y / 16.0;
 
+            signed_dist *= mul;
             opacity = clamp( signed_dist, 0.0, 1.0 );
         }
         
