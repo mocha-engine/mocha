@@ -17,7 +17,7 @@ public static partial class Input
 
 	public static Rotation Rotation { get; private set; } = Rotation.Identity;
 
-	private static float DegreesPerPixel = 0.1f;
+	private static float DegreesPerPixel = 10.0f;
 
 	public static Vector3 Direction { get; private set; }
 
@@ -33,8 +33,8 @@ public static partial class Input
 		// Rotation
 		//
 		var euler = Rotation.ToEulerAngles();
-		euler.X += MouseDelta.Y * MouseSensitivity * DegreesPerPixel; // Pitch
-		euler.Y += MouseDelta.X * MouseSensitivity * DegreesPerPixel; // Yaw
+		euler.X += MouseDelta.Y * MouseSensitivity * Time.Delta * DegreesPerPixel; // Pitch
+		euler.Y += MouseDelta.X * MouseSensitivity * Time.Delta * DegreesPerPixel; // Yaw
 		Rotation = Rotation.From( euler.X.Clamp( -89, 89 ), euler.Y, 0 );
 
 		//
