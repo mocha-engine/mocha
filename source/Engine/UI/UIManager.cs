@@ -2,12 +2,14 @@
 
 internal partial class UIManager
 {
-	public bool Debug { get; set; } = true;
+	public bool Debug { get; set; } = false;
 
 	internal static UIManager Instance { get; private set; }
 
 	private Menu MainMenu { get; }
 	private Menu? SubMenu { get; set; }
+
+	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex" );
 
 	internal UIManager()
 	{
@@ -30,6 +32,10 @@ internal partial class UIManager
 		UpdateWidgets();
 
 		Graphics.PanelRenderer.NewFrame();
+		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) ), Crosshair );
+
+		var tr = Cast.Ray( Player.Local.EyeRay, 10f ).Ignore( Player.Local ).Run();
+		Graphics.DrawText( new Rectangle( 512, 512 ), tr.Entity?.Name ?? "None" );
 		RenderWidgets();
 	}
 
