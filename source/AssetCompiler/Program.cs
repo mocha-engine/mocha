@@ -124,7 +124,7 @@ public static class Program
 		}
 	}
 
-	private static void CompileFile( string path )
+	public static void CompileFile( string path )
 	{
 		var fileExtension = Path.GetExtension( path );
 
