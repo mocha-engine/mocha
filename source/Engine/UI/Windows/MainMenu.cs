@@ -27,13 +27,18 @@ internal class MainMenu : Menu
 
 		RootLayout.AddSpacing( 16f );
 
-		RootLayout.Add( new Button( "Singleplayer", () => UIManager.SetSubMenu( null ) ), true );
+		RootLayout.Add( new Button( "Singleplayer", () =>
+		{
+			Delete();
+			UIManager.SetSubMenu( null );
+		} ), true );
+
 		RootLayout.Add( new Button( "Server Browser", () => UIManager.SetSubMenu( new ServerBrowserMenu() ) ), true );
 		RootLayout.Add( new Button( "Settings", () => UIManager.SetSubMenu( new SettingsMenu() ) ), true );
 		RootLayout.Add( new Button( "Quit", () => Environment.Exit( 0 ) ), true );
 
-		RootLayout.AddSpacing( Screen.Size.Y / 2f - 180f );
+		RootLayout.AddSpacing( Screen.Size.Y / 2f - 200f );
 
-		RootLayout.Add( new Label( $"{FontAwesome.Copyright} 2022 Alex Guthrie", 12 ) );
+		RootLayout.Add( new Label( $"{FontAwesome.Copyright} 2022 Alex Guthrie" ) );
 	}
 }
