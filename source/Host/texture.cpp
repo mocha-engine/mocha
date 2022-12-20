@@ -8,7 +8,7 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 {
 	VkFormat imageFormat = ( VkFormat )_imageFormat;
 	VkDeviceSize imageSize = 0;
-	
+
 	for ( int i = 0; i < mipCount; ++i )
 	{
 		imageSize += CalcMipSize( width, height, i, imageFormat );
@@ -172,4 +172,15 @@ void Texture::Blit( uint32_t srcX, uint32_t srcY, uint32_t dstX, uint32_t dstY, 
 		vkCmdBlitImage( cmd, src->m_image.image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, m_image.image,
 		    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &region, VK_FILTER_NEAREST );
 	} );
+}
+
+ImTextureID Texture::GetImGuiID()
+{
+	if ( m_imGuiDescriptorSet == VK_NULL_HANDLE )
+	{
+		m_imGuiDescriptorSet = ImGui_ImplVulkan_AddTexture(
+		    g_renderManager->m_anisoSampler, GetImageView(), VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+	}
+
+	return ( ImTextureID )m_imGuiDescriptorSet;
 }
