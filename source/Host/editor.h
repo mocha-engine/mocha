@@ -1,4 +1,5 @@
 #pragma once
+#include <backends/imgui_impl_vulkan.h>
 #include <baseentity.h>
 #include <defs.h>
 #include <edict.h>
@@ -7,6 +8,7 @@
 #include <rendermanager.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
+#include <texture.h>
 #include <vulkan/vulkan.h>
 
 //@InteropGen generate class
@@ -239,6 +241,11 @@ namespace Editor
 	inline bool Selectable( const char* name )
 	{
 		return ImGui::Selectable( name );
+	}
+
+	inline void Image( Texture* texture, int x, int y )
+	{
+		ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
 	}
 
 	//@InteropGen ignore

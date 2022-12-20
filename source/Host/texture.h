@@ -1,5 +1,6 @@
 #pragma once
 #include <algorithm>
+#include <backends/imgui_impl_vulkan.h>
 #include <managedtypes.h>
 #include <spdlog/spdlog.h>
 #include <vk_types.h>
@@ -10,6 +11,8 @@ class Texture
 private:
 	AllocatedImage m_image;
 	VkImageView m_imageView;
+
+	VkDescriptorSet m_imGuiDescriptorSet;
 
 	inline int GetTexelSize( VkFormat format )
 	{
@@ -57,4 +60,7 @@ public:
 
 	//@InteropGen ignore
 	inline VkImageView GetImageView() { return m_imageView; }
+
+	//@InteropGen ignore
+	ImTextureID GetImGuiID();
 };

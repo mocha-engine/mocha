@@ -6,6 +6,9 @@ namespace Mocha.Editor;
 public class MaterialEditorWindow : EditorWindow
 {
 	private MaterialInfo? CurrentMaterial { get; set; }
+	private string CurrentPath { get; set; } = "unnamed.mmat";
+
+	private Dictionary<string, Texture> TextureCache = new();
 
 	private void DrawMaterialTexture( PropertyInfo propertyInfo )
 	{
@@ -15,12 +18,22 @@ public class MaterialEditorWindow : EditorWindow
 		ImGui.Text( name );
 		ImGui.Text( currentPath ?? "None" );
 
+		if ( currentPath != null && FileSystem.Game.Exists( currentPath ) )
+		{
+			if ( !TextureCache.ContainsKey( currentPath ) )
+				TextureCache[currentPath] = new Texture( currentPath );
+
+			ImGui.Image( TextureCache[currentPath].NativeTexture, 64, 64 );
+		}
+
 		if ( ImGui.Button( $"Replace...##{propertyInfo.GetHashCode()}" ) )
 		{
 			var openFileDialog = new OpenFileWindow();
 			openFileDialog.Filter = "*.png, *.jpg";
 			openFileDialog.OnSelected += ( path ) =>
 			{
+				path = Path.ChangeExtension( path, "mtex" );
+
 				// SetValue does not work on non-boxed struct
 				object boxed = CurrentMaterial;
 				propertyInfo.SetValue( boxed, path );
@@ -54,6 +67,8 @@ public class MaterialEditorWindow : EditorWindow
 			openFileDialog.Filter = "*.mmat";
 			openFileDialog.OnSelected += ( path ) =>
 			{
+				CurrentPath = path;
+
 				var data = File.ReadAllText( FileSystem.Game.GetAbsolutePath( path, true, true ) );
 				CurrentMaterial = JsonSerializer.Deserialize<MaterialInfo>( data );
 			};
@@ -66,7 +81,7 @@ public class MaterialEditorWindow : EditorWindow
 		if ( ImGui.Button( "Save" ) )
 		{
 			var data = JsonSerializer.Serialize<MaterialInfo>( CurrentMaterial ?? default );
-			File.WriteAllText( FileSystem.Game.GetAbsolutePath( "./temp.mmat", true, true ), data );
+			File.WriteAllText( FileSystem.Game.GetAbsolutePath( CurrentPath, true, true ), data );
 		}
 	}
 
