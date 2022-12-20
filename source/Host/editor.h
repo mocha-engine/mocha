@@ -236,6 +236,11 @@ namespace Editor
 		return { v[0], v[1], v[2] };
 	}
 
+	inline bool Selectable( const char* name )
+	{
+		return ImGui::Selectable( name );
+	}
+
 	//@InteropGen ignore
 	inline void Draw() {} // Do nothing - we're re-writing this in C#
 

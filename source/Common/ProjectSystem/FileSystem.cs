@@ -13,18 +13,21 @@ public class FileSystem
 		this.BasePath = Path.GetFullPath( relativePath, Directory.GetCurrentDirectory() );
 	}
 
-	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false )
+	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, bool ignoreCompiledFiles = false )
 	{
 		var path = Path.Combine( this.BasePath, relativePath ).NormalizePath();
 
-		switch ( Path.GetExtension( relativePath ) )
+		if ( !ignoreCompiledFiles )
 		{
-			case ".mmdl":
-			case ".mmat":
-			case ".mtex":
-			case ".mfnt":
-				path += "_c"; // Load compiled assets
-				break;
+			switch ( Path.GetExtension( relativePath ) )
+			{
+				case ".mmdl":
+				case ".mmat":
+				case ".mtex":
+				case ".mfnt":
+					path += "_c"; // Load compiled assets
+					break;
+			}
 		}
 
 		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound )
@@ -76,21 +79,30 @@ public class FileSystem
 	{
 		return Path.Combine( BasePath, filePath );
 	}
+
 	public IEnumerable<string> GetFiles( string directory )
 	{
 		return Directory.GetFiles( GetAbsolutePath( directory ) );
 	}
+
 	public IEnumerable<string> GetDirectories( string directory )
 	{
 		return Directory.GetDirectories( GetAbsolutePath( directory ) );
 	}
+
 	public string GetRelativePath( string filePath )
 	{
 		return Path.GetRelativePath( BasePath, filePath );
 	}
+
 	public T? Deserialize<T>( string filePath )
 	{
 		var text = ReadAllText( filePath );
 		return JsonSerializer.Deserialize<T>( text );
+	}
+
+	public IEnumerable<string> FindAllFiles( string filter )
+	{
+		return Directory.GetFiles( BasePath, filter, SearchOption.AllDirectories );
 	}
 }

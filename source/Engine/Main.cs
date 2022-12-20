@@ -42,7 +42,7 @@ public class Main
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		Editor.Draw();
+		Editor.Editor.Draw();
 	}
 
 	public delegate void FireEventDelegate( IntPtr ptrEventName );
