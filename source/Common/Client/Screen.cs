@@ -6,6 +6,8 @@ public static class Screen
 
 	public static float Aspect => Size.X / (float)Size.Y;
 
+	public static float UIScale => Screen.Size.Y / 1080f;
+
 	public static void UpdateFrom( Vector2 size )
 	{
 		Size = new Point2( (int)size.X, (int)size.Y );

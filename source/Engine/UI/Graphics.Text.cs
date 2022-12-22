@@ -12,13 +12,11 @@ partial class Graphics
 
 	private static Dictionary<string, CachedFont> CachedFonts { get; } = new();
 
-	private static Dictionary<string, Texture> CachedStringTextures { get; } = new();
-
 	private static Texture GetTextureForText( string text, string fontFamily, float fontSize )
 	{
 		var key = GetKeyForText( text, fontFamily );
 
-		if ( CachedStringTextures.TryGetValue( key, out var cachedTexture ) )
+		if ( CachedTextures.TryGetValue( key, out var cachedTexture ) )
 		{
 			return cachedTexture;
 		}
@@ -76,7 +74,7 @@ partial class Graphics
 			x += (float)glyph.Advance * fontData.Atlas.Size;
 		}
 
-		CachedStringTextures.Add( key, stitcher.Texture );
+		CachedTextures.Add( key, stitcher.Texture );
 		return stitcher.Texture;
 	}
 
@@ -124,7 +122,7 @@ partial class Graphics
 		var font = LoadOrGetFont( fontFamily );
 		var scale = (fontSize / font.Data.Atlas.Size);
 
-		if ( CachedStringTextures.TryGetValue( key, out var cachedTexture ) )
+		if ( CachedTextures.TryGetValue( key, out var cachedTexture ) )
 		{
 			return cachedTexture.Size * scale;
 		}
@@ -338,6 +336,6 @@ partial class Graphics
 		// Flip y axis
 		atlasBounds.Y = 1.0f - atlasBounds.Y;
 
-		PanelRenderer.AddRectangle( bounds, atlasBounds, 0, color, color, color, color, flags );
+		PanelRenderer.AddRectangle( bounds, atlasBounds, color, color, color, color, flags, 0f );
 	}
 }

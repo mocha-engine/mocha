@@ -19,6 +19,20 @@ public enum RoundingFlags
 public static partial class Graphics
 {
 	internal static UIEntity PanelRenderer { get; set; }
+	private static Dictionary<string, Texture> CachedTextures { get; } = new();
+
+	private static Texture GetTexture( string path )
+	{
+		if ( CachedTextures.TryGetValue( path, out var cachedTexture ) )
+		{
+			return cachedTexture;
+		}
+
+		var texture = new Texture( path );
+		CachedTextures.Add( path, texture );
+
+		return texture;
+	}
 
 	private static GraphicsFlags GetRoundedGraphicsFlags( RoundingFlags roundingFlags )
 	{
@@ -47,25 +61,25 @@ public static partial class Graphics
 		return graphicsFlags;
 	}
 
-	public static void DrawRect( Rectangle bounds, Vector4 colorTop, Vector4 colorBottom, RoundingFlags roundingFlags = RoundingFlags.None )
+	public static void DrawRect( Rectangle bounds, Vector4 colorTop, Vector4 colorBottom, RoundingFlags roundingFlags = RoundingFlags.None, float roundingRadius = 0f )
 	{
 		var flags = GetRoundedGraphicsFlags( roundingFlags );
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, colorTop, colorBottom, colorTop, colorBottom, flags );
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), colorTop, colorBottom, colorTop, colorBottom, flags, roundingRadius );
 	}
 
-	public static void DrawRect( Rectangle bounds, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, RoundingFlags roundingFlags = RoundingFlags.None )
+	public static void DrawRect( Rectangle bounds, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, RoundingFlags roundingFlags = RoundingFlags.None, float roundingRadius = 0f )
 	{
 		var flags = GetRoundedGraphicsFlags( roundingFlags );
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, colorA, colorB, colorC, colorD, flags );
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), colorA, colorB, colorC, colorD, flags, roundingRadius );
 	}
 
-	public static void DrawRect( Rectangle bounds, Vector4 color, RoundingFlags roundingFlags = RoundingFlags.None )
+	public static void DrawRect( Rectangle bounds, Vector4 color, RoundingFlags roundingFlags = RoundingFlags.None, float roundingRadius = 0f )
 	{
 		var flags = GetRoundedGraphicsFlags( roundingFlags );
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color, flags );
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 0, 0 ), color, color, color, color, flags, roundingRadius );
 	}
 
-	public static void DrawShadow( Rectangle bounds, float size, float opacity )
+	public static void DrawShadow( Rectangle bounds, float size, float opacity, float roundingRadius = 0f )
 	{
 		bounds = bounds.Expand( size / 2.0f );
 		bounds.Position += new Vector2( 0, size / 2.0f );
@@ -74,7 +88,7 @@ public static partial class Graphics
 		{
 			var currBounds = bounds.Shrink( i );
 			var color = new Vector4( 0, 0, 0, (1f / size) * opacity );
-			PanelRenderer.AddRectangle( currBounds, new Rectangle( 0, 0, 0, 0 ), 0, color, color, color, color, GetRoundedGraphicsFlags( RoundingFlags.All ) );
+			PanelRenderer.AddRectangle( currBounds, new Rectangle( 0, 0, 0, 0 ), color, color, color, color, GetRoundedGraphicsFlags( RoundingFlags.All ), roundingRadius );
 		}
 	}
 
@@ -98,7 +112,13 @@ public static partial class Graphics
 		const float size = 256;
 		float aspect = PanelRenderer.AtlasBuilder.Texture.Width / (float)PanelRenderer.AtlasBuilder.Texture.Height;
 		var bounds = new Rectangle( position, new( size * aspect, size ) );
-		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 1, 1 ), 0f, Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage );
+		PanelRenderer.AddRectangle( bounds, new Rectangle( 0, 0, 1, 1 ), Vector4.One, Vector4.One, Vector4.One, Vector4.One, GraphicsFlags.UseRawImage, 0f );
+	}
+
+	internal static void DrawTexture( Rectangle bounds, string path )
+	{
+		var texture = GetTexture( path );
+		DrawTexture( bounds, texture );
 	}
 
 	internal static void DrawTexture( Rectangle bounds, Texture texture, GraphicsFlags flags = GraphicsFlags.UseRawImage )
@@ -119,6 +139,6 @@ public static partial class Graphics
 		// Flip y axis
 		texBounds.Y = 1.0f - texBounds.Y;
 
-		PanelRenderer.AddRectangle( bounds, texBounds, screenPxRange: 0, tint, tint, tint, tint, flags );
+		PanelRenderer.AddRectangle( bounds, texBounds, tint, tint, tint, tint, flags, 0f );
 	}
 }

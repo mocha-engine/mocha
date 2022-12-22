@@ -66,6 +66,7 @@ layout( location = 5 ) in int g_flags;
 //
 layout( location = 0 ) out VS_OUT vs_out;
 layout( location = 8 ) flat out int vs_flags;
+layout( location = 9 ) flat out float vs_rounding;
 
 void main() {
     vec4 pos = vec4( g_vPosition.xy, 0.0, 1.0 );
@@ -77,7 +78,14 @@ void main() {
     vs_out.vPanelPos = g_vPanelPos;
     vs_out.vPanelSize = g_vPanelSize;
 
-    vs_flags = g_flags;
+    //C#:
+    //var flagsInt = (int)flags;
+    //flagsInt |= (int)rounding << 16;
+    //
+
+    vs_flags = g_flags & 0xFFFF;
+    vs_rounding = (g_flags >> 16);
+    
     gl_Position = pos;
 }
 
@@ -95,6 +103,7 @@ void main() {
 //
 layout( location = 0 ) in VS_OUT fs_in;
 layout( location = 8 ) flat in int fs_flags;
+layout( location = 9 ) flat in float fs_rounding;
 
 //
 // Out
@@ -141,10 +150,7 @@ void main()
             float median = max(min(r, g), min(max(r, g), b));
             float signed_dist = median;
 
-            float mul = fs_in.vPanelSize.y / 2.0;
-
-            if ( (fs_flags & HighDistMul) == HighDistMul )
-                mul = fs_in.vPanelSize.y / 16.0;
+            float mul = fs_in.vPanelSize.y / 3.0;
 
             signed_dist *= mul;
             opacity = clamp( signed_dist, 0.0, 1.0 );
@@ -161,7 +167,7 @@ void main()
     if ( rounded )
     {
         vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
-        vec4 rounding = vec4( 4 * 2.0 );
+        vec4 rounding = vec4( fs_rounding );
 
         if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
             rounding.w *= 0.0;

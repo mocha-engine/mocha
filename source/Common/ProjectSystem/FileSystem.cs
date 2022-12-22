@@ -5,6 +5,7 @@ namespace Mocha.Common;
 public class FileSystem
 {
 	public static FileSystem Game => new FileSystem( "content\\" );
+	private List<FileSystemWatcher> Watchers { get; } = new();
 
 	private string BasePath { get; }
 
@@ -56,11 +57,12 @@ public class FileSystem
 		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
 	}
 
-	public FileSystemWatcher CreateWatcher( string relativeDir, string filter )
+	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action onChange )
 	{
 		var directoryName = GetAbsolutePath( relativeDir );
 		var watcher = new FileSystemWatcher( directoryName, filter );
 
+		watcher.IncludeSubdirectories = true;
 		watcher.NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
 							 | NotifyFilters.DirectoryName
@@ -71,8 +73,24 @@ public class FileSystem
 							 | NotifyFilters.Size;
 
 		watcher.EnableRaisingEvents = true;
+		watcher.Changed += ( _, _ ) => onChange();
+
+		Watchers.Add( watcher );
 
 		return watcher;
+	}
+
+	public bool IsFileReady( string path )
+	{
+		try
+		{
+			using FileStream inputStream = File.Open( GetAbsolutePath( path ), FileMode.Open, FileAccess.Read, FileShare.None );
+			return inputStream.Length > 0;
+		}
+		catch ( Exception )
+		{
+			return false;
+		}
 	}
 
 	public string GetFullPath( string filePath )

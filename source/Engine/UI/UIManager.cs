@@ -6,107 +6,71 @@ internal partial class UIManager
 
 	internal static UIManager Instance { get; private set; }
 
-	private Menu MainMenu { get; }
-	private Menu? SubMenu { get; set; }
-
 	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex" );
+
+	private IRenderer Renderer { get; } = new UIEntity();
+	private LayoutNode RootPanel { get; set; }
+
+	private const string Path = "ui/Game.html";
+
+	private FileSystemWatcher Watcher { get; }
 
 	internal UIManager()
 	{
 		Event.Register( this );
 		Instance = this;
-
 		Graphics.Init();
 
-		MainMenu = new MainMenu();
+		var directory = System.IO.Path.GetDirectoryName( Path );
+		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", LoadTemplate );
+
+		LoadTemplate();
 	}
 
-	public static void SetSubMenu( Menu? menu )
+	[Event.Window.Resized]
+	public void LoadTemplate()
 	{
-		Instance.SubMenu?.Delete();
-		Instance.SubMenu = menu;
+		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
+		RootPanel = Template.FromFile( Renderer, Path );
 	}
 
 	internal void Render()
 	{
-		UpdateWidgets();
-
 		Graphics.PanelRenderer.NewFrame();
 		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) ), Crosshair );
 
-		var tr = Cast.Ray( Player.Local.EyeRay, 10f ).Ignore( Player.Local ).Run();
-		Graphics.DrawText( new Rectangle( 512, 512 ), tr.Entity?.Name ?? "None" );
-		RenderWidgets();
+		DrawNode( RootPanel );
 	}
 
-	internal void RenderWidgets()
+	internal void DrawNode( LayoutNode layoutNode )
 	{
-		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
-		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
-
-		foreach ( var widget in widgets )
+		if ( layoutNode.StyledNode.Node is ElementNode elementNode )
 		{
-			widget.Render();
-		}
+			var backgroundColor = layoutNode.StyledNode.StyleValues.BackgroundColor ?? ColorValue.Transparent;
+			var rounding = layoutNode.StyledNode.StyleValues.BorderRadius?.Value ?? 0;
+			var bounds = layoutNode.Bounds;
 
-		if ( !Debug )
-			return;
+			Renderer.DrawRectangle( bounds, backgroundColor, rounding );
 
-		foreach ( var layout in BaseLayout.All )
-		{
-			Graphics.DrawRectUnfilled( layout.Bounds, Theme.Green, 1f );
-		}
-
-		foreach ( var widget in widgets )
-		{
-			if ( widget.InputFlags.HasFlag( PanelInputFlags.MouseOver ) )
+			var backgroundImage = layoutNode.StyledNode.StyleValues.BackgroundImage?.Value;
+			if ( backgroundImage != null )
 			{
-				float thickness = widget.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
-
-				Graphics.DrawRectUnfilled( widget.Bounds, Theme.Red, thickness );
-
-				var textBounds = new Rectangle( Input.MousePosition + 16, 512 );
-				Graphics.DrawTextWithShadow( textBounds, $"{widget}:" );
-
-				textBounds.Y += 20f;
-				Graphics.DrawTextWithShadow( textBounds, $"{widget.Bounds}" );
-
-				var parent = widget.Parent;
-				while ( parent != null )
-				{
-					thickness = parent.InputFlags.HasFlag( PanelInputFlags.MouseDown ) ? 4f : 1f;
-
-					Graphics.DrawRectUnfilled( parent.Bounds, Theme.Blue, thickness );
-					parent = parent.Parent;
-				}
+				Renderer.DrawImage( bounds, backgroundImage );
 			}
 		}
-	}
-
-	internal void UpdateWidgets()
-	{
-		var widgets = Widget.All.Where( x => x.Visible ).OrderBy( x => x.ZIndex ).ToList();
-		var mouseOverWidgets = widgets.Where( x => x.Bounds.Contains( Input.MousePosition ) );
-
-		foreach ( var widget in widgets )
+		else if ( layoutNode.StyledNode.Node is TextNode textNode )
 		{
-			widget.InputFlags = PanelInputFlags.None;
+			var color = layoutNode.StyledNode.Parent.StyleValues.Color ?? ColorValue.White;
+			var fontSize = layoutNode.StyledNode.Parent.StyleValues.FontSize?.Value ?? 16;
+			var weight = layoutNode.StyledNode.Parent.StyleValues.FontWeight?.Value ?? 400;
+			var font = layoutNode.StyledNode.Parent.StyleValues.FontFamily?.Value ?? "Inter";
+
+			var bounds = layoutNode.Bounds;
+
+			Renderer.DrawText( bounds, textNode.Text, font, (int)weight, fontSize, color );
 		}
 
-		if ( mouseOverWidgets.Any() )
-		{
-			var focusedWidget = mouseOverWidgets.Last();
-			focusedWidget.InputFlags |= PanelInputFlags.MouseOver;
-
-			if ( Input.Left )
-			{
-				focusedWidget.InputFlags |= PanelInputFlags.MouseDown;
-			}
-		}
-
-		foreach ( var widget in widgets )
-		{
-			widget.Update();
-		}
+		foreach ( var childNode in layoutNode.Children )
+			DrawNode( childNode );
 	}
 }

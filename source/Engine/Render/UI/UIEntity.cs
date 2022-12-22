@@ -1,7 +1,7 @@
 ﻿namespace Mocha.UI;
 
 [Icon( FontAwesome.Square ), Title( "UI" )]
-public partial class UIEntity : ModelEntity
+public partial class UIEntity : ModelEntity, IRenderer
 {
 	public AtlasBuilder AtlasBuilder { get; set; }
 	private Material Material { get; set; }
@@ -26,7 +26,14 @@ public partial class UIEntity : ModelEntity
 		RectCount = 0;
 	}
 
-	public void AddRectangle( Common.Rectangle rect, Common.Rectangle ndcTexRect, float screenPxRange, Vector4 colorA, Vector4 colorB, Vector4 colorC, Vector4 colorD, GraphicsFlags flags )
+	public void AddRectangle( Common.Rectangle rect,
+		Common.Rectangle ndcTexRect,
+		Vector4 colorA,
+		Vector4 colorB,
+		Vector4 colorC,
+		Vector4 colorD,
+		GraphicsFlags flags,
+		float rounding )
 	{
 		if ( rect.X > Screen.Size.X || rect.Y > Screen.Size.Y )
 			return;
@@ -47,6 +54,13 @@ public partial class UIEntity : ModelEntity
 			position.X -= 1.0f;
 			position.Y -= 1.0f;
 
+			// Pack the bytes!
+			// Lower 2 bytes of Flags is the flags
+			// Upper 2 bytes of Flags is the rounding
+			var flagsInt = (int)flags;
+			flagsInt |= (int)rounding << 16;
+
+			tx.Flags = flagsInt;
 			tx.Position = position;
 			tx.TexCoords = texCoords;
 			tx.PanelPos *= rect.Size;
@@ -59,7 +73,6 @@ public partial class UIEntity : ModelEntity
 				3 => colorD,
 				_ => Vector4.Zero,
 			};
-			tx.Flags = (short)flags;
 
 			return tx;
 		} ).ToArray();
@@ -68,5 +81,61 @@ public partial class UIEntity : ModelEntity
 		RectCount++;
 
 		IsDirty = true;
+	}
+	private static string GetFont( string fontFamily, int weight )
+	{
+		var fontName = weight switch
+		{
+			100 => $"{fontFamily}-Thin",
+			200 => $"{fontFamily}-ExtraLight",
+			300 => $"{fontFamily}-Light",
+			400 => $"{fontFamily}-Regular",
+			500 => $"{fontFamily}-Medium",
+			600 => $"{fontFamily}-SemiBold",
+			700 => $"{fontFamily}-Bold",
+			800 => $"{fontFamily}-ExtraBold",
+			_ => $"{fontFamily}-Regular",
+		};
+
+		if ( FileSystem.Game.Exists( $"core/fonts/{fontName}.mfnt" ) )
+			return fontName;
+
+		if ( FileSystem.Game.Exists( $"core/fonts/{fontFamily}.mfnt" ) )
+			return fontFamily;
+
+		return "Inter-Regular";
+	}
+
+	public void DrawRectangle( Rectangle bounds, ColorValue color, float rounding = 0 )
+	{
+		bounds.Size *= Screen.UIScale;
+		bounds.Position *= Screen.UIScale;
+		rounding *= Screen.UIScale;
+
+		Graphics.DrawRect( bounds, color.ToVector4(), RoundingFlags.All, rounding );
+	}
+
+	public void DrawText( Rectangle bounds, string text, string fontFamily, int weight, float fontSize, ColorValue color )
+	{
+		bounds.Size *= Screen.UIScale;
+		bounds.Position *= Screen.UIScale;
+		fontSize *= Screen.UIScale;
+
+		Graphics.DrawText( bounds, text, GetFont( fontFamily, weight ), fontSize, color.ToVector4() );
+	}
+
+	public Vector2 CalcTextSize( string text, string fontFamily, int weight, float fontSize )
+	{
+		return Graphics.MeasureText( text, GetFont( fontFamily, weight ), fontSize );
+	}
+
+	public void DrawImage( Rectangle bounds, string path )
+	{
+		bounds.Size *= Screen.UIScale;
+		bounds.Position *= Screen.UIScale;
+
+		// Replace .png and .jpg in case I forget to change it to mtex myself..
+		path = path.Replace( ".jpg", ".mtex" ).Replace( ".png", ".mtex" );
+		Graphics.DrawTexture( bounds, path );
 	}
 }

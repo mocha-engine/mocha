@@ -86,4 +86,23 @@ public struct Rectangle
 			|| rect.Y > this.Y + this.Height
 			|| rect.Y + rect.Height < this.Y);
 	}
+
+	public Rectangle Fit( Rectangle inner )
+	{
+		var outer = this;
+
+		float innerAspectRatio = inner.Width / (float)inner.Height;
+		float outerAspectRatio = outer.Width / (float)outer.Height;
+
+		float resizeFactor = (innerAspectRatio >= outerAspectRatio) ?
+		(outer.Width / (float)inner.Width) :
+		(outer.Height / (float)inner.Height);
+
+		float width = inner.Width * resizeFactor;
+		float height = inner.Height * resizeFactor;
+		float x = outer.X + (outer.Width - width) / 2f;
+		float y = outer.Y + (outer.Height - height) / 2f;
+
+		return new Rectangle( x, y, width + x, height + y );
+	}
 }
