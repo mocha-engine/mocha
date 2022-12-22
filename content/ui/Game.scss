@@ -1,0 +1,74 @@
+$background: #000000;
+$bar: #ffffff;
+
+$safe-area-x: 50px;
+$safe-area-y: 50px;
+
+root {
+    align-items: flex-end;
+    justify-content: space-between;
+    padding-left: $safe-area-x;
+    padding-right: $safe-area-x;
+    padding-bottom: $safe-area-y;
+}
+
+vitals, weapon {
+    width: 256px;
+    border-radius: 10px;
+    flex-direction: column;
+
+    background-color: $background;
+
+    padding: 10px;
+    padding-top: 0;
+    padding-bottom: 5px;
+}
+
+image {
+    position: absolute;
+    left: $safe-area-x;
+    top: $safe-area-y;
+    width: 512px;
+    height: 256px;
+
+    background-image: "ui/banner.png";
+}
+
+weapon {
+    width: -1px;
+}
+
+row {
+    flex-grow: 1;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+p, b {
+    font-size: 10px;
+    font-weight: 500;
+    color: $bar;
+
+    font-family: "QuinqueFive";
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+b {
+    font-size: 16px;
+}
+
+bar {
+    width: 236px;
+    height: 10px;
+    flex-grow: 1;
+}
+
+bar.health {
+    background-color: $bar;
+}
+
+bar.oxygen {
+    height: 2px;
+    background-color: $bar;
+}

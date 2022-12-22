@@ -23,6 +23,8 @@ public class Player : ModelEntity
 
 	public ViewModel ViewModel { get; set; }
 
+	private TimeSince TimeSinceFire;
+
 	protected override void Spawn()
 	{
 		base.Spawn();
@@ -36,8 +38,6 @@ public class Player : ModelEntity
 
 		Respawn();
 	}
-
-	bool rightLastFrame = false;
 
 	public void Respawn()
 	{
@@ -53,23 +53,23 @@ public class Player : ModelEntity
 		WalkController.Update();
 
 		//
-		// Spawn some balls when right clicking
+		// Spawn some balls when clicking
 		//
-		if ( Input.Right && !rightLastFrame )
-		{
-			var tr = Cast.Ray( EyeRay, 10f ).Ignore( this ).Run();
-
-			var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
-			ball.Name = "My Ball";
-			ball.Position = tr.EndPosition + tr.Normal * 1.0f;
-			ball.Restitution = 1.0f;
-			ball.Friction = 1.0f;
-			ball.Mass = 10.0f;
-
-			ball.SetSpherePhysics( 0.5f, false );
-		}
-
-		rightLastFrame = Input.Right;
+		//if ( Input.Left && TimeSinceFire > 0.1f )
+		//{
+		//	var tr = Cast.Ray( EyeRay, 10f ).Ignore( this ).Run();
+		//
+		//	var ball = new ModelEntity( "core/models/dev/dev_ball.mmdl" );
+		//	ball.Name = "My Ball";
+		//	ball.Position = tr.EndPosition + tr.Normal * 1.0f;
+		//	ball.Restitution = 1.0f;
+		//	ball.Friction = 1.0f;
+		//	ball.Mass = 10.0f;
+		//
+		//	ball.SetSpherePhysics( 0.5f, false );
+		//
+		//	TimeSinceFire = 0;
+		//}
 	}
 
 	float lastHeight = 1.8f;

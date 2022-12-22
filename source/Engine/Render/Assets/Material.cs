@@ -11,7 +11,7 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
-	public Glue.Material NativeMaterial { get; }
+	public Glue.Material NativeMaterial { get; private set; }
 
 	/// <summary>
 	/// Loads a material from an MMAT (compiled) file.

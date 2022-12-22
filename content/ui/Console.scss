@@ -1,0 +1,65 @@
+$color-900: #DAEDFF;
+$color-800: #B1D9FF;
+$color-700: #79BEFF;
+$color-600: #41A2FF;
+$color-500: #0987FF;
+$color-400: #006AD0;
+$color-300: #004E98;
+$color-200: #00315F;
+$color-100: #001427;
+
+root {
+    background-color: $color-900;
+    min-height: 1080px;
+    width: 1920px;
+    padding: 25px;
+
+    flex-direction: column;
+}
+
+textarea {
+    background-color: $color-800;
+    flex-grow: 1;
+    border-radius: 4px;
+}
+
+row {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+textbox {
+    flex-grow: 1;
+    background-color: $color-800;
+    margin-left: 10px;
+    margin-right: 10px;
+    padding: 25px;
+}
+
+hr {
+    height: 1px;
+    margin: 15px;
+    background-color: #00000022;
+}
+
+label, button {
+    font-size: 20px;
+    width: 50px;
+    height: 25px;
+}
+
+label {
+    font-weight: 600;
+}
+
+button {
+    width: 150px;
+    padding: 25px;
+    padding-right: 35px;
+    background-color: $color-800;    
+    align-items: center;
+    justify-content: center;
+}

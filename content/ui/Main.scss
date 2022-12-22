@@ -1,0 +1,212 @@
+// Variables
+$color-100: #C2C5CC;
+$color-200: #ACB0BA;
+$color-300: #969BA7;
+$color-400: #7F8694;
+$color-500: #6B7280;
+$color-600: #515761;
+$color-700: #383C43;
+$color-800: #1E2024;
+$color-900: #050506;
+
+root {
+    background-color: $color-900;
+    max-width: 1920px;
+    padding: 25px;
+
+    flex-direction: column;
+}
+
+title {
+    color: $color-100;
+}
+
+h1 {
+    font-size: 32px; 
+    font-weight: 600;
+
+    color: $color-100;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    font-weight: 500;
+
+    color: $color-100;
+}
+
+h3 {
+    font-size: 20px;
+    margin-bottom: 8px;
+
+    color: $color-100;
+}
+
+p {
+    font-size: 14px;
+    margin-top: 1px;
+    margin-bottom: 1px;
+    
+    color: $color-100;
+}
+
+div.hidden {
+    width: 128px;
+    height: 128px;
+    background-color: $color-800;
+    display: none;
+}
+
+button {
+    padding: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    font-size: 20px;
+    background-color: $color-800;
+    border-radius: 4px;
+
+    align-items: center;
+    justify-content: center;
+}
+
+p.button {
+    color: $color-100;
+}
+
+h1.button {
+    color: $color-100;
+    margin-top: 0px;
+}
+
+.a {
+    width: 150px;
+    height: 150px;
+    background-color: $color-800;
+    flex-wrap: wrap;
+    padding: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.b {
+    width: 64px;
+    height: 64px;
+    background-color: $color-700;
+    align-items: center;
+    justify-content: center;
+}
+
+.c {
+    width: 32px;
+    height: 32px;
+    background-color: $color-600;
+    align-items: center;
+    justify-content: center;
+}
+
+hr {
+    flex-grow: 1;
+    height: 1px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    background-color: $color-800;
+}
+
+article {
+    align-items: center;
+    justify-content: space-around;
+    width: 1870px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.flex-grow-1 { flex-grow: 1; height: 128px; background-color: $color-800; }
+.flex-grow-2 { flex-grow: 1; height: 128px; background-color: $color-700; }
+.flex-grow-3 { flex-grow: 1; height: 128px; background-color: $color-600; }
+.flex-grow-4 { flex-grow: 1; height: 128px; background-color: $color-500; }
+
+.flex-shrink-1 { flex-grow: 1; height: 128px; background-color: $color-800; }
+.flex-shrink-2 { min-width: 64px; flex-shrink: 1; height: 128px; background-color: $color-700; }
+.flex-shrink-3 { min-width: 420px; flex-shrink: 1; height: 128px; background-color: $color-600; }
+.flex-shrink-4 { flex-grow: 1; height: 128px; background-color: $color-500; }
+
+div.aspect-1 {
+    width: 256px;
+    aspect-ratio: 1;
+    background-color: $color-800;
+}
+
+div.aspect-2 {
+    width: 256px;
+    aspect-ratio: 2;
+    background-color: $color-700;
+}
+
+div.aspect-3 {
+    width: 256px;
+    aspect-ratio: 3;
+    background-color: $color-600;
+}
+
+div.flex-wrap {
+    flex-wrap: wrap;
+}
+
+.flex-wrap-inner-1,
+.flex-wrap-inner-2,
+.flex-wrap-inner-3,
+.flex-wrap-inner-4,
+.flex-wrap-inner-5 {
+    width: 500px;
+    height: 128px;
+    margin: 8px;
+    flex-grow: 1;
+}
+
+.flex-wrap-inner-1 {
+    background-color: $color-800;
+}
+
+.flex-wrap-inner-2 {
+    background-color: $color-700;
+}
+
+.flex-wrap-inner-3 {
+    background-color: $color-600;
+}
+
+.flex-wrap-inner-4 {
+    background-color: $color-500;
+}
+
+.flex-wrap-inner-5 {
+    background-color: $color-400;
+}
+
+.weight-100 { font-weight: 100; font-size: 24px; }
+.weight-200 { font-weight: 200; font-size: 24px; }
+.weight-300 { font-weight: 300; font-size: 24px; }
+.weight-400 { font-weight: 400; font-size: 24px; }
+.weight-500 { font-weight: 500; font-size: 24px; }
+.weight-600 { font-weight: 600; font-size: 24px; }
+.weight-700 { font-weight: 700; font-size: 24px; }
+.weight-800 { font-weight: 800; font-size: 24px; }
+
+title {
+    font-size: 48px;
+    font-weight: 800;
+}
+
+item {
+    flex-direction: column;
+    align-items: center;
+}
+
+.image {
+    flex-grow: 1;
+    height: 512px;
+    background-color: #fe71dc;
+    background-image: "banner.png";
+}

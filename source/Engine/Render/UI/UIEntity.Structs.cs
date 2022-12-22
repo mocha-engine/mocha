@@ -28,7 +28,7 @@ partial class UIEntity
 		public Vector4 Color { get; set; }
 		public Vector2 PanelPos { get; set; }
 		public Vector2 PanelSize { get; set; }
-		public short Flags { get; set; }
+		public int Flags { get; set; }
 
 		public static VertexAttribute[] VertexAttributes = new[]
 		{
