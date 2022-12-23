@@ -1,5 +1,4 @@
-﻿
-using Mocha.UI;
+﻿using Mocha.UI;
 
 namespace Mocha;
 

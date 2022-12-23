@@ -56,6 +56,9 @@ bool Window::Update()
 
 			if ( we.event == SDL_WINDOWEVENT_SIZE_CHANGED )
 			{
+				if ( we.windowID != SDL_GetWindowID( m_window ) )
+					continue;
+
 				auto width = we.data1;
 				auto height = we.data2;
 

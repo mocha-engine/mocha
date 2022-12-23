@@ -1,5 +1,6 @@
 ﻿namespace Mocha.Editor;
 
+[Title( "Console" )]
 public class ConsoleWindow : EditorWindow
 {
 	const int MAX_INPUT_LENGTH = 512;
@@ -9,13 +10,13 @@ public class ConsoleWindow : EditorWindow
 	{
 		if ( ImGui.Begin( "Console" ) )
 		{
-			if ( ImGui.BeginChild( "##console_output" ) )
+			if ( ImGui.BeginChild( "##console_output", -1, -32 ) )
 			{
 				ImGui.BeginTable( "##console_output_table", 3, 0 );
 
-				ImGui.TableSetupColumn( "Time", 0, 64.0f );
-				ImGui.TableSetupColumn( "Logger", 0, 64.0f );
-				ImGui.TableSetupColumn( "Text", 0, 512.0f );
+				ImGui.TableSetupFixedColumn( "Time", 64.0f );
+				ImGui.TableSetupFixedColumn( "Logger", 64.0f );
+				ImGui.TableSetupStretchColumn( "Text" );
 
 				foreach ( var item in Log.GetHistory() )
 				{

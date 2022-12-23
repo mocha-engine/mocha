@@ -28,6 +28,7 @@
 #include <modelentity.h>
 #include <physicsmanager.h>
 #include <vk_mem_alloc.h>
+#include <fontawesome.h>
 
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
 
@@ -131,6 +132,15 @@ VkExtent2D RenderManager::GetWindowExtent()
 	return windowExtent;
 }
 
+VkExtent2D RenderManager::GetDesktopSize()
+{
+	int desktopWidth, desktopHeight;
+	m_window->GetDesktopSize( &desktopWidth, &desktopHeight );
+	VkExtent2D desktopExtent = { desktopWidth, desktopHeight };
+
+	return desktopExtent;
+}
+
 void RenderManager::CreateSwapchain( VkExtent2D size )
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_chosenGPU, m_device, m_surface );
@@ -228,7 +238,6 @@ void RenderManager::InitSyncStructures()
 void RenderManager::InitImGUI()
 {
 #ifdef _IMGUI
-
 	VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
 	    { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 }, { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
 	    { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
@@ -247,6 +256,25 @@ void RenderManager::InitImGUI()
 	VK_CHECK( vkCreateDescriptorPool( m_device, &pool_info, nullptr, &imguiPool ) );
 
 	ImGui::CreateContext();
+	
+	auto& io = ImGui::GetIO();
+	io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
+
+	ImFontConfig iconConfig = {};
+	iconConfig.MergeMode = 1;
+	iconConfig.GlyphMinAdvanceX = 16.0f;
+
+	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
+
+	io.Fonts->Build();
+
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigViewportsNoDecoration = false;
+	io.ConfigViewportsNoAutoMerge = true;
+	io.ConfigDockingWithShift = true;
 
 	ImGui_ImplSDL2_InitForVulkan( m_window->GetSDLWindow() );
 
@@ -265,6 +293,90 @@ void RenderManager::InitImGUI()
 	ImGui_ImplVulkan_Init( &init_info, nullptr );
 	ImmediateSubmit( [&]( VkCommandBuffer cmd ) { ImGui_ImplVulkan_CreateFontsTexture( cmd ); } );
 	ImGui_ImplVulkan_DestroyFontUploadObjects();
+
+	auto& style = ImGui::GetStyle();
+	style.WindowPadding = { 8.00f, 8.00f };
+	style.FramePadding = { 12.00f, 6.00f };
+	style.CellPadding = { 4.00f, 4.00f };
+	style.ItemSpacing = { 4.00f, 4.00f };
+	style.ItemInnerSpacing = { 2.00f, 2.00f };
+	style.TouchExtraPadding = { 0.00f, 0.00f };
+	style.IndentSpacing = 25;
+	style.ScrollbarSize = 12;
+	style.GrabMinSize = 12;
+	style.WindowBorderSize = 1;
+	style.ChildBorderSize = 0;
+	style.PopupBorderSize = 0;
+	style.FrameBorderSize = 0;
+	style.TabBorderSize = 0;
+	style.WindowRounding = 6;
+	style.ChildRounding = 4;
+	style.FrameRounding = 3;
+	style.PopupRounding = 4;
+	style.ScrollbarRounding = 9;
+	style.GrabRounding = 3;
+	style.LogSliderDeadzone = 4;
+	style.TabRounding = 4;
+	style.WindowTitleAlign = { 0.5f, 0.5f };
+	style.WindowMenuButtonPosition = ImGuiDir_None;
+	style.AntiAliasedLinesUseTex = false;
+
+	auto& colors = style.Colors;
+	colors[ImGuiCol_Text] = { 1.00f, 1.00f, 1.00f, 1.00f };
+	colors[ImGuiCol_TextDisabled] = { 0.50f, 0.50f, 0.50f, 1.00f };
+	colors[ImGuiCol_WindowBg] = { 0.17f, 0.17f, 0.18f, 1.00f };
+	colors[ImGuiCol_ChildBg] = { 0.10f, 0.11f, 0.11f, 1.00f };
+	colors[ImGuiCol_PopupBg] = { 0.24f, 0.24f, 0.25f, 1.00f };
+	colors[ImGuiCol_Border] = { 0.00f, 0.00f, 0.00f, 0.5f };
+	colors[ImGuiCol_BorderShadow] = { 0.00f, 0.00f, 0.00f, 0.24f };
+	colors[ImGuiCol_FrameBg] = { 0.10f, 0.11f, 0.11f, 1.00f };
+	colors[ImGuiCol_FrameBgHovered] = { 0.19f, 0.19f, 0.19f, 0.54f };
+	colors[ImGuiCol_FrameBgActive] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_TitleBg] = { 0.0f, 0.0f, 0.0f, 1.00f };
+	colors[ImGuiCol_TitleBgActive] = { 0.00f, 0.00f, 0.00f, 1.00f };
+	colors[ImGuiCol_TitleBgCollapsed] = { 0.00f, 0.00f, 0.00f, 1.00f };
+	colors[ImGuiCol_MenuBarBg] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_ScrollbarBg] = { 0.05f, 0.05f, 0.05f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrab] = { 0.34f, 0.34f, 0.34f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrabHovered] = { 0.40f, 0.40f, 0.40f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrabActive] = { 0.56f, 0.56f, 0.56f, 0.54f };
+	colors[ImGuiCol_CheckMark] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_SliderGrab] = { 0.34f, 0.34f, 0.34f, 0.54f };
+	colors[ImGuiCol_SliderGrabActive] = { 0.56f, 0.56f, 0.56f, 0.54f };
+	colors[ImGuiCol_Button] = { 0.24f, 0.24f, 0.25f, 1.00f };
+	colors[ImGuiCol_ButtonHovered] = { 0.19f, 0.19f, 0.19f, 0.54f };
+	colors[ImGuiCol_ButtonActive] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_Header] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_HeaderHovered] = { 0.00f, 0.00f, 0.00f, 0.36f };
+	colors[ImGuiCol_HeaderActive] = { 0.20f, 0.22f, 0.23f, 0.33f };
+	colors[ImGuiCol_Separator] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	colors[ImGuiCol_SeparatorHovered] = { 0.44f, 0.44f, 0.44f, 0.29f };
+	colors[ImGuiCol_SeparatorActive] = { 0.40f, 0.44f, 0.47f, 1.00f };
+	colors[ImGuiCol_ResizeGrip] = { 0.28f, 0.28f, 0.28f, 0.29f };
+	colors[ImGuiCol_ResizeGripHovered] = { 0.44f, 0.44f, 0.44f, 0.29f };
+	colors[ImGuiCol_ResizeGripActive] = { 0.40f, 0.44f, 0.47f, 1.00f };
+	colors[ImGuiCol_Tab] = { 0.08f, 0.08f, 0.09f, 1.00f };
+	colors[ImGuiCol_TabHovered] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_TabActive] = { 0.17f, 0.17f, 0.18f, 1.00f };
+	colors[ImGuiCol_TabUnfocused] = { 0.08f, 0.08f, 0.09f, 1.00f };
+	colors[ImGuiCol_TabUnfocusedActive] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_DockingPreview] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_DockingEmptyBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotLines] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotLinesHovered] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotHistogram] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotHistogramHovered] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_TableHeaderBg] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_TableBorderStrong] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_TableBorderLight] = { 0.28f, 0.28f, 0.28f, 0.29f };
+	colors[ImGuiCol_TableRowBg] = { 0.00f, 0.00f, 0.00f, 0.00f };
+	colors[ImGuiCol_TableRowBgAlt] = { 1.00f, 1.00f, 1.00f, 0.06f };
+	colors[ImGuiCol_TextSelectedBg] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_DragDropTarget] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavHighlight] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavWindowingHighlight] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavWindowingDimBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_ModalWindowDimBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
 #endif
 }
 
@@ -346,10 +458,6 @@ void RenderManager::Shutdown()
 
 void RenderManager::Render()
 {
-#ifdef _IMGUI
-	ImGui::Render();
-#endif
-
 	// Get window size ( we use this in a load of places )
 	VkExtent2D windowExtent = GetWindowExtent();
 
@@ -430,7 +538,7 @@ void RenderManager::Render()
 
 	//
 	// Render viewmodels
-	//	
+	//
 	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		auto renderEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 		if ( renderEntity != nullptr )
@@ -528,11 +636,22 @@ void RenderManager::Run()
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 		ImGui::NewFrame();
-		
+
+		ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 		g_hostManager->DrawEditor();
 #endif
 
 		g_hostManager->Render();
+
+#ifdef _IMGUI
+		ImGui::Render();
+		
+		if ( ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
+#endif
 
 		Render();
 

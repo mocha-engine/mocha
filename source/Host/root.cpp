@@ -1,4 +1,8 @@
 #define _RENDERDOC 1
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 #include "root.h"
 
 #include <defs.h>
@@ -89,6 +93,9 @@ void Root::Shutdown()
 	CVarManager::Instance().Shutdown();
 
 	g_logManager->Shutdown();
+
+	_CrtDumpMemoryLeaks();
+
 }
 
 void Root::Run()

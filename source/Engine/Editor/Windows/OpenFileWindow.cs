@@ -44,11 +44,11 @@ public class OpenFileWindow : EditorWindow
 			ImGui.SetNextItemWidth( -1 );
 			searchInput = ImGui.InputText( "##search_input", searchInput, MAX_INPUT_LENGTH );
 
-			if ( ImGui.BeginChild( "##file_list" ) )
+			if ( ImGui.BeginChild( "##file_list", -1, -1 ) )
 			{
 				ImGui.BeginTable( "##file_List_table", 1, 0 );
 
-				ImGui.TableSetupColumn( "Name", 0, 512.0f );
+				ImGui.TableSetupStretchColumn( "Name" );
 
 				foreach ( var item in Matches )
 				{

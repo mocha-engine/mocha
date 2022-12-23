@@ -25,6 +25,14 @@ struct LogEntryInterop
 	char* logger;
 	char* level;
 	char* message;
+
+	~LogEntryInterop()
+	{
+		free( time );
+		free( logger );
+		free( level );
+		free( message );
+	}
 };
 
 struct LogHistory
@@ -98,6 +106,8 @@ protected:
 		strftime( s, MAX_SIZE, "[%H:%M]", &tm );
 
 		std::string ts = std::string( s );
+		free( s );
+		
 		return ts;
 	}
 

@@ -83,4 +83,5 @@ public:
 	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
 	VkExtent2D GetWindowExtent();
+	VkExtent2D GetDesktopSize();
 };
