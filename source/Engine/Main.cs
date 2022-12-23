@@ -24,10 +24,7 @@ public class Main
 		Log.Info( $"Parent process: {parentPath}" );
 
 		world = new World();
-		LastUpdate = DateTime.Now;
 	}
-
-	private static DateTime LastUpdate;
 
 	[UnmanagedCallersOnly]
 	public static void Render()
@@ -35,6 +32,12 @@ public class Main
 		Input.Update();
 		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
+
+		const float threshold = 30f;
+		if ( Time.Delta > 1.0f / threshold )
+		{
+			Log.Warning( $"!!! Deltatime is lower than {threshold}fps: {Time.Delta}ms ({1.0f / Time.Delta}fps) !!!" );
+		}
 
 		world.Update();
 	}
