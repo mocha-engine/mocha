@@ -59,4 +59,21 @@ public static class StringExtension
 	{
 		return str.PadRight( 16 );
 	}
+
+	public static string DisplayName( this string str )
+	{
+		string result = "";
+
+		for ( int i = 0; i < str.Length; ++i )
+		{
+			char c = str[i];
+			if ( i != 0 && char.IsUpper( c ) )
+				result += " ";
+
+			result += c;
+		}
+
+		return result;
+	}
+
 }

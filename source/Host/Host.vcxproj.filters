@@ -37,6 +37,9 @@
     <Filter Include="Rendering\Assets">
       <UniqueIdentifier>{ca723609-bf7e-40d4-b6d0-7e1e77239234}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\FontAwesome">
+      <UniqueIdentifier>{decdf9eb-0f40-445e-91c2-c4f91ba7c493}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
@@ -477,9 +480,6 @@
     <ClCompile Include="inputmanager.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
-    <ClCompile Include="game\model.cpp">
-      <Filter>Rendering\Assets</Filter>
-    </ClCompile>
     <ClCompile Include="texture.cpp">
       <Filter>Rendering\Assets</Filter>
     </ClCompile>
@@ -506,12 +506,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="generated\InteropList.generated.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1373,9 +1367,6 @@
     <ClInclude Include="managedwrappers.h">
       <Filter>Managed</Filter>
     </ClInclude>
-    <ClInclude Include="game\model.h">
-      <Filter>Rendering\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="texture.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
@@ -1411,6 +1402,9 @@
     </ClInclude>
     <ClInclude Include="hostmanager.h">
       <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="fontawesome.h">
+      <Filter>Thirdparty\FontAwesome</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -62,12 +62,12 @@ public class Editor
 			float fps = 1.0f / Time.Delta;
 			ImGui.Text( $"FPS: {fps.CeilToInt()}" );
 
-			ImGui.Separator();
+			ImGui.SeparatorH();
 
 			ImGui.Text( $"Current time: {Time.Now}" );
 			ImGui.Text( $"Frame time: {(Time.Delta * 1000f).CeilToInt()}ms" );
 
-			ImGui.Separator();
+			ImGui.SeparatorH();
 
 			ImGui.Text( $"F10 to toggle cursor" );
 		}

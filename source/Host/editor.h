@@ -3,6 +3,7 @@
 #include <baseentity.h>
 #include <defs.h>
 #include <edict.h>
+#include <fontawesome.h>
 #include <globalvars.h>
 #include <imgui.h>
 #include <rendermanager.h>
@@ -14,18 +15,19 @@
 //@InteropGen generate class
 namespace Editor
 {
-	inline void End()
-	{
-		ImGui::End();
-	};
-
-	inline void Separator()
+	inline void SeparatorH()
 	{
 		ImGui::Dummy( ImVec2( 0, 4 ) );
 		ImGui::PushStyleColor( ImGuiCol_Separator, ImVec4( 0.28f, 0.28f, 0.28f, 0.29f ) );
 		ImGui::Separator();
 		ImGui::PopStyleColor();
 		ImGui::Dummy( ImVec2( 0, 4 ) );
+	};
+
+	inline void SeparatorV()
+	{
+		ImGui::Dummy( ImVec2( 8, 0 ) );
+		ImGui::SameLine();
 	};
 
 	inline void Text( const char* text )
@@ -107,7 +109,15 @@ namespace Editor
 
 	inline bool Begin( const char* name )
 	{
-		return ImGui::Begin( name );
+		return ImGui::Begin( name, nullptr,
+		    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollWithMouse |
+		        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize );
+	};
+
+	inline void End()
+	{
+		// ImGui::EndChild();
+		ImGui::End();
 	};
 
 	inline void ShowDemoWindow()
@@ -122,6 +132,8 @@ namespace Editor
 
 	inline bool BeginOverlay( const char* name )
 	{
+		ImGui::SetNextWindowViewport( ImGui::GetMainViewport()->ID );
+
 		bool b = ImGui::Begin(
 		    name, nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs );
 
@@ -138,9 +150,9 @@ namespace Editor
 		return g_renderManager->m_deviceName.c_str();
 	}
 
-	inline bool BeginChild( const char* name )
+	inline bool BeginChild( const char* name, int width, int height )
 	{
-		return ImGui::BeginChild( name, { -1, -24 } );
+		return ImGui::BeginChild( name, { ( float )width, ( float )height }, false, ImGuiWindowFlags_AlwaysUseWindowPadding );
 	}
 
 	inline void EndChild()
@@ -150,8 +162,8 @@ namespace Editor
 
 	inline bool BeginTable( const char* name, int columnCount, int flags )
 	{
-		return ImGui::BeginTable(
-		    name, columnCount, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX );
+		return ImGui::BeginTable( name, columnCount,
+		    ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable );
 	}
 
 	inline void EndTable()
@@ -159,7 +171,12 @@ namespace Editor
 		ImGui::EndTable();
 	}
 
-	inline void TableSetupColumn( const char* name, int flags, float width )
+	inline void TableSetupStretchColumn( const char* name )
+	{
+		ImGui::TableSetupColumn( name, ImGuiTableColumnFlags_WidthStretch, 1.0f );
+	}
+
+	inline void TableSetupFixedColumn( const char* name, float width )
 	{
 		ImGui::TableSetupColumn( name, ImGuiTableColumnFlags_WidthFixed, width );
 	}
@@ -246,5 +263,47 @@ namespace Editor
 	inline void Image( Texture* texture, int x, int y )
 	{
 		ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
+	}
+
+	inline void SetCursorPos( float x, float y )
+	{
+		ImGui::SetCursorPos( { x, y } );
+	}
+
+	inline float GetCursorX()
+	{
+		return ImGui::GetCursorPosX();
+	}
+
+	inline float GetCursorY()
+	{
+		return ImGui::GetCursorPosY();
+	}
+
+	inline void SetCursorX( float x )
+	{
+		ImGui::SetCursorPosX( x );
+	}
+
+	inline void SetCursorY( float y )
+	{
+		ImGui::SetCursorPosY( y );
+	}
+
+	inline void BumpCursorX( float x )
+	{
+		float curr = ImGui::GetCursorPosX();
+		ImGui::SetCursorPosX( curr + x );
+	}
+
+	inline void BumpCursorY( float y )
+	{
+		float curr = ImGui::GetCursorPosY();
+		ImGui::SetCursorPosY( curr + y );
+	}
+
+	inline float GetColumnWidth()
+	{
+		return ImGui::GetColumnWidth();
 	}
 } // namespace Editor

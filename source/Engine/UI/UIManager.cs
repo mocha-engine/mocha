@@ -15,6 +15,8 @@ internal partial class UIManager
 
 	private FileSystemWatcher Watcher { get; }
 
+	private bool IsDirty { get; set; }
+
 	internal UIManager()
 	{
 		Event.Register( this );
@@ -32,14 +34,19 @@ internal partial class UIManager
 	{
 		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
 		RootPanel = Template.FromFile( Renderer, Path );
+		IsDirty = true;
 	}
 
 	internal void Render()
 	{
+		if ( !IsDirty )
+			return;
+
 		Graphics.PanelRenderer.NewFrame();
 		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) ), Crosshair );
 
 		DrawNode( RootPanel );
+		IsDirty = false;
 	}
 
 	internal void DrawNode( LayoutNode layoutNode )
