@@ -12,72 +12,6 @@ partial class Graphics
 
 	private static Dictionary<string, CachedFont> CachedFonts { get; } = new();
 
-	private static Texture GetTextureForText( string text, string fontFamily, float fontSize )
-	{
-		var key = GetKeyForText( text, fontFamily );
-
-		if ( CachedTextures.TryGetValue( key, out var cachedTexture ) )
-		{
-			return cachedTexture;
-		}
-
-		var font = LoadOrGetFont( fontFamily );
-
-		var targetSize = MeasureText( text, fontFamily, font.Data.Atlas.Size );
-		var stitcher = new TextureStitcher( (int)targetSize.X, (int)targetSize.Y );
-		stitcher.Texture.Path = "internal:editor_" + fontFamily + "_" + text;
-
-		float x = 0;
-		foreach ( var c in text )
-		{
-			var fontData = font.Data;
-			var fontTexture = font.Texture;
-
-			//
-			// HACK HACK: Hard check to see if this is a font awesome glyph, swap the font
-			// data and texture out temporarily
-			//
-			if ( c > FontAwesome.IconMin )
-			{
-				var fontAwesome = LoadOrGetFont( "fa-solid-900" );
-				fontData = fontAwesome.Data;
-				fontTexture = fontAwesome.Texture;
-			}
-
-			var glyph = fontData.Glyphs.FirstOrDefault( x => x.Unicode == (int)c );
-
-			// If we don't have anything for this glyph, use the missing texture
-			// ( makes it super obvious )
-			if ( glyph == null )
-			{
-				Log.Warning( "Couldn't find glyph!" );
-				return Texture.MissingTexture;
-			}
-
-			if ( glyph.AtlasBounds != null )
-			{
-				var glyphRect = FontBoundsToAtlasRect( glyph );
-				glyphRect.Y = fontTexture.Height - glyphRect.Y;
-
-				var glyphSize = new Vector2( glyphRect.Width, glyphRect.Height );
-
-				var glyphPos = new Vector2( x, fontData.Atlas.Size );
-				glyphPos.X += (float)glyph.PlaneBounds.Left * fontData.Atlas.Size;
-				glyphPos.Y -= (float)glyph.PlaneBounds.Top * fontData.Atlas.Size;
-
-				glyphPos.X = glyphPos.X.Clamp( 0, float.MaxValue );
-				glyphPos.Y = glyphPos.Y.Clamp( 0, float.MaxValue );
-
-				stitcher.AddTexture( glyphPos, glyphRect.Position, glyphRect.Size, fontTexture );
-			}
-
-			x += (float)glyph.Advance * fontData.Atlas.Size;
-		}
-
-		CachedTextures.Add( key, stitcher.Texture );
-		return stitcher.Texture;
-	}
-
 	private static string GetKeyForText( string text, string fontName )
 	{
 		return text + "_" + fontName;
@@ -198,16 +132,6 @@ partial class Graphics
 
 	public static void DrawText( Rectangle bounds, string text, string fontFamily, float fontSize, Vector4 color )
 	{
-		//var flags = GraphicsFlags.UseSdf;
-		//if ( fontSize > 24f )
-		//	flags |= GraphicsFlags.HighDistMul;
-
-		//var texture = GetTextureForText( text, fontFamily, fontSize );
-		//bounds.Width = texture.Width * (fontSize / 32f);
-		//bounds.Height = texture.Height * (fontSize / 32f);
-
-		//DrawTexture( bounds, texture, color, flags );
-
 		float x = 0;
 
 		var font = LoadOrGetFont( fontFamily );

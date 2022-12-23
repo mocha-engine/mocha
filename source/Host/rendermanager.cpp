@@ -528,8 +528,7 @@ void RenderManager::Run()
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 		ImGui::NewFrame();
-
-		Editor::Draw();
+		
 		g_hostManager->DrawEditor();
 #endif
 

@@ -1,6 +1,4 @@
-﻿using FlexLayoutSharp;
-using System.Net;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.RegularExpressions;
 
 namespace Mocha.UI;
@@ -121,7 +119,7 @@ class ScssParser : BaseParser
 			else
 			{
 				// Unknown selector, bail immediately
-				Console.WriteLine( $"Couldn't parse selector '{NextChar()}'" );
+				Log.Error( $"Couldn't parse selector '{NextChar()}'" );
 				return selectors;
 			}
 		}
@@ -196,8 +194,6 @@ class ScssParser : BaseParser
 		{
 			var variableName = variable.Groups[1].Value;
 			var variableValue = variable.Groups[2].Value;
-
-			Console.WriteLine( $"{variableName} = {variableValue}" );
 
 			// Remove declaration
 			input = input.Replace( variable.Value, "" );

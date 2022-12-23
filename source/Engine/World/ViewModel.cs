@@ -7,7 +7,7 @@ public static class Bobbing
 		Vector3 TargetOffset = new();
 
 		TargetOffset += Vector3.Up * MathF.Sin( walkBob ) * t * -0.5f * factor;
-		TargetOffset += Vector3.Left * MathF.Sin( walkBob * 0.5f ) * t * -0.25f * factor;
+		TargetOffset += Vector3.Left * MathF.Sin( walkBob * 0.5f ) * t * -0.5f * factor;
 
 		return TargetOffset;
 	}
@@ -88,7 +88,7 @@ public class ViewModel : ModelEntity
 		if ( player.GroundEntity != null )
 			WalkBob += Time.Delta * 20.0f * t;
 
-		float factor = 0.05f;
+		float factor = 0.025f;
 		TargetPosition += Bobbing.CalculateOffset( WalkBob, t, factor ) * Camera.Rotation;
 		TargetPosition += new Vector3( 0, 0, t ) * factor * 0.1f;
 	}
