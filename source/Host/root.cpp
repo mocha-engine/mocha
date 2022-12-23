@@ -43,12 +43,11 @@ void Root::Startup()
 	//		 Should we have a wrapper around VmaAllocator?
 	//		 Should it be part of a 'RenderSystem'?
 	//
-
-	// HACK: CvarManager needs to start up before *everything*
-	CVarManager::Instance().Startup();
-
 	g_logManager = new LogManager();
 	g_logManager->Startup();
+
+	// HACK: CvarManager needs to start up before *everything* excluding logger
+	CVarManager::Instance().Startup();
 
 #if _RENDERDOC
 	g_renderdocManager = new RenderdocManager();
@@ -86,10 +85,10 @@ void Root::Shutdown()
 	g_renderdocManager->Shutdown();
 #endif
 
-	g_logManager->Shutdown();
-
-	// HACK: CvarManager needs to shut down before *everything*
+	// HACK: CvarManager needs to shut down after *everything* excluding logger
 	CVarManager::Instance().Shutdown();
+
+	g_logManager->Shutdown();
 }
 
 void Root::Run()

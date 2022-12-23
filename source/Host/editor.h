@@ -181,7 +181,7 @@ namespace Editor
 
 	inline char* InputText( const char* name, char* inputBuf, int inputLength )
 	{
-		ImGui::InputText( name, inputBuf, inputLength );
+		ImGui::InputText( name, inputBuf, inputLength, ImGuiInputTextFlags_EnterReturnsTrue );
 
 		return inputBuf;
 	}
@@ -228,7 +228,7 @@ namespace Editor
 
 	inline const char* GetVersionName()
 	{
-		return VERSION_NAME;
+		return GAME_VERSION;
 	}
 
 	inline Vector3 DragFloat3( const char* name, Vector3 value )
@@ -247,177 +247,4 @@ namespace Editor
 	{
 		ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
 	}
-
-	//@InteropGen ignore
-	inline void Draw() {} // Do nothing - we're re-writing this in C#
-
-	//@InteropGen ignore
-	// inline void Draw()
-	//{
-	//	if ( ImGui::Begin( "Entities" ) )
-	//	{
-	//		// List all entities
-	//		g_entityDictionary->ForEach( []( std::shared_ptr<BaseEntity> entity ) {
-	//			std::vector<std::string> flags = {};
-
-	//			// Get flag string based on entity flags
-	//			if ( entity->HasFlag( ENTITY_MANAGED ) )
-	//				flags.push_back( "ENTITY_MANAGED" );
-	//			if ( entity->HasFlag( ENTITY_RENDERABLE ) )
-	//				flags.push_back( "ENTITY_RENDERABLE" );
-
-	//			// Join flags together as a comma-separated string
-
-	//			std::string flagString = "";
-	//			for ( int i = 0; i < flags.size(); i++ )
-	//			{
-	//				flagString += flags[i];
-	//				if ( i != flags.size() - 1 )
-	//					flagString += ", ";
-	//			}
-
-	//			// Display name
-	//			if ( ImGui::CollapsingHeader( entity->GetName() ) )
-	//			{
-	//				// Basic info
-	//				ImGui::Text( "\t%s", flagString.c_str() );
-	//				ImGui::Text( "\t%s", entity->GetType() );
-	//				ImGui::Text( "" );
-
-	//				// Display transform
-	//				auto transform = entity->GetTransform();
-	//				ImGui::Text( "\tPosition: %f, %f, %f", transform.position.x, transform.position.y, transform.position.z );
-	//				ImGui::Text( "\tRotation: %f, %f, %f, %f", transform.rotation.x, transform.rotation.y, transform.rotation.z,
-	//				    transform.rotation.w );
-	//				ImGui::Text( "\tScale: %f, %f, %f", transform.scale.x, transform.scale.y, transform.scale.z );
-
-	//				ImGui::Text( "" );
-	//			}
-	//		} );
-	//	}
-
-	//	ImGui::End();
-
-	//	if ( ImGui::Begin(
-	//	         "Time", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs ) )
-	//	{
-	//		ImGui::SetWindowPos( { 16, 16 } );
-	//		ImGui::SetWindowSize( { -1, -1 } );
-
-	//		ImGui::Text( "GPU: %s", g_renderManager->m_deviceName.c_str() );
-
-	//		ImGui::Text( "Current time: %f", g_curTime );
-	//		ImGui::Text( "Delta time: %f", g_frameTime );
-
-	//		const float fps = 1.0f / g_frameTime;
-	//		ImGui::Text( "FPS: %f", fps );
-	//	}
-
-	//	ImGui::End();
-
-	//	if ( ImGui::Begin( "Console" ) )
-	//	{
-	//		if ( ImGui::BeginChild( "##console_output", { -1, -24 } ) )
-	//		{
-	//			ImGui::BeginTable(
-	//			    "##console_output_table", 3, ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX );
-
-	//			ImGui::TableSetupColumn( "Time", ImGuiTableColumnFlags_WidthFixed, 64.0f );
-	//			ImGui::TableSetupColumn( "Logger", ImGuiTableColumnFlags_WidthFixed, 64.0f );
-	//			// ImGui::TableSetupColumn( "Level", ImGuiTableColumnFlags_WidthFixed, 64.0f );
-	//			ImGui::TableSetupColumn( "Text", ImGuiTableColumnFlags_WidthStretch, 1.0f );
-
-	//			for ( auto& item : g_logManager->m_logHistory )
-	//			{
-	//				ImGui::TableNextRow();
-	//				ImGui::TableNextColumn();
-	//				ImGui::PushStyleColor( ImGuiCol_Text, { 1.0f, 1.0f, 1.0f, 0.5f } );
-	//				ImGui::Text( "%s", item.time.c_str() );
-	//				ImGui::PopStyleColor();
-
-	//				ImGui::TableNextColumn();
-	//				ImGui::Text( "%s", item.logger.c_str() );
-
-	//				// ImGui::TableNextColumn();
-	//				// ImGui::Text( "%s", item.level.c_str() );
-
-	//				ImGui::TableNextColumn();
-	//				ImGui::TextWrapped( item.message.c_str() );
-	//			}
-
-	//			ImGui::EndTable();
-
-	//			ImGui::SetScrollHereY( 1.0f );
-	//			ImGui::EndChild();
-	//		}
-
-	//		bool shouldSubmit = false;
-
-	//		const int MAX_INPUT_LENGTH = 512;
-	//		static char inputBuf[MAX_INPUT_LENGTH];
-	//		ImGui::SetNextItemWidth( -60 );
-
-	//		if ( ImGui::IsWindowFocused() && !ImGui::IsAnyItemActive() && !ImGui::IsMouseClicked( 0 ) )
-	//			ImGui::SetKeyboardFocusHere( 0 );
-
-	//		ImVec2 inputPos = ImGui::GetCursorPos();
-	//		inputPos.x += ImGui::GetWindowPos().x;
-	//		inputPos.x += ImGui::GetWindowPos().y;
-
-	//		if ( ImGui::InputText( "##console_input", inputBuf, MAX_INPUT_LENGTH, ImGuiInputTextFlags_EnterReturnsTrue ) )
-	//			shouldSubmit = true;
-	//
-	//		ImGui::SameLine();
-
-	//		if ( ImGui::Button( "Submit" ) )
-	//			shouldSubmit = true;
-	//
-	//		if ( shouldSubmit )
-	//		{
-	//			spdlog::info( "> {}", inputBuf );
-
-	//			std::string inputString = std::string( inputBuf );
-
-	//			// Clear inputBuf
-	//			memset( inputBuf, 0, sizeof( inputBuf ) );
-
-	//			std::stringstream ss( inputString );
-
-	//			std::string cvarName, cvarValue;
-	//			ss >> cvarName >> cvarValue;
-
-	//			std::stringstream valueStream( cvarValue );
-
-	//			if ( !CVarManager::Instance().Exists( cvarName ) )
-	//			{
-	//				if ( cvarName == "list" )
-	//				{
-	//					CVarManager::Instance().ForEach( cvarValue, []( CVarEntry& cvar ) {
-	//						std::string valueStr = CVarManager::Instance().ToString( cvar.m_name );
-	//						std::string typeStr = cvar.m_value.type().name();
-	//						spdlog::info( "{} - {}: {} ({})", cvar.m_name, cvar.m_description, valueStr, typeStr );
-	//					} );
-	//				}
-	//				else
-	//				{
-	//					spdlog::info( "{} is not a valid command or variable", cvarName );
-	//				}
-	//			}
-	//			else
-	//			{
-	//				if ( valueStream.str().size() > 0 )
-	//				{
-	//					CVarManager::Instance().FromString( cvarName, cvarValue );
-	//				}
-	//				else
-	//				{
-	//					cvarValue = CVarManager::Instance().ToString( cvarName );
-	//					spdlog::info( "{} is '{}'", cvarName, cvarValue );
-	//				}
-	//			}
-	//		}
-	//	}
-
-	//	ImGui::End();
-	//}
 } // namespace Editor
