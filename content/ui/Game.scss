@@ -29,7 +29,7 @@ image {
     left: $safe-area-x;
     top: $safe-area-y;
     width: 512px;
-    height: 256px;
+    aspect-ratio: 2.388;
 
     background-image: "ui/banner.png";
 }
