@@ -2,6 +2,27 @@
 
 namespace Mocha.Glue;
 
+// Ok this is HORRIBLE but it does work...
+public class Defer
+{
+	private Action Function { get; set; }
+
+	public Defer( Action action )
+	{
+		Function = action;
+	}
+
+	public static Defer Action( Action action )
+	{
+		return new Defer( action );
+	}
+
+	~Defer()
+	{
+		Function?.Invoke();
+	}
+}
+
 public static class InteropUtils
 {
 	public static IntPtr GetPtr( object obj )
@@ -18,9 +39,16 @@ public static class InteropUtils
 		{
 			return native.NativePtr;
 		}
+		else if ( obj is Sampler s )
+		{
+			return GetPtr( (int)s );
+		}
 		else if ( obj is string str )
 		{
-			return Marshal.StringToCoTaskMemUTF8( str );
+			var ptr = Marshal.StringToCoTaskMemUTF8( str );
+			Defer.Action( () => Marshal.FreeCoTaskMem( ptr ) );
+
+			return ptr;
 		}
 		else if ( obj is int i )
 		{
@@ -38,14 +66,12 @@ public static class InteropUtils
 		{
 			return b ? new IntPtr( 1 ) : IntPtr.Zero;
 		}
-		else if ( obj is Sampler s )
-		{
-			return GetPtr( (int)s );
-		}
 		else if ( obj.GetType().IsValueType )
 		{
 			var ptr = Marshal.AllocHGlobal( Marshal.SizeOf( obj ) );
 			Marshal.StructureToPtr( obj, ptr, false );
+
+			Defer.Action( () => Marshal.FreeHGlobal( ptr ) );
 			return ptr;
 		}
 		else
@@ -54,6 +80,14 @@ public static class InteropUtils
 		}
 
 		return IntPtr.Zero;
+	}
+
+	public static void FreePtrs( params IntPtr[] pointers )
+	{
+		foreach ( var pointer in pointers )
+		{
+			Marshal.FreeHGlobal( pointer );
+		}
 	}
 
 	internal static string GetString( IntPtr strPtr )
