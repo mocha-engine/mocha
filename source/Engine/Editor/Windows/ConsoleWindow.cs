@@ -38,7 +38,7 @@ public class ConsoleWindow : EditorWindow
 				ImGui.EndChild();
 			}
 
-			ImGui.SetNextItemWidth( -60 );
+			ImGui.SetNextItemWidth( -68 );
 			consoleInput = ImGui.InputText( "##console_input", consoleInput, MAX_INPUT_LENGTH );
 
 			ImGui.SameLine();

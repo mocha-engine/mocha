@@ -11,28 +11,12 @@
 
 #define MAX_LOG_MESSAGES 128
 
-struct LogEntry
-{
-	std::string time;
-	std::string logger;
-	std::string level;
-	std::string message;
-};
-
 struct LogEntryInterop
 {
 	char* time;
 	char* logger;
 	char* level;
 	char* message;
-
-	~LogEntryInterop()
-	{
-		free( time );
-		free( logger );
-		free( level );
-		free( message );
-	}
 };
 
 struct LogHistory
@@ -55,36 +39,13 @@ public:
 	static void ManagedError( std::string str );
 	static void ManagedTrace( std::string str );
 
-	std::vector<LogEntry> m_logHistory;
-
-	//@InteropGen ignore
-	inline static void CopyString( char** dest, std::string source )
-	{
-		size_t destSize = source.size() + 1;
-		*dest = ( char* )malloc( destSize );
-		strcpy_s( *dest, destSize, source.c_str() );
-	}
+	std::vector<LogEntryInterop> m_logHistory;
 
 	inline static LogHistory GetLogHistory()
 	{
 		LogHistory logHistory = {};
 		logHistory.count = g_logManager->m_logHistory.size();
-
-		logHistory.items = new LogEntryInterop[logHistory.count];
-
-		for ( int i = 0; i < logHistory.count; ++i )
-		{
-			LogEntry logEntry = g_logManager->m_logHistory[i];
-
-			LogEntryInterop logEntryInterop = {};
-
-			CopyString( &logEntryInterop.time, logEntry.time );
-			CopyString( &logEntryInterop.logger, logEntry.logger );
-			CopyString( &logEntryInterop.level, logEntry.level );
-			CopyString( &logEntryInterop.message, logEntry.message );
-
-			logHistory.items[i] = logEntryInterop;
-		}
+		logHistory.items = g_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -107,8 +68,16 @@ protected:
 
 		std::string ts = std::string( s );
 		free( s );
-		
+
 		return ts;
+	}
+
+	//@InteropGen ignore
+	inline static void CopyString( char** dest, std::string source )
+	{
+		size_t destSize = source.size() + 1;
+		*dest = new char[destSize];
+		strcpy_s( *dest, destSize, source.c_str() );
 	}
 
 	void sink_it_( const spdlog::details::log_msg& msg ) override
@@ -123,20 +92,19 @@ protected:
 		std::string level = fmt::format( "{}", msg.level );
 		std::string message = fmt::format( "{}", msg.payload.begin() );
 
-		// clang-format off
-		LogEntry logEntry = { 
-			time,
-		    logger,
-		    level,
-		    message
-		};
-		// clang-format on
+		LogEntryInterop logEntry = {};
+		CopyString( &logEntry.time, time );
+		CopyString( &logEntry.logger, logger );
+		CopyString( &logEntry.level, level );
+		CopyString( &logEntry.message, message );
 
-		g_logManager->m_logHistory.push_back( logEntry );
+		g_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
 		if ( g_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		{
 			g_logManager->m_logHistory.erase( g_logManager->m_logHistory.begin() );
+		}
 	}
 
 	void flush_() override { std::cout << std::flush; }
