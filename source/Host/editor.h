@@ -79,7 +79,16 @@ namespace Editor
 
 	inline bool BeginMainMenuBar()
 	{
-		return ImGui::BeginMainMenuBar();
+		bool result = ImGui::BeginMainMenuBar();
+
+		ImGui::Dummy( { 4, 0 } );
+		ImGui::Text( ENGINE_NAME " Engine" );
+		ImGui::Dummy( { 4, 0 } );
+
+		ImGui::Separator();
+		ImGui::Dummy( { 4, 0 } );
+
+		return result;
 	}
 
 	inline bool MenuItem( const char* text )
