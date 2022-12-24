@@ -9,7 +9,10 @@
 #include <imgui.h>
 #endif
 
-
+#ifdef _WIN32
+#include <SDL_syswm.h>
+#include <Windows.h>
+#endif
 
 Window::Window( uint32_t width, uint32_t height )
 {
@@ -54,7 +57,33 @@ bool Window::Update()
 		{
 			SDL_WindowEvent we = e.window;
 
-			if ( we.event == SDL_WINDOWEVENT_SIZE_CHANGED )
+			if ( we.event == SDL_WINDOWEVENT_SHOWN )
+			{
+#if _WIN32
+				// Force window dark mode
+				auto dwm = LoadLibraryA( "dwmapi.dll" );
+				auto uxtheme = LoadLibraryA( "uxtheme.dll" );
+
+				typedef HRESULT ( *SetWindowThemePTR )( HWND, const wchar_t*, const wchar_t* );
+				SetWindowThemePTR SetWindowTheme = ( SetWindowThemePTR )GetProcAddress( uxtheme, "SetWindowTheme" );
+
+				typedef HRESULT ( *DwmSetWindowAttributePTR )( HWND, DWORD, LPCVOID, DWORD );
+				DwmSetWindowAttributePTR DwmSetWindowAttribute =
+				    ( DwmSetWindowAttributePTR )GetProcAddress( dwm, "DwmSetWindowAttribute" );
+
+				SDL_SysWMinfo wmi;
+				SDL_VERSION( &wmi.version );
+				SDL_GetWindowWMInfo( SDL_GetWindowFromID( we.windowID ), &wmi );
+				auto hwnd = wmi.info.win.window;
+
+				SetWindowTheme( hwnd, L"DarkMode_Explorer", NULL );
+
+				BOOL darkMode = 1;
+				if ( FAILED ( DwmSetWindowAttribute( hwnd, 20, &darkMode, sizeof( darkMode ) ) ) )
+					DwmSetWindowAttribute( hwnd, 19, &darkMode, sizeof( darkMode ) );
+#endif			
+			}
+			else if ( we.event == SDL_WINDOWEVENT_SIZE_CHANGED )
 			{
 				if ( we.windowID != SDL_GetWindowID( m_window ) )
 					continue;
