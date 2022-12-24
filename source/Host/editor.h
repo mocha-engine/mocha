@@ -191,6 +191,11 @@ namespace Editor
 		ImGui::TableNextColumn();
 	}
 
+	inline void TableHeaders()
+	{
+		ImGui::TableHeadersRow();
+	}
+
 	inline void SetNextItemWidth( float width )
 	{
 		ImGui::SetNextItemWidth( width );

@@ -2,6 +2,27 @@
 
 namespace Mocha.Glue;
 
+public static class MemoryLogger
+{
+	public static Dictionary<string, (int Allocations, int Frees)> Entries = new();
+
+	public static void AllocatedBytes( string name, int count )
+	{
+		if ( !Entries.ContainsKey( name ) )
+			Entries[name] = (0, 0);
+
+		Entries[name] = (Entries[name].Allocations + count, Entries[name].Frees);
+	}
+
+	public static void FreedBytes( string name, int count )
+	{
+		if ( !Entries.ContainsKey( name ) )
+			Entries[name] = (0, 0);
+
+		Entries[name] = (Entries[name].Allocations, Entries[name].Frees + count);
+	}
+}
+
 /// <summary>
 /// Use this for allocating memory, it will automatically free it
 /// when IDisposable.Dispose is called.
@@ -27,6 +48,9 @@ public class MemoryContext : IDisposable
 	{
 		var ptr = Marshal.StringToCoTaskMemUTF8( str );
 		Values.Add( (Type.CoTaskMem, ptr) );
+
+		MemoryLogger.AllocatedBytes( Name, IntPtr.Size );
+
 		return ptr;
 	}
 
@@ -34,6 +58,9 @@ public class MemoryContext : IDisposable
 	{
 		var ptr = Marshal.AllocHGlobal( size );
 		Values.Add( (Type.HGlobal, ptr) );
+
+		MemoryLogger.AllocatedBytes( Name, IntPtr.Size );
+
 		return ptr;
 	}
 
@@ -51,6 +78,8 @@ public class MemoryContext : IDisposable
 					break;
 			}
 		}
+
+		MemoryLogger.FreedBytes( Name, Values.Count * IntPtr.Size );
 	}
 }
 

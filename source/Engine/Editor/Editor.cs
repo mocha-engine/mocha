@@ -9,7 +9,8 @@ public class Editor
 	public static List<EditorWindow> EditorWindows = new()
 	{
 		new MaterialEditorWindow(),
-		new ConsoleWindow()
+		new ConsoleWindow(),
+		new MemoryWindow()
 	};
 
 	public static void Draw()
