@@ -2,30 +2,61 @@
 
 namespace Mocha.Glue;
 
-// Ok this is HORRIBLE but it does work...
-public class Defer
+/// <summary>
+/// Use this for allocating memory, it will automatically free it
+/// when IDisposable.Dispose is called.
+/// </summary>
+public class MemoryContext : IDisposable
 {
-	private Action Function { get; set; }
-
-	public Defer( Action action )
+	enum Type
 	{
-		Function = action;
+		CoTaskMem,
+		HGlobal
 	}
 
-	public static Defer Action( Action action )
+	private List<(Type Type, IntPtr Pointer)> Values { get; } = new();
+
+	private string Name { get; }
+
+	public MemoryContext( string name )
 	{
-		return new Defer( action );
+		Name = name;
 	}
 
-	~Defer()
+	public IntPtr StringToCoTaskMemUTF8( string str )
 	{
-		Function?.Invoke();
+		var ptr = Marshal.StringToCoTaskMemUTF8( str );
+		Values.Add( (Type.CoTaskMem, ptr) );
+		return ptr;
+	}
+
+	public IntPtr AllocHGlobal( int size )
+	{
+		var ptr = Marshal.AllocHGlobal( size );
+		Values.Add( (Type.HGlobal, ptr) );
+		return ptr;
+	}
+
+	public void Dispose()
+	{
+		foreach ( var value in Values )
+		{
+			switch ( value.Type )
+			{
+				case Type.CoTaskMem:
+					Marshal.FreeCoTaskMem( value.Pointer );
+					break;
+				case Type.HGlobal:
+					Marshal.FreeHGlobal( value.Pointer );
+					break;
+			}
+		}
 	}
 }
 
 public static class InteropUtils
 {
-	public static IntPtr GetPtr( object obj )
+	public static IntPtr GetPtr( MemoryContext memoryContext, object obj )
 	{
 		if ( obj is IntPtr pointer )
 		{
@@ -33,7 +64,7 @@ public static class InteropUtils
 		}
 		else if ( obj is IInteropArray arr )
 		{
-			return GetPtr( arr.GetNative() );
+			return GetPtr( memoryContext, arr.GetNative() );
 		}
 		else if ( obj is INativeGlue native )
 		{
@@ -41,14 +72,11 @@ public static class InteropUtils
 		}
 		else if ( obj is Sampler s )
 		{
-			return GetPtr( (int)s );
+			return GetPtr( memoryContext, (int)s );
 		}
 		else if ( obj is string str )
 		{
-			var ptr = Marshal.StringToCoTaskMemUTF8( str );
-			Defer.Action( () => Marshal.FreeCoTaskMem( ptr ) );
-
-			return ptr;
+			return memoryContext.StringToCoTaskMemUTF8( str );
 		}
 		else if ( obj is int i )
 		{
@@ -68,10 +96,8 @@ public static class InteropUtils
 		}
 		else if ( obj.GetType().IsValueType )
 		{
-			var ptr = Marshal.AllocHGlobal( Marshal.SizeOf( obj ) );
+			var ptr = memoryContext.AllocHGlobal( Marshal.SizeOf( obj ) );
 			Marshal.StructureToPtr( obj, ptr, false );
-
-			Defer.Action( () => Marshal.FreeHGlobal( ptr ) );
 			return ptr;
 		}
 		else
@@ -80,14 +106,6 @@ public static class InteropUtils
 		}
 
 		return IntPtr.Zero;
-	}
-
-	public static void FreePtrs( params IntPtr[] pointers )
-	{
-		foreach ( var pointer in pointers )
-		{
-			Marshal.FreeHGlobal( pointer );
-		}
 	}
 
 	internal static string GetString( IntPtr strPtr )

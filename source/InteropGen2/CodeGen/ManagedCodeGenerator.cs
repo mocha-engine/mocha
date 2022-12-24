@@ -110,6 +110,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
+			// Spin up a MemoryContext instance
+			writer.WriteLine( $"using var ctx = new MemoryContext( \"{sel.Name}.{name}\" );" );
+
 			//
 			// Gather function body
 			//
@@ -120,7 +123,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "instance", "IntPtr" ) ).ToList();
 
 			// Gather function call arguments. Make sure that we're passing in a pointer for everything
-			var paramNames = paramsAndInstance.Select( x => "InteropUtils.GetPtr( " + x.Name + " )" );
+			var paramNames = paramsAndInstance.Select( x => "InteropUtils.GetPtr( ctx, " + x.Name + " )" );
 
 			// Function call arguments as comma-separated string
 			var functionCallArgs = string.Join( ", ", paramNames );
@@ -223,8 +226,11 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
+			// Spin up a MemoryContext instance
+			writer.WriteLine( $"using var ctx = new MemoryContext( \"{sel.Name}.{name}\" );" );
+
 			var @params = method.Parameters;
-			var paramNames = @params.Select( x => "InteropUtils.GetPtr( " + x.Name + " )" );
+			var paramNames = @params.Select( x => "InteropUtils.GetPtr( ctx, " + x.Name + " )" );
 			var functionCallArgs = string.Join( ", ", paramNames );
 
 			if ( returnType != "void" )
