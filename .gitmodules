@@ -7,3 +7,6 @@
 [submodule "source/Host/thirdparty/vk-bootstrap"]
 	path = source/Host/thirdparty/vk-bootstrap
 	url = https://github.com/charles-lunarg/vk-bootstrap
+[submodule "source/Host/thirdparty/implot"]
+	path = source/Host/thirdparty/implot
+	url = https://github.com/epezent/implot
