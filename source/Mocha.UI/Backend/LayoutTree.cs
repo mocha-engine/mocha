@@ -5,12 +5,12 @@ namespace Mocha.UI;
 
 public class LayoutNode
 {
-	public YogaNode YogaNode { get; set; }
-	public StyledNode StyledNode { get; set; }
+	public YogaNode? YogaNode { get; set; }
+	public StyledNode? StyledNode { get; set; }
 	public Rectangle Bounds { get; set; }
-	public LayoutNode Parent { get; set; }
+	public LayoutNode? Parent { get; set; }
 	public List<LayoutNode> Children { get; set; } = new();
-	public string ComposedName { get; set; }
+	public string ComposedName { get; set; } = "Unnamed";
 
 	public bool IsRootNode => this.Parent == null;
 }

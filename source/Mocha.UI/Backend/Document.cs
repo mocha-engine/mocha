@@ -1,4 +1,6 @@
-﻿namespace Mocha.UI;
+﻿using System.Text;
+
+namespace Mocha.UI;
 
 public class Node
 {
@@ -22,6 +24,27 @@ public class ElementData
 
 	public string Id => Attributes.GetValueOrDefault( "id" ) ?? "";
 	public List<string> Class => (Attributes.GetValueOrDefault( "class" ) ?? "").Split( ' ' ).ToList();
+
+	public override string ToString()
+	{
+		var sb = new StringBuilder();
+
+		sb.Append( $"<{TagName}" );
+
+		if ( Attributes.GetValueOrDefault( "class" ) != null )
+		{
+			sb.Append( $" class=\"{Attributes["class"]}\"" );
+		}
+
+		if ( Attributes.GetValueOrDefault( "id" ) != null )
+		{
+			sb.Append( $" id=\"{Attributes["id"]}\"" );
+		}
+
+		sb.Append( $">" );
+
+		return sb.ToString();
+	}
 }
 
 public class ElementNode : Node

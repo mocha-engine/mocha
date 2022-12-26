@@ -73,7 +73,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
-    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
@@ -81,7 +81,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
-    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;C:\VulkanSDK\1.3.224.1\Include;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>C:\VulkanSDK\1.3.224.1\Lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
@@ -146,6 +146,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
       <ConformanceMode>true</ConformanceMode>
       <ExceptionHandling>Sync</ExceptionHandling>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -189,6 +190,9 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="thirdparty\implot\implot.cpp" />
+    <ClCompile Include="thirdparty\implot\implot_demo.cpp" />
+    <ClCompile Include="thirdparty\implot\implot_items.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Color.cpp" />
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Factory.cpp" />
@@ -320,6 +324,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="baseentity.h" />
+    <ClInclude Include="consolesystem.h" />
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
@@ -355,6 +360,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
     <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
     <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
+    <ClInclude Include="thirdparty\implot\implot.h" />
+    <ClInclude Include="thirdparty\implot\implot_internal.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeToBuffer.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\NodeCodec\NodeCodecQuadTreeHalfFloat.h" />

@@ -2,33 +2,56 @@
 
 #include <globalvars.h>
 #include <managedtypes.h>
-#include <vk_types.h>
 #include <rendermanager.h>
+#include <vk_types.h>
 
 void Model::UploadMesh( Mesh& mesh )
 {
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.pNext = nullptr;
+	VkBufferCreateInfo stagingBufferInfo = {};
+	stagingBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	stagingBufferInfo.pNext = nullptr;
 
-	bufferInfo.size = mesh.vertices.size;
+	stagingBufferInfo.size = mesh.vertices.size;
+	stagingBufferInfo.usage = VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
 	VmaAllocationCreateInfo vmaallocInfo = {};
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
 	//
 	// Vertex buffer
 	//
 	{
-		bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+		AllocatedBuffer stagingBuffer = {};
+
+		vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 		VK_CHECK( vmaCreateBuffer(
-		    *g_allocator, &bufferInfo, &vmaallocInfo, &mesh.vertexBuffer.buffer, &mesh.vertexBuffer.allocation, nullptr ) );
+		    *g_allocator, &stagingBufferInfo, &vmaallocInfo, &stagingBuffer.buffer, &stagingBuffer.allocation, nullptr ) );
 
 		void* data;
-		vmaMapMemory( *g_allocator, mesh.vertexBuffer.allocation, &data );
+		vmaMapMemory( *g_allocator, stagingBuffer.allocation, &data );
 		memcpy( data, mesh.vertices.data, mesh.vertices.size );
-		vmaUnmapMemory( *g_allocator, mesh.vertexBuffer.allocation );
+		vmaUnmapMemory( *g_allocator, stagingBuffer.allocation );
+
+		VkBufferCreateInfo vertexBufferInfo = {};
+		vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		vertexBufferInfo.pNext = nullptr;
+
+		vertexBufferInfo.size = mesh.vertices.size;
+		vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+		vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+		VK_CHECK( vmaCreateBuffer( *g_allocator, &vertexBufferInfo, &vmaallocInfo, &mesh.vertexBuffer.buffer,
+		    &mesh.vertexBuffer.allocation, nullptr ) );
+
+		g_renderManager->ImmediateSubmit( [=]( VkCommandBuffer cmd ) {
+			VkBufferCopy copy = {};
+			copy.dstOffset = 0;
+			copy.srcOffset = 0;
+			copy.size = mesh.vertices.size;
+
+			vkCmdCopyBuffer( cmd, stagingBuffer.buffer, mesh.vertexBuffer.buffer, 1, &copy );
+		} );
 	}
 
 	//
@@ -36,16 +59,39 @@ void Model::UploadMesh( Mesh& mesh )
 	//
 	if ( mesh.indices.size > 0 )
 	{
-		bufferInfo.size = mesh.indices.size;
-		bufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+		stagingBufferInfo.size = mesh.indices.size;
+		AllocatedBuffer stagingBuffer = {};
+
+		vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 		VK_CHECK( vmaCreateBuffer(
-		    *g_allocator, &bufferInfo, &vmaallocInfo, &mesh.indexBuffer.buffer, &mesh.indexBuffer.allocation, nullptr ) );
+		    *g_allocator, &stagingBufferInfo, &vmaallocInfo, &stagingBuffer.buffer, &stagingBuffer.allocation, nullptr ) );
 
 		void* data;
-		vmaMapMemory( *g_allocator, mesh.indexBuffer.allocation, &data );
+		vmaMapMemory( *g_allocator, stagingBuffer.allocation, &data );
 		memcpy( data, mesh.indices.data, mesh.indices.size );
-		vmaUnmapMemory( *g_allocator, mesh.indexBuffer.allocation );
+		vmaUnmapMemory( *g_allocator, stagingBuffer.allocation );
+
+		VkBufferCreateInfo indexBufferInfo = {};
+		indexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+		indexBufferInfo.pNext = nullptr;
+
+		indexBufferInfo.size = mesh.indices.size;
+		indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+		vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+
+		VK_CHECK( vmaCreateBuffer(
+		    *g_allocator, &indexBufferInfo, &vmaallocInfo, &mesh.indexBuffer.buffer, &mesh.indexBuffer.allocation, nullptr ) );
+
+		g_renderManager->ImmediateSubmit( [=]( VkCommandBuffer cmd ) {
+			VkBufferCopy copy = {};
+			copy.dstOffset = 0;
+			copy.srcOffset = 0;
+			copy.size = mesh.indices.size;
+
+			vkCmdCopyBuffer( cmd, stagingBuffer.buffer, mesh.indexBuffer.buffer, 1, &copy );
+		} );
 
 		m_hasIndexBuffer = true;
 	}

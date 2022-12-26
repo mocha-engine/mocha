@@ -18,19 +18,21 @@
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui.h>
+#include <implot.h>
 #endif
 
 #define VMA_IMPLEMENTATION
 #include <baseentity.h>
 #include <cvarmanager.h>
 #include <edict.h>
+#include <fontawesome.h>
 #include <globalvars.h>
 #include <modelentity.h>
 #include <physicsmanager.h>
 #include <vk_mem_alloc.h>
-#include <fontawesome.h>
 
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
+FloatCVar maxFramerate( "fps_max", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
 VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageTypes,
     const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData )
@@ -147,7 +149,7 @@ void RenderManager::CreateSwapchain( VkExtent2D size )
 
 	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
 	                                  .set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
-	                                  .set_desired_present_mode( VK_PRESENT_MODE_FIFO_KHR )
+	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
 	                                  .set_desired_extent( size.width, size.height )
 	                                  .build()
 	                                  .value();
@@ -256,9 +258,10 @@ void RenderManager::InitImGUI()
 	VK_CHECK( vkCreateDescriptorPool( m_device, &pool_info, nullptr, &imguiPool ) );
 
 	ImGui::CreateContext();
-	
+	ImPlot::CreateContext();
+
 	auto& io = ImGui::GetIO();
-	io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
+	m_mainFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
 
 	ImFontConfig iconConfig = {};
 	iconConfig.MergeMode = 1;
@@ -268,6 +271,8 @@ void RenderManager::InitImGUI()
 
 	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
 	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
+
+	m_monospaceFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
 
 	io.Fonts->Build();
 
@@ -626,9 +631,39 @@ void RenderManager::Run()
 
 	while ( !bQuit )
 	{
-		bQuit = m_window->Update();
+		static auto gameStart = std::chrono::steady_clock::now();
+		static float flFilteredTime = 0;
+		static float flPreviousTime = 0;
+		static float flFrameTime = 0;
 
-		auto start = std::chrono::steady_clock::now();
+		std::chrono::duration<float> timeSinceStart = std::chrono::steady_clock::now() - gameStart;
+		float flCurrentTime = timeSinceStart.count();
+
+		float dt = flCurrentTime - flPreviousTime;
+		flPreviousTime = flCurrentTime;
+
+		flFrameTime += dt;
+
+		if ( flFrameTime < 0.0f )
+			return;
+
+		// How quick did we do last frame? Let's limit ourselves if (1.0f / g_frameTime) is more than maxFramerate
+		float fps = 1.0f / flFrameTime;
+		float maxFps = maxFramerate.GetValue();
+
+		if ( maxFps > 0 && fps > maxFps )
+		{
+			flFilteredTime += g_frameTime;
+			continue;
+		}
+		
+		g_curTime = flCurrentTime;
+		g_frameTime = flFrameTime;
+
+		flFilteredTime = 0;
+		flFrameTime = 0;
+
+		bQuit = m_window->Update();
 
 		g_physicsManager->Update();
 
@@ -636,7 +671,6 @@ void RenderManager::Run()
 		ImGui_ImplVulkan_NewFrame();
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 		ImGui::NewFrame();
-
 		ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 		g_hostManager->DrawEditor();
 #endif
@@ -645,7 +679,7 @@ void RenderManager::Run()
 
 #ifdef _IMGUI
 		ImGui::Render();
-		
+
 		if ( ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
 		{
 			ImGui::UpdatePlatformWindows();
@@ -654,12 +688,6 @@ void RenderManager::Run()
 #endif
 
 		Render();
-
-		auto end = std::chrono::steady_clock::now();
-		std::chrono::duration<float> frameTime = end - start;
-
-		g_frameTime = frameTime.count() * timescale.GetValue();
-		g_curTime += g_frameTime * timescale.GetValue();
 	}
 }
 

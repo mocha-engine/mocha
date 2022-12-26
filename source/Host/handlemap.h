@@ -1,7 +1,13 @@
 #pragma once
+#define THREADED
 #include <functional>
 #include <memory>
 #include <unordered_map>
+
+#ifdef THREADED
+#include <algorithm>
+#include <execution>
+#endif
 
 typedef uint32_t Handle;
 
@@ -90,10 +96,15 @@ inline Handle HandleMap<T>::AddSpecific( T1 object )
 template <typename T>
 inline void HandleMap<T>::ForEach( std::function<void( std::shared_ptr<T> object )> func )
 {
+#ifndef THREADED
 	for ( const auto& [handle, object] : m_objects )
 	{
 		func( object );
 	}
+#else
+	std::for_each(
+	    std::execution::par_unseq, m_objects.cbegin(), m_objects.cend(), [func]( const auto& pair ) { func( pair.second ); } );
+#endif
 }
 
 // Calls the specified function for each object managed by this HandleMap.
@@ -101,8 +112,13 @@ inline void HandleMap<T>::ForEach( std::function<void( std::shared_ptr<T> object
 template <typename T>
 inline void HandleMap<T>::For( std::function<void( Handle handle, std::shared_ptr<T> object )> func )
 {
+#ifndef THREADED
 	for ( const auto& [handle, object] : m_objects )
 	{
 		func( handle, object );
 	}
+#else
+	std::for_each( std::execution::par_unseq, m_objects.cbegin(), m_objects.cend(),
+	    [func]( const auto& pair ) { func( pair.first, pair.second ); } );
+#endif
 }

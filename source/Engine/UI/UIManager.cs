@@ -9,7 +9,7 @@ internal partial class UIManager
 	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex" );
 
 	private IRenderer Renderer { get; } = new UIEntity();
-	private LayoutNode RootPanel { get; set; }
+	public LayoutNode RootPanel { get; private set; }
 
 	private const string Path = "ui/Game.html";
 
