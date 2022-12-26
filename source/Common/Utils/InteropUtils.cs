@@ -81,11 +81,8 @@ public class MemoryContext : IDisposable
 
 		MemoryLogger.FreedBytes( Name, Values.Count * IntPtr.Size );
 	}
-}
 
-public static class InteropUtils
-{
-	public static IntPtr GetPtr( MemoryContext memoryContext, object obj )
+	public IntPtr GetPtr( object obj )
 	{
 		if ( obj is IntPtr pointer )
 		{
@@ -93,19 +90,15 @@ public static class InteropUtils
 		}
 		else if ( obj is IInteropArray arr )
 		{
-			return GetPtr( memoryContext, arr.GetNative() );
+			return GetPtr( arr.GetNative() );
 		}
 		else if ( obj is INativeGlue native )
 		{
 			return native.NativePtr;
 		}
-		else if ( obj is Sampler s )
-		{
-			return GetPtr( memoryContext, (int)s );
-		}
 		else if ( obj is string str )
 		{
-			return memoryContext.StringToCoTaskMemUTF8( str );
+			return StringToCoTaskMemUTF8( str );
 		}
 		else if ( obj is int i )
 		{
@@ -123,9 +116,13 @@ public static class InteropUtils
 		{
 			return b ? new IntPtr( 1 ) : IntPtr.Zero;
 		}
+		else if ( obj is Enum e )
+		{
+			return GetPtr( Convert.ToInt32( e ) );
+		}
 		else if ( obj.GetType().IsValueType )
 		{
-			var ptr = memoryContext.AllocHGlobal( Marshal.SizeOf( obj ) );
+			var ptr = AllocHGlobal( Marshal.SizeOf( obj ) );
 			Marshal.StructureToPtr( obj, ptr, false );
 			return ptr;
 		}
@@ -137,7 +134,7 @@ public static class InteropUtils
 		return IntPtr.Zero;
 	}
 
-	internal static string GetString( IntPtr strPtr )
+	internal string GetString( IntPtr strPtr )
 	{
 		return Marshal.PtrToStringUTF8( strPtr ) ?? "UNKNOWN";
 	}

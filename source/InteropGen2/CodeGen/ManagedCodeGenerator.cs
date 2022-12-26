@@ -123,7 +123,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "instance", "IntPtr" ) ).ToList();
 
 			// Gather function call arguments. Make sure that we're passing in a pointer for everything
-			var paramNames = paramsAndInstance.Select( x => "InteropUtils.GetPtr( ctx, " + x.Name + " )" );
+			var paramNames = paramsAndInstance.Select( x => "ctx.GetPtr( " + x.Name + " )" );
 
 			// Function call arguments as comma-separated string
 			var functionCallArgs = string.Join( ", ", paramNames );
@@ -134,7 +134,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 			// This is a pretty dumb and HACKy way of handling strings
 			if ( returnType == "string" )
-				writer.Write( "InteropUtils.GetString( " );
+				writer.Write( "ctx.GetString( " );
 
 			// Call the function..
 			writer.Write( $"_{name}( {functionCallArgs} )" );
@@ -230,14 +230,14 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			writer.WriteLine( $"using var ctx = new MemoryContext( \"{sel.Name}.{name}\" );" );
 
 			var @params = method.Parameters;
-			var paramNames = @params.Select( x => "InteropUtils.GetPtr( ctx, " + x.Name + " )" );
+			var paramNames = @params.Select( x => "ctx.GetPtr( " + x.Name + " )" );
 			var functionCallArgs = string.Join( ", ", paramNames );
 
 			if ( returnType != "void" )
 				writer.Write( "return " );
 
 			if ( returnType == "string" )
-				writer.Write( "InteropUtils.GetString( " );
+				writer.Write( "ctx.GetString( " );
 
 			writer.Write( $"_{name}( {functionCallArgs} )" );
 
