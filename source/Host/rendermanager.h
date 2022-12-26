@@ -6,6 +6,7 @@
 #include <vector>
 #include <vk_types.h>
 #include <window.h>
+#include <imgui.h>
 
 class Model;
 class HostManager;
@@ -84,4 +85,7 @@ public:
 
 	VkExtent2D GetWindowExtent();
 	VkExtent2D GetDesktopSize();
+
+	ImFont* m_mainFont;
+	ImFont* m_monospaceFont;
 };

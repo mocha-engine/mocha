@@ -9,7 +9,7 @@
 #include <string>
 #include <subsystem.h>
 
-#define MAX_LOG_MESSAGES 128
+#define MAX_LOG_MESSAGES 50
 
 struct LogEntryInterop
 {
@@ -64,7 +64,7 @@ protected:
 
 		const int MAX_SIZE = 32;
 		char* s = ( char* )malloc( MAX_SIZE );
-		strftime( s, MAX_SIZE, "[%H:%M]", &tm );
+		strftime( s, MAX_SIZE, "[%H:%M:%S]", &tm );
 
 		std::string ts = std::string( s );
 		free( s );

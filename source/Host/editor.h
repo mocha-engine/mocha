@@ -6,6 +6,8 @@
 #include <fontawesome.h>
 #include <globalvars.h>
 #include <imgui.h>
+#include <imgui_internal.h>
+#include <implot.h>
 #include <rendermanager.h>
 #include <spdlog/spdlog.h>
 #include <sstream>
@@ -65,9 +67,9 @@ namespace Editor
 
 	inline void TextMonospace( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mMonospaceFont );
+		ImGui::PushFont( g_renderManager->m_monospaceFont );
 		Text( text );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	inline void TextLight( const char* text )
@@ -171,8 +173,8 @@ namespace Editor
 
 	inline bool BeginTable( const char* name, int columnCount, int flags )
 	{
-		return ImGui::BeginTable( name, columnCount,
-		    ImGuiTableFlags_Borders | ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable );
+		return ImGui::BeginTable(
+		    name, columnCount, ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable );
 	}
 
 	inline void EndTable()
@@ -319,5 +321,127 @@ namespace Editor
 	inline float GetColumnWidth()
 	{
 		return ImGui::GetColumnWidth();
+	}
+
+	inline bool BeginTabBar( const char* name )
+	{
+		return ImGui::BeginTabBar( name );
+	}
+
+	inline void EndTabBar()
+	{
+		ImGui::EndTabBar();
+	}
+
+	inline bool BeginTabItem( const char* name )
+	{
+		return ImGui::BeginTabItem( name );
+	}
+
+	inline void EndTabItem()
+	{
+		ImGui::EndTabItem();
+	}
+
+	inline bool TreeNode( const char* name, bool isLeafNode )
+	{
+		return ImGui::TreeNodeEx( name, isLeafNode ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None );
+	}
+
+	inline void TreePop()
+	{
+		ImGui::TreePop();
+	}
+
+	inline void Indent()
+	{
+		ImGui::Indent();
+	}
+
+	inline void Unindent()
+	{
+		ImGui::Unindent();
+	}
+
+	inline bool BeginMainStatusBar()
+	{
+		ImGuiViewportP* viewport = ( ImGuiViewportP* )( void* )ImGui::GetMainViewport();
+		ImGuiWindowFlags window_flags =
+		    ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_MenuBar;
+		float height = ImGui::GetFrameHeight();
+
+		if ( ImGui::BeginViewportSideBar( "##MainStatusBar", viewport, ImGuiDir_Down, height, window_flags ) )
+		{
+			if ( ImGui::BeginMenuBar() )
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	inline void EndMainStatusBar()
+	{
+		ImGui::EndMenuBar();
+		ImGui::End();
+	}
+
+	inline void DrawGraph( const char* name, Vector4 color, InteropArray values )
+	{
+		const std::vector<float> plotValues = values.GetData<float>();
+		const float MARKERS[] = { 30.0f, 60.0f, 144.0f };
+		const int MARKER_COUNT = 3;
+		const int sampleCount = plotValues.size();
+
+		auto startPos = ImGui::GetCursorPos();
+		
+		ImPlot::PushStyleVar( ImPlotStyleVar_PlotPadding, { 0, 0 } );
+		ImPlot::PushStyleVar( ImPlotStyleVar_LineWeight, 1.0f );
+		ImPlot::PushStyleColor( ImPlotCol_PlotBg, { color.x, color.y, color.z, color.w } );
+		ImPlot::PushStyleColor( ImPlotCol_Line, { color.x, color.y, color.z, color.w * 4.0f } );
+		ImPlot::PushStyleColor( ImPlotCol_InlayText, { color.x, color.y, color.z, color.w * 4.0f } );
+
+		if ( ImPlot::BeginPlot( name, { -1, 128 },
+		         ImPlotFlags_NoInputs | ImPlotFlags_NoMenus | ImPlotFlags_NoTitle | ImPlotFlags_NoMouseText ) )
+		{
+			ImPlot::SetupAxis( ImAxis_X1, 0, ImPlotAxisFlags_NoDecorations );
+			ImPlot::SetupAxis( ImAxis_Y1, 0, ImPlotAxisFlags_NoDecorations );
+			ImPlot::SetupAxisLimits( ImAxis_Y1, 0.0, MARKERS[MARKER_COUNT - 1] + 20.0f, ImPlotCond_Always );
+			ImPlot::SetupAxisLimits( ImAxis_X1, 0.0, sampleCount, ImPlotCond_Always );
+
+			ImPlot::PlotInfLines<float>( "##reference", MARKERS, MARKER_COUNT, ImPlotInfLinesFlags_Horizontal );
+
+			for ( auto& marker : MARKERS )
+			{
+				std::string str = std::to_string( ( int )marker ) + "fps";
+				float x = sampleCount - 40.0f;
+				float y = marker - 15.0f;
+				ImPlot::PlotText( str.c_str(), x, y );
+			}
+
+			ImPlot::PushStyleVar( ImPlotStyleVar_LineWeight, 2.0f );
+			ImPlot::PlotLine<float>( name, plotValues.data(), sampleCount );
+			ImPlot::PopStyleVar( );
+			ImPlot::EndPlot();
+		}
+		
+		ImPlot::PopStyleColor( 3 );
+		ImPlot::PopStyleVar( 2 );
+	}
+
+	inline void PushColor( ImGuiCol color, Vector4 value )
+	{
+		ImGui::PushStyleColor( color, { value.x, value.y, value.z, value.w } );
+	}
+
+	inline void PopColor()
+	{
+		ImGui::PopStyleColor();
+	}
+
+	inline void TableSetBgColor( ImGuiTableBgTarget target, Vector4 color, int columnNumber = -1 )
+	{
+		ImGui::TableSetBgColor( target, ImGui::GetColorU32( { color.x, color.y, color.z, color.w } ), columnNumber );
 	}
 } // namespace Editor

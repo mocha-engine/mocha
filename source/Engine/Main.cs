@@ -34,9 +34,10 @@ public class Main
 		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
 
 		const float threshold = 30f;
-		if ( Time.Delta > 1.0f / threshold )
+
+		if ( Time.FPS < threshold )
 		{
-			Log.Warning( $"!!! Deltatime is lower than {threshold}fps: {Time.Delta}ms ({1.0f / Time.Delta}fps) !!!" );
+			Log.Warning( $"!!! Deltatime is lower than {threshold}fps: {Time.Delta}ms ({Time.FPS}fps) !!!" );
 		}
 
 		world.Update();

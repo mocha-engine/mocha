@@ -40,6 +40,9 @@
     <Filter Include="Thirdparty\FontAwesome">
       <UniqueIdentifier>{decdf9eb-0f40-445e-91c2-c4f91ba7c493}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\ImPlot">
+      <UniqueIdentifier>{1ed25892-3413-420a-a1dd-e8459eccf314}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
@@ -504,14 +507,17 @@
     <ClCompile Include="hostmanager.cpp">
       <Filter>Managed</Filter>
     </ClCompile>
+    <ClCompile Include="thirdparty\implot\implot_items.cpp">
+      <Filter>Thirdparty\ImPlot</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\implot\implot.cpp">
+      <Filter>Thirdparty\ImPlot</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\implot\implot_demo.cpp">
+      <Filter>Thirdparty\ImPlot</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="generated\InteropList.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="generated\UnmanagedArgs.generated.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="modelentity.h">
       <Filter>Entities</Filter>
     </ClInclude>
@@ -1405,6 +1411,13 @@
     </ClInclude>
     <ClInclude Include="fontawesome.h">
       <Filter>Thirdparty\FontAwesome</Filter>
+    </ClInclude>
+    <ClInclude Include="consolesystem.h" />
+    <ClInclude Include="thirdparty\implot\implot_internal.h">
+      <Filter>Thirdparty\ImPlot</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\implot\implot.h">
+      <Filter>Thirdparty\ImPlot</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

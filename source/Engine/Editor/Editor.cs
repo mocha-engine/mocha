@@ -16,6 +16,7 @@ public class Editor
 	public static void Draw()
 	{
 		DrawMenuBar();
+		DrawStatusBar();
 
 		if ( drawPerformanceOverlay )
 			DrawPerformanceOverlay();
@@ -52,6 +53,17 @@ public class Editor
 		ImGui.EndMainMenuBar();
 	}
 
+	private static void DrawStatusBar()
+	{
+		if ( ImGui.BeginMainStatusBar() )
+		{
+			ImGui.Text( $"{Screen.Size.X}x{Screen.Size.Y}" );
+			ImGui.Text( $"{Time.FPS} FPS" );
+		}
+
+		ImGui.EndMainStatusBar();
+	}
+
 	private static void DrawPerformanceOverlay()
 	{
 		if ( ImGui.BeginOverlay( "Time" ) )
@@ -59,10 +71,7 @@ public class Editor
 			var gpuName = ImGui.GetGPUName();
 
 			ImGui.Text( $"GPU: {gpuName}" );
-
-			float fps = 1.0f / Time.Delta;
-			ImGui.Text( $"FPS: {fps.CeilToInt()}" );
-
+			ImGui.Text( $"FPS: {Time.FPS}" );
 			ImGui.Text( $"Current time: {Time.Now}" );
 			ImGui.Text( $"Frame time: {(Time.Delta * 1000f).CeilToInt()}ms" );
 		}
