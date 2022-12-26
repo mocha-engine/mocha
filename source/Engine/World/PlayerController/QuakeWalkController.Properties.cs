@@ -5,7 +5,6 @@ partial class QuakeWalkController
 	//
 	// Movement parameters
 	//
-
 	public static float StopSpeed { get; set; } = 0.25f;
 
 	public static float GroundDistance { get; set; } = 0.05f;
@@ -24,9 +23,9 @@ partial class QuakeWalkController
 
 	public static float Gravity { get; set; } = 9.8f;
 
-	public static float MaxWalkAngle { get; set; } = 45f;
+	public static float MaxWalkAngle { get; set; } = 100f;
 
-	public static float StepSize { get; set; } = 0.3f;
+	public static float StepSize { get; set; } = 0.5f;
 
 	public static float JumpVelocity { get; set; } = 4.0f;
 

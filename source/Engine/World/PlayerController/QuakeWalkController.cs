@@ -10,8 +10,6 @@
 //
 public partial class QuakeWalkController
 {
-	private Vector3 Impulse { get; set; }
-
 	public bool Crouching { get; private set; }
 	public bool Sprinting { get; private set; }
 	private bool Walking { get; set; }
@@ -41,17 +39,6 @@ public partial class QuakeWalkController
 		Player = player;
 	}
 
-	private void UpdateVelocity()
-	{
-		if ( Impulse.Length > 0 )
-		{
-			Velocity += Impulse;
-			Impulse = Vector3.Zero;
-
-			SetGroundEntity( null );
-		}
-	}
-
 	public void Update()
 	{
 		if ( SpeedLimit > 0f )
@@ -70,9 +57,6 @@ public partial class QuakeWalkController
 
 		// set player eye height
 		UpdateEyePosition();
-
-		// update velocity based on any impulse applied
-		UpdateVelocity();
 
 		// set groundentity
 		TraceToGround();
@@ -295,7 +279,7 @@ public partial class QuakeWalkController
 		if ( trace.StartedSolid )
 		{
 			LogToScreen( "do something corrective if the trace starts in a solid..." );
-			// CorrectAllSolid();
+			CorrectAllSolid();
 		}
 
 		// if the trace didn't hit anything, we are in free fall
@@ -318,6 +302,10 @@ public partial class QuakeWalkController
 		{
 			LogToScreen( $"Too steep" );
 			SetGroundEntity( null );
+
+			// If they can't slide down the slope, let them walk
+			GroundPlane = true;
+			Walking = false;
 			return;
 		}
 
