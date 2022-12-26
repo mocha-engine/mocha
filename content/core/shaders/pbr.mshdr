@@ -190,6 +190,18 @@ vec3 sampleTexture( sampler2D target )
 	return texture( target, vs_out.vTexCoord.xy ).rgb;
 }
 
+float luminance(vec3 v)
+{
+    return dot(v, vec3(0.2126f, 0.7152f, 0.0722f));
+}
+
+vec3 reinhard_jodie(vec3 v)
+{
+    float l = luminance(v);
+    vec3 tv = v / (1.0f + v);
+    return mix(v / (1.0f + l), tv, tv);
+}
+
 void main()
 {
 	// Collect material properties
@@ -203,7 +215,7 @@ void main()
 
 	// If we don't have a normal map, use the vertex normal ( calculated in tangent space )
 	if ( vNormalTS.z > 0 )
-		vNormalTS = vs_out.vNormalTS;
+		vNormalTS = vs_out.vNormalWS;
 
 	// Recalculate Z axis - BC5 stomps it
 	vNormalTS.z = sqrt( 1.0 - vNormalTS.x * vNormalTS.x - vNormalTS.y * vNormalTS.y );
@@ -231,12 +243,15 @@ void main()
 	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
 	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
 
+	// Tonemap
+	fragColor = reinhard_jodie( fragColor );
+
 	int debugView = int( floor( PushConstants.data.x ) );
 
 	if ( debugView == DEBUG_VIEW_DIFFUSE )
 		fragColor = albedo;
 	else if ( debugView == DEBUG_VIEW_NORMAL )
-		fragColor = vNormalTS;
+		fragColor = ( vNormalTS + vec3( 1.0 ) ) / vec3( 2.0 );
 	else if ( debugView == DEBUG_VIEW_AMBIENTOCCLUSION )
 		fragColor = ao.xxx;
 	else if ( debugView == DEBUG_VIEW_METALNESS )
