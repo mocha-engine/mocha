@@ -8,11 +8,6 @@ void ModelEntity::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj )
 	m_model.Render( cmd, viewProj, m_transform );
 }
 
-void ModelEntity::SetModel( Model model )
-{
-	m_model = model;
-}
-
 void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 {
 	PhysicsBody body = {};
@@ -21,12 +16,12 @@ void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 	body.restitution = 1.0f;
 
 	body.transform = m_transform;
-	body.type = isStatic ? PhysicsType::Static : PhysicsType::Dynamic;
+	body.type = isStatic ? PhysicsType::PHYSICS_MODE_STATIC : PhysicsType::PHYSICS_MODE_DYNAMIC;
 
 	body.shape = {};
 	body.shape.shapeData = {};
 	body.shape.shapeData.radius = radius;
-	body.shape.shapeType = PhysicsShapeType::Sphere;
+	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_SPHERE;
 
 	m_physicsHandle = g_physicsManager->AddBody( this, body );
 }
@@ -39,12 +34,12 @@ void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
 	body.restitution = 1.0f;
 
 	body.transform = m_transform;
-	body.type = isStatic ? PhysicsType::Static : PhysicsType::Dynamic;
+	body.type = isStatic ? PhysicsType::PHYSICS_MODE_STATIC : PhysicsType::PHYSICS_MODE_DYNAMIC;
 
 	body.shape = {};
 	body.shape.shapeData = {};
 	body.shape.shapeData.extents = bounds;
-	body.shape.shapeType = PhysicsShapeType::Box;
+	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_BOX;
 
 	m_physicsHandle = g_physicsManager->AddBody( this, body );
 }
@@ -57,12 +52,12 @@ void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
 	body.restitution = 1.0f;
 
 	body.transform = m_transform;
-	body.type = PhysicsType::Static;
+	body.type = PhysicsType::PHYSICS_MODE_STATIC;
 
 	body.shape = {};
 	body.shape.shapeData = {};
 	body.shape.shapeData.vertices = vertices;
-	body.shape.shapeType = PhysicsShapeType::Mesh;
+	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_MESH;
 
 	m_physicsHandle = g_physicsManager->AddBody( this, body );
 }

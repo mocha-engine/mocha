@@ -43,6 +43,9 @@
     <Filter Include="Thirdparty\ImPlot">
       <UniqueIdentifier>{1ed25892-3413-420a-a1dd-e8459eccf314}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\Volk">
+      <UniqueIdentifier>{4591a9b7-aad3-486b-b73c-00c53b036c12}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
@@ -515,6 +518,9 @@
     </ClCompile>
     <ClCompile Include="thirdparty\implot\implot_demo.cpp">
       <Filter>Thirdparty\ImPlot</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\volk\volk.c">
+      <Filter>Thirdparty\Volk</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1418,6 +1424,9 @@
     </ClInclude>
     <ClInclude Include="thirdparty\implot\implot.h">
       <Filter>Thirdparty\ImPlot</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\volk\volk.h">
+      <Filter>Thirdparty\Volk</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

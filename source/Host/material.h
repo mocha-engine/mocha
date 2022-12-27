@@ -1,4 +1,5 @@
 #pragma once
+#include <defs.h>
 #include <texture.h>
 #include <vector>
 #include <vk_types.h>
@@ -36,11 +37,11 @@ struct VertexInputDescription
 class Material
 {
 private:
-	void CreatePipeline();
 	void CreateDescriptors();
 
-	void CreateResources();
 	bool LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
+	void CreatePipeline();
+	void CreateAccelDescriptors();
 
 	size_t GetSizeOf( VertexAttributeFormat format );
 	VertexInputDescription CreateVertexDescription( std::vector<VertexAttribute> vertexAttributes );
@@ -49,9 +50,18 @@ private:
 public:
 	std::vector<Texture> m_textures;
 	std::string m_shaderPath;
+	
+	void CreateResources();
 
 	VkDescriptorSet m_textureSet;
 	VkDescriptorSetLayout m_textureSetLayout;
+
+#if RAYTRACING
+	VkDescriptorSet m_accelerationStructureSet;
+	VkDescriptorSetLayout m_accelerationStructureSetLayout;
+
+#endif
+
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;
 	Sampler m_sampler;

@@ -48,4 +48,14 @@ struct Transform
 	Vector3 position;
 	Quaternion rotation;
 	Vector3 scale;
+
+	glm::mat4x4 GetModelMatrix()
+	{
+		glm::mat4x4 model = glm::mat4{ 1.0f };
+		model *= glm::translate( glm::mat4{ 1.0f }, position.ToGLM() );
+		model *= glm::mat4_cast( rotation.ToGLM() );
+		model *= glm::scale( glm::mat4{ 1.0f }, scale.ToGLM() );
+
+		return model;
+	}
 };

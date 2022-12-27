@@ -1,16 +1,44 @@
 #pragma once
 
+#include <defs.h>
 #include <functional>
 #include <glm/glm.hpp>
+#include <imgui.h>
 #include <subsystem.h>
 #include <vector>
 #include <vk_types.h>
-#include <window.h>
-#include <imgui.h>
+#include <window.h>s
 
+struct Mesh;
 class Model;
 class HostManager;
 class Camera;
+
+#if RAYTRACING
+struct BlasInput
+{
+public:
+	std::vector<VkAccelerationStructureGeometryKHR> asGeometry = {};
+	std::vector<VkAccelerationStructureBuildRangeInfoKHR> asBuildOffsetInfo = {};
+	VkBuildAccelerationStructureFlagsKHR flags;
+};
+
+struct AllocatedAccel
+{
+	VkAccelerationStructureKHR accel;
+	AllocatedBuffer buffer;
+};
+
+struct BuildAccelerationStructure
+{
+	VkAccelerationStructureBuildGeometryInfoKHR buildInfo = {};
+	VkAccelerationStructureBuildSizesInfoKHR sizeInfo = {};
+	VkAccelerationStructureBuildRangeInfoKHR* rangeInfo = {};
+
+	AllocatedAccel as;
+	AllocatedAccel cleanupAS;
+};
+#endif
 
 class RenderManager : ISubSystem
 {
@@ -24,8 +52,35 @@ private:
 	void InitDescriptors();
 	void InitSamplers();
 
-	void CreateSwapchain( VkExtent2D size );
+#if RAYTRACING
+	void InitRayTracing();
+	VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_rtProperties;
 
+	BlasInput ModelToVkGeometry( Model& model );
+	void CreateBottomLevelAS();
+	void CreateTopLevelAS();
+
+	VkDeviceAddress GetBlasDeviceAddress( uint32_t handle );
+
+	AllocatedAccel CreateAcceleration( VkAccelerationStructureCreateInfoKHR& createInfo );
+
+	void CmdCreateBlas( VkCommandBuffer cmdBuf, std::vector<uint32_t> indices, std::vector<BuildAccelerationStructure>& buildAs,
+	    VkDeviceAddress scratchAddress, VkQueryPool queryPool );
+
+	void CmdCompactBlas( VkCommandBuffer cmdBuf, std::vector<uint32_t> indices,
+	    std::vector<BuildAccelerationStructure>& buildAs, VkQueryPool queryPool );
+
+	void CmdCreateTlas( VkCommandBuffer cmdBuf, uint32_t countInstance, VkDeviceAddress instBufferAddr,
+	    AllocatedBuffer& scratchBuffer, VkBuildAccelerationStructureFlagsKHR flags, bool update );
+
+	std::vector<AllocatedAccel> m_blas = {};
+
+	uint32_t GetMemoryType( uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr ) const;
+
+	VkPhysicalDeviceMemoryProperties m_memoryProperties;
+#endif
+
+	void CreateSwapchain( VkExtent2D size );
 	void CalculateCameraMatrices( glm::mat4x4& viewMatrix, glm::mat4x4& projMatrix );
 
 public:
@@ -78,7 +133,8 @@ public:
 	UploadContext m_uploadContext;
 	void ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function );
 
-	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage );
+	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
+	    VmaAllocationCreateFlagBits allocFlags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT );
 
 	glm::mat4x4 CalculateViewProjMatrix();
 	glm::mat4x4 CalculateViewmodelViewProjMatrix();
@@ -88,4 +144,8 @@ public:
 
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;
+
+#if RAYTRACING
+	AllocatedAccel m_tlas = {};
+#endif
 };

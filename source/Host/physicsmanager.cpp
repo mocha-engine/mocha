@@ -140,7 +140,7 @@ void PhysicsManager::Update()
 		modelEntity->SetTransform( tx );
 
 		// Save off velocity so that we can make changes to it if we need to
-		if ( body->type == PhysicsType::Dynamic )
+		if ( body->type == PhysicsType::PHYSICS_MODE_DYNAMIC )
 			modelEntity->SetVelocity( JoltConversions::JoltToMochaVec3( velocity ) );
 	} );
 }
@@ -152,7 +152,7 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 
 	// These basic properties are used across all types - they're just based on whether we want the physics body
 	// to move and interact with things or not.
-	bool isStatic = body.type == PhysicsType::Static;
+	bool isStatic = body.type == PhysicsType::PHYSICS_MODE_STATIC;
 	JPH::EActivation activation = isStatic ? JPH::EActivation::DontActivate : JPH::EActivation::Activate;
 	JPH::EMotionType motionType = isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
 	JPH::uint8 layer = isStatic ? Layers::NON_MOVING : Layers::MOVING;
@@ -166,16 +166,18 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 	// Shape-specific setup
 	switch ( body.shape.shapeType )
 	{
-	case PhysicsShapeType::Sphere:
+	case PhysicsShapeType::PHYSICS_SHAPE_SPHERE: {
 		shapeSettings = new JPH::SphereShapeSettings( body.shape.shapeData.radius );
 		break;
+	}
 
-	case PhysicsShapeType::Box:
+	case PhysicsShapeType::PHYSICS_SHAPE_BOX: {
 		auto extents = JoltConversions::MochaToJoltVec3( body.shape.shapeData.extents );
 		shapeSettings = new JPH::BoxShapeSettings( extents );
 		break;
+	}
 
-	case PhysicsShapeType::Mesh: {
+	case PhysicsShapeType::PHYSICS_SHAPE_MESH: {
 		JPH::TriangleList triangleList;
 
 		for ( size_t i = 0; i < body.shape.shapeData.vertices.size(); i += 3 )
@@ -191,9 +193,12 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 		shapeSettings = new JPH::MeshShapeSettings( triangleList );
 		break;
 	}
-	default:
+	default: {
 		spdlog::error( "Unsupported phys shape" );
 		return UINT32_MAX;
+
+		break;
+	}
 	}
 
 	// Make a shape, then set up a body
