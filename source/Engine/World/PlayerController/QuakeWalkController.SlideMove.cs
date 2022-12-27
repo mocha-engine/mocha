@@ -45,7 +45,7 @@ partial class QuakeWalkController
 		// Never turn against original velocity
 		planes[numPlanes] = Velocity.Normal;
 
-		for ( bumpCount = 0; bumpCount < 4; bumpCount++ )
+		for ( bumpCount = 0; bumpCount < 5; bumpCount++ )
 		{
 			if ( Velocity.Length <= 0.001f )
 				break;

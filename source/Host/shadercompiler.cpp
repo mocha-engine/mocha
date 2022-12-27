@@ -167,6 +167,9 @@ bool ShaderCompiler::Compile( const VkShaderStageFlagBits shader_type, const cha
 	std::string preamble = GetPreamble( stage );
 	shader.setPreamble( preamble.c_str() );
 
+	// Set spirv 1.4
+	shader.setEnvTarget( glslang::EShTargetSpv, glslang::EShTargetSpv_1_4 );
+
 	if ( !shader.parse( &builtInResources, 460, false, messages ) )
 	{
 		puts( shader.getInfoLog() );

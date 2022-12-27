@@ -44,4 +44,7 @@ public:
 
 	//@InteropGen ignore
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transform );
+
+	//@InteropGen ignore
+	const std::vector<Mesh> GetMeshes() { return m_meshes; }
 };

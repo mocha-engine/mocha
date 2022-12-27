@@ -4,6 +4,6 @@ partial class QuakeWalkController
 {
 	private void LogToScreen( string text )
 	{
-		Log.Trace( text );
+		//Log.Trace( text );
 	}
 }

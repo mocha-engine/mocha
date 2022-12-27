@@ -1,19 +1,18 @@
-#define _RENDERDOC 1
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
 
 #include "root.h"
 
+#include <crtdbg.h>
 #include <defs.h>
 #include <edict.h>
 #include <globalvars.h>
-#include <logmanager.h>
 #include <hostmanager.h>
+#include <inputmanager.h>
+#include <logmanager.h>
+#include <physicsmanager.h>
 #include <renderdocmanager.h>
 #include <rendermanager.h>
-#include <physicsmanager.h>
-#include <inputmanager.h>
+#include <stdlib.h>
 
 //
 // These global variables are all defined in globalvars.h,
@@ -95,7 +94,6 @@ void Root::Shutdown()
 	g_logManager->Shutdown();
 
 	_CrtDumpMemoryLeaks();
-
 }
 
 void Root::Run()

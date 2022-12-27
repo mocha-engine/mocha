@@ -10,3 +10,9 @@
 [submodule "source/Host/thirdparty/implot"]
 	path = source/Host/thirdparty/implot
 	url = https://github.com/epezent/implot
+[submodule "source/Host/thirdparty/--force"]
+	path = source/Host/thirdparty/--force
+	url = https://github.com/zeux/volk
+[submodule "source/Host/thirdparty/volk"]
+	path = source/Host/thirdparty/volk
+	url = https://github.com/zeux/volk

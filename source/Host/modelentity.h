@@ -1,9 +1,9 @@
 #pragma once
 #include <baseentity.h>
-#include <model.h>
 #include <game_types.h>
+#include <model.h>
 #include <vector>
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 struct PhysicsBody;
 
@@ -28,7 +28,8 @@ private:
 public:
 	void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj ) override;
 
-	void SetModel( Model model );
+	void SetModel( Model model ) { m_model = model; }
+	Model GetModel() { return m_model; };
 
 	//
 	// Getters & setters

@@ -37,7 +37,9 @@ void Model::UploadMesh( Mesh& mesh )
 		vertexBufferInfo.pNext = nullptr;
 
 		vertexBufferInfo.size = mesh.vertices.size;
-		vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+		                         VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
+		                         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
 
 		vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
@@ -77,7 +79,9 @@ void Model::UploadMesh( Mesh& mesh )
 		indexBufferInfo.pNext = nullptr;
 
 		indexBufferInfo.size = mesh.indices.size;
-		indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+		indexBufferInfo.usage = VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
+		                        VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
+		                        VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
 
 		vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
@@ -117,17 +121,21 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 
 	for ( Mesh& mesh : m_meshes )
 	{
-		auto material = mesh.material;
+		auto& material = mesh.material;
+
+		// JIT pipeline creation
+		if ( mesh.material.m_pipeline == nullptr )
+		{
+			spdlog::trace( "Model::Render: Creating pipeline JIT..." );
+			
+			mesh.material.CreateResources();
+		}
 
 		vkCmdBindPipeline( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipeline );
 		VkDeviceSize offset = 0;
 		vkCmdBindVertexBuffers( cmd, 0, 1, &mesh.vertexBuffer.buffer, &offset );
 
-		glm::mat4x4 model = glm::mat4{ 1.0f };
-		model *= glm::translate( glm::mat4{ 1.0f }, transform.position.ToGLM() );
-		model *= glm::mat4_cast( transform.rotation.ToGLM() );
-		model *= glm::scale( glm::mat4{ 1.0f }, transform.scale.ToGLM() );
-
+		glm::mat4x4 model = transform.GetModelMatrix();
 		glm::mat4x4 renderMatrix = viewProj * model;
 
 		MeshPushConstants constants = {};
@@ -154,8 +162,15 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		constants.vLightInfoWS[2] = packedLightInfo[2];
 		constants.vLightInfoWS[3] = packedLightInfo[3];
 
+#if RAYTRACING
+		VkDescriptorSet sets[] = { mesh.material.m_textureSet, mesh.material.m_accelerationStructureSet };
+
+		vkCmdBindDescriptorSets( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 2, &sets[0], 0, nullptr );
+#else
 		vkCmdBindDescriptorSets(
 		    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1, &mesh.material.m_textureSet, 0, nullptr );
+#endif
+
 		vkCmdPushConstants( cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
 		    sizeof( MeshPushConstants ), &constants );
 

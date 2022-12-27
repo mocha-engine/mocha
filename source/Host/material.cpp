@@ -6,6 +6,45 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
+#if RAYTRACING
+void Material::CreateAccelDescriptors()
+{
+	VkDevice device = g_renderManager->m_device;
+	VkDescriptorPool descriptorPool = g_renderManager->m_descriptorPool;
+
+	VkDescriptorSetLayoutBinding accelerationStructureLayoutBinding = {};
+	accelerationStructureLayoutBinding.binding = 0;
+	accelerationStructureLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+	accelerationStructureLayoutBinding.descriptorCount = 1;
+	accelerationStructureLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	VkDescriptorSetLayoutCreateInfo accelerationStructureLayoutInfo =
+	    VKInit::DescriptorSetLayoutCreateInfo( &accelerationStructureLayoutBinding, 1 );
+	VK_CHECK(
+	    vkCreateDescriptorSetLayout( device, &accelerationStructureLayoutInfo, nullptr, &m_accelerationStructureSetLayout ) );
+
+	VkDescriptorSetAllocateInfo accelerationStructureAllocInfo =
+	    VKInit::DescriptorSetAllocateInfo( descriptorPool, &m_accelerationStructureSetLayout, 1 );
+
+	VK_CHECK( vkAllocateDescriptorSets( device, &accelerationStructureAllocInfo, &m_accelerationStructureSet ) );
+
+	VkWriteDescriptorSetAccelerationStructureKHR accelerationStructureWrite = {};
+	accelerationStructureWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET_ACCELERATION_STRUCTURE_KHR;
+	accelerationStructureWrite.accelerationStructureCount = 1;
+	accelerationStructureWrite.pAccelerationStructures = &g_renderManager->m_tlas.accel;
+
+	VkWriteDescriptorSet accelerationStructureDescriptorWrite = {};
+	accelerationStructureDescriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+	accelerationStructureDescriptorWrite.dstSet = m_accelerationStructureSet;
+	accelerationStructureDescriptorWrite.dstBinding = 0;
+	accelerationStructureDescriptorWrite.descriptorCount = 1;
+	accelerationStructureDescriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_ACCELERATION_STRUCTURE_KHR;
+	accelerationStructureDescriptorWrite.pNext = &accelerationStructureWrite;
+
+	vkUpdateDescriptorSets( device, 1, &accelerationStructureDescriptorWrite, 0, nullptr );
+}
+#endif
+
 Material::Material(
     const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler, bool ignoreDepth )
 {
@@ -24,8 +63,6 @@ Material::Material(
 
 	m_sampler = sampler;
 	m_ignoreDepth = ignoreDepth;
-
-	CreateResources();
 }
 
 void Material::CreateDescriptors()
@@ -50,10 +87,9 @@ void Material::CreateDescriptors()
 	    VKInit::DescriptorSetLayoutCreateInfo( textureBindings.data(), textureBindings.size() );
 	VK_CHECK( vkCreateDescriptorSetLayout( device, &textureLayoutInfo, nullptr, &m_textureSetLayout ) );
 
-	VkDescriptorSetAllocateInfo allocInfo =
-	    VKInit::DescriptorSetAllocateInfo( g_renderManager->m_descriptorPool, &m_textureSetLayout, 1 );
+	VkDescriptorSetAllocateInfo allocInfo = VKInit::DescriptorSetAllocateInfo( descriptorPool, &m_textureSetLayout, 1 );
 
-	VK_CHECK( vkAllocateDescriptorSets( g_renderManager->m_device, &allocInfo, &m_textureSet ) );
+	VK_CHECK( vkAllocateDescriptorSets( device, &allocInfo, &m_textureSet ) );
 
 	std::vector<VkDescriptorImageInfo> imageInfos = {};
 	std::vector<VkWriteDescriptorSet> descriptorWrites = {};
@@ -75,7 +111,7 @@ void Material::CreateDescriptors()
 		descriptorWrites.push_back(
 		    VKInit::WriteDescriptorImage( VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, m_textureSet, &imageInfos[i], i ) );
 
-	vkUpdateDescriptorSets( g_renderManager->m_device, descriptorWrites.size(), descriptorWrites.data(), 0, nullptr );
+	vkUpdateDescriptorSets( device, descriptorWrites.size(), descriptorWrites.data(), 0, nullptr );
 }
 
 void Material::CreatePipeline()
@@ -106,6 +142,10 @@ void Material::CreatePipeline()
 	std::vector<VkDescriptorSetLayout> setLayouts;
 	setLayouts.push_back( m_textureSetLayout );
 
+#if RAYTRACING
+	setLayouts.push_back( m_accelerationStructureSetLayout );
+#endif
+
 	pipeline_layout_info.pSetLayouts = setLayouts.data();
 	pipeline_layout_info.setLayoutCount = setLayouts.size();
 
@@ -123,6 +163,7 @@ void Material::CreatePipeline()
 void Material::CreateResources()
 {
 	CreateDescriptors();
+	CreateAccelDescriptors();
 	CreatePipeline();
 }
 

@@ -12,7 +12,7 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <texture.h>
-#include <vulkan/vulkan.h>
+#include <volk.h>
 
 //@InteropGen generate class
 namespace Editor

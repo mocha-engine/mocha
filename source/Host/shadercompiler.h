@@ -1,6 +1,6 @@
 #pragma once
 #include <glslang/SPIRV/GlslangToSpv.h>
-#include <vulkan/vulkan.h>
+#include <volk.h>
 #include "mesh.h"
 
 class ShaderCompiler

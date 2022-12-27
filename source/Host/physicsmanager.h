@@ -31,15 +31,15 @@
 
 enum PhysicsType
 {
-	Static,
-	Dynamic
+	PHYSICS_MODE_STATIC,
+	PHYSICS_MODE_DYNAMIC
 };
 
 enum PhysicsShapeType
 {
-	Box,
-	Sphere,
-	Mesh
+	PHYSICS_SHAPE_BOX,
+	PHYSICS_SHAPE_SPHERE,
+	PHYSICS_SHAPE_MESH
 };
 
 struct PhysicsShapeData
