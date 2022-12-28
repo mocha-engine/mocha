@@ -57,10 +57,8 @@ public:
 	VkDescriptorSet m_textureSet;
 	VkDescriptorSetLayout m_textureSetLayout;
 
-#if RAYTRACING
 	VkDescriptorSet m_accelerationStructureSet;
 	VkDescriptorSetLayout m_accelerationStructureSetLayout;
-#endif
 
 	VkPipelineLayout m_pipelineLayout;
 	VkPipeline m_pipeline;

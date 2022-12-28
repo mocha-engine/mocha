@@ -116,14 +116,21 @@ public:
 		Register<float>( name, value, flags, description );
 	}
 
+	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description )
+	{
+		Register<bool>( name, value, flags, description );
+	}
+
 	std::string GetString( std::string name ) { return Get<std::string>( name ); }
 	float GetFloat( std::string name ) { return Get<float>( name ); }
+	bool GetBool( std::string name ) { return Get<bool>( name ); }
 
 	void FromString( std::string name, std::string valueStr );
 	std::string ToString( std::string name );
 
 	void SetString( std::string name, std::string value ) { Set<std::string>( name, value ); }
 	void SetFloat( std::string name, float value ) { Set<float>( name, value ); }
+	void SetBool( std::string name, bool value ) { Set<bool>( name, value ); }
 
 	void ForEach( std::function<void( CVarEntry& entry )> func );
 	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );
@@ -159,6 +166,20 @@ public:
 	float GetValue() { return CVarManager::Instance().GetFloat( m_name ); }
 
 	void SetValue( float value ) { CVarManager::Instance().SetFloat( m_name, value ); }
+};
+
+class BoolCVar : CVarParameter
+{
+public:
+	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
+	{
+		m_name = name;
+
+		CVarManager::Instance().RegisterBool( name, value, flags, description );
+	}
+
+	bool GetValue() { return CVarManager::Instance().GetBool( m_name ); }
+	void SetValue( bool value ) { CVarManager::Instance().SetBool( m_name, value ); }
 };
 
 template <typename T>

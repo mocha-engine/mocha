@@ -128,23 +128,42 @@ EShLanguage ShaderCompiler::FindLanguage( const VkShaderStageFlagBits shader_typ
 
 std::string ShaderCompiler::GetPreamble( EShLanguage language )
 {
+	std::string preamble;
+
+	//
+	// Add language type
+	//
 	switch ( language )
 	{
 	case EShLangVertex:
-		return "#define VERTEX\n";
+		preamble += "#define VERTEX\n";
+		break;
 	case EShLangTessControl:
-		return "#define TESS_CONTROL\n";
+		preamble += "#define TESS_CONTROL\n";
+		break;
 	case EShLangTessEvaluation:
-		return "#define TESS_EVALUATION\n";
+		preamble += "#define TESS_EVALUATION\n";
+		break;
 	case EShLangGeometry:
-		return "#define GEOMETRY\n";
+		preamble += "#define GEOMETRY\n";
+		break;
 	case EShLangFragment:
-		return "#define FRAGMENT\n";
+		preamble += "#define FRAGMENT\n";
+		break;
 	case EShLangCompute:
-		return "#define COMPUTE\n";
-	default:
-		return "";
+		preamble += "#define COMPUTE\n";
+		break;
 	}
+
+	//
+	// Add engine features
+	//
+	if ( EngineFeatures::Raytracing )
+	{
+		preamble += "#define RAYTRACING\n";
+	}
+
+	return preamble;
 }
 
 bool ShaderCompiler::Compile( const VkShaderStageFlagBits shader_type, const char* pshader, std::vector<uint32_t>& spirv )

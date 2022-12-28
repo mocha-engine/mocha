@@ -14,7 +14,6 @@ class Model;
 class HostManager;
 class Camera;
 
-#if RAYTRACING
 struct BlasInput
 {
 public:
@@ -38,7 +37,6 @@ struct BuildAccelerationStructure
 	AllocatedAccel as;
 	AllocatedAccel cleanupAS;
 };
-#endif
 
 class RenderManager : ISubSystem
 {
@@ -52,7 +50,6 @@ private:
 	void InitDescriptors();
 	void InitSamplers();
 
-#if RAYTRACING
 	void InitRayTracing();
 	VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_rtProperties;
 
@@ -78,7 +75,6 @@ private:
 	uint32_t GetMemoryType( uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr ) const;
 
 	VkPhysicalDeviceMemoryProperties m_memoryProperties;
-#endif
 
 	void CreateSwapchain( VkExtent2D size );
 	void CalculateCameraMatrices( glm::mat4x4& viewMatrix, glm::mat4x4& projMatrix );
@@ -145,7 +141,5 @@ public:
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;
 
-#if RAYTRACING
 	AllocatedAccel m_tlas = {};
-#endif
 };

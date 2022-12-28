@@ -24,10 +24,10 @@ Window::Window( uint32_t width, uint32_t height )
 
 	m_window = SDL_CreateWindow( WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 
-	if ( !g_gameSettings->icon.empty() )
+	if ( !GameSettings::Get()->icon.empty() )
 	{
 		SDL_Surface* icon;
-		icon = IMG_Load( g_gameSettings->icon.c_str() );
+		icon = IMG_Load( GameSettings::Get()->icon.c_str() );
 		SDL_SetWindowIcon( m_window, icon );
 	}
 	else

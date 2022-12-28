@@ -1,5 +1,8 @@
 {
-    "gameName": "SpaceGame",
+    "name": "SpaceGame",
     "icon": "content/core/icon.ico",
-    "version": "Prototype"
+    "milestone": "Prototype",
+    "features": {
+        "raytracing": true
+    }
 }

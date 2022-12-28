@@ -8,6 +8,7 @@
 #include <defs.h>
 #include <edict.h>
 #include <fontawesome.h>
+#include <gamesettings.h>
 #include <globalvars.h>
 #include <hostmanager.h>
 #include <mesh.h>
@@ -77,7 +78,7 @@ void RenderManager::InitVulkan()
 
 	vkb::InstanceBuilder builder;
 
-	auto ret = builder.set_app_name( GAME_NAME )
+	auto ret = builder.set_app_name( GameSettings::Get()->name.c_str() )
 	               .set_engine_name( ENGINE_NAME )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
@@ -102,15 +103,16 @@ void RenderManager::InitVulkan()
 	selector = selector.set_minimum_version( 1, 3 );
 	selector = selector.set_surface( m_surface );
 
-#if RAYTRACING
-	//
-	// Set required extensions
-	//
-	selector = selector.add_required_extension( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
-	selector = selector.add_required_extension( VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME );
-	selector = selector.add_required_extension( VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME );
-	selector = selector.add_required_extension( VK_KHR_RAY_QUERY_EXTENSION_NAME );
-#endif
+	if ( EngineFeatures::Raytracing )
+	{
+		//
+		// Set required extensions
+		//
+		selector = selector.add_required_extension( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
+		selector = selector.add_required_extension( VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME );
+		selector = selector.add_required_extension( VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME );
+		selector = selector.add_required_extension( VK_KHR_RAY_QUERY_EXTENSION_NAME );
+	}
 
 	//
 	// Set required VK1.0 features
@@ -164,17 +166,18 @@ void RenderManager::InitVulkan()
 	vkb::PhysicalDevice physicalDevice = physicalDeviceReturn.value();
 	vkb::DeviceBuilder deviceBuilder( physicalDevice );
 
-#if RAYTRACING
-	VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeature = {};
-	accelFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-	accelFeature.accelerationStructure = true;
+	if ( EngineFeatures::Raytracing )
+	{
+		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeature = {};
+		accelFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
+		accelFeature.accelerationStructure = true;
 
-	VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeature = {};
-	rayQueryFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
-	rayQueryFeature.rayQuery = true;
+		VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeature = {};
+		rayQueryFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
+		rayQueryFeature.rayQuery = true;
 
-	deviceBuilder = deviceBuilder.add_pNext( &accelFeature ).add_pNext( &rayQueryFeature );
-#endif
+		deviceBuilder = deviceBuilder.add_pNext( &accelFeature ).add_pNext( &rayQueryFeature );
+	}
 
 	vkb::Device vkbDevice = deviceBuilder.build().value();
 
@@ -521,7 +524,6 @@ void RenderManager::InitSamplers()
 	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_pointSampler ) );
 }
 
-#if RAYTRACING
 void RenderManager::InitRayTracing()
 {
 	spdlog::info( "Ray tracing enabled" );
@@ -958,7 +960,6 @@ void RenderManager::CmdCreateTlas( VkCommandBuffer cmdBuf, uint32_t countInstanc
 	// Build the TLAS
 	vkCmdBuildAccelerationStructuresKHR( cmdBuf, 1, &buildInfo, &pBuildOffsetInfo );
 }
-#endif
 
 void RenderManager::Startup()
 {
@@ -1177,11 +1178,12 @@ void RenderManager::Run()
 
 	g_hostManager->FireEvent( "Event.Game.Load" );
 
-#if RAYTRACING
-	InitRayTracing();
-	CreateBottomLevelAS();
-	CreateTopLevelAS();
-#endif
+	if ( EngineFeatures::Raytracing )
+	{
+		InitRayTracing();
+		CreateBottomLevelAS();
+		CreateTopLevelAS();
+	}
 
 	while ( !bQuit )
 	{

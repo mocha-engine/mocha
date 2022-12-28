@@ -6,7 +6,6 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-#if RAYTRACING
 void Material::CreateAccelDescriptors()
 {
 	VkDevice device = g_renderManager->m_device;
@@ -43,7 +42,6 @@ void Material::CreateAccelDescriptors()
 
 	vkUpdateDescriptorSets( device, 1, &accelerationStructureDescriptorWrite, 0, nullptr );
 }
-#endif
 
 Material::Material(
     const char* shaderPath, InteropArray vertexAttributes, InteropArray textures, Sampler sampler, bool ignoreDepth )
@@ -142,9 +140,8 @@ void Material::CreatePipeline()
 	std::vector<VkDescriptorSetLayout> setLayouts;
 	setLayouts.push_back( m_textureSetLayout );
 
-#if RAYTRACING
-	setLayouts.push_back( m_accelerationStructureSetLayout );
-#endif
+	if ( EngineFeatures::Raytracing )
+		setLayouts.push_back( m_accelerationStructureSetLayout );
 
 	pipeline_layout_info.pSetLayouts = setLayouts.data();
 	pipeline_layout_info.setLayoutCount = setLayouts.size();
@@ -164,9 +161,8 @@ void Material::CreateResources()
 {
 	CreateDescriptors();
 
-#if RAYTRACING
-	CreateAccelDescriptors();
-#endif
+	if ( EngineFeatures::Raytracing )
+		CreateAccelDescriptors();
 
 	CreatePipeline();
 }
