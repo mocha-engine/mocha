@@ -4,22 +4,29 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-struct GameSettings
+struct GameFeatures
 {
-	std::string gameName;
-	std::string icon;
-	std::string version;
+	bool raytracing;
+};
 
-	nlohmann::json Serialize() { return nlohmann::json{ { "gameName", gameName }, { "icon", icon }, { "version", version } }; }
+struct Settings
+{
+	std::string name;
+	std::string icon;
+	std::string milestone;
+
+	GameFeatures features;
 
 	void Deserialize( const nlohmann::json& j )
 	{
-		gameName = j["gameName"].get<std::string>();
+		name = j["name"].get<std::string>();
 		icon = j["icon"].get<std::string>();
-		version = j["version"].get<std::string>();
+		milestone = j["milestone"].get<std::string>();
+
+		features.raytracing = j["features"]["raytracing"].get<bool>();
 	}
 
-	GameSettings( std::string path )
+	Settings( std::string path )
 	{
 		nlohmann::json j;
 
@@ -29,3 +36,14 @@ struct GameSettings
 		Deserialize( j );
 	}
 };
+
+class GameSettings
+{
+public:
+	static Settings* Get()
+	{
+		static Settings settings( "spacegame.json" );
+
+		return &settings;
+	}
+}; // namespace GameSettings

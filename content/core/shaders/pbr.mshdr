@@ -1,6 +1,9 @@
 #version 460
+
+#ifdef RAYTRACING
 #extension GL_EXT_ray_tracing : enable
 #extension GL_EXT_ray_query : enable
+#endif
 
 #define DEBUG_VIEW_NONE 					0
 #define DEBUG_VIEW_DIFFUSE 					1
@@ -115,7 +118,10 @@ layout (set = 0, binding = 2) uniform sampler2D ambientOcclusionTexture;
 layout (set = 0, binding = 3) uniform sampler2D metalnessTexture;
 layout (set = 0, binding = 4) uniform sampler2D roughnessTexture;
 layout (set = 0, binding = 5) uniform sampler2D blueNoiseTexture;
+
+#ifdef RAYTRACING
 layout (set = 1, binding = 0) uniform accelerationStructureEXT topLevelAS;
+#endif
 
 const vec2 BlueNoiseInDisk[64] = vec2[64](
     vec2(0.478712,0.875764),
@@ -299,6 +305,7 @@ vec3 random3( vec3 uv )
 
 float traceShadow( vec3 L, vec3 origin, vec3 direction, float distance, int index )
 {
+#ifdef RAYTRACING
 	float tMin      = 0.01f;
 	float tMax      = distance;
 
@@ -329,6 +336,7 @@ float traceShadow( vec3 L, vec3 origin, vec3 direction, float distance, int inde
 		// Got an intersection == Shadow
 		return 1.0f;
 	}
+#endif
 
 	return 0.0f;
 }

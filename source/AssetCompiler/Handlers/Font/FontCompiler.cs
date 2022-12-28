@@ -17,6 +17,20 @@ public class FontCompiler : BaseCompiler
 		var destAtlasFileName = Path.ChangeExtension( path, ".png" );
 		var destFileName = Path.ChangeExtension( path, "mfnt_c" );
 
+		// TODO: Move to a nice generic function somewhere
+		if ( File.Exists( destFileName ) )
+		{
+			// Read mocha file
+			var existingFile = File.ReadAllBytes( destFileName );
+			var deserializedFile = Serializer.Deserialize<MochaFile<Font.Data>>( existingFile );
+
+			if ( deserializedFile.Data.ModifiedDate == File.GetLastWriteTime( path ).ToString() )
+			{
+				Log.Skip( path );
+				return destFileName;
+			}
+		}
+
 		var charSetFileName = Path.ChangeExtension( path, ".txt" );
 
 		// Get exe directory
@@ -60,10 +74,12 @@ public class FontCompiler : BaseCompiler
 
 		// Load json
 		var fileData = File.ReadAllText( destJsonFileName );
-		var fontData = JsonSerializer.Deserialize<dynamic>( fileData );
+		var fontData = JsonSerializer.Deserialize<Font.Data>( fileData );
+
+		fontData.ModifiedDate = File.GetLastWriteTime( path ).ToString();
 
 		// Wrapper for file
-		var mochaFile = new MochaFile<dynamic>()
+		var mochaFile = new MochaFile<Font.Data>()
 		{
 			MajorVersion = 3,
 			MinorVersion = 1,

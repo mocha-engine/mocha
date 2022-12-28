@@ -127,7 +127,7 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		if ( mesh.material.m_pipeline == nullptr )
 		{
 			spdlog::trace( "Model::Render: Creating pipeline JIT..." );
-			
+
 			mesh.material.CreateResources();
 		}
 
@@ -161,15 +161,18 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		constants.vLightInfoWS[1] = packedLightInfo[1];
 		constants.vLightInfoWS[2] = packedLightInfo[2];
 		constants.vLightInfoWS[3] = packedLightInfo[3];
-
-#if RAYTRACING
-		VkDescriptorSet sets[] = { mesh.material.m_textureSet, mesh.material.m_accelerationStructureSet };
-
-		vkCmdBindDescriptorSets( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 2, &sets[0], 0, nullptr );
-#else
-		vkCmdBindDescriptorSets(
-		    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1, &mesh.material.m_textureSet, 0, nullptr );
-#endif
+		
+		if ( EngineFeatures::Raytracing )
+		{
+			VkDescriptorSet sets[] = { mesh.material.m_textureSet, mesh.material.m_accelerationStructureSet };
+			vkCmdBindDescriptorSets(
+			    cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 2, &sets[0], 0, nullptr );
+		}
+		else
+		{
+			vkCmdBindDescriptorSets( cmd, VK_PIPELINE_BIND_POINT_GRAPHICS, material.m_pipelineLayout, 0, 1,
+			    &mesh.material.m_textureSet, 0, nullptr );
+		}
 
 		vkCmdPushConstants( cmd, material.m_pipelineLayout, VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
 		    sizeof( MeshPushConstants ), &constants );

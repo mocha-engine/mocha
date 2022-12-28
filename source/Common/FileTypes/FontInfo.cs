@@ -1,5 +1,6 @@
 ﻿using System.Text.Json.Serialization;
-namespace Mocha.UI;
+
+namespace Mocha.Common;
 
 public class Font
 {
@@ -88,6 +89,9 @@ public class Font
 
 		[JsonPropertyName( "kerning" )]
 		public List<object> Kerning { get; set; }
+
+		[JsonPropertyName( "modifiedDate" )]
+		public string ModifiedDate { get; set; }
 	}
 
 }
