@@ -1,6 +1,8 @@
 #include "window.h"
 
+#include <SDL2/SDL_image.h>
 #include <defs.h>
+#include <gamesettings.h>
 #include <globalvars.h>
 #include <inputmanager.h>
 
@@ -21,6 +23,17 @@ Window::Window( uint32_t width, uint32_t height )
 	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
 
 	m_window = SDL_CreateWindow( WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
+
+	if ( !g_gameSettings->icon.empty() )
+	{
+		SDL_Surface* icon;
+		icon = IMG_Load( g_gameSettings->icon.c_str() );
+		SDL_SetWindowIcon( m_window, icon );
+	}
+	else
+	{
+		spdlog::info( "No icon provided, so not using one. Make sure GameSettings has been loaded and filled correctly." );
+	}
 }
 
 VkSurfaceKHR Window::CreateSurface( VkInstance instance )
@@ -79,9 +92,9 @@ bool Window::Update()
 				SetWindowTheme( hwnd, L"DarkMode_Explorer", NULL );
 
 				BOOL darkMode = 1;
-				if ( FAILED ( DwmSetWindowAttribute( hwnd, 20, &darkMode, sizeof( darkMode ) ) ) )
+				if ( FAILED( DwmSetWindowAttribute( hwnd, 20, &darkMode, sizeof( darkMode ) ) ) )
 					DwmSetWindowAttribute( hwnd, 19, &darkMode, sizeof( darkMode ) );
-#endif			
+#endif
 			}
 			else if ( we.event == SDL_WINDOWEVENT_SIZE_CHANGED )
 			{
@@ -94,7 +107,7 @@ bool Window::Update()
 				spdlog::info( "Window was resized to {}x{}", width, height );
 
 				// Push event so that renderer etc. knows we've resized the window
-				VkExtent2D windowExtents = { (uint32_t)width, (uint32_t)height };
+				VkExtent2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
 				m_onWindowResized( windowExtents );
 			}
 		}
