@@ -13,7 +13,7 @@ void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, Inter
 	{
 		imageSize += CalcMipSize( width, height, i, imageFormat );
 	}
-
+	
 	AllocatedBuffer stagingBuffer =
 	    g_renderManager->CreateBuffer( imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VMA_MEMORY_USAGE_CPU_ONLY );
 

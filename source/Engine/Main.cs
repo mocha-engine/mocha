@@ -33,6 +33,9 @@ public class Main
 		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
 
+		if ( Time.Delta > 0.1f )
+			return;
+
 		const float threshold = 30f;
 
 		if ( Time.FPS < threshold )

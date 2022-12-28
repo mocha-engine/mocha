@@ -193,8 +193,6 @@ void RenderManager::InitVulkan()
 	allocatorFuncs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
 	allocatorFuncs.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
 	allocatorInfo.pVulkanFunctions = &allocatorFuncs;
-
-#if RAYTRACING
 	allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 
 	{
@@ -213,7 +211,6 @@ void RenderManager::InitVulkan()
 		}
 		spdlog::info( "=== END ===" );
 	}
-#endif
 
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
 }
@@ -734,11 +731,11 @@ void RenderManager::CreateTopLevelAS()
 		VkAccelerationStructureInstanceKHR rayInst = {};
 
 		// clang-format off
-		glm::mat4x4 m = modelEntity->GetTransform().GetModelMatrix();
+		glm::mat4x4 inputMatrix = modelEntity->GetTransform().GetModelMatrix();
 		VkTransformMatrixKHR transformMatrix = {
-		    m[0][0], m[0][1], m[0][2], m[0][3], 
-			m[1][0], m[1][1], m[1][2], m[1][3], 
-			m[2][0], m[2][1], m[2][2], m[2][3]
+            inputMatrix[0][0], inputMatrix[1][0], inputMatrix[2][0], inputMatrix[3][0],
+            inputMatrix[0][1], inputMatrix[1][1], inputMatrix[2][1], inputMatrix[3][1],
+            inputMatrix[0][2], inputMatrix[1][2], inputMatrix[2][2], inputMatrix[3][2],
 		};
 		// clang-format on
 

@@ -61,7 +61,7 @@ void main()
 	vs_out.vPositionWS = vec3( PushConstants.model_matrix * vec4( vPosition, 1.0f ) );
 	vs_out.vCameraWS = PushConstants.vCameraPosWS;
 	vs_out.vColor = vColor;
-	vs_out.vTexCoord = vTexCoord;
+	vs_out.vTexCoord = vTexCoord * vec2( -1, 1 );
 	vs_out.vNormalWS = vNormal;
 
 	//
@@ -95,6 +95,8 @@ void main()
 	// Finish - transform into clip space
 	//
 	gl_Position = PushConstants.render_matrix * vec4( vPosition, 1.0f );
+	
+	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize
 }
 
 #endif
@@ -112,7 +114,75 @@ layout (set = 0, binding = 1) uniform sampler2D normalTexture;
 layout (set = 0, binding = 2) uniform sampler2D ambientOcclusionTexture;
 layout (set = 0, binding = 3) uniform sampler2D metalnessTexture;
 layout (set = 0, binding = 4) uniform sampler2D roughnessTexture;
+layout (set = 0, binding = 5) uniform sampler2D blueNoiseTexture;
 layout (set = 1, binding = 0) uniform accelerationStructureEXT topLevelAS;
+
+const vec2 BlueNoiseInDisk[64] = vec2[64](
+    vec2(0.478712,0.875764),
+    vec2(-0.337956,-0.793959),
+    vec2(-0.955259,-0.028164),
+    vec2(0.864527,0.325689),
+    vec2(0.209342,-0.395657),
+    vec2(-0.106779,0.672585),
+    vec2(0.156213,0.235113),
+    vec2(-0.413644,-0.082856),
+    vec2(-0.415667,0.323909),
+    vec2(0.141896,-0.939980),
+    vec2(0.954932,-0.182516),
+    vec2(-0.766184,0.410799),
+    vec2(-0.434912,-0.458845),
+    vec2(0.415242,-0.078724),
+    vec2(0.728335,-0.491777),
+    vec2(-0.058086,-0.066401),
+    vec2(0.202990,0.686837),
+    vec2(-0.808362,-0.556402),
+    vec2(0.507386,-0.640839),
+    vec2(-0.723494,-0.229240),
+    vec2(0.489740,0.317826),
+    vec2(-0.622663,0.765301),
+    vec2(-0.010640,0.929347),
+    vec2(0.663146,0.647618),
+    vec2(-0.096674,-0.413835),
+    vec2(0.525945,-0.321063),
+    vec2(-0.122533,0.366019),
+    vec2(0.195235,-0.687983),
+    vec2(-0.563203,0.098748),
+    vec2(0.418563,0.561335),
+    vec2(-0.378595,0.800367),
+    vec2(0.826922,0.001024),
+    vec2(-0.085372,-0.766651),
+    vec2(-0.921920,0.183673),
+    vec2(-0.590008,-0.721799),
+    vec2(0.167751,-0.164393),
+    vec2(0.032961,-0.562530),
+    vec2(0.632900,-0.107059),
+    vec2(-0.464080,0.569669),
+    vec2(-0.173676,-0.958758),
+    vec2(-0.242648,-0.234303),
+    vec2(-0.275362,0.157163),
+    vec2(0.382295,-0.795131),
+    vec2(0.562955,0.115562),
+    vec2(0.190586,0.470121),
+    vec2(0.770764,-0.297576),
+    vec2(0.237281,0.931050),
+    vec2(-0.666642,-0.455871),
+    vec2(-0.905649,-0.298379),
+    vec2(0.339520,0.157829),
+    vec2(0.701438,-0.704100),
+    vec2(-0.062758,0.160346),
+    vec2(-0.220674,0.957141),
+    vec2(0.642692,0.432706),
+    vec2(-0.773390,-0.015272),
+    vec2(-0.671467,0.246880),
+    vec2(0.158051,0.062859),
+    vec2(0.806009,0.527232),
+    vec2(-0.057620,-0.247071),
+    vec2(0.333436,-0.516710),
+    vec2(-0.550658,-0.315773),
+    vec2(-0.652078,0.589846),
+    vec2(0.008818,0.530556),
+    vec2(-0.210004,0.519896) 
+);
 
 vec3 fresnelSchlick( float cosTheta, vec3 F0 )
 {
@@ -180,32 +250,7 @@ vec3 calculateLighting( float roughness, float metallic, vec3 albedo, vec3 light
 
 	float NdotL = max( dot( N, L ), 0.0 );
 
-	vec3 o_color = ( kD * albedo / PI + specular ) * radiance * NdotL;
-
-	// Trace them rays
-	// Ray Query for shadow
-	vec3  origin    = vs_out.vPositionTS;
-	vec3  direction = L;  // vector to light
-	float tMin      = 0.01f;
-	float tMax      = distance;
-
-	// Initializes a ray query object but does not start traversal
-	rayQueryEXT rayQuery;
-	rayQueryInitializeEXT(rayQuery, topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin, tMin, direction, tMax);
-
-	// Start traversal: return false if traversal is complete
-	while(rayQueryProceedEXT(rayQuery))
-	{
-	}
-
-	// Returns type of committed (true) intersection
-	if(rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionNoneEXT)
-	{
-		// Got an intersection == Shadow
-		o_color *= 0.01;
-	}
-	
-	return o_color;
+	return ( kD * albedo / PI + specular ) * radiance * NdotL;
 }
 
 float ambient()
@@ -230,6 +275,64 @@ vec3 reinhard_jodie(vec3 v)
     return mix(v / (1.0f + l), tv, tv);
 }
 
+vec2 blueNoise( int index )
+{
+	return BlueNoiseInDisk[ index % 64 ].xy;
+}
+
+float hash( float n )
+{
+	return fract(sin(n) * 43758.5453123);
+}
+
+vec2 random2( vec2 uv )
+{
+	float noise = hash( uv.x * 0.5f + uv.y * 0.5f );
+	return vec2( noise, hash( noise ) );
+}
+
+vec3 random3( vec3 uv )
+{
+	float noise = hash( uv.x * 0.5f + uv.y * 0.5f + uv.z * 0.5f );
+	return vec3( noise, hash( noise ), hash( noise * 2.0f ) );
+}
+
+float traceShadow( vec3 L, vec3 origin, vec3 direction, float distance, int index )
+{
+	float tMin      = 0.01f;
+	float tMax      = distance;
+
+	vec2 rng = random3( origin ).xy;
+	
+	float r = sqrt( rng.x );
+	float phi = 2.0f * PI * rng.y;
+
+	vec2 diskPoint = vec2( r * cos( phi ), r * sin( phi ) );
+
+	vec3 lightTangent = normalize( cross( L, vec3( 0.0f, 0.0f, 1.0f ) ) );
+	vec3 lightBitangent = normalize( cross( L, lightTangent ) );
+
+	vec3 rayDir = normalize( direction + ( diskPoint.x * lightTangent + diskPoint.y * lightBitangent ) * 0.025f );
+
+	// Initializes a ray query object but does not start traversal
+	rayQueryEXT rayQuery;
+	rayQueryInitializeEXT( rayQuery, topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin, tMin, rayDir, tMax );
+
+	// Start traversal: return false if traversal is complete
+	while(rayQueryProceedEXT(rayQuery))
+	{
+	}
+
+	// Returns type of committed (true) intersection
+	if(rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionNoneEXT)
+	{
+		// Got an intersection == Shadow
+		return 1.0f;
+	}
+
+	return 0.0f;
+}
+
 void main()
 {
 	// Collect material properties
@@ -240,10 +343,12 @@ void main()
 
 	vec3 vNormalTS = sampleTexture( normalTexture );
 	vNormalTS = vNormalTS * 2.0 - 1.0;
-
+	
 	// If we don't have a normal map, use the vertex normal ( calculated in tangent space )
-	if ( vNormalTS.z > 0 )
-		vNormalTS = vs_out.vNormalWS;
+	if ( vNormalTS.z > 0.0 )
+	{
+		vNormalTS = vs_out.vNormalTS;
+	}
 
 	// Recalculate Z axis - BC5 stomps it
 	vNormalTS.z = sqrt( 1.0 - vNormalTS.x * vNormalTS.x - vNormalTS.y * vNormalTS.y );
@@ -257,13 +362,35 @@ void main()
 	{
 		// Unpack lighting info
 		vec3 vLightPosTS = vs_out.vLightInfoTS[i].xyz;
+		vec3 vLightPosWS = PushConstants.vLightInfoWS[i].xyz;
 		float flLightIntensity = vs_out.vLightInfoTS[i].w;
 
-		color += calculateLighting( roughness, metallic, albedo, vLightPosTS, flLightIntensity, viewDir, vNormalTS );
+		vec3 vLightCol = calculateLighting( roughness, metallic, albedo, vLightPosTS, flLightIntensity, viewDir, vNormalTS );
+
+		// Trace them rays
+		vec3  L = vLightPosWS - vs_out.vPositionWS;
+		vec3  origin    = vs_out.vPositionWS;
+		vec3  direction = normalize( L );  // vector to light
+		float tMin      = 0.01f;
+		float tMax      = length( L );
+
+		int sampleCount = 4;
+
+		// Sample 8 random positions to average shadow from ( based on the position of the vertex )
+		float shadow = 0.0f;
+		for ( int j = 0; j < sampleCount; ++j )
+		{
+			shadow += traceShadow( L, origin, direction, tMax, j );// * ( 1.0f / float( sampleCount ) );
+		}
+
+		// Average shadow
+		shadow = shadow * ( 1.0f / float( sampleCount ) );
+		shadow = clamp( 1.0f - shadow, 0, 1 );
+		color += vLightCol * shadow;
 	}
 
 	vec3 fragColor = ambient + color;
-
+	
 	// Ambient occlusion
 	fragColor *= ao;
 
@@ -273,6 +400,9 @@ void main()
 
 	// Tonemap
 	fragColor = reinhard_jodie( fragColor );
+
+	// Exposure
+	fragColor *= 1.5f;
 
 	int debugView = int( floor( PushConstants.data.x ) );
 
@@ -287,7 +417,7 @@ void main()
 	else if ( debugView == DEBUG_VIEW_ROUGHNESS )
 		fragColor = roughness.xxx;
 	else if ( debugView == DEBUG_VIEW_OTHER )
-		fragColor = vs_out.vDebug;
+		fragColor = color;
 
 	outFragColor = vec4(fragColor, 1.0f);
 }

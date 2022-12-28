@@ -34,7 +34,7 @@ public class Player : ModelEntity
 		Mass = 100f;
 		IgnoreRigidbodyRotation = true;
 
-		ViewModel = new();
+		// ViewModel = new();
 
 		Respawn();
 	}
@@ -43,7 +43,7 @@ public class Player : ModelEntity
 	{
 		WalkController = new( this );
 		Velocity = Vector3.Zero;
-		Position = new Vector3( 0, 0, 2.0f );
+		Position = new Vector3( 0, 0, 3.0f );
 	}
 
 	public override void Update()
