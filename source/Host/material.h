@@ -52,6 +52,7 @@ public:
 	std::string m_shaderPath;
 	
 	void CreateResources();
+	void ReloadShaders();
 
 	VkDescriptorSet m_textureSet;
 	VkDescriptorSetLayout m_textureSetLayout;
@@ -59,7 +60,6 @@ public:
 #if RAYTRACING
 	VkDescriptorSet m_accelerationStructureSet;
 	VkDescriptorSetLayout m_accelerationStructureSetLayout;
-
 #endif
 
 	VkPipelineLayout m_pipelineLayout;

@@ -68,11 +68,11 @@ public class ModelCompiler : BaseCompiler
 					binaryWriter.Write( a.Y );
 				}
 
-				WriteVector3( vertex.Position );
-				WriteVector3( vertex.Normal );
-				WriteVector2( vertex.TexCoords );
-				WriteVector3( vertex.Tangent );
-				WriteVector3( vertex.Bitangent );
+				WriteVector3( vertex.Position * new System.Numerics.Vector3( -1, 1, 1 ) );
+				WriteVector3( vertex.Normal * new System.Numerics.Vector3( -1, 1, 1 ) );
+				WriteVector2( vertex.TexCoords * new System.Numerics.Vector2( -1, 1 ) );
+				WriteVector3( vertex.Tangent * new System.Numerics.Vector3( -1, 1, 1 ) );
+				WriteVector3( vertex.Bitangent * new System.Numerics.Vector3( -1, 1, 1 ) );
 			}
 
 			//

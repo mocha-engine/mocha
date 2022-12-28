@@ -11,7 +11,11 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
+	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex" );
+
 	public Glue.Material NativeMaterial { get; private set; }
+
+	private FileSystemWatcher Watcher { get; set; }
 
 	/// <summary>
 	/// Loads a material from an MMAT (compiled) file.
@@ -51,7 +55,8 @@ public class Material : Asset
 			NormalTexture.NativeTexture,
 			AmbientOcclusionTexture.NativeTexture,
 			MetalnessTexture.NativeTexture,
-			RoughnessTexture.NativeTexture
+			RoughnessTexture.NativeTexture,
+			BlueNoiseTexture.NativeTexture
 		};
 
 		NativeMaterial = new(
@@ -61,6 +66,11 @@ public class Material : Asset
 			Sampler.Point,
 			false
 		);
+
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", () =>
+		{
+			NativeMaterial.ReloadShaders();
+		} );
 
 		Path = path;
 	}
@@ -86,6 +96,11 @@ public class Material : Asset
 			MetalnessTexture.NativeTexture,
 			RoughnessTexture.NativeTexture
 		};
+
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", () =>
+		{
+			NativeMaterial.ReloadShaders();
+		} );
 
 		NativeMaterial = new(
 			shaderPath,

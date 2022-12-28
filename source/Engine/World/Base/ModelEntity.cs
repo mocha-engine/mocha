@@ -162,7 +162,7 @@ public partial class ModelEntity : BaseEntity
 		//
 		// Reverse winding order
 		//
-		vertexList.Reverse();
+		// vertexList.Reverse();
 
 		unsafe
 		{

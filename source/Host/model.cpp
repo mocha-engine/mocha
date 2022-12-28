@@ -154,7 +154,7 @@ void Model::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj, Transform transfo
 		std::vector<glm::vec4> packedLightInfo = {};
 		for ( int i = 0; i < 4; ++i )
 		{
-			packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 10.0f } );
+			packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 50.0f } );
 		}
 
 		constants.vLightInfoWS[0] = packedLightInfo[0];

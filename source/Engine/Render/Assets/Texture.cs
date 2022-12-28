@@ -37,7 +37,7 @@ public partial class Texture : Asset
 		TextureFormat format = TextureFormat.BC3_SRGB;
 		if ( path.Contains( "normal" ) )
 			format = TextureFormat.BC5_UNORM;
-		else if ( path.Contains( "fonts" ) )
+		else if ( path.Contains( "font" ) )
 			format = TextureFormat.R8G8B8A8_SRGB;
 
 		NativeTexture.SetData( Width, Height, (uint)mipCount, textureData.ToInterop(), (int)format );

@@ -163,8 +163,17 @@ void Material::CreatePipeline()
 void Material::CreateResources()
 {
 	CreateDescriptors();
+
+#if RAYTRACING
 	CreateAccelDescriptors();
+#endif
+
 	CreatePipeline();
+}
+
+void Material::ReloadShaders()
+{
+	CreateResources();
 }
 
 bool Material::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
@@ -182,7 +191,12 @@ bool Material::LoadShaderModule( const char* filePath, VkShaderStageFlagBits sha
 	const char* buffer = text.c_str();
 
 	std::vector<unsigned int> shaderBits;
-	ShaderCompiler::Instance().Compile( shaderStage, buffer, shaderBits );
+	if ( !ShaderCompiler::Instance().Compile( shaderStage, buffer, shaderBits ) )
+	{
+		std::string error = std::string( filePath ) + " failed to compile.\nCheck the console for more details.";
+		ERRORMESSAGE( error );
+		exit( 1 );
+	}
 
 	//
 	//

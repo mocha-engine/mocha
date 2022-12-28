@@ -69,6 +69,11 @@ public class TextureCompiler : BaseCompiler
 				// Do not compress
 				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
 			}
+			else if ( path.Contains( "noise" ) )
+			{
+				// Do not compress
+				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
+			}
 			else
 			{
 				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
