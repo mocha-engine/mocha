@@ -1418,7 +1418,6 @@
     <ClInclude Include="fontawesome.h">
       <Filter>Thirdparty\FontAwesome</Filter>
     </ClInclude>
-    <ClInclude Include="consolesystem.h" />
     <ClInclude Include="thirdparty\implot\implot_internal.h">
       <Filter>Thirdparty\ImPlot</Filter>
     </ClInclude>
@@ -1427,6 +1426,12 @@
     </ClInclude>
     <ClInclude Include="thirdparty\volk\volk.h">
       <Filter>Thirdparty\Volk</Filter>
+    </ClInclude>
+    <ClInclude Include="gamesettings.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="consolesystem.h">
+      <Filter>Managed</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

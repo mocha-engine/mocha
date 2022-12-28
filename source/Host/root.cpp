@@ -5,6 +5,7 @@
 #include <crtdbg.h>
 #include <defs.h>
 #include <edict.h>
+#include <gamesettings.h>
 #include <globalvars.h>
 #include <hostmanager.h>
 #include <inputmanager.h>
@@ -30,6 +31,8 @@ EntityManager* g_entityDictionary;
 PhysicsManager* g_physicsManager;
 InputManager* g_inputManager;
 
+GameSettings* g_gameSettings;
+
 float g_curTime;
 float g_frameTime;
 Vector3 g_cameraPos;
@@ -41,6 +44,9 @@ RenderDebugViews g_debugView;
 
 void Root::Startup()
 {
+	// Load game settings
+	g_gameSettings = new GameSettings( "spacegame.json" );
+	
 	//
 	// TODO: How do we start up g_allocator like this?
 	//		 Should we have a wrapper around VmaAllocator?
