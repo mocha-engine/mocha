@@ -16,3 +16,6 @@
 [submodule "source/Host/thirdparty/volk"]
 	path = source/Host/thirdparty/volk
 	url = https://github.com/zeux/volk
+[submodule "source/VConsoleLib"]
+	path = source/VConsoleLib
+	url = https://github.com/xezno/VConsoleLib
