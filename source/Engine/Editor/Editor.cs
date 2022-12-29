@@ -1,4 +1,4 @@
-﻿global using ImGui = Mocha.Glue.Editor;
+﻿global using ImGuiNET;
 
 namespace Mocha.Editor;
 
@@ -8,9 +8,10 @@ public class Editor
 
 	public static List<EditorWindow> EditorWindows = new()
 	{
-		new MaterialEditorWindow(),
+		// new MaterialEditorWindow(),
 		new ConsoleWindow(),
-		new MemoryWindow()
+		new BrowserWindow()
+		// new MemoryWindow()
 	};
 
 	public static void Draw()
@@ -32,6 +33,13 @@ public class Editor
 	{
 		if ( ImGui.BeginMainMenuBar() )
 		{
+			ImGui.Dummy( new Vector2( 4, 0 ) );
+			ImGui.Text( "Mocha Engine" );
+			ImGui.Dummy( new Vector2( 4, 0 ) );
+
+			ImGui.Separator();
+			ImGui.Dummy( new Vector2( 4, 0 ) );
+
 			if ( ImGui.BeginMenu( "Window" ) )
 			{
 				foreach ( var window in EditorWindows )
@@ -47,7 +55,7 @@ public class Editor
 				ImGui.EndMenu();
 			}
 
-			ImGui.RenderViewDropdown();
+			ImGuiX.RenderViewDropdown();
 		}
 
 		ImGui.EndMainMenuBar();
@@ -55,20 +63,20 @@ public class Editor
 
 	private static void DrawStatusBar()
 	{
-		if ( ImGui.BeginMainStatusBar() )
+		if ( ImGuiX.BeginMainStatusBar() )
 		{
 			ImGui.Text( $"{Screen.Size.X}x{Screen.Size.Y}" );
 			ImGui.Text( $"{Time.FPS} FPS" );
 		}
 
-		ImGui.EndMainStatusBar();
+		ImGuiX.EndMainStatusBar();
 	}
 
 	private static void DrawPerformanceOverlay()
 	{
-		if ( ImGui.BeginOverlay( "Time" ) )
+		if ( ImGuiX.BeginOverlay( "Time" ) )
 		{
-			var gpuName = ImGui.GetGPUName();
+			var gpuName = ImGuiX.GetGPUName();
 
 			ImGui.Text( $"GPU: {gpuName}" );
 			ImGui.Text( $"FPS: {Time.FPS}" );

@@ -35,6 +35,8 @@ public partial class Texture : Asset
 		}
 
 		TextureFormat format = TextureFormat.BC3_SRGB;
+		if ( path.Contains( "icon" ) )
+			format = TextureFormat.BC3_UNORM;
 		if ( path.Contains( "normal" ) )
 			format = TextureFormat.BC5_UNORM;
 		else if ( path.Contains( "font" ) )
@@ -81,5 +83,22 @@ public partial class Texture : Asset
 	public void Delete()
 	{
 		Asset.All.Remove( this );
+	}
+
+	//
+	// Texture caching
+	// TODO: This should really be handled by the C++ side, but this will do for now
+	//
+	private static Dictionary<string, Texture> CachedTextures { get; } = new();
+
+	public static Texture FromCache( string fontName )
+	{
+		if ( CachedTextures.TryGetValue( fontName, out var cachedTexture ) )
+		{
+			return cachedTexture;
+		}
+
+		var loadedTexture = new Texture( fontName );
+		return CachedTextures[fontName] = loadedTexture;
 	}
 }

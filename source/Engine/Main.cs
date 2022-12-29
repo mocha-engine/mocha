@@ -17,6 +17,9 @@ public class Main
 		SetupFunctionPointers( args );
 		Log.Info( "Managed init" );
 
+		ImGuiNative.igSetCurrentContext( Glue.Editor.GetContextPointer() );
+		Log.Trace( $"Imgui context is {ImGuiNative.igGetCurrentContext()}" );
+
 		// Get parent process path
 		var parentProcess = System.Diagnostics.Process.GetCurrentProcess();
 		var parentModule = parentProcess.MainModule;

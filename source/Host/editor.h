@@ -17,42 +17,23 @@
 //@InteropGen generate class
 namespace Editor
 {
-	inline void SeparatorH()
+	inline void* GetContextPointer()
 	{
-		ImGui::Dummy( ImVec2( 0, 4 ) );
-		ImGui::PushStyleColor( ImGuiCol_Separator, ImVec4( 0.28f, 0.28f, 0.28f, 0.29f ) );
-		ImGui::Separator();
-		ImGui::PopStyleColor();
-		ImGui::Dummy( ImVec2( 0, 4 ) );
-	};
-
-	inline void SeparatorV()
-	{
-		ImGui::Dummy( ImVec2( 8, 0 ) );
-		ImGui::SameLine();
-	};
-
-	inline void Text( const char* text )
-	{
-		ImGui::Text( "%s", text );
-	};
-
-	inline void TextWrapped( const char* text )
-	{
-		ImGui::TextWrapped( "%s", text );
+		auto ctx = ImGui::GetCurrentContext();
+		return ( void* )ctx;
 	};
 
 	inline void TextBold( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mBoldFont );
-		Text( text );
+		ImGui::Text( "%s", text );
 		// ImGui::PopFont();
 	};
 
 	inline void TextSubheading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mSubheadingFont );
-		Text( text );
+		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		// ImGui::PopFont();
 	};
@@ -60,7 +41,7 @@ namespace Editor
 	inline void TextHeading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mHeadingFont );
-		Text( text );
+		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		// ImGui::PopFont();
 	};
@@ -68,92 +49,15 @@ namespace Editor
 	inline void TextMonospace( const char* text )
 	{
 		ImGui::PushFont( g_renderManager->m_monospaceFont );
-		Text( text );
+		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
 
 	inline void TextLight( const char* text )
 	{
 		ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 1, 1, 1, 0.75f ) );
-		Text( text );
+		ImGui::Text( "%s", text );
 		ImGui::PopStyleColor();
-	}
-
-	inline bool BeginMainMenuBar()
-	{
-		bool result = ImGui::BeginMainMenuBar();
-
-		ImGui::Dummy( { 4, 0 } );
-		ImGui::Text( ENGINE_NAME " Engine" );
-		ImGui::Dummy( { 4, 0 } );
-
-		ImGui::Separator();
-		ImGui::Dummy( { 4, 0 } );
-
-		return result;
-	}
-
-	inline bool MenuItem( const char* text )
-	{
-		return ImGui::MenuItem( text );
-	}
-
-	inline bool BeginMenu( const char* text )
-	{
-		return ImGui::BeginMenu( text );
-	}
-
-	inline void EndMenu()
-	{
-		return ImGui::EndMenu();
-	}
-
-	inline void EndMainMenuBar()
-	{
-		ImGui::EndMainMenuBar();
-	}
-
-	inline bool Button( const char* text )
-	{
-		return ImGui::Button( text );
-	};
-
-	inline bool Begin( const char* name )
-	{
-		return ImGui::Begin( name, nullptr,
-		    ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysUseWindowPadding | ImGuiWindowFlags_NoScrollWithMouse |
-		        ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoResize );
-	};
-
-	inline void End()
-	{
-		// ImGui::EndChild();
-		ImGui::End();
-	};
-
-	inline void ShowDemoWindow()
-	{
-		ImGui::ShowDemoWindow();
-	};
-
-	inline bool CollapsingHeader( const char* name )
-	{
-		return ImGui::CollapsingHeader( name );
-	}
-
-	inline bool BeginOverlay( const char* name )
-	{
-		ImGui::SetNextWindowViewport( ImGui::GetMainViewport()->ID );
-
-		bool b = ImGui::Begin(
-		    name, nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoInputs );
-
-		auto workPos = ImGui::GetMainViewport()->WorkPos;
-
-		ImGui::SetWindowPos( { workPos.x + 16, workPos.y + 16 } );
-		ImGui::SetWindowSize( { -1, -1 } );
-
-		return b;
 	}
 
 	inline const char* GetGPUName()
@@ -161,67 +65,11 @@ namespace Editor
 		return g_renderManager->m_deviceName.c_str();
 	}
 
-	inline bool BeginChild( const char* name, int width, int height )
-	{
-		return ImGui::BeginChild( name, { ( float )width, ( float )height }, false, ImGuiWindowFlags_AlwaysUseWindowPadding );
-	}
-
-	inline void EndChild()
-	{
-		ImGui::EndChild();
-	}
-
-	inline bool BeginTable( const char* name, int columnCount, int flags )
-	{
-		return ImGui::BeginTable(
-		    name, columnCount, ImGuiTableFlags_RowBg | ImGuiTableFlags_PadOuterX | ImGuiTableFlags_Resizable );
-	}
-
-	inline void EndTable()
-	{
-		ImGui::EndTable();
-	}
-
-	inline void TableSetupStretchColumn( const char* name )
-	{
-		ImGui::TableSetupColumn( name, ImGuiTableColumnFlags_WidthStretch, 1.0f );
-	}
-
-	inline void TableSetupFixedColumn( const char* name, float width )
-	{
-		ImGui::TableSetupColumn( name, ImGuiTableColumnFlags_WidthFixed, width );
-	}
-
-	inline void TableNextRow()
-	{
-		ImGui::TableNextRow();
-	}
-
-	inline void TableNextColumn()
-	{
-		ImGui::TableNextColumn();
-	}
-
-	inline void TableHeaders()
-	{
-		ImGui::TableHeadersRow();
-	}
-
-	inline void SetNextItemWidth( float width )
-	{
-		ImGui::SetNextItemWidth( width );
-	}
-
 	inline char* InputText( const char* name, char* inputBuf, int inputLength )
 	{
 		ImGui::InputText( name, inputBuf, inputLength, ImGuiInputTextFlags_EnterReturnsTrue );
 
 		return inputBuf;
-	}
-
-	inline void SameLine()
-	{
-		ImGui::SameLine();
 	}
 
 	inline void RenderViewDropdown()
@@ -264,103 +112,9 @@ namespace Editor
 		return GAME_VERSION;
 	}
 
-	inline Vector3 DragFloat3( const char* name, Vector3 value )
-	{
-		float v[3] = { value.x, value.y, value.z };
-		ImGui::DragFloat3( name, v );
-		return { v[0], v[1], v[2] };
-	}
-
-	inline bool Selectable( const char* name )
-	{
-		return ImGui::Selectable( name );
-	}
-
 	inline void Image( Texture* texture, int x, int y )
 	{
 		ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
-	}
-
-	inline void SetCursorPos( float x, float y )
-	{
-		ImGui::SetCursorPos( { x, y } );
-	}
-
-	inline float GetCursorX()
-	{
-		return ImGui::GetCursorPosX();
-	}
-
-	inline float GetCursorY()
-	{
-		return ImGui::GetCursorPosY();
-	}
-
-	inline void SetCursorX( float x )
-	{
-		ImGui::SetCursorPosX( x );
-	}
-
-	inline void SetCursorY( float y )
-	{
-		ImGui::SetCursorPosY( y );
-	}
-
-	inline void BumpCursorX( float x )
-	{
-		float curr = ImGui::GetCursorPosX();
-		ImGui::SetCursorPosX( curr + x );
-	}
-
-	inline void BumpCursorY( float y )
-	{
-		float curr = ImGui::GetCursorPosY();
-		ImGui::SetCursorPosY( curr + y );
-	}
-
-	inline float GetColumnWidth()
-	{
-		return ImGui::GetColumnWidth();
-	}
-
-	inline bool BeginTabBar( const char* name )
-	{
-		return ImGui::BeginTabBar( name );
-	}
-
-	inline void EndTabBar()
-	{
-		ImGui::EndTabBar();
-	}
-
-	inline bool BeginTabItem( const char* name )
-	{
-		return ImGui::BeginTabItem( name );
-	}
-
-	inline void EndTabItem()
-	{
-		ImGui::EndTabItem();
-	}
-
-	inline bool TreeNode( const char* name, bool isLeafNode )
-	{
-		return ImGui::TreeNodeEx( name, isLeafNode ? ImGuiTreeNodeFlags_Leaf : ImGuiTreeNodeFlags_None );
-	}
-
-	inline void TreePop()
-	{
-		ImGui::TreePop();
-	}
-
-	inline void Indent()
-	{
-		ImGui::Indent();
-	}
-
-	inline void Unindent()
-	{
-		ImGui::Unindent();
 	}
 
 	inline bool BeginMainStatusBar()
@@ -381,12 +135,6 @@ namespace Editor
 		return false;
 	}
 
-	inline void EndMainStatusBar()
-	{
-		ImGui::EndMenuBar();
-		ImGui::End();
-	}
-
 	inline void DrawGraph( const char* name, Vector4 color, InteropArray values )
 	{
 		const std::vector<float> plotValues = values.GetData<float>();
@@ -395,7 +143,7 @@ namespace Editor
 		const int sampleCount = plotValues.size();
 
 		auto startPos = ImGui::GetCursorPos();
-		
+
 		ImPlot::PushStyleVar( ImPlotStyleVar_PlotPadding, { 0, 0 } );
 		ImPlot::PushStyleVar( ImPlotStyleVar_LineWeight, 1.0f );
 		ImPlot::PushStyleColor( ImPlotCol_PlotBg, { color.x, color.y, color.z, color.w } );
@@ -422,26 +170,11 @@ namespace Editor
 
 			ImPlot::PushStyleVar( ImPlotStyleVar_LineWeight, 2.0f );
 			ImPlot::PlotLine<float>( name, plotValues.data(), sampleCount );
-			ImPlot::PopStyleVar( );
+			ImPlot::PopStyleVar();
 			ImPlot::EndPlot();
 		}
-		
+
 		ImPlot::PopStyleColor( 3 );
 		ImPlot::PopStyleVar( 2 );
-	}
-
-	inline void PushColor( ImGuiCol color, Vector4 value )
-	{
-		ImGui::PushStyleColor( color, { value.x, value.y, value.z, value.w } );
-	}
-
-	inline void PopColor()
-	{
-		ImGui::PopStyleColor();
-	}
-
-	inline void TableSetBgColor( ImGuiTableBgTarget target, Vector4 color, int columnNumber = -1 )
-	{
-		ImGui::TableSetBgColor( target, ImGui::GetColorU32( { color.x, color.y, color.z, color.w } ), columnNumber );
 	}
 } // namespace Editor

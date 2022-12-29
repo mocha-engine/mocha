@@ -103,21 +103,24 @@ void RenderManager::InitVulkan()
 	selector = selector.set_minimum_version( 1, 3 );
 	selector = selector.set_surface( m_surface );
 
+	//
+	// Set required extensions
+	//
 	if ( EngineFeatures::Raytracing )
 	{
-		//
-		// Set required extensions
-		//
-		selector = selector.add_required_extension( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
-		selector = selector.add_required_extension( VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME );
-		selector = selector.add_required_extension( VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME );
-		selector = selector.add_required_extension( VK_KHR_RAY_QUERY_EXTENSION_NAME );
+#define X( name ) selector = selector.add_required_extension( name );
+		X( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
+		X( VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME );
+		X( VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME );
+		X( VK_KHR_RAY_QUERY_EXTENSION_NAME );
+#undef X
 	}
 
 	//
 	// Set required VK1.0 features
 	//
 	VkPhysicalDeviceFeatures requiredFeatures = {};
+	requiredFeatures.samplerAnisotropy = VK_TRUE;
 	selector = selector.set_required_features( requiredFeatures );
 
 	//
@@ -1228,6 +1231,7 @@ void RenderManager::Run()
 		ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 		ImGui::NewFrame();
 		ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
+		
 		g_hostManager->DrawEditor();
 #endif
 

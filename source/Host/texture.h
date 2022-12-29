@@ -14,7 +14,7 @@ private:
 
 	VkDescriptorSet m_imGuiDescriptorSet;
 
-	inline int GetTexelSize( VkFormat format )
+	inline int GetTexelBlockSize( VkFormat format )
 	{
 		switch ( format )
 		{
@@ -47,7 +47,7 @@ private:
 	{
 		uint32_t outWidth, outHeight;
 		GetMipDimensions( inWidth, inHeight, mipLevel, &outWidth, &outHeight );
-		return outWidth * outHeight * GetTexelSize( format );
+		return outWidth * outHeight * GetTexelBlockSize( format );
 	}
 
 public:
