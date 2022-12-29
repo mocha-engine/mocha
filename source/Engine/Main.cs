@@ -1,10 +1,12 @@
 ﻿using System.Runtime.InteropServices;
+using VConsoleLib;
 
 namespace Mocha;
 
 public class Main
 {
 	private static World world;
+	private static VConsoleServer vconsoleServer;
 
 	private static void SetupFunctionPointers( IntPtr args )
 	{
@@ -16,6 +18,9 @@ public class Main
 	{
 		SetupFunctionPointers( args );
 		Log.Info( "Managed init" );
+
+		vconsoleServer = new();
+		Log.OnLog += ( s ) => vconsoleServer.Log( s );
 
 		ImGuiNative.igSetCurrentContext( Glue.Editor.GetContextPointer() );
 		Log.Trace( $"Imgui context is {ImGuiNative.igGetCurrentContext()}" );
