@@ -15,7 +15,6 @@
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -50,6 +49,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
+		<PackageReference Include="ImGui.NET" Version="1.89.1" />
 		<PackageReference Include="StbImageSharp" Version="2.27.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
 	</ItemGroup>
@@ -61,6 +61,27 @@
 
 	<ItemGroup>
 	  <Folder Include="ImGUI\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="cimgui.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="cimgui.exp">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="cimgui.lib">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="cimgui.pdb">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="FlexLayoutSharp.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="ImGui.NET.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 	
 	<PropertyGroup>

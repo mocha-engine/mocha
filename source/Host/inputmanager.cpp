@@ -1,5 +1,15 @@
 #include "inputmanager.h"
 
+#if _IMGUI
+
+#include <imgui.h>
+#define WANTS_CAPTURE ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse
+
+#else
+
+#define WANTS_CAPTURE false
+
+#endif
 
 void InputManager::Startup() {}
 
@@ -17,6 +27,9 @@ void InputManager::SetState( InputState newState )
 
 bool InputManager::IsButtonDown( int button )
 {
+	if ( WANTS_CAPTURE )
+		return false;
+
 	if ( m_inputState.buttons.size() <= button )
 		m_inputState.buttons.resize( button + 1 );
 
@@ -25,6 +38,9 @@ bool InputManager::IsButtonDown( int button )
 
 bool InputManager::IsKeyDown( int key )
 {
+	if ( WANTS_CAPTURE )
+		return false;
+
 	if ( m_inputState.keys.size() <= key )
 		m_inputState.keys.resize( key + 1 );
 
@@ -33,10 +49,16 @@ bool InputManager::IsKeyDown( int key )
 
 Vector2 InputManager::GetMousePosition()
 {
+	if ( WANTS_CAPTURE )
+		return { 0, 0 };
+
 	return m_inputState.mousePosition;
 }
 
 Vector2 InputManager::GetMouseDelta()
 {
+	if ( WANTS_CAPTURE )
+		return { 0, 0 };
+
 	return m_inputState.mouseDelta;
 }
