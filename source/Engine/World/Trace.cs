@@ -65,10 +65,9 @@ public class Cast
 			fixed ( void* data = IgnoredEntities.Select( x => x.NativeHandle ).ToArray() )
 			{
 				traceInfo.ignoredEntityHandles = (IntPtr)data;
+				var result = Glue.Physics.Trace( traceInfo );
+				return TraceResult.From( result );
 			}
 		}
-
-		var result = Glue.Physics.Trace( traceInfo );
-		return TraceResult.From( result );
 	}
 }
