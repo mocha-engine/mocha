@@ -6,23 +6,45 @@ public static class Parser
 
 	private static string[] GetLaunchArgs()
 	{
+		// Locate vcpkg
+		var vcpkgRoot = Environment.GetEnvironmentVariable( "VCPKG_ROOT" );
+
+		if ( vcpkgRoot == null )
+		{
+			// Use default
+			vcpkgRoot = @"C:\Users\" + Environment.UserName + @"\vcpkg";
+		}
+
+		// Locate vulkan sdk
+		var vulkanSdk = Environment.GetEnvironmentVariable( "VULKAN_SDK" );
+
+		Console.WriteLine( "VCPKG_ROOT: " + vcpkgRoot );
+		Console.WriteLine( "VULKAN_SDK: " + vulkanSdk );
+
 		var includeDirs = new string[]
 		{
-			"C:\\VulkanSDK\\1.3.224.1\\Include",
-			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include",
-			"C:\\Users\\Alex\\vcpkg\\installed\\x64-windows\\include\\SDL2",
+			$"{vcpkgRoot}\\installed\\x64-windows\\include",
+			$"{vcpkgRoot}\\installed\\x64-windows\\include\\SDL2",
+			$"{vulkanSdk}\\Include",
 			"../Host/",
 			"../Host/ThirdParty/Renderdoc",
 			"../Host/ThirdParty/vk-bootstrap/src",
 			"../Host/ThirdParty/imgui",
+			"../Host/ThirdParty/ImPlot",
 			"../Host/ThirdParty/JoltPhysics",
+			"../Host/ThirdParty/volk",
 		};
 
-		var args = new List<string>();
-		args.Add( "-x" );
-		args.Add( "c++" );
-		args.Add( "-fparse-all-comments" );
-		args.Add( "-std=c++17" );
+		var args = new List<string>
+		{
+			"-x",
+			"c++",
+			"-fparse-all-comments",
+			"-std=c++17",
+			"-DVK_NO_PROTOTYPES",
+			"-DNOMINMAX",
+			"-DVK_USE_PLATFORM_WIN32_KHR"
+		};
 
 		args.AddRange( includeDirs.Select( x => "-I" + x ) );
 
