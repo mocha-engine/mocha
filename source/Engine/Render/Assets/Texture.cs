@@ -16,6 +16,9 @@ public partial class Texture : Asset
 	/// </summary>
 	public Texture( string path )
 	{
+		Path = path;
+		All.Add( this );
+
 		var fileBytes = FileSystem.Game.ReadAllBytes( path );
 
 		var textureFormat = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes );
@@ -41,6 +44,8 @@ public partial class Texture : Asset
 			format = TextureFormat.BC5_UNORM;
 		else if ( path.Contains( "font" ) )
 			format = TextureFormat.R8G8B8A8_SRGB;
+		else if ( path.Contains( "noise" ) )
+			format = TextureFormat.R8G8B8A8_SRGB;
 
 		NativeTexture.SetData( Width, Height, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}
@@ -58,20 +63,14 @@ public partial class Texture : Asset
 	/// </summary>
 	public Texture( uint width, uint height )
 	{
+		Path = "Procedural Texture";
+		All.Add( this );
+
 		Width = width;
 		Height = height;
 
 		NativeTexture = new();
 		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
-	}
-
-	internal Texture( string path, int width, int height )
-	{
-		Path = path;
-		Width = (uint)width;
-		Height = (uint)height;
-
-		All.Add( this );
 	}
 
 	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )

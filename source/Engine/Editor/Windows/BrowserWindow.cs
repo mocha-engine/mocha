@@ -26,9 +26,56 @@ internal class BrowserWindow : EditorWindow
 	public BrowserWindow()
 	{
 		Instance = this;
-		isVisible = true;
 
 		CacheEverything();
+	}
+
+	private BaseInspector Inspector { get; set; }
+
+	public static void SetSelectedObject( object obj )
+	{
+		// TODO: Use reflection for this
+
+		if ( obj is Texture texture )
+			Instance.Inspector = new TextureInspector( texture );
+		else if ( obj is Model model )
+			Instance.Inspector = new ModelInspector( model );
+		else if ( obj is List<Model> modelList )
+			Instance.Inspector = new ModelInspector( modelList.First() );
+		else if ( obj is Material material )
+			Instance.Inspector = new MaterialInspector( material );
+	}
+
+	public void SelectItem( string name )
+	{
+		if ( name.EndsWith( "_c", StringComparison.InvariantCultureIgnoreCase ) )
+			name = name[..^2];
+
+		if ( name.EndsWith( "mtex" ) )
+		{
+			var texture = new Texture( name );
+			SetSelectedObject( texture );
+		}
+		else if ( name.EndsWith( "mmdl" ) )
+		{
+			var model = new Model( name );
+			SetSelectedObject( model );
+		}
+		else if ( name.EndsWith( "mmat" ) )
+		{
+			var material = new Material( name );
+			SetSelectedObject( material );
+		}
+	}
+
+	public void DrawInspector()
+	{
+		if ( ImGuiX.BeginWindow( $"Inspector", ref isVisible ) )
+		{
+			Inspector?.Draw();
+		}
+
+		ImGui.End();
 	}
 
 	private void CacheEverything()
@@ -88,11 +135,6 @@ internal class BrowserWindow : EditorWindow
 		}
 	}
 
-	public void SelectItem( string name )
-	{
-		// TODO
-	}
-
 	private bool DrawIcon( float x, float y, string name, bool selected )
 	{
 		var fileExtension = Path.GetExtension( name );
@@ -106,7 +148,7 @@ internal class BrowserWindow : EditorWindow
 		var windowPos = ImGui.GetWindowPos();
 		var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
 
-		var icon = Texture.FromCache( fileType.IconLg );
+		var icon = fileType.IconLg;
 
 		{
 			drawList.AddRectFilledMultiColor(
@@ -349,179 +391,184 @@ internal class BrowserWindow : EditorWindow
 		ImGui.PopStyleVar();
 	}
 
-	public override void Draw()
+	public void DrawBrowser()
 	{
-		if ( ImGuiX.BeginWindow( "Browser", ref isVisible ) )
+		ImGui.PushStyleColor( ImGuiCol.ChildBg, Theme.Transparent );
+
+		if ( ImGui.BeginChild( "sidebar", new System.Numerics.Vector2( 200, -1 ) ) )
 		{
-
-			ImGui.PushStyleColor( ImGuiCol.ChildBg, Theme.Transparent );
-
-			if ( ImGui.BeginChild( "sidebar", new System.Numerics.Vector2( 200, -1 ) ) )
+			var specialSources = new[]
 			{
-				var specialSources = new[]
-				{
 				$"{FontAwesome.ClockRotateLeft} Recent",
 				$"{FontAwesome.Star} Favourites",
 			};
 
-				var localSources = new[]
-				{
+			var localSources = new[]
+			{
 				$"{FontAwesome.FolderOpen} test project",
 				$"{FontAwesome.MugHot} Mocha Core"
 			};
 
-				var onlineSources = new[]
-				{
+			var onlineSources = new[]
+			{
 				$"{FontAwesome.Cubes} AmbientCG"
 			};
 
-				ImGui.BeginListBox( "##sources", new System.Numerics.Vector2( -1, -1 ) );
+			ImGui.BeginListBox( "##sources", new System.Numerics.Vector2( -1, -1 ) );
 
-				ImGuiX.TextSubheading( $"{FontAwesome.FaceGrinStars} Special" );
-				foreach ( var source in specialSources )
-					ImGuiX.TextLight( source );
+			ImGuiX.TextSubheading( $"{FontAwesome.FaceGrinStars} Special" );
+			foreach ( var source in specialSources )
+				ImGuiX.TextLight( source );
 
-				ImGuiX.Separator();
+			ImGuiX.Separator();
 
-				ImGuiX.TextSubheading( $"{FontAwesome.Folder} Local" );
-				foreach ( var source in localSources )
-					ImGuiX.TextLight( source );
+			ImGuiX.TextSubheading( $"{FontAwesome.Folder} Local" );
+			foreach ( var source in localSources )
+				ImGuiX.TextLight( source );
 
-				ImGuiX.Separator();
+			ImGuiX.Separator();
 
-				ImGuiX.TextSubheading( $"{FontAwesome.Globe} Online" );
-				foreach ( var source in onlineSources )
-					ImGuiX.TextLight( source );
+			ImGuiX.TextSubheading( $"{FontAwesome.Globe} Online" );
+			foreach ( var source in onlineSources )
+				ImGuiX.TextLight( source );
+
+			ImGui.EndListBox();
+			ImGui.EndChild();
+		}
+
+		ImGui.SameLine();
+
+		if ( ImGui.BeginChild( "main", new System.Numerics.Vector2( -1, -1 ) ) )
+		{
+			{
+				var sortString = sortMode switch
+				{
+					SortModes.DateAscending => $"{FontAwesome.CalendarPlus}",
+					SortModes.DateDescending => $"{FontAwesome.CalendarMinus}",
+					SortModes.Alphabetical => $"{FontAwesome.ArrowDownAZ}",
+					_ => "Unsorted"
+				};
+
+				if ( ImGuiX.GradientButton( $"{sortString}" ) )
+				{
+					sortMode++;
+					sortMode = (SortModes)((int)sortMode % 3);
+
+					Sort();
+				}
+
+				ImGui.SameLine();
+
+				ImGui.SetNextItemWidth( -243 );
+				ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
+
+				ImGui.SameLine();
+
+				string suffix = (assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
+				if ( ImGuiX.GradientButton( $"{FontAwesome.File} Asset{suffix}" ) )
+				{
+					ImGui.OpenPopup( "asset_popup" );
+				}
+
+				ImGui.SameLine();
+				if ( ImGuiX.GradientButton( $"{FontAwesome.Filter} Filter" ) )
+				{
+					ImGui.OpenPopup( "filter_popup" );
+				}
+
+				ImGui.SameLine();
+				if ( ImGuiX.GradientButton( $"{FontAwesome.Repeat}" ) )
+				{
+					CacheEverything();
+				}
+
+				ImGui.SameLine();
+				ImGuiX.GradientButton( $"{FontAwesome.Gear}" );
+			}
+
+			ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 380, 30 ) );
+			DrawAssetPopup();
+
+			ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 290, 30 ) );
+			DrawFilterPopup();
+
+			if ( ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) ) )
+			{
+
+				var windowSize = ImGui.GetWindowSize();
+				var windowPos = ImGui.GetWindowPos();
+
+				Vector2 margin = new( 24, 0 );
+
+				float startPos = 16;
+
+				var availableSpace = windowSize.X - startPos - 4f;
+				var remainingSpace = availableSpace % (baseIconSize.X + margin.X);
+
+				int count = (int)windowSize.X / (int)(baseIconSize.X + margin.X);
+
+				iconSize = baseIconSize;
+				iconSize.X += (remainingSpace / count);
+
+				float x = startPos;
+				float y = startPos;
+
+				for ( int i = 0; i < fileSystemCache.Count; i++ )
+				{
+					var name = fileSystemCache[i];
+
+					if ( !string.IsNullOrEmpty( assetSearchText ) )
+					{
+						bool foundAll = true;
+						var inputs = assetSearchText.Split( " " );
+
+						foreach ( var input in inputs )
+							if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
+								foundAll = false;
+
+						if ( !foundAll )
+							continue;
+					}
+
+					if ( assetFilter.Count > 0 )
+					{
+						var fileType = FileType.GetFileTypeForExtension( Path.GetExtension( name ) ) ?? FileType.Default;
+						if ( !assetFilter.Contains( fileType ) )
+							continue;
+					}
+
+					if ( DrawIcon( x, y, name, i == selectedIndex ) )
+					{
+						SelectItem( name );
+						selectedIndex = i;
+					}
+
+					x += iconSize.X + margin.X;
+					if ( x + iconSize.X > windowSize.X )
+					{
+						x = startPos;
+						y += iconSize.Y + margin.Y + 24;
+					}
+
+					ImGui.Dummy( new System.Numerics.Vector2( -1, iconSize.Y ) );
+				}
 
 				ImGui.EndListBox();
-				ImGui.EndChild();
 			}
 
-			ImGui.SameLine();
+			ImGui.EndChild();
+		}
 
-			if ( ImGui.BeginChild( "main", new System.Numerics.Vector2( -1, -1 ) ) )
-			{
-				{
-					var sortString = sortMode switch
-					{
-						SortModes.DateAscending => $"{FontAwesome.CalendarPlus}",
-						SortModes.DateDescending => $"{FontAwesome.CalendarMinus}",
-						SortModes.Alphabetical => $"{FontAwesome.ArrowDownAZ}",
-						_ => "Unsorted"
-					};
+		ImGui.PopStyleColor();
 
-					if ( ImGuiX.GradientButton( $"{sortString}" ) )
-					{
-						sortMode++;
-						sortMode = (SortModes)((int)sortMode % 3);
+	}
 
-						Sort();
-					}
-
-					ImGui.SameLine();
-
-					ImGui.SetNextItemWidth( -243 );
-					ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
-
-					ImGui.SameLine();
-
-					string suffix = (assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
-					if ( ImGuiX.GradientButton( $"{FontAwesome.File} Asset{suffix}" ) )
-					{
-						ImGui.OpenPopup( "asset_popup" );
-					}
-
-					ImGui.SameLine();
-					if ( ImGuiX.GradientButton( $"{FontAwesome.Filter} Filter" ) )
-					{
-						ImGui.OpenPopup( "filter_popup" );
-					}
-
-					ImGui.SameLine();
-					if ( ImGuiX.GradientButton( $"{FontAwesome.Repeat}" ) )
-					{
-						CacheEverything();
-					}
-
-					ImGui.SameLine();
-					ImGuiX.GradientButton( $"{FontAwesome.Gear}" );
-				}
-
-				ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 380, 30 ) );
-				DrawAssetPopup();
-
-				ImGui.SetNextWindowPos( ImGui.GetWindowPos() + new System.Numerics.Vector2( ImGui.GetWindowWidth() - 290, 30 ) );
-				DrawFilterPopup();
-
-				if ( ImGui.BeginListBox( "##asset_list", new System.Numerics.Vector2( -1, -1 ) ) )
-				{
-
-					var windowSize = ImGui.GetWindowSize();
-					var windowPos = ImGui.GetWindowPos();
-
-					Vector2 margin = new( 24, 0 );
-
-					float startPos = 16;
-
-					var availableSpace = windowSize.X - startPos - 4f;
-					var remainingSpace = availableSpace % (baseIconSize.X + margin.X);
-
-					int count = (int)windowSize.X / (int)(baseIconSize.X + margin.X);
-
-					iconSize = baseIconSize;
-					iconSize.X += (remainingSpace / count);
-
-					float x = startPos;
-					float y = startPos;
-
-					for ( int i = 0; i < fileSystemCache.Count; i++ )
-					{
-						var name = fileSystemCache[i];
-
-						if ( !string.IsNullOrEmpty( assetSearchText ) )
-						{
-							bool foundAll = true;
-							var inputs = assetSearchText.Split( " " );
-
-							foreach ( var input in inputs )
-								if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
-									foundAll = false;
-
-							if ( !foundAll )
-								continue;
-						}
-
-						if ( assetFilter.Count > 0 )
-						{
-							var fileType = FileType.GetFileTypeForExtension( Path.GetExtension( name ) ) ?? FileType.Default;
-							if ( !assetFilter.Contains( fileType ) )
-								continue;
-						}
-
-						if ( DrawIcon( x, y, name, i == selectedIndex ) )
-						{
-							SelectItem( name );
-							selectedIndex = i;
-						}
-
-						x += iconSize.X + margin.X;
-						if ( x + iconSize.X > windowSize.X )
-						{
-							x = startPos;
-							y += iconSize.Y + margin.Y + 24;
-						}
-
-						ImGui.Dummy( new System.Numerics.Vector2( -1, iconSize.Y ) );
-					}
-
-					ImGui.EndListBox();
-				}
-
-				ImGui.EndChild();
-			}
-
-			ImGui.PopStyleColor();
-
+	public override void Draw()
+	{
+		if ( ImGuiX.BeginWindow( "Browser", ref isVisible ) )
+		{
+			DrawBrowser();
+			DrawInspector();
 		}
 
 		ImGui.End();

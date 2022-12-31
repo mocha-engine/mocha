@@ -4,10 +4,31 @@ namespace Mocha.Common;
 
 public class Logger
 {
-	public void Trace( object obj ) => Glue.LogManager.ManagedTrace( obj?.ToString() );
-	public void Info( object obj ) => Glue.LogManager.ManagedInfo( obj?.ToString() );
-	public void Warning( object obj ) => Glue.LogManager.ManagedWarning( obj?.ToString() );
-	public void Error( object obj ) => Glue.LogManager.ManagedError( obj?.ToString() );
+	public Action<string> OnLog;
+
+	public void Trace( object obj )
+	{
+		OnLog?.Invoke( obj?.ToString() );
+		Glue.LogManager.ManagedTrace( obj?.ToString() );
+	}
+
+	public void Info( object obj )
+	{
+		OnLog?.Invoke( obj?.ToString() );
+		Glue.LogManager.ManagedInfo( obj?.ToString() );
+	}
+
+	public void Warning( object obj )
+	{
+		OnLog?.Invoke( obj?.ToString() );
+		Glue.LogManager.ManagedWarning( obj?.ToString() );
+	}
+
+	public void Error( object obj )
+	{
+		OnLog?.Invoke( obj?.ToString() );
+		Glue.LogManager.ManagedError( obj?.ToString() );
+	}
 
 	public struct LogEntry
 	{

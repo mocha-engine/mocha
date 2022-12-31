@@ -75,9 +75,9 @@ partial class ProceduralMeshes
 					tmp.Add( new Vertex()
 					{
 						Position = new Vector3( x, y, z ),
-						Normal = new Vector3( nX, nY, nZ ),
-						Color = new Vector3( x, y, z ),
 						UV = new Vector2( u, v ),
+						Color = new Vector3( x, y, z ),
+						Normal = new Vector3( nX, nY, nZ ),
 					} );
 				}
 
@@ -87,7 +87,7 @@ partial class ProceduralMeshes
 
 		public static Model GenerateModel( Material material )
 		{
-			return new Model( "internal:cube", Vertices.ToArray(), indices, material );
+			return new Model( Vertices.ToArray(), indices, material );
 		}
 	}
 }

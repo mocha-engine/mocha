@@ -30,10 +30,17 @@ public static class ImGuiX
 
 	public static bool BeginWindow( string name, ref bool isOpen )
 	{
-		return ImGui.Begin( name, ref isOpen,
+		bool b = ImGui.Begin( name, ref isOpen,
 			ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.AlwaysUseWindowPadding |
 			ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar |
 			ImGuiWindowFlags.NoResize );
+
+		if ( ImGui.GetWindowViewport().ID != ImGui.GetMainViewport().ID )
+		{
+			// TODO: This window is its own thing - let's give it an icon
+		}
+
+		return b;
 	}
 
 	public static void TextMonospace( string text )
@@ -119,9 +126,19 @@ public static class ImGuiX
 		return false;
 	}
 
+	public static void Image( string texturePath, Vector2 size )
+	{
+		Image( Texture.FromCache( texturePath ), size );
+	}
+
 	public static void Image( Texture texture, Vector2 size )
 	{
 		Glue.Editor.Image( texture.NativeTexture, (int)size.X, (int)size.Y );
+	}
+
+	public static void Image( string texture, Vector2 size, Vector4 tint )
+	{
+		Image( Texture.FromCache( texture ), size, tint );
 	}
 
 	public static void Image( Texture texture, Vector2 size, Vector4 tint )
@@ -249,57 +266,56 @@ public static class ImGuiX
 
 	public static void InspectorTitle( string text, string subtext, FileType fileType )
 	{
-		var colorA = fileType.Color * 0.75f;
-		var colorB = fileType.Color * 0.75f;
-		colorB.W = 0.0f;
+		const float heightTop = 56;
+		const float heightBottom = 24;
+		const float iconSize = 64;
 
-		var windowPos = ImGui.GetWindowPos();
-		var windowWidth = ImGui.GetWindowWidth();
+		var color = fileType.Color * 0.75f;
+
+		var windowPos = ImGui.GetWindowContentRegionMin() + ImGui.GetWindowPos();
+		var windowWidth = ImGui.GetWindowContentRegionMax().X;
+
+		windowPos -= new System.Numerics.Vector2( 8, 8 );
+		windowWidth += 8;
 
 		var min = windowPos;
-		var max = windowPos + new System.Numerics.Vector2( windowWidth, 72 );
+		var max = windowPos + new System.Numerics.Vector2( windowWidth, heightTop );
 
 		var drawList = ImGui.GetWindowDrawList();
 
-		drawList.AddRectFilledMultiColor(
+		drawList.AddRectFilled(
 			min,
 			max,
-			ImGui.GetColorU32( colorA ),
-			ImGui.GetColorU32( colorB ),
-			ImGui.GetColorU32( colorB ),
-			ImGui.GetColorU32( colorA )
+			ImGui.GetColorU32( color )
 		);
 
-		min = windowPos + new System.Numerics.Vector2( 0, 72 );
-		max = max + new System.Numerics.Vector2( 0, 32 );
+		min = windowPos + new System.Numerics.Vector2( 0, heightTop );
+		max = max + new System.Numerics.Vector2( 0, heightBottom );
 
-		drawList.AddRectFilledMultiColor(
+		drawList.AddRectFilled(
 			min,
 			max,
-			ImGui.GetColorU32( colorA * 1.25f ),
-			ImGui.GetColorU32( colorB * 1.25f ),
-			ImGui.GetColorU32( colorB * 1.25f ),
-			ImGui.GetColorU32( colorA * 1.25f )
+			ImGui.GetColorU32( color * 1.25f )
 		);
 
 		var cursorPos = ImGui.GetCursorPos();
-		SetCursorPosXRelative( 4 );
-		SetCursorPosYRelative( 4 );
-		// Image( fileType.IconLg, new( 96 / 2.0f ) );
+		Image( fileType.IconLg, new( iconSize ) );
 
 		ImGui.SetCursorPos( cursorPos );
-		SetCursorPosXRelative( 96 / 2.0f );
+		SetCursorPosXRelative( iconSize );
 		SetCursorPosXRelative( 8 );
 
-		if ( ImGui.BeginChild( $"title##{text}{subtext}", new System.Numerics.Vector2( 0, 63 ), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground ) )
+		if ( ImGui.BeginChild( $"title##{text}{subtext}", new System.Numerics.Vector2( 0, heightTop - 8f ), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoBackground ) )
 		{
 			TextSubheading( text );
 
-			ImGui.Dummy( new System.Numerics.Vector2( 0, 0 ) );
+			SetCursorPosYRelative( -8f );
 			ImGui.Text( subtext );
 
 			ImGui.EndChild();
 		}
+
+		SetCursorPosXRelative( iconSize );
 	}
 
 	public static void Title( string text, string subtext, Vector4? _color = null, bool drawSubpanel = false )
