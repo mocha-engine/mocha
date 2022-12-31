@@ -12,6 +12,8 @@
 #include <vk_mem_alloc.h>
 #include <vkinit.h>
 
+// ----------------------------------------------------------------------------------------------------
+
 enum RenderTextureType
 {
 	RENDER_TEXTURE_COLOR,
@@ -19,12 +21,16 @@ enum RenderTextureType
 	RENDER_TEXTURE_DEPTH
 };
 
+// ----------------------------------------------------------------------------------------------------
+
 enum SamplerType
 {
 	SAMPLER_TYPE_POINT,
 	SAMPLER_TYPE_LINEAR,
 	SAMPLER_TYPE_ANISOTROPIC
 };
+
+// ----------------------------------------------------------------------------------------------------
 
 struct VulkanBuffer
 {
@@ -35,6 +41,8 @@ struct VulkanBuffer
 	VulkanBuffer( VkDevice m_device, size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
 	    VmaAllocationCreateFlagBits allocFlags );
 };
+
+// ----------------------------------------------------------------------------------------------------
 
 struct VulkanSampler
 {
@@ -48,6 +56,8 @@ public:
 	VulkanSampler( VkDevice m_device, SamplerType samplerType );
 };
 
+// ----------------------------------------------------------------------------------------------------
+
 struct VulkanCommandContext
 {
 	VkCommandPool commandPool;
@@ -57,6 +67,8 @@ struct VulkanCommandContext
 	VulkanCommandContext() {}
 	VulkanCommandContext( VkDevice device, uint32_t graphicsQueueFamily );
 };
+
+// ----------------------------------------------------------------------------------------------------
 
 class VulkanRenderTexture
 {
@@ -75,6 +87,8 @@ public:
 	VulkanRenderTexture( VkDevice device, Size2D size, RenderTextureType type );
 };
 
+// ----------------------------------------------------------------------------------------------------
+
 class VulkanSwapchain
 {
 private:
@@ -92,6 +106,8 @@ public:
 	VulkanSwapchain() {}
 	VulkanSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size );
 };
+
+// ----------------------------------------------------------------------------------------------------
 
 class VulkanRenderContext : public BaseRenderContext
 {
