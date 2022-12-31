@@ -5,6 +5,12 @@
 #include <glm/gtx/quaternion.hpp>
 #include <imgui.h>
 
+struct Size2D
+{
+	uint32_t x;
+	uint32_t y;
+};
+
 struct Vector2
 {
 	float x;

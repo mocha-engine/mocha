@@ -21,18 +21,22 @@ public:
 	bool Update();
 
 	inline SDL_Window* GetSDLWindow() { return m_window; }
-	
-	inline void GetWindowSize( int* outW, int* outH )
+
+	inline Size2D GetWindowSize()
 	{
+		int outW, outH;
+
 		if ( ( SDL_GetWindowFlags( m_window ) & SDL_WINDOW_MINIMIZED ) == 0 )
 		{
-			SDL_GetWindowSize( m_window, outW, outH );
+			SDL_GetWindowSize( m_window, &outW, &outH );
 		}
 		else
 		{
-			*outW = 0;
-			*outH = 0;
+			outW = 0;
+			outH = 0;
 		}
+
+		return { ( uint32_t )outW, ( uint32_t )outH };
 	}
 
 	inline void GetDesktopSize( int* outW, int* outH )

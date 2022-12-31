@@ -46,6 +46,12 @@
     <Filter Include="Thirdparty\Volk">
       <UniqueIdentifier>{4591a9b7-aad3-486b-b73c-00c53b036c12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Platform">
+      <UniqueIdentifier>{a9bab490-1b10-4fcb-915c-ac3ea029d4dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Platform\Vulkan">
+      <UniqueIdentifier>{542b08c0-946d-486f-bf41-85a032c27422}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
@@ -521,6 +527,12 @@
     </ClCompile>
     <ClCompile Include="thirdparty\volk\volk.c">
       <Filter>Thirdparty\Volk</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkanrendercontext.cpp">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="baserendercontext.cpp">
+      <Filter>Rendering\Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1385,9 +1397,6 @@
     <ClInclude Include="material.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="vkinit.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="vk_types.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -1432,6 +1441,15 @@
     </ClInclude>
     <ClInclude Include="consolesystem.h">
       <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkanrendercontext.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="baserendercontext.h">
+      <Filter>Rendering\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="vkinit.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
