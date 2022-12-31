@@ -16,9 +16,21 @@ void VulkanSwapchain::CreateMainSwapchain( VkDevice device, VkPhysicalDevice phy
 	                                  .value();
 
 	m_swapchain = vkbSwapchain.swapchain;
-	m_images = vkbSwapchain.get_images().value();
-	m_imageViews = vkbSwapchain.get_image_views().value();
-	m_imageFormat = vkbSwapchain.image_format;
+
+	m_swapchainTextures = {};
+	auto images = vkbSwapchain.get_images().value();
+	auto imageViews = vkbSwapchain.get_image_views().value();
+	auto imageFormat = vkbSwapchain.image_format;
+
+	for ( uint32_t i = 0; i < vkbSwapchain.image_count; ++i )
+	{
+		VulkanRenderTexture renderTexture = {};
+		renderTexture.image = images[i];
+		renderTexture.imageView = imageViews[i];
+		renderTexture.format = imageFormat;
+
+		m_swapchainTextures.push_back( renderTexture );
+	}
 }
 
 void VulkanSwapchain::CreateDepthTexture( VkDevice device, Size2D size )
@@ -369,6 +381,8 @@ void VulkanRenderContext::CreateAllocator()
 	allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
+
+	g_allocator = &m_allocator;
 }
 
 RenderContextStatus VulkanRenderContext::Startup()
@@ -412,10 +426,80 @@ RenderContextStatus VulkanRenderContext::Shutdown()
 	return STATUS_OK;
 }
 
+inline bool VulkanRenderContext::CanRender()
+{
+	// Get window size ( we use this in a load of places )
+	Size2D renderSize = m_window->GetWindowSize();
+
+	if ( renderSize.x < 1 || renderSize.y < 1 )
+	{
+		// Do not render if we can't render to anything..
+		return;
+	}
+}
+
 RenderContextStatus VulkanRenderContext::BeginRendering()
 {
 	ErrorIf( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
 	ErrorIf( m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
+
+	// Get window size ( we use this in a load of places )
+	Size2D renderSize = m_window->GetWindowSize();
+
+	if ( !CanRender() )
+		return;
+
+	// Wait until we can render ( 1 second timeout )
+	VK_CHECK( vkWaitForFences( m_device, 1, &m_mainContext.fence, true, 1000000000 ) );
+	VK_CHECK( vkResetFences( m_device, 1, &m_mainContext.fence ) );
+
+	// Acquire swapchain image ( 1 second timeout )
+	m_swapchainImageIndex = m_swapchain.AcquireSwapchainImageIndex( m_device, m_presentSemaphore, m_mainContext );
+
+	m_swapchainTarget = m_swapchain.m_swapchainTextures[m_swapchainImageIndex];
+	m_depthTarget = m_swapchain.m_depthTexture;
+
+	// Begin command buffer
+	VkCommandBuffer cmd = m_mainContext.commandBuffer;
+	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
+	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
+
+	//
+	// Set viewport & scissor
+	//
+	VkViewport viewport = {};
+	viewport.minDepth = 0.0;
+	viewport.maxDepth = 1.0;
+	viewport.width = renderSize.x;
+	viewport.height = renderSize.y;
+
+	VkRect2D scissor = { { 0, 0 }, { renderSize.x, renderSize.y } };
+	vkCmdSetScissor( cmd, 0, 1, &scissor );
+	vkCmdSetViewport( cmd, 0, 1, &viewport );
+
+	//
+	// We want to draw the image, so we'll manually transition the layout to
+	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
+	//
+	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_swapchainTarget.image );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr,
+	    0, nullptr, 1, &startRenderImageMemoryBarrier );
+
+	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+	VkClearValue depthClear = {};
+	depthClear.depthStencil.depth = 1.0f;
+
+	VkRenderingAttachmentInfo colorAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	colorAttachmentInfo.clearValue = colorClear;
+
+	VkRenderingAttachmentInfo depthAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_depthTarget.imageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
+	depthAttachmentInfo.clearValue = depthClear;
+
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderSize );
 
 	m_renderingActive = true;
 	return STATUS_OK;
@@ -425,6 +509,42 @@ RenderContextStatus VulkanRenderContext::EndRendering()
 {
 	ErrorIf( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
+
+	VkCommandBuffer cmd = m_mainContext.commandBuffer;
+
+	//
+	// We want to present the image, so we'll manually transition the layout to
+	// VK_IMAGE_LAYOUT_PRESENT_SRC_KHR before presenting
+	//
+	VkImageMemoryBarrier endRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, m_swapchainTarget.image );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0,
+	    nullptr, 0, nullptr, 1, &endRenderImageMemoryBarrier );
+
+	VK_CHECK( vkEndCommandBuffer( cmd ) );
+
+	// Submit
+	VkPipelineStageFlags waitStage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+	VkSubmitInfo submit = VKInit::SubmitInfo( &cmd );
+
+	submit.pWaitDstStageMask = &waitStage;
+
+	submit.waitSemaphoreCount = 1;
+	submit.pWaitSemaphores = &m_presentSemaphore;
+
+	submit.signalSemaphoreCount = 1;
+	submit.pSignalSemaphores = &m_renderSemaphore;
+
+	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_mainContext.fence ) );
+
+	// Present
+	VkPresentInfoKHR presentInfo = VKInit::PresentInfo( &m_swapchain.m_swapchain, &m_renderSemaphore, &m_swapchainImageIndex );
+
+	if ( !CanRender() )
+		return;
+
+	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
 
 	m_renderingActive = false;
 	return STATUS_OK;

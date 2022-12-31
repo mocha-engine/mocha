@@ -124,8 +124,10 @@ namespace VKInit
 	}
 
 	inline VkRenderingInfo RenderingInfo(
-	    VkRenderingAttachmentInfo* colorAttachmentInfo, VkRenderingAttachmentInfo* depthAttachmentInfo, VkExtent2D extent )
+	    VkRenderingAttachmentInfo* colorAttachmentInfo, VkRenderingAttachmentInfo* depthAttachmentInfo, Size2D size )
 	{
+		VkExtent2D extent = { size.x, size.y };
+
 		VkRenderingInfo renderInfo = {};
 		renderInfo.sType = VK_STRUCTURE_TYPE_RENDERING_INFO;
 		renderInfo.pNext = nullptr;

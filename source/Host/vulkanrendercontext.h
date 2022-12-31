@@ -5,30 +5,13 @@
 #include <defs.h>
 #include <game_types.h>
 #include <globalvars.h>
+#include <handlemap.h>
+#include <vkinit.h>
 #include <vulkan/vulkan.h>
 #include <window.h>
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
-#include <vkinit.h>
-
-// ----------------------------------------------------------------------------------------------------
-
-enum RenderTextureType
-{
-	RENDER_TEXTURE_COLOR,
-	RENDER_TEXTURE_COLOR_OPAQUE,
-	RENDER_TEXTURE_DEPTH
-};
-
-// ----------------------------------------------------------------------------------------------------
-
-enum SamplerType
-{
-	SAMPLER_TYPE_POINT,
-	SAMPLER_TYPE_LINEAR,
-	SAMPLER_TYPE_ANISOTROPIC
-};
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -89,6 +72,20 @@ public:
 
 // ----------------------------------------------------------------------------------------------------
 
+class VulkanImageTexture
+{
+public:
+	VkImage image;
+	VmaAllocation allocation;
+	VkImageView imageView;
+	VkFormat format;
+
+	VulkanImageTexture() {}
+	VulkanImageTexture( VkDevice device, Size2D size );
+};
+
+// ----------------------------------------------------------------------------------------------------
+
 class VulkanSwapchain
 {
 private:
@@ -97,11 +94,18 @@ private:
 
 public:
 	VkSwapchainKHR m_swapchain;
-	std::vector<VkImage> m_images;
-	std::vector<VkImageView> m_imageViews;
-	VkFormat m_imageFormat;
-
+	std::vector<VulkanRenderTexture> m_swapchainTextures;
 	VulkanRenderTexture m_depthTexture;
+
+	uint32_t AcquireSwapchainImageIndex( VkDevice device, VkSemaphore presentSemaphore, VulkanCommandContext mainContext )
+	{
+		uint32_t swapchainImageIndex;
+
+		VK_CHECK( vkAcquireNextImageKHR( device, m_swapchain, 1000000000, presentSemaphore, nullptr, &swapchainImageIndex ) );
+		VK_CHECK( vkResetCommandBuffer( mainContext.commandBuffer, 0 ) );
+
+		return swapchainImageIndex;
+	}
 
 	VulkanSwapchain() {}
 	VulkanSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size );
@@ -149,9 +153,52 @@ private:
 	VmaAllocator m_allocator;
 	void CreateAllocator();
 
+	//
+	// State
+	//
+	uint32_t m_swapchainImageIndex;
+	// Current swapchain target image. Refers to m_swapchain.images[currentImageIndex]
+	VulkanRenderTexture m_swapchainTarget;
+	// Current swapchain target depth buffer.
+	VulkanRenderTexture m_depthTarget;
+
+	// Checks to see whether the current window size is valid for rendering.
+	inline bool CanRender();
+
+	//
+	// Handle maps
+	// We refer to these in our external 'base' objects..
+	// struct Texture
+	// {
+	//    public Handle handle;
+	//
+	//    Texture( /* ... */ )
+	//    {
+	//         handle = RenderContext::CreateImageTexture( /* ... */ );
+	//    }
+	// }
+	//
+	HandleMap<VkBuffer> m_buffers = {};
+	HandleMap<VulkanImageTexture> m_imageTextures = {};
+	HandleMap<VulkanRenderTexture> m_renderTextures = {};
+
 public:
 	RenderContextStatus Startup() override;
 	RenderContextStatus Shutdown() override;
 	RenderContextStatus BeginRendering() override;
 	RenderContextStatus EndRendering() override;
+	// ----------------------------------------
+	RenderContextStatus BindPipeline( Pipeline p ) override;
+
+	RenderContextStatus BindDescriptor( Descriptor d ) override;
+
+	RenderContextStatus BindVertexBuffer( VertexBuffer vb ) override;
+
+	RenderContextStatus BindIndexBuffer( IndexBuffer ib ) override;
+
+	RenderContextStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
+
+	RenderContextStatus BindRenderTarget( RenderTexture rt ) override;
+	// ----------------------------------------
+	RenderContextStatus RenderEntity( BaseEntity* entity ) override;
 };
