@@ -1,5 +1,9 @@
 #pragma once
 #include <cstdint>
+#include <defs.h>
+#include <string>
+
+// ----------------------------------------------------------------------------------------------------
 
 class BaseTexture;
 class ImageTexture;
@@ -11,7 +15,9 @@ class IndexBuffer;
 class Pipeline;
 class Descriptor;
 
+// ----------------------------------------------------------------------------------------------------
 // clang-format off
+
 enum RenderContextStatus
 {
 	STATUS_OK,							// No error
@@ -22,23 +28,47 @@ enum RenderContextStatus
 	NO_VERTEX_BUFFER_BOUND,				// You tried to render without a vertex buffer bound
 	NO_INDEX_BUFFER_BOUND,				// You tried to render without an index buffer bound and had indexCount > 0
 };
-// clang-format on
-
-#define RETURN_ERROR_IF( x, e ) \
-	if ( x )                    \
-	{                           \
-		return e;               \
-	}
 
 #define RENDERCONTEXT_FUNC virtual RenderContextStatus
+
+// clang-format on
+// ----------------------------------------------------------------------------------------------------
+
+inline std::string GetRenderContextStatusString( RenderContextStatus status )
+{
+	const std::string RenderContextStatusStrings[] = {
+	    "STATUS_OK",
+	    "NOT_INITIALIZED",
+	    "ALREADY_INITIALIZED",
+	    "BEGIN_END_MISMATCH",
+	    "NO_PIPELINE_BOUND",
+	    "NO_VERTEX_BUFFER_BOUND",
+	    "NO_INDEX_BUFFER_BOUND",
+	};
+
+	return RenderContextStatusStrings[status];
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+inline void ErrorIf( bool condition, RenderContextStatus status )
+{
+	if ( condition )
+	{
+		std::string error = "RenderContext Error: " + GetRenderContextStatusString( status );
+		ERRORMESSAGE( error );
+	}
+}
+
+// ----------------------------------------------------------------------------------------------------
 
 // This is the base class for all rendering contexts.
 class BaseRenderContext
 {
 protected:
-	//
+	// ----------------------------------------
 	// Internal state
-	//
+	// ----------------------------------------
 
 	// Was Startup called?
 	bool m_hasInitialized;
@@ -53,15 +83,15 @@ protected:
 	VertexBuffer* m_currentVertexBuffer;
 
 public:
-	//
+	// ----------------------------------------
 	// Startup / shutdown
-	//
+	// ----------------------------------------
 	RENDERCONTEXT_FUNC Startup() = 0;
 	RENDERCONTEXT_FUNC Shutdown() = 0;
 
-	//
+	// ----------------------------------------
 	// Rendering commands
-	//
+	// ----------------------------------------
 
 	// Call this before invoking any render functions.
 	RENDERCONTEXT_FUNC BeginRendering() = 0;
@@ -87,3 +117,5 @@ public:
 	// Call this after you're done.
 	RENDERCONTEXT_FUNC EndRendering() = 0;
 };
+
+#undef RENDERCONTEXT_FUNC

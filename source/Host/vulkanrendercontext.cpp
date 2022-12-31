@@ -1,8 +1,178 @@
 #include "vulkanrendercontext.h"
+
 #include <volk.h>
 
-// Create a Vulkan context, set up devices
+// ----------------------------------------------------------------------------------------------------
 
+void VulkanSwapchain::CreateMainSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size )
+{
+	vkb::SwapchainBuilder swapchainBuilder( physicalDevice, device, surface );
+
+	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
+	                                  .set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
+	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
+	                                  .set_desired_extent( size.x, size.y )
+	                                  .build()
+	                                  .value();
+
+	m_swapchain = vkbSwapchain.swapchain;
+	m_images = vkbSwapchain.get_images().value();
+	m_imageViews = vkbSwapchain.get_image_views().value();
+	m_imageFormat = vkbSwapchain.image_format;
+}
+
+void VulkanSwapchain::CreateDepthTexture( VkDevice device, Size2D size )
+{
+	m_depthTexture = VulkanRenderTexture( device, size, RENDER_TEXTURE_DEPTH );
+}
+
+VulkanSwapchain::VulkanSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size )
+{
+	CreateMainSwapchain( device, physicalDevice, surface, size );
+	CreateDepthTexture( device, size );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType type )
+{
+	switch ( type )
+	{
+	case RENDER_TEXTURE_COLOR:
+	case RENDER_TEXTURE_COLOR_OPAQUE:
+		return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	case RENDER_TEXTURE_DEPTH:
+		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	}
+
+	assert( true && "Invalid render texture type" );
+}
+
+VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
+{
+	switch ( type )
+	{
+	case RENDER_TEXTURE_COLOR:
+		return VK_FORMAT_R8G8B8A8_UNORM;
+	case RENDER_TEXTURE_COLOR_OPAQUE:
+		return VK_FORMAT_R8G8B8_UNORM;
+	case RENDER_TEXTURE_DEPTH:
+		return VK_FORMAT_D32_SFLOAT;
+	}
+
+	assert( true && "Invalid render texture type" );
+}
+
+VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
+{
+	switch ( type )
+	{
+	case RENDER_TEXTURE_COLOR:
+	case RENDER_TEXTURE_COLOR_OPAQUE:
+		return VK_IMAGE_ASPECT_COLOR_BIT;
+	case RENDER_TEXTURE_DEPTH:
+		return VK_IMAGE_ASPECT_DEPTH_BIT;
+	}
+
+	assert( true && "Invalid render texture type" );
+}
+
+VulkanRenderTexture::VulkanRenderTexture( VkDevice device, Size2D size, RenderTextureType type )
+{
+	VkExtent3D depthImageExtent = {
+	    size.x,
+	    size.y,
+	    1,
+	};
+
+	format = GetFormat( type ); // Depth & stencil format
+
+	VkImageCreateInfo imageInfo = VKInit::ImageCreateInfo( format, GetUsageFlagBits( type ), depthImageExtent, 1 );
+
+	VmaAllocationCreateInfo allocInfo = {};
+	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
+
+	vmaCreateImage( *g_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
+
+	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( type ), 1 );
+	VK_CHECK( vkCreateImageView( device, &viewInfo, nullptr, &imageView ) );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+VulkanCommandContext::VulkanCommandContext( VkDevice device, uint32_t graphicsQueueFamily )
+{
+	VkCommandPoolCreateInfo poolInfo = {};
+	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+	poolInfo.pNext = nullptr;
+
+	poolInfo.queueFamilyIndex = graphicsQueueFamily;
+	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+	VK_CHECK( vkCreateCommandPool( device, &poolInfo, nullptr, &commandPool ) );
+
+	VkCommandBufferAllocateInfo allocInfo = {};
+	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+	allocInfo.pNext = nullptr;
+
+	allocInfo.commandPool = commandPool;
+	allocInfo.commandBufferCount = 1;
+	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+
+	VK_CHECK( vkAllocateCommandBuffers( device, &allocInfo, &commandBuffer ) );
+
+	VkFenceCreateInfo fenceInfo = {};
+	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+	fenceInfo.pNext = nullptr;
+	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+	VK_CHECK( vkCreateFence( device, &fenceInfo, nullptr, &fence ) );
+	vkResetFences( device, 1, &fence );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
+{
+	if ( samplerType == SAMPLER_TYPE_POINT )
+		return VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
+	if ( samplerType == SAMPLER_TYPE_LINEAR )
+		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
+	if ( samplerType == SAMPLER_TYPE_ANISOTROPIC )
+		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
+
+	assert( true && "Invalid sampler type." );
+}
+
+VulkanSampler::VulkanSampler( VkDevice m_device, SamplerType samplerType )
+{
+	VkSamplerCreateInfo samplerInfo = GetCreateInfo( samplerType );
+	VK_CHECK( vkCreateSampler( m_device, &samplerInfo, nullptr, &sampler ) );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+VulkanBuffer::VulkanBuffer( VkDevice m_device, size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
+    VmaAllocationCreateFlagBits allocFlags )
+{
+	VkBufferCreateInfo bufferInfo = {};
+	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+	bufferInfo.pNext = nullptr;
+
+	bufferInfo.size = allocationSize;
+	bufferInfo.usage = usage;
+
+	VmaAllocationCreateInfo allocInfo = {};
+	allocInfo.usage = memoryUsage;
+	allocInfo.flags = allocFlags;
+
+	VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &allocInfo, &buffer, &allocation, nullptr ) );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+// Create a Vulkan context, set up devices
 vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 {
 	vkb::InstanceBuilder builder;
@@ -31,6 +201,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 void VulkanRenderContext::FinalizeAndCreateDevice( vkb::PhysicalDevice physicalDevice )
 {
 	vkb::DeviceBuilder deviceBuilder( physicalDevice );
+
 	if ( EngineFeatures::Raytracing )
 	{
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeature = {};
@@ -202,7 +373,7 @@ void VulkanRenderContext::CreateAllocator()
 
 RenderContextStatus VulkanRenderContext::Startup()
 {
-	RETURN_ERROR_IF( m_hasInitialized, RenderContextStatus::ALREADY_INITIALIZED );
+	ErrorIf( m_hasInitialized, RenderContextStatus::ALREADY_INITIALIZED );
 
 	volkInitialize();
 
@@ -235,7 +406,7 @@ RenderContextStatus VulkanRenderContext::Startup()
 
 RenderContextStatus VulkanRenderContext::Shutdown()
 {
-	RETURN_ERROR_IF( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
+	ErrorIf( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
 
 	m_hasInitialized = false;
 	return STATUS_OK;
@@ -243,8 +414,8 @@ RenderContextStatus VulkanRenderContext::Shutdown()
 
 RenderContextStatus VulkanRenderContext::BeginRendering()
 {
-	RETURN_ERROR_IF( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
-	RETURN_ERROR_IF( m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
+	ErrorIf( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
+	ErrorIf( m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
 
 	m_renderingActive = true;
 	return STATUS_OK;
@@ -252,168 +423,9 @@ RenderContextStatus VulkanRenderContext::BeginRendering()
 
 RenderContextStatus VulkanRenderContext::EndRendering()
 {
-	RETURN_ERROR_IF( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
-	RETURN_ERROR_IF( !m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
+	ErrorIf( !m_hasInitialized, RenderContextStatus::NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RenderContextStatus::BEGIN_END_MISMATCH );
 
 	m_renderingActive = false;
 	return STATUS_OK;
-}
-
-void VulkanSwapchain::CreateMainSwapchain(
-    VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size )
-{
-	vkb::SwapchainBuilder swapchainBuilder( physicalDevice, device, surface );
-
-	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
-	                                  .set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
-	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
-	                                  .set_desired_extent( size.x, size.y )
-	                                  .build()
-	                                  .value();
-
-	m_swapchain = vkbSwapchain.swapchain;
-	m_images = vkbSwapchain.get_images().value();
-	m_imageViews = vkbSwapchain.get_image_views().value();
-	m_imageFormat = vkbSwapchain.image_format;
-}
-
-void VulkanSwapchain::CreateDepthTexture( VkDevice device, Size2D size )
-{
-	m_depthTexture = VulkanRenderTexture( device, size, RENDER_TEXTURE_DEPTH );
-}
-
-VulkanSwapchain::VulkanSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size )
-{
-	CreateMainSwapchain( device, physicalDevice, surface, size );
-	CreateDepthTexture( device, size );
-}
-
-VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType type )
-{
-	switch ( type )
-	{
-	case RENDER_TEXTURE_COLOR:
-	case RENDER_TEXTURE_COLOR_OPAQUE:
-		return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	case RENDER_TEXTURE_DEPTH:
-		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-	}
-
-	assert( true && "Invalid render texture type" );
-}
-
-VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
-{
-	switch ( type )
-	{
-	case RENDER_TEXTURE_COLOR:
-		return VK_FORMAT_R8G8B8A8_UNORM;
-	case RENDER_TEXTURE_COLOR_OPAQUE:
-		return VK_FORMAT_R8G8B8_UNORM;
-	case RENDER_TEXTURE_DEPTH:
-		return VK_FORMAT_D32_SFLOAT;
-	}
-
-	assert( true && "Invalid render texture type" );
-}
-
-VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
-{
-	switch ( type )
-	{
-	case RENDER_TEXTURE_COLOR:
-	case RENDER_TEXTURE_COLOR_OPAQUE:
-		return VK_IMAGE_ASPECT_COLOR_BIT;
-	case RENDER_TEXTURE_DEPTH:
-		return VK_IMAGE_ASPECT_DEPTH_BIT;
-	}
-
-	assert( true && "Invalid render texture type" );
-}
-
-VulkanRenderTexture::VulkanRenderTexture( VkDevice device, Size2D size, RenderTextureType type )
-{
-	VkExtent3D depthImageExtent = {
-	    size.x,
-	    size.y,
-	    1,
-	};
-
-	format = GetFormat( type ); // Depth & stencil format
-
-	VkImageCreateInfo imageInfo = VKInit::ImageCreateInfo( format, GetUsageFlagBits( type ), depthImageExtent, 1 );
-
-	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-
-	vmaCreateImage( *g_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
-
-	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( type ), 1 );
-	VK_CHECK( vkCreateImageView( device, &viewInfo, nullptr, &imageView ) );
-}
-
-VulkanCommandContext::VulkanCommandContext( VkDevice device, uint32_t graphicsQueueFamily )
-{
-	VkCommandPoolCreateInfo poolInfo = {};
-	poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	poolInfo.pNext = nullptr;
-
-	poolInfo.queueFamilyIndex = graphicsQueueFamily;
-	poolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-	VK_CHECK( vkCreateCommandPool( device, &poolInfo, nullptr, &commandPool ) );
-
-	VkCommandBufferAllocateInfo allocInfo = {};
-	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	allocInfo.pNext = nullptr;
-
-	allocInfo.commandPool = commandPool;
-	allocInfo.commandBufferCount = 1;
-	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-
-	VK_CHECK( vkAllocateCommandBuffers( device, &allocInfo, &commandBuffer ) );
-
-	VkFenceCreateInfo fenceInfo = {};
-	fenceInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-	fenceInfo.pNext = nullptr;
-	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
-
-	VK_CHECK( vkCreateFence( device, &fenceInfo, nullptr, &fence ) );
-	vkResetFences( device, 1, &fence );
-}
-
-VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
-{
-	if ( samplerType == SAMPLER_TYPE_POINT )
-		return VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
-	if ( samplerType == SAMPLER_TYPE_LINEAR )
-		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
-	if ( samplerType == SAMPLER_TYPE_ANISOTROPIC )
-		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
-
-	assert( true && "Invalid sampler type." );
-}
-
-VulkanSampler::VulkanSampler( VkDevice m_device, SamplerType samplerType )
-{
-	VkSamplerCreateInfo samplerInfo = GetCreateInfo( samplerType );
-	VK_CHECK( vkCreateSampler( m_device, &samplerInfo, nullptr, &sampler ) );
-}
-
-VulkanBuffer::VulkanBuffer( VkDevice m_device, size_t allocationSize, VkBufferUsageFlags usage,
-    VmaMemoryUsage memoryUsage, VmaAllocationCreateFlagBits allocFlags )
-{
-	VkBufferCreateInfo bufferInfo = {};
-	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	bufferInfo.pNext = nullptr;
-
-	bufferInfo.size = allocationSize;
-	bufferInfo.usage = usage;
-
-	VmaAllocationCreateInfo allocInfo = {};
-	allocInfo.usage = memoryUsage;
-	allocInfo.flags = allocFlags;
-
-	VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferInfo, &allocInfo, &buffer, &allocation, nullptr ) );
 }
