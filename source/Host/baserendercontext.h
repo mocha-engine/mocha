@@ -1,19 +1,103 @@
 #pragma once
+#include <baseentity.h>
 #include <cstdint>
 #include <defs.h>
 #include <string>
 
 // ----------------------------------------------------------------------------------------------------
+// clang-format off
 
-class BaseTexture;
-class ImageTexture;
-class RenderTexture;
+enum RenderObjectStatus
+{
+	STATUS_OK,							// No error
+	STATUS_ERROR,						// Generic error
+};
 
-class VertexBuffer;
-class IndexBuffer;
+#define RENDEROBJECT_FUNC virtual RenderObjectStatus
 
-class Pipeline;
-class Descriptor;
+// clang-format on
+// ----------------------------------------------------------------------------------------------------
+
+struct TextureData_t
+{
+	uint32_t width;
+	uint32_t height;
+	uint32_t mipCount;
+	InteropArray mipData;
+	int imageFormat;
+};
+
+struct TextureCopyData_t
+{
+	uint32_t srcX;
+	uint32_t srcY;
+	uint32_t dstX;
+	uint32_t dstY;
+	uint32_t width;
+	uint32_t height;
+	Texture* src;
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+enum RenderTextureType
+{
+	RENDER_TEXTURE_COLOR,
+	RENDER_TEXTURE_COLOR_OPAQUE,
+	RENDER_TEXTURE_DEPTH
+};
+
+// ----------------------------------------------------------------------------------------------------
+
+enum SamplerType
+{
+	SAMPLER_TYPE_POINT,
+	SAMPLER_TYPE_LINEAR,
+	SAMPLER_TYPE_ANISOTROPIC
+};
+
+// ----------------------------------------------------------------------------------------------------
+class BaseTexture
+{
+public:
+};
+
+class ImageTexture : public BaseTexture
+{
+public:
+	RENDEROBJECT_FUNC SetData( TextureData_t textureData ) = 0;
+	RENDEROBJECT_FUNC Copy( TextureCopyData_t copyData ) = 0;
+};
+
+class RenderTexture : public BaseTexture
+{
+public:
+	
+};
+
+// ----------------------------------------
+
+class VertexBuffer
+{
+public:
+};
+
+class IndexBuffer
+{
+public:
+};
+
+// ----------------------------------------
+
+class Pipeline
+{
+public:
+};
+
+class Descriptor
+{
+public:
+};
 
 // ----------------------------------------------------------------------------------------------------
 // clang-format off
@@ -86,6 +170,7 @@ public:
 	// ----------------------------------------
 	// Startup / shutdown
 	// ----------------------------------------
+
 	RENDERCONTEXT_FUNC Startup() = 0;
 	RENDERCONTEXT_FUNC Shutdown() = 0;
 
@@ -96,6 +181,13 @@ public:
 	// Call this before invoking any render functions.
 	RENDERCONTEXT_FUNC BeginRendering() = 0;
 
+	// Call this after you're done.
+	RENDERCONTEXT_FUNC EndRendering() = 0;
+
+	// ----------------------------------------
+	//
+	// Low-level rendering
+	//
 	// Binds a pipeline
 	RENDERCONTEXT_FUNC BindPipeline( Pipeline p ) = 0;
 
@@ -114,8 +206,14 @@ public:
 	// Call this to set the render target to render to.
 	RENDERCONTEXT_FUNC BindRenderTarget( RenderTexture rt ) = 0;
 
-	// Call this after you're done.
-	RENDERCONTEXT_FUNC EndRendering() = 0;
+	// ----------------------------------------
+	//
+	// High-level rendering
+	//
+	// Render an entity. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
+	// this once and it'll do all the work.
+	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
+	RENDERCONTEXT_FUNC RenderEntity( BaseEntity* entity ) = 0;
 };
 
 #undef RENDERCONTEXT_FUNC
