@@ -30,13 +30,8 @@
 //
 //
 //
-#include <VkBootstrap.h>
 #include <glm/ext.hpp>
 #include <spdlog/spdlog.h>
-#include <volk.h>
-
-#define VMA_IMPLEMENTATION
-#include <vk_mem_alloc.h>
 
 #ifdef _IMGUI
 #include <backends/imgui_impl_sdl.h>
@@ -72,161 +67,8 @@ VkBool32 DebugCallback( VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, 
 	return VK_FALSE;
 }
 
-void RenderManager::InitVulkan()
-{
-	volkInitialize();
-
-	vkb::InstanceBuilder builder;
-
-	auto ret = builder.set_app_name( GameSettings::Get()->name.c_str() )
-	               .set_engine_name( ENGINE_NAME )
-	               .request_validation_layers( true )
-	               .require_api_version( 1, 3, 0 )
-	               .use_default_debug_messenger()
-	               .enable_extension( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME )
-	               .build();
-
-	vkb::Instance vkbInstance = ret.value();
-
-	m_instance = vkbInstance.instance;
-	m_debugMessenger = vkbInstance.debug_messenger;
-
-	volkLoadInstance( m_instance );
-
-	m_surface = m_window->CreateSurface( m_instance );
-
-	//
-	// Set up physical device selection properties
-	//
-	vkb::PhysicalDeviceSelector selector( vkbInstance );
-	// Minimum vulkan version, set target surface
-	selector = selector.set_minimum_version( 1, 3 );
-	selector = selector.set_surface( m_surface );
-
-	//
-	// Set required extensions
-	//
-	if ( EngineFeatures::Raytracing )
-	{
-#define X( name ) selector = selector.add_required_extension( name );
-		X( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
-		X( VK_KHR_DEFERRED_HOST_OPERATIONS_EXTENSION_NAME );
-		X( VK_KHR_ACCELERATION_STRUCTURE_EXTENSION_NAME );
-		X( VK_KHR_RAY_QUERY_EXTENSION_NAME );
-#undef X
-	}
-
-	//
-	// Set required VK1.0 features
-	//
-	VkPhysicalDeviceFeatures requiredFeatures = {};
-	requiredFeatures.samplerAnisotropy = VK_TRUE;
-	selector = selector.set_required_features( requiredFeatures );
-
-	//
-	// Set required VK1.1 features
-	//
-	VkPhysicalDeviceVulkan11Features requiredFeatures11 = {};
-	requiredFeatures11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
-	requiredFeatures11.pNext = nullptr;
-	selector = selector.set_required_features_11( requiredFeatures11 );
-
-	//
-	// Set required VK1.2 features
-	//
-	VkPhysicalDeviceVulkan12Features requiredFeatures12 = {};
-	requiredFeatures12.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_2_FEATURES;
-	requiredFeatures12.pNext = nullptr;
-	requiredFeatures12.descriptorIndexing = VK_TRUE;
-	requiredFeatures12.bufferDeviceAddress = VK_TRUE;
-	selector = selector.set_required_features_12( requiredFeatures12 );
-
-	//
-	// Set required VK1.3 features
-	//
-	VkPhysicalDeviceVulkan13Features requiredFeatures13 = {};
-	requiredFeatures13.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_3_FEATURES;
-	requiredFeatures13.pNext = nullptr;
-	requiredFeatures13.dynamicRendering = VK_TRUE;
-	selector = selector.set_required_features_13( requiredFeatures13 );
-
-	//
-	// Finalize and select a physical device
-	//
-	auto physicalDeviceReturn = selector.select();
-
-	if ( !physicalDeviceReturn )
-	{
-		auto error = physicalDeviceReturn.full_error();
-
-		std::string errorStr = "Couldn't find valid physical device: " + error.type.message();
-		ERRORMESSAGE( errorStr );
-
-		// Exit
-		exit( error.type.value() );
-	}
-
-	vkb::PhysicalDevice physicalDevice = physicalDeviceReturn.value();
-	vkb::DeviceBuilder deviceBuilder( physicalDevice );
-
-	if ( EngineFeatures::Raytracing )
-	{
-		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeature = {};
-		accelFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
-		accelFeature.accelerationStructure = true;
-
-		VkPhysicalDeviceRayQueryFeaturesKHR rayQueryFeature = {};
-		rayQueryFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_RAY_QUERY_FEATURES_KHR;
-		rayQueryFeature.rayQuery = true;
-
-		deviceBuilder = deviceBuilder.add_pNext( &accelFeature ).add_pNext( &rayQueryFeature );
-	}
-
-	vkb::Device vkbDevice = deviceBuilder.build().value();
-
-	m_device = vkbDevice.device;
-	m_chosenGPU = vkbDevice.physical_device;
-
-	m_graphicsQueue = vkbDevice.get_queue( vkb::QueueType::graphics ).value();
-	m_graphicsQueueFamily = vkbDevice.get_queue_index( vkb::QueueType::graphics ).value();
-
-	VmaAllocatorCreateInfo allocatorInfo = {};
-	allocatorInfo.physicalDevice = m_chosenGPU;
-	allocatorInfo.device = m_device;
-	allocatorInfo.instance = m_instance;
-
-	VmaVulkanFunctions allocatorFuncs = {};
-	allocatorFuncs.vkGetInstanceProcAddr = vkGetInstanceProcAddr;
-	allocatorFuncs.vkGetDeviceProcAddr = vkGetDeviceProcAddr;
-	allocatorInfo.pVulkanFunctions = &allocatorFuncs;
-	allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
-
-	{
-		std::vector<VkExtensionProperties> extensions;
-		VkResult rs;
-
-		uint32_t propertyCount;
-		rs = vkEnumerateDeviceExtensionProperties( m_chosenGPU, nullptr, &propertyCount, nullptr );
-		extensions.resize( propertyCount );
-		rs = vkEnumerateDeviceExtensionProperties( m_chosenGPU, nullptr, &propertyCount, extensions.data() );
-
-		spdlog::info( "Supported extensions ({}):", extensions.size() );
-		for ( auto& ext : extensions )
-		{
-			spdlog::info( "\t{} {}", ext.extensionName, ext.specVersion );
-		}
-		spdlog::info( "=== END ===" );
-	}
-
-	vmaCreateAllocator( &allocatorInfo, &m_allocator );
-}
-
 void RenderManager::InitDeviceProperties()
 {
-	VkPhysicalDeviceProperties deviceProperties = {};
-	vkGetPhysicalDeviceProperties( m_chosenGPU, &deviceProperties );
-
-	m_deviceName = deviceProperties.deviceName;
 }
 
 void RenderManager::InitSwapchain()
@@ -293,29 +135,6 @@ void RenderManager::CreateSwapchain( VkExtent2D size )
 
 void RenderManager::InitCommands()
 {
-	VkCommandPoolCreateInfo commandPoolInfo = {};
-	commandPoolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-	commandPoolInfo.pNext = nullptr;
-
-	commandPoolInfo.queueFamilyIndex = m_graphicsQueueFamily;
-	commandPoolInfo.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-	VK_CHECK( vkCreateCommandPool( m_device, &commandPoolInfo, nullptr, &m_commandPool ) );
-
-	VkCommandBufferAllocateInfo commandAllocInfo = {};
-	commandAllocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-	commandAllocInfo.pNext = nullptr;
-
-	commandAllocInfo.commandPool = m_commandPool;
-	commandAllocInfo.commandBufferCount = 1;
-	commandAllocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-
-	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_commandBuffer ) );
-
-	// create pool for upload context
-	VK_CHECK( vkCreateCommandPool( m_device, &commandPoolInfo, nullptr, &m_uploadContext.commandPool ) );
-	commandAllocInfo.commandPool = m_uploadContext.commandPool;
-	VK_CHECK( vkAllocateCommandBuffers( m_device, &commandAllocInfo, &m_uploadContext.commandBuffer ) );
 }
 
 void RenderManager::InitSyncStructures()
@@ -328,13 +147,7 @@ void RenderManager::InitSyncStructures()
 
 	VK_CHECK( vkCreateFence( m_device, &fenceCreateInfo, nullptr, &m_renderFence ) );
 
-	VkSemaphoreCreateInfo semaphoreCreateInfo = {};
-	semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
-	semaphoreCreateInfo.pNext = nullptr;
-	semaphoreCreateInfo.flags = 0;
 
-	VK_CHECK( vkCreateSemaphore( m_device, &semaphoreCreateInfo, nullptr, &m_presentSemaphore ) );
-	VK_CHECK( vkCreateSemaphore( m_device, &semaphoreCreateInfo, nullptr, &m_renderSemaphore ) );
 
 	VkFenceCreateInfo uploadFenceCreateInfo = {};
 	uploadFenceCreateInfo.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -520,11 +333,6 @@ void RenderManager::InitDescriptors()
 
 void RenderManager::InitSamplers()
 {
-	VkSamplerCreateInfo samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
-	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_anisoSampler ) );
-
-	samplerInfo = VKInit::SamplerCreateInfo( VK_FILTER_NEAREST, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
-	VK_CHECK( vkCreateSampler( g_renderManager->m_device, &samplerInfo, nullptr, &m_pointSampler ) );
 }
 
 void RenderManager::InitRayTracing()
