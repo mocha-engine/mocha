@@ -43,7 +43,7 @@ public class Player : ModelEntity
 	{
 		WalkController = new( this );
 		Velocity = Vector3.Zero;
-		Position = new Vector3( 0, 0, 16.0f );
+		Position = new Vector3( 0.0f, 4.0f, 4.0f );
 	}
 
 	public override void Update()

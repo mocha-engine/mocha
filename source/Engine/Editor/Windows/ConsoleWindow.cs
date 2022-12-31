@@ -77,7 +77,7 @@ public class ConsoleWindow : EditorWindow
 		graphColor = Vector4.Lerp( graphColor, targetGraphColor, Time.Delta * 10f );
 
 		// TODO:
-		Glue.Editor.DrawGraph( "##performance", graphColor.ToBackground(), Time.FPSHistory.Select( x => (float)x ).ToList().ToInterop() );
+		// Glue.Editor.DrawGraph( "##performance", graphColor.ToBackground(), Time.FPSHistory.Select( x => (float)x ).ToList().ToInterop() );
 	}
 
 	private void DrawEntityList()

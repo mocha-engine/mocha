@@ -22,6 +22,11 @@ public class Main
 		vconsoleServer = new();
 		Log.OnLog += ( s ) => vconsoleServer.Log( s );
 
+		vconsoleServer.OnCommand += ( s ) =>
+		{
+			Log.Info( $"Command: {s}" );
+		};
+
 		ImGuiNative.igSetCurrentContext( Glue.Editor.GetContextPointer() );
 		Log.Trace( $"Imgui context is {ImGuiNative.igGetCurrentContext()}" );
 

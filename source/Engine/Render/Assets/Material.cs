@@ -22,6 +22,8 @@ public class Material : Asset
 	/// </summary>
 	public Material( string path )
 	{
+		Path = path;
+
 		// TODO: Hook up to filesystem
 		const string DefaultShaderPath = "content/core/shaders/pbr.mshdr";
 
@@ -67,12 +69,7 @@ public class Material : Asset
 			false
 		);
 
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", () =>
-		{
-			NativeMaterial.ReloadShaders();
-		} );
-
-		Path = path;
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", NativeMaterial.ReloadShaders );
 	}
 
 	/// <summary>
@@ -82,6 +79,8 @@ public class Material : Asset
 		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
 		Texture? roughnessTexture = null, Sampler sampler = Sampler.Point, bool ignoreDepth = false )
 	{
+		Path = "Procedural Material";
+
 		DiffuseTexture = diffuseTexture ?? Texture.MissingTexture;
 		NormalTexture = normalTexture ?? Texture.Normal;
 		AmbientOcclusionTexture = ambientOcclusionTexture ?? Texture.One;

@@ -7,6 +7,7 @@ public partial class Model : Model<Vertex>
 	/// </summary>
 	public Model( string path )
 	{
+		Path = path;
 		All.Add( this );
 
 		LoadFromPath( path );
@@ -15,16 +16,22 @@ public partial class Model : Model<Vertex>
 	/// <summary>
 	/// Creates an indexed model from a given set of vertices and indices.
 	/// </summary>
-	public Model( string path, Vertex[] vertices, uint[] indices, Material material ) : this( path )
+	public Model( Vertex[] vertices, uint[] indices, Material material )
 	{
+		Path = "Procedural Model";
+		All.Add( this );
+
 		AddMesh( vertices, indices, material );
 	}
 
 	/// <summary>
 	/// Creates a basic model from a given set of vertices.
 	/// </summary>
-	public Model( string path, Vertex[] vertices, Material material ) : this( path )
+	public Model( Vertex[] vertices, Material material )
 	{
+		Path = "Procedural Model";
+		All.Add( this );
+
 		AddMesh( vertices, material );
 	}
 }
