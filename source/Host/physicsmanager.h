@@ -1,6 +1,6 @@
 #pragma once
 #include <Jolt/Jolt.h>
-#include <game_types.h>
+#include <mathtypes.h>
 #include <handlemap.h>
 #include <memory>
 #include <modelentity.h>

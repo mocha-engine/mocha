@@ -1,6 +1,5 @@
 #pragma once
 #include <baseentity.h>
-#include <camera.h>
 #include <edict.h>
 #include <globalvars.h>
 #include <modelentity.h>

@@ -1,8 +1,13 @@
 #pragma once
+
 #include <glslang/SPIRV/GlslangToSpv.h>
 #include <volk.h>
-#include "mesh.h"
 
+//
+// This compiles from GLSL to SPIR-V.
+// It's not Vulkan-specific, so doesn't belong in
+// Platform/Vulkan/.
+//
 class ShaderCompiler
 {
 private:

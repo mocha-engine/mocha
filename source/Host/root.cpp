@@ -30,6 +30,7 @@ RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
 PhysicsManager* g_physicsManager;
 InputManager* g_inputManager;
+BaseRenderContext* g_renderContext; // TODO??
 
 float g_curTime;
 float g_frameTime;

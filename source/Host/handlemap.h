@@ -1,5 +1,6 @@
 #pragma once
 #define THREADED
+#include <defs.h>
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -8,8 +9,6 @@
 #include <algorithm>
 #include <execution>
 #endif
-
-typedef uint32_t Handle;
 
 // A class that manages a collection of objects of type T, indexed by a handle.
 template <typename T>
@@ -22,7 +21,7 @@ private:
 	// The current index to use when inserting a new object into the map.
 	Handle m_nextIndex;
 
-protected:
+public:
 	// Adds the specified object to the map and returns a handle to it.
 	Handle Add( T object );
 

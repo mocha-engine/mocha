@@ -21,8 +21,8 @@ class EntityManager;
 class CVarManager;
 class PhysicsManager;
 class InputManager;
-
-struct GameSettings;
+class BaseRenderContext;
+class GameSettings;
 
 struct Vector3;
 struct Quaternion;
@@ -40,6 +40,7 @@ extern EntityManager* g_entityDictionary;
 extern CVarManager* g_cvarManager;
 extern PhysicsManager* g_physicsManager;
 extern InputManager* g_inputManager;
+extern BaseRenderContext* g_renderContext;
 
 extern float g_curTime;
 extern float g_frameTime;

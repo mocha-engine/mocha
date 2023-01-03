@@ -107,7 +107,7 @@ bool Window::Update()
 				spdlog::info( "Window was resized to {}x{}", width, height );
 
 				// Push event so that renderer etc. knows we've resized the window
-				VkExtent2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
+				Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
 				m_onWindowResized( windowExtents );
 			}
 		}

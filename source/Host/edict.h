@@ -2,7 +2,7 @@
 
 #include <baseentity.h>
 #include <functional>
-#include <game_types.h>
+#include <mathtypes.h>
 #include <handlemap.h>
 #include <memory>
 #include <subsystem.h>

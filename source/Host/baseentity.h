@@ -1,5 +1,5 @@
 #pragma once
-#include <game_types.h>
+#include <mathtypes.h>
 #include <stdint.h>
 #include <string>
 #include <volk.h>

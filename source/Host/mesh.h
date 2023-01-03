@@ -1,18 +1,16 @@
 #pragma once
 
-#include <game_types.h>
-#include <glm/glm.hpp>
-#include <managedtypes.h>
 #include <material.h>
-#include <vector>
+#include <rendering.h>
+#include <util.h>
 
 struct Mesh
 {
-	InteropArray vertices;
-	InteropArray indices;
+	UtilArray vertices;
+	UtilArray indices;
 
-	AllocatedBuffer vertexBuffer;
-	AllocatedBuffer indexBuffer;
+	VertexBuffer vertexBuffer;
+	IndexBuffer indexBuffer;
 
 	Material material;
 
@@ -21,7 +19,7 @@ struct Mesh
 	{
 	}
 
-	Mesh( InteropArray _vertices, InteropArray _indices, Material _material )
+	Mesh( UtilArray _vertices, UtilArray _indices, Material _material )
 	    : material( _material )
 	    , indices( _indices )
 	    , vertices( _vertices )
