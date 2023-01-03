@@ -3,31 +3,61 @@
 #include <VkBootstrap.h>
 #include <baserendercontext.h>
 #include <defs.h>
-#include <game_types.h>
 #include <globalvars.h>
 #include <handlemap.h>
+#include <mathtypes.h>
 #include <vkinit.h>
 #include <vulkan/vulkan.h>
 #include <window.h>
-
-#define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-struct VulkanBuffer
+// Forward decls
+class VulkanRenderContext;
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+struct VulkanVertexInputDescription
+{
+	std::vector<VkVertexInputBindingDescription> bindings;
+	std::vector<VkVertexInputAttributeDescription> attributes;
+
+	VkPipelineVertexInputStateCreateFlags flags = 0;
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+struct VulkanObject
+{
+protected:
+	VulkanRenderContext* m_parent; // This MUST never be null. If an object exists, then it should have
+	                               // a parent context.
+
+	void SetParent( VulkanRenderContext* parent )
+	{
+		assert( parent != nullptr && "Parent was nullptr" );
+		m_parent = parent;
+	}
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+struct VulkanBuffer : public VulkanObject
 {
 	VkBuffer buffer;
 	VmaAllocation allocation;
 
 	VulkanBuffer() {}
-	VulkanBuffer( VkDevice m_device, size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
+	VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
 	    VmaAllocationCreateFlagBits allocFlags );
+
+	void SetData( BufferUploadInfo_t uploadInfo );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-struct VulkanSampler
+struct VulkanSampler : public VulkanObject
 {
 private:
 	VkSamplerCreateInfo GetCreateInfo( SamplerType samplerType );
@@ -36,24 +66,24 @@ public:
 	VkSampler sampler;
 
 	VulkanSampler() {}
-	VulkanSampler( VkDevice m_device, SamplerType samplerType );
+	VulkanSampler( VulkanRenderContext* parent, SamplerType samplerType );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-struct VulkanCommandContext
+struct VulkanCommandContext : public VulkanObject
 {
 	VkCommandPool commandPool;
 	VkCommandBuffer commandBuffer;
 	VkFence fence;
 
 	VulkanCommandContext() {}
-	VulkanCommandContext( VkDevice device, uint32_t graphicsQueueFamily );
+	VulkanCommandContext( VulkanRenderContext* parent );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-class VulkanRenderTexture
+class VulkanRenderTexture : public VulkanObject
 {
 private:
 	VkImageUsageFlagBits GetUsageFlagBits( RenderTextureType type );
@@ -67,13 +97,51 @@ public:
 	VkFormat format;
 
 	VulkanRenderTexture() {}
-	VulkanRenderTexture( VkDevice device, Size2D size, RenderTextureType type );
+	VulkanRenderTexture( VulkanRenderContext* parent ) { SetParent( parent ); }
+	VulkanRenderTexture( VulkanRenderContext* parent, RenderTextureInfo_t textureInfo );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-class VulkanImageTexture
+class VulkanImageTexture : public VulkanObject
 {
+private:
+	inline int GetTexelBlockSize( VkFormat format )
+	{
+		switch ( format )
+		{
+		case VkFormat::VK_FORMAT_R8G8B8A8_SRGB:
+		case VkFormat::VK_FORMAT_R8G8B8A8_UNORM:
+			return 4;
+			break;
+		case VkFormat::VK_FORMAT_BC3_SRGB_BLOCK:
+		case VkFormat::VK_FORMAT_BC3_UNORM_BLOCK:
+			return 1;
+			break;
+		case VkFormat::VK_FORMAT_BC5_UNORM_BLOCK:
+		case VkFormat::VK_FORMAT_BC5_SNORM_BLOCK:
+			return 1;
+			break;
+		}
+
+		assert( false && "Format is not supported." ); // Format is not supported
+		return -1;
+	}
+
+	inline void GetMipDimensions(
+	    uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, uint32_t* outWidth, uint32_t* outHeight )
+	{
+		*outWidth = inWidth >> mipLevel;
+		*outHeight = inHeight >> mipLevel;
+	}
+
+	inline int CalcMipSize( uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, VkFormat format )
+	{
+		uint32_t outWidth, outHeight;
+		GetMipDimensions( inWidth, inHeight, mipLevel, &outWidth, &outHeight );
+		return outWidth * outHeight * GetTexelBlockSize( format );
+	}
+
 public:
 	VkImage image;
 	VmaAllocation allocation;
@@ -81,16 +149,19 @@ public:
 	VkFormat format;
 
 	VulkanImageTexture() {}
-	VulkanImageTexture( VkDevice device, Size2D size );
+	VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t textureInfo );
+
+	void SetData( TextureData_t textureData );
+	void Copy( TextureCopyData_t copyData );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
 
-class VulkanSwapchain
+class VulkanSwapchain : public VulkanObject
 {
 private:
-	void CreateMainSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size );
-	void CreateDepthTexture( VkDevice device, Size2D size );
+	void CreateMainSwapchain( Size2D size );
+	void CreateDepthTexture( Size2D size );
 
 public:
 	VkSwapchainKHR m_swapchain;
@@ -108,10 +179,54 @@ public:
 	}
 
 	VulkanSwapchain() {}
-	VulkanSwapchain( VkDevice device, VkPhysicalDevice physicalDevice, VkSurfaceKHR surface, Size2D size );
+	VulkanSwapchain( VulkanRenderContext* parent, Size2D size );
 };
 
-// ----------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------------------------------------------------------
+
+class VulkanDescriptor : public VulkanObject
+{
+private:
+public:
+	VkDescriptorSet descriptorSet;
+	VkDescriptorSetLayout descriptorSetLayout;
+
+	VulkanDescriptor() {}
+	VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo );
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+class VulkanShader : public VulkanObject
+{
+private:
+	void LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
+
+public:
+	VkShaderModule vertexShader;
+	VkShaderModule fragmentShader;
+
+	VulkanShader() {}
+	VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo );
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+class VulkanPipeline : public VulkanObject
+{
+private:
+	VkFormat GetVulkanFormat( VertexAttributeFormat format );
+	uint32_t GetSizeOf( VertexAttributeFormat format );
+
+public:
+	VkPipeline pipeline;
+	VkPipelineLayout layout;
+
+	VulkanPipeline(){}
+	VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipelineInfo );
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
 
 class VulkanRenderContext : public BaseRenderContext
 {
@@ -162,6 +277,9 @@ private:
 	// Current swapchain target depth buffer.
 	VulkanRenderTexture m_depthTarget;
 
+	// Current pipeline. Used when binding descriptors
+	std::shared_ptr<VulkanPipeline> m_pipeline;
+
 	// Checks to see whether the current window size is valid for rendering.
 	inline bool CanRender();
 
@@ -178,27 +296,75 @@ private:
 	//    }
 	// }
 	//
-	HandleMap<VkBuffer> m_buffers = {};
+	HandleMap<VulkanBuffer> m_buffers = {};
 	HandleMap<VulkanImageTexture> m_imageTextures = {};
 	HandleMap<VulkanRenderTexture> m_renderTextures = {};
+	HandleMap<VulkanDescriptor> m_descriptors = {};
+	HandleMap<VulkanPipeline> m_pipelines = {};
+	HandleMap<VulkanShader> m_shaders = {};
+
+	//
+	// Immediate submit
+	//
+	RenderStatus ImmediateSubmit( std::function<RenderStatus( VkCommandBuffer commandBuffer )> func );
+
+protected:
+	// ----------------------------------------
+
+	RenderStatus CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle ) override;
+	RenderStatus CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle ) override;
+	RenderStatus SetImageTextureData( Handle handle, TextureData_t pipelineInfo ) override;
+	RenderStatus CopyImageTexture( Handle handle, TextureCopyData_t pipelineInfo ) override;
+
+	RenderStatus CreateBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) override;
+	RenderStatus CreateVertexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) override;
+	RenderStatus CreateIndexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) override;
+	RenderStatus UploadBuffer( Handle handle, BufferUploadInfo_t pipelineInfo ) override;
+
+	RenderStatus CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle ) override;
+	RenderStatus CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle ) override;
+	RenderStatus CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) override;
 
 public:
-	RenderContextStatus Startup() override;
-	RenderContextStatus Shutdown() override;
-	RenderContextStatus BeginRendering() override;
-	RenderContextStatus EndRendering() override;
+#define FRIEND( x ) friend class x
+	// All vulkan types should be able to access render context internals.
+	// This saves us having to pass things like m_device around whenever we want
+	// to do anything
+
+	FRIEND( VulkanObject );
+	FRIEND( VulkanSwapchain );
+	FRIEND( VulkanBuffer );
+	FRIEND( VulkanSampler );
+	FRIEND( VulkanCommandContext );
+	FRIEND( VulkanImageTexture );
+	FRIEND( VulkanRenderTexture );
+	FRIEND( VulkanDescriptor );
+	FRIEND( VulkanPipeline );
+	FRIEND( VulkanShader );
+#undef FRIEND
+
+	RenderStatus Startup() override;
+	RenderStatus Shutdown() override;
+	RenderStatus BeginRendering() override;
+	RenderStatus EndRendering() override;
+
 	// ----------------------------------------
-	RenderContextStatus BindPipeline( Pipeline p ) override;
 
-	RenderContextStatus BindDescriptor( Descriptor d ) override;
+	RenderStatus BindPipeline( Pipeline p ) override;
 
-	RenderContextStatus BindVertexBuffer( VertexBuffer vb ) override;
+	RenderStatus BindDescriptor( Descriptor d ) override;
 
-	RenderContextStatus BindIndexBuffer( IndexBuffer ib ) override;
+	RenderStatus BindVertexBuffer( VertexBuffer vb ) override;
 
-	RenderContextStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
+	RenderStatus BindIndexBuffer( IndexBuffer ib ) override;
 
-	RenderContextStatus BindRenderTarget( RenderTexture rt ) override;
+	RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
+
+	RenderStatus BindRenderTarget( RenderTexture rt ) override;
+
+	RenderStatus GetRenderSize( Size2D* outSize ) override;
+
 	// ----------------------------------------
-	RenderContextStatus RenderEntity( BaseEntity* entity ) override;
+
+	RenderStatus RenderMesh( Mesh* mesh ) override;
 };

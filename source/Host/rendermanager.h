@@ -7,13 +7,9 @@
 #include <imgui.h>
 #include <subsystem.h>
 #include <vector>
-#include <vk_types.h>
 #include <window.h>
 
-struct Mesh;
-class Model;
-class HostManager;
-class Camera;
+class ModelEntity;
 
 class RenderManager : ISubSystem
 {
@@ -23,6 +19,8 @@ private:
 	glm::mat4x4 CalculateViewProjMatrix();
 	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
+	void RenderEntity( ModelEntity* entity );
+
 public:
 	void Startup();
 	void Shutdown();
@@ -30,6 +28,10 @@ public:
 	void Render();
 	void Run();
 
-	VkExtent2D GetWindowExtent();
-	VkExtent2D GetDesktopSize();
+	Size2D GetWindowExtent()
+	{
+		Size2D size;
+		assert( m_renderContext->GetRenderSize( &size ) == RENDER_STATUS_OK );
+		return size;
+	}
 };

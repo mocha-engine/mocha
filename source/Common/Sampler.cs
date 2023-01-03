@@ -1,7 +1,8 @@
 ﻿namespace Mocha;
 
-public enum Sampler
+public enum SamplerType
 {
-	Anisotropic,
-	Point
+	Point,
+	Linear,
+	Anisotropic
 };

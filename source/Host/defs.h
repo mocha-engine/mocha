@@ -2,7 +2,6 @@
 #include <cvarmanager.h>
 #include <gamesettings.h>
 #include <gitdefs.h>
-#include <globalvars.h>
 
 // clang-format off
 
@@ -45,5 +44,10 @@ namespace EngineFeatures
 //
 #define ENGINE_NAME						"Mocha"
 #define WINDOW_TITLE					std::string( GameSettings::Get()->name + " [" + GameSettings::Get()->milestone + "] - " GAME_VERSION ).c_str()
+
+//
+// Types
+//
+typedef uint32_t Handle;
 
 // clang-format on

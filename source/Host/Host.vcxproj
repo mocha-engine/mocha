@@ -173,7 +173,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="logmanager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
-    <ClCompile Include="mesh.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="modelentity.cpp" />
     <ClCompile Include="physicsmanager.cpp" />
@@ -184,7 +183,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="root.cpp" />
     <ClCompile Include="shadercompiler.cpp" />
     <ClCompile Include="texture.cpp" />
-    <ClCompile Include="texturecache.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_vulkan.cpp" />
     <ClCompile Include="thirdparty\imgui\imgui.cpp" />
@@ -336,16 +334,18 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="entities.h" />
     <ClInclude Include="fontawesome.h" />
     <ClInclude Include="gamesettings.h" />
-    <ClInclude Include="game_types.h" />
+    <ClInclude Include="mathtypes.h" />
     <ClInclude Include="gitdefs.h" />
     <ClInclude Include="handlemap.h" />
     <ClInclude Include="hostmanager.h" />
     <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
-    <ClInclude Include="managedtypes.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="rendering.h" />
+    <ClInclude Include="util.h" />
+    <ClInclude Include="utilarray.h" />
     <ClInclude Include="managedwrappers.h" />
     <ClInclude Include="material.h" />
-    <ClInclude Include="mesh.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modelentity.h" />
     <ClInclude Include="physics.h" />
@@ -358,7 +358,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="shadercompiler.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
-    <ClInclude Include="texturecache.h" />
     <ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />
     <ClInclude Include="thirdparty\imgui\backends\imgui_impl_vulkan.h" />
     <ClInclude Include="thirdparty\imgui\imgui.h" />
@@ -627,7 +626,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
     <ClInclude Include="thirdparty\volk\volk.h" />
     <ClInclude Include="vkinit.h" />
-    <ClInclude Include="vk_types.h" />
+    <ClInclude Include="vkmacros.h" />
     <ClInclude Include="globalvars.h" />
     <ClInclude Include="logmanager.h" />
     <ClInclude Include="vulkanrendercontext.h" />

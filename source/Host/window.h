@@ -2,8 +2,8 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_vulkan.h>
 #include <functional>
+#include <mathtypes.h>
 #include <spdlog/spdlog.h>
-#include <vk_types.h>
 
 class Window
 {
@@ -14,7 +14,7 @@ private:
 public:
 	Window( uint32_t width, uint32_t height );
 
-	std::function<void( VkExtent2D newWindowExtents )> m_onWindowResized;
+	std::function<void( Size2D newSize )> m_onWindowResized;
 
 	VkSurfaceKHR CreateSurface( VkInstance instance );
 	void Cleanup();

@@ -1,5 +1,6 @@
 #pragma once
-#include <vk_types.h>
+#include <mathtypes.h>
+#include <vkmacros.h>
 
 namespace VKInit
 {
