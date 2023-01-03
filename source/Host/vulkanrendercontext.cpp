@@ -1002,6 +1002,45 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
+VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo )
+{
+	std::vector<VkDescriptorSetLayoutBinding> bindings = {};
+
+	for ( int i = 0; i < descriptorInfo.bindings.size(); ++i )
+	{
+		VkDescriptorSetLayoutBinding binding = {};
+		binding.binding = i;
+		binding.descriptorType = GetDescriptorType( descriptorInfo.bindings[i].type );
+		binding.descriptorCount = 1;
+		binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT;
+		binding.pImmutableSamplers = nullptr;
+
+		bindings.push_back( binding );
+	}
+
+	VkDescriptorSetLayoutCreateInfo textureLayoutInfo =
+	    VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), bindings.size() );
+	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &textureLayoutInfo, nullptr, &descriptorSetLayout ) );
+
+	VkDescriptorSetAllocateInfo allocInfo =
+	    VKInit::DescriptorSetAllocateInfo( m_parent->m_descriptorPool, &descriptorSetLayout, 1 );
+
+	VK_CHECK( vkAllocateDescriptorSets( m_parent->m_device, &allocInfo, &descriptorSet ) );
+}
+
+VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type )
+{
+	switch ( type )
+	{
+	case DESCRIPTOR_BINDING_TYPE_IMAGE:
+		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	}
+
+	assert( false && "Invalid descriptor binding type" );
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
 VkFormat VulkanPipeline::GetVulkanFormat( VertexAttributeFormat format )
 {
 	switch ( format )
@@ -1146,5 +1185,3 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	pipeline = builder.Build(
 	    m_parent->m_device, m_parent->m_swapchain.m_swapchainTextures[0].format, m_parent->m_swapchain.m_depthTexture.format );
 }
-
-// ----------------------------------------------------------------------------------------------------------------------------
