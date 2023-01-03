@@ -187,6 +187,8 @@ public:
 class VulkanDescriptor : public VulkanObject
 {
 private:
+	VkDescriptorType GetDescriptorType( DescriptorBindingType type );
+
 public:
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
