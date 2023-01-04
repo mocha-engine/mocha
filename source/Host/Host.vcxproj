@@ -329,6 +329,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="baseentity.h" />
     <ClInclude Include="consolesystem.h" />
     <ClInclude Include="cvarmanager.h" />
+    <ClInclude Include="defer.h" />
     <ClInclude Include="defs.h" />
     <ClInclude Include="edict.h" />
     <ClInclude Include="editor.h" />

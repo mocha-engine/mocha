@@ -1248,6 +1248,16 @@ RenderStatus VulkanRenderContext::CreateShader( ShaderInfo_t pipelineInfo, Handl
 	return RENDER_STATUS_OK;
 }
 
+RenderStatus VulkanRenderContext::GetGPUInfo( GPUInfo* outInfo )
+{
+	GPUInfo info = {};
+	info.name = std::string( m_deviceProperties.deviceName );
+
+	*outInfo = info;
+
+	return RENDER_STATUS_OK;
+}
+
 RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( VkCommandBuffer commandBuffer )> func )
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );

@@ -175,6 +175,11 @@ struct RenderPushConstants
 	glm::vec4 vLightInfoWS[4];
 };
 
+struct GPUInfo
+{
+	std::string name;
+};
+
 // ----------------------------------------------------------------------------------------------------
 
 class RenderObject
@@ -390,6 +395,9 @@ public:
 
 	// Call this to set the render target to render to.
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
+
+	// Get information about the GPU.
+	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
 	// ----------------------------------------
 	//

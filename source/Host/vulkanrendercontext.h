@@ -368,27 +368,19 @@ public:
 	// ----------------------------------------
 
 	RenderStatus BindPipeline( Pipeline p ) override;
-
 	RenderStatus BindDescriptor( Descriptor d ) override;
-
 	RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) override;
-
 	RenderStatus BindVertexBuffer( VertexBuffer vb ) override;
-
 	RenderStatus BindIndexBuffer( IndexBuffer ib ) override;
-
 	RenderStatus BindConstants( RenderPushConstants p ) override;
-
 	RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
-
 	RenderStatus BindRenderTarget( RenderTexture rt ) override;
-
 	RenderStatus GetRenderSize( Size2D* outSize ) override;
-
 	RenderStatus UpdateWindow() override;
+	RenderStatus GetGPUInfo( GPUInfo* outInfo ) override;
 
 	// ----------------------------------------
-	
+
 	RenderStatus BeginImGui() override;
 	RenderStatus EndImGui() override;
 	RenderStatus RenderImGui() override;

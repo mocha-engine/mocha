@@ -33,6 +33,13 @@ public:
 	void Render();
 	void Run();
 
+	std::string GetGPUName()
+	{
+		GPUInfo info;
+		assert( m_renderContext->GetGPUInfo( &info ) == RENDER_STATUS_OK );
+		return info.name;
+	}
+
 	Size2D GetWindowExtent()
 	{
 		Size2D size;

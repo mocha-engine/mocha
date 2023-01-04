@@ -1451,6 +1451,7 @@
     <ClInclude Include="mesh.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="defer.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

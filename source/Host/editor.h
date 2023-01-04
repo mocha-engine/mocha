@@ -1,6 +1,7 @@
 #pragma once
 #include <backends/imgui_impl_vulkan.h>
 #include <baseentity.h>
+#include <defer.h>
 #include <defs.h>
 #include <edict.h>
 #include <fontawesome.h>
@@ -49,7 +50,7 @@ namespace Editor
 	inline void TextMonospace( const char* text )
 	{
 		// TODO
-		
+
 		// ImGui::PushFont( g_renderManager->m_monospaceFont );
 		ImGui::Text( "%s", text );
 		// ImGui::PopFont();
@@ -64,8 +65,10 @@ namespace Editor
 
 	inline const char* GetGPUName()
 	{
-		return "TODO";
-		// return g_renderManager->m_deviceName.c_str();
+		std::string gpuName = g_renderManager->GetGPUName();
+		char* ret;
+		ret = _strdup( gpuName.c_str() );
+		return ret;		
 	}
 
 	inline char* InputText( const char* name, char* inputBuf, int inputLength )
