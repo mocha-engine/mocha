@@ -63,12 +63,14 @@ enum VertexAttributeFormat
 
 enum BufferUsageFlags
 {
-	BUFFER_USAGE_FLAG_VERTEX_BUFFER = 1 << 0,
-	BUFFER_USAGE_FLAG_INDEX_BUFFER = 1 << 1,
-	BUFFER_USAGE_FLAG_UNIFORM_BUFFER = 1 << 2,
-	BUFFER_USAGE_FLAG_TRANSFER_SRC = 1 << 3,
-	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 4
+	BUFFER_USAGE_FLAG_VERTEX_BUFFER = 1 << 1,
+	BUFFER_USAGE_FLAG_INDEX_BUFFER = 1 << 2,
+	BUFFER_USAGE_FLAG_UNIFORM_BUFFER = 1 << 3,
+	BUFFER_USAGE_FLAG_TRANSFER_SRC = 1 << 4,
+	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 5
 };
+
+DEFINE_ENUM_FLAG_OPERATORS( BufferUsageFlags );
 
 // ----------------------------------------------------------------------------------------------------
 

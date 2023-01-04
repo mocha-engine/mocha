@@ -14,7 +14,7 @@ void Model::UploadMesh( Mesh& mesh )
 		BufferInfo_t vertexBufferInfo = {};
 		vertexBufferInfo.size = mesh.vertices.size;
 		vertexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
-		vertexBufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER;
+		vertexBufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 		VertexBuffer vertexBuffer( vertexBufferInfo );
 
 		BufferUploadInfo_t vertexUploadInfo = {};
@@ -32,7 +32,7 @@ void Model::UploadMesh( Mesh& mesh )
 		BufferInfo_t indexBufferInfo = {};
 		indexBufferInfo.size = mesh.indices.size;
 		indexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
-		indexBufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER;
+		indexBufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 		IndexBuffer indexBuffer( indexBufferInfo );
 
 		BufferUploadInfo_t indexUploadInfo = {};
