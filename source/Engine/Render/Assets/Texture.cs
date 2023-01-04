@@ -28,7 +28,7 @@ public partial class Texture : Asset
 		var mipData = textureFormat.Data.MipData;
 		var mipCount = textureFormat.Data.MipCount;
 
-		NativeTexture = new();
+		NativeTexture = new( Width, Height );
 
 		// Flatten mip data into one big buffer
 		List<byte> textureData = new List<byte>();
@@ -69,14 +69,14 @@ public partial class Texture : Asset
 		Width = width;
 		Height = height;
 
-		NativeTexture = new();
+		NativeTexture = new( width, height );
 		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
 	}
 
 	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )
 	{
 		// TODO: This actually just blits because copying does not ignore texture format differences. Is this a performance issue?
-		NativeTexture.Blit( srcX, srcY, dstX, dstY, width, height, src.NativeTexture );
+		NativeTexture.Copy( srcX, srcY, dstX, dstY, width, height, src.NativeTexture );
 	}
 
 	public void Delete()

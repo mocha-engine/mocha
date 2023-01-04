@@ -65,7 +65,7 @@ public class Material : Asset
 			DefaultShaderPath,
 			Vertex.VertexAttributes.ToInterop(),
 			textures.ToInterop(),
-			Sampler.Point,
+			SamplerType.Point,
 			false
 		);
 
@@ -77,7 +77,7 @@ public class Material : Asset
 	/// </summary>
 	public Material( string shaderPath, VertexAttribute[] vertexAttributes, Texture? diffuseTexture = null,
 		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
-		Texture? roughnessTexture = null, Sampler sampler = Sampler.Point, bool ignoreDepth = false )
+		Texture? roughnessTexture = null, SamplerType sampler = SamplerType.Point, bool ignoreDepth = false )
 	{
 		Path = "Procedural Material";
 

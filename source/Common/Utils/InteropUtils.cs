@@ -142,12 +142,12 @@ public class MemoryContext : IDisposable
 
 public interface IInteropArray
 {
-	public Glue.InteropArray GetNative();
+	public Glue.UtilArray GetNative();
 }
 
 public class InteropArray<T> : IInteropArray
 {
-	private Glue.InteropArray NativeStruct;
+	private Glue.UtilArray NativeStruct;
 	private InteropArray() { }
 
 	public static InteropArray<T> FromArray( T[] array )
@@ -191,7 +191,7 @@ public class InteropArray<T> : IInteropArray
 		return FromArray( list.ToArray() );
 	}
 
-	public Glue.InteropArray GetNative()
+	public Glue.UtilArray GetNative()
 	{
 		return NativeStruct;
 	}
@@ -199,6 +199,6 @@ public class InteropArray<T> : IInteropArray
 	//
 	// Implicit conversions to Glue.InteropStruct and from lists/arrays
 	//
-	public static implicit operator Glue.InteropArray( InteropArray<T> arr ) => arr.GetNative();
+	public static implicit operator Glue.UtilArray( InteropArray<T> arr ) => arr.GetNative();
 	public static implicit operator InteropArray<T>( List<T> list ) => FromList( list );
 }

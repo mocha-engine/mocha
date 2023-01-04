@@ -46,6 +46,15 @@
     <Filter Include="Thirdparty\Volk">
       <UniqueIdentifier>{4591a9b7-aad3-486b-b73c-00c53b036c12}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Platform">
+      <UniqueIdentifier>{a9bab490-1b10-4fcb-915c-ac3ea029d4dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rendering\Platform\Vulkan">
+      <UniqueIdentifier>{542b08c0-946d-486f-bf41-85a032c27422}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Util">
+      <UniqueIdentifier>{7f4b2273-d77c-4a42-80df-5d0ae84ac90d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
@@ -480,9 +489,6 @@
     <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp">
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClCompile>
-    <ClCompile Include="texturecache.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="inputmanager.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
@@ -492,16 +498,7 @@
     <ClCompile Include="material.cpp">
       <Filter>Rendering\Assets</Filter>
     </ClCompile>
-    <ClCompile Include="shadercompiler.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="rendermanager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="pipeline.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="mesh.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="model.cpp">
@@ -521,6 +518,18 @@
     </ClCompile>
     <ClCompile Include="thirdparty\volk\volk.c">
       <Filter>Thirdparty\Volk</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkanrendercontext.cpp">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="baserendercontext.cpp">
+      <Filter>Rendering\Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="shadercompiler.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="pipeline.cpp">
+      <Filter>Rendering\Platform\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1361,9 +1370,6 @@
     <ClInclude Include="physics.h">
       <Filter>Managed</Filter>
     </ClInclude>
-    <ClInclude Include="texturecache.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="handlemap.h">
       <Filter>Misc</Filter>
     </ClInclude>
@@ -1371,9 +1377,6 @@
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="input.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
-    <ClInclude Include="managedtypes.h">
       <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="managedwrappers.h">
@@ -1385,28 +1388,13 @@
     <ClInclude Include="material.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="vkinit.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="vk_types.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="shadercompiler.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="rendermanager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="pipeline.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="mesh.h">
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="model.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="game_types.h">
+    <ClInclude Include="mathtypes.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="editor.h">
@@ -1432,6 +1420,36 @@
     </ClInclude>
     <ClInclude Include="consolesystem.h">
       <Filter>Managed</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkanrendercontext.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="baserendercontext.h">
+      <Filter>Rendering\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="vkinit.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="utilarray.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="util.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="rendering.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="shadercompiler.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="vkmacros.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="pipeline.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Rendering\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

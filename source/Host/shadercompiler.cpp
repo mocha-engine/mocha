@@ -155,14 +155,6 @@ std::string ShaderCompiler::GetPreamble( EShLanguage language )
 		break;
 	}
 
-	//
-	// Add engine features
-	//
-	if ( EngineFeatures::Raytracing )
-	{
-		preamble += "#define RAYTRACING\n";
-	}
-
 	return preamble;
 }
 

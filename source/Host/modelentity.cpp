@@ -3,11 +3,6 @@
 #include <globalvars.h>
 #include <physicsmanager.h>
 
-void ModelEntity::Render( VkCommandBuffer cmd, glm::mat4x4 viewProj )
-{
-	m_model.Render( cmd, viewProj, m_transform );
-}
-
 void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 {
 	PhysicsBody body = {};

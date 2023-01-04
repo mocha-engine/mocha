@@ -2,7 +2,6 @@
 #include <cvarmanager.h>
 #include <gamesettings.h>
 #include <gitdefs.h>
-#include <globalvars.h>
 
 // clang-format off
 
@@ -14,9 +13,15 @@
 
 #if _WIN32
 #include <windows.h>
+#include <source_location>
 
 // Display message box
-#define ERRORMESSAGE( x ) MessageBoxA( nullptr, x.c_str(), ENGINE_NAME " Error", MB_OK | MB_ICONERROR )
+inline void ErrorMessage( std::string str, const std::source_location& location = std::source_location::current() )
+{
+	MessageBoxA( nullptr, str.c_str(), "Engine Error", MB_OK | MB_ICONERROR );
+	printf( "Engine Error %s occurred at line %d in file %s", str.c_str(), location.line(), location.file_name() );
+	__debugbreak();
+}
 #else
 #pragma error "Unsupported platform"
 #endif
@@ -45,5 +50,11 @@ namespace EngineFeatures
 //
 #define ENGINE_NAME						"Mocha"
 #define WINDOW_TITLE					std::string( GameSettings::Get()->name + " [" + GameSettings::Get()->milestone + "] - " GAME_VERSION ).c_str()
+
+//
+// Types
+//
+typedef uint32_t Handle;
+#define HANDLE_INVALID					UINT32_MAX
 
 // clang-format on

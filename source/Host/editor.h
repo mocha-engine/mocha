@@ -48,9 +48,11 @@ namespace Editor
 
 	inline void TextMonospace( const char* text )
 	{
-		ImGui::PushFont( g_renderManager->m_monospaceFont );
+		// TODO
+		
+		// ImGui::PushFont( g_renderManager->m_monospaceFont );
 		ImGui::Text( "%s", text );
-		ImGui::PopFont();
+		// ImGui::PopFont();
 	};
 
 	inline void TextLight( const char* text )
@@ -62,7 +64,8 @@ namespace Editor
 
 	inline const char* GetGPUName()
 	{
-		return g_renderManager->m_deviceName.c_str();
+		return "TODO";
+		// return g_renderManager->m_deviceName.c_str();
 	}
 
 	inline char* InputText( const char* name, char* inputBuf, int inputLength )
@@ -103,8 +106,9 @@ namespace Editor
 
 	inline Vector2 GetWindowSize()
 	{
-		VkExtent2D extent = g_renderManager->GetWindowExtent();
-		return { ( float )extent.width, ( float )extent.height };
+		return { 1280, 720 };
+		// VkExtent2D extent = g_renderManager->GetWindowExtent();
+		// return { ( float )extent.width, ( float )extent.height };
 	}
 
 	inline const char* GetVersionName()
@@ -114,7 +118,7 @@ namespace Editor
 
 	inline void Image( Texture* texture, int x, int y )
 	{
-		ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
+		// ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
 	}
 
 	inline bool BeginMainStatusBar()
@@ -135,7 +139,7 @@ namespace Editor
 		return false;
 	}
 
-	inline void DrawGraph( const char* name, Vector4 color, InteropArray values )
+	inline void DrawGraph( const char* name, Vector4 color, UtilArray values )
 	{
 		const std::vector<float> plotValues = values.GetData<float>();
 		const float MARKERS[] = { 30.0f, 60.0f, 144.0f };

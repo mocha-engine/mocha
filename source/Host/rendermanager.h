@@ -1,145 +1,42 @@
 #pragma once
 
+#include <baserendercontext.h>
 #include <defs.h>
 #include <functional>
 #include <glm/glm.hpp>
 #include <imgui.h>
 #include <subsystem.h>
 #include <vector>
-#include <vk_types.h>
-#include <window.h>s
+#include <window.h>
 
-struct Mesh;
-class Model;
-class HostManager;
-class Camera;
-
-struct BlasInput
-{
-public:
-	std::vector<VkAccelerationStructureGeometryKHR> asGeometry = {};
-	std::vector<VkAccelerationStructureBuildRangeInfoKHR> asBuildOffsetInfo = {};
-	VkBuildAccelerationStructureFlagsKHR flags;
-};
-
-struct AllocatedAccel
-{
-	VkAccelerationStructureKHR accel;
-	AllocatedBuffer buffer;
-};
-
-struct BuildAccelerationStructure
-{
-	VkAccelerationStructureBuildGeometryInfoKHR buildInfo = {};
-	VkAccelerationStructureBuildSizesInfoKHR sizeInfo = {};
-	VkAccelerationStructureBuildRangeInfoKHR* rangeInfo = {};
-
-	AllocatedAccel as;
-	AllocatedAccel cleanupAS;
-};
+class ModelEntity;
 
 class RenderManager : ISubSystem
 {
 private:
-	void InitVulkan();
-	void InitDeviceProperties();
-	void InitSwapchain();
-	void InitCommands();
-	void InitSyncStructures();
-	void InitImGUI();
-	void InitDescriptors();
-	void InitSamplers();
+	std::unique_ptr<BaseRenderContext> m_renderContext;
 
-	void InitRayTracing();
-	VkPhysicalDeviceRayTracingPipelinePropertiesKHR m_rtProperties;
+	glm::mat4x4 CalculateViewProjMatrix();
+	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
-	BlasInput ModelToVkGeometry( Model& model );
-	void CreateBottomLevelAS();
-	void CreateTopLevelAS();
+	void RenderEntity( ModelEntity* entity );
 
-	VkDeviceAddress GetBlasDeviceAddress( uint32_t handle );
-
-	AllocatedAccel CreateAcceleration( VkAccelerationStructureCreateInfoKHR& createInfo );
-
-	void CmdCreateBlas( VkCommandBuffer cmdBuf, std::vector<uint32_t> indices, std::vector<BuildAccelerationStructure>& buildAs,
-	    VkDeviceAddress scratchAddress, VkQueryPool queryPool );
-
-	void CmdCompactBlas( VkCommandBuffer cmdBuf, std::vector<uint32_t> indices,
-	    std::vector<BuildAccelerationStructure>& buildAs, VkQueryPool queryPool );
-
-	void CmdCreateTlas( VkCommandBuffer cmdBuf, uint32_t countInstance, VkDeviceAddress instBufferAddr,
-	    AllocatedBuffer& scratchBuffer, VkBuildAccelerationStructureFlagsKHR flags, bool update );
-
-	std::vector<AllocatedAccel> m_blas = {};
-
-	uint32_t GetMemoryType( uint32_t typeBits, VkMemoryPropertyFlags properties, VkBool32* memTypeFound = nullptr ) const;
-
-	VkPhysicalDeviceMemoryProperties m_memoryProperties;
-
-	void CreateSwapchain( VkExtent2D size );
-	void CalculateCameraMatrices( glm::mat4x4& viewMatrix, glm::mat4x4& projMatrix );
+	// Render a mesh. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
+	// this once and it'll do all the work.
+	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
+	void RenderMesh( RenderPushConstants constants, Mesh* mesh );
 
 public:
-	bool m_isInitialized{ false };
-	int m_frameNumber{ 0 };
-
-	VkSampler m_pointSampler;
-	VkSampler m_anisoSampler;
-
-	std::unique_ptr<Window> m_window;
-
-	VkInstance m_instance;
-	VkDebugUtilsMessengerEXT m_debugMessenger;
-	VkPhysicalDevice m_chosenGPU;
-	VkDevice m_device;
-	VkSurfaceKHR m_surface;
-
-	VkSwapchainKHR m_swapchain;
-	VkFormat m_swapchainImageFormat;
-
-	VkQueue m_graphicsQueue;
-	uint32_t m_graphicsQueueFamily;
-
-	VkCommandPool m_commandPool;
-	VkCommandBuffer m_commandBuffer;
-
-	std::vector<VkImage> m_swapchainImages;
-	std::vector<VkImageView> m_swapchainImageViews;
-
-	VkImageView m_depthImageView;
-	AllocatedImage m_depthImage;
-
-	VkFormat m_depthFormat;
-
-	VkSemaphore m_presentSemaphore, m_renderSemaphore;
-	VkFence m_renderFence;
-
-	VmaAllocator m_allocator;
-
-	VkDescriptorPool m_descriptorPool;
-
 	void Startup();
 	void Shutdown();
 
 	void Render();
 	void Run();
 
-	std::string m_deviceName;
-
-	UploadContext m_uploadContext;
-	void ImmediateSubmit( std::function<void( VkCommandBuffer cmd )>&& function );
-
-	AllocatedBuffer CreateBuffer( size_t allocationSize, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
-	    VmaAllocationCreateFlagBits allocFlags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT );
-
-	glm::mat4x4 CalculateViewProjMatrix();
-	glm::mat4x4 CalculateViewmodelViewProjMatrix();
-
-	VkExtent2D GetWindowExtent();
-	VkExtent2D GetDesktopSize();
-
-	ImFont* m_mainFont;
-	ImFont* m_monospaceFont;
-
-	AllocatedAccel m_tlas = {};
+	Size2D GetWindowExtent()
+	{
+		Size2D size;
+		assert( m_renderContext->GetRenderSize( &size ) == RENDER_STATUS_OK );
+		return size;
+	}
 };

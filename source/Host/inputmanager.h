@@ -1,6 +1,6 @@
 #pragma once
 #include <cstdint>
-#include <game_types.h>
+#include <mathtypes.h>
 #include <memory.h>
 #include <subsystem.h>
 #include <vector>

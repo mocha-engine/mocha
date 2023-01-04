@@ -1,5 +1,5 @@
 #pragma once
-#include <game_types.h>
+#include <mathtypes.h>
 #include <stdint.h>
 #include <string>
 #include <volk.h>
@@ -21,14 +21,12 @@ protected:
 	std::string m_name;
 
 	Transform m_transform;
-	
+
 	int m_flags;
 
 public:
 	BaseEntity();
 	virtual ~BaseEntity() {}
-
-	virtual void Render( VkCommandBuffer cmd, glm::mat4x4 viewProj ){};
 
 	//
 	// Getters & setters
