@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glslang/SPIRV/GlslangToSpv.h>
+#include <rendering.h>
 #include <volk.h>
 
 //
@@ -15,7 +16,7 @@ private:
 	inline ~ShaderCompiler() { glslang::FinalizeProcess(); }
 
 	void InitResources( TBuiltInResource& Resources );
-	EShLanguage FindLanguage( const VkShaderStageFlagBits shader_type );
+	EShLanguage FindLanguage( const ShaderType shader_type );
 	static std::string GetPreamble( EShLanguage language );
 
 public:
@@ -25,5 +26,5 @@ public:
 		return *instance;
 	}
 
-	bool Compile( const VkShaderStageFlagBits shader_type, const char* pshader, std::vector<uint32_t>& spirv );
+	bool Compile( const ShaderType shader_type, const char* pshader, std::vector<uint32_t>& spirv );
 };

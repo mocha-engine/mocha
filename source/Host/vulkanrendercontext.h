@@ -99,6 +99,8 @@ public:
 	VkImageView imageView;
 	VkFormat format;
 
+	Size2D size;
+
 	VulkanRenderTexture() {}
 	VulkanRenderTexture( VulkanRenderContext* parent ) { SetParent( parent ); }
 	VulkanRenderTexture( VulkanRenderContext* parent, RenderTextureInfo_t textureInfo );
@@ -208,7 +210,7 @@ public:
 class VulkanShader : public VulkanObject
 {
 private:
-	void LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule );
+	RenderStatus LoadShaderModule( const char* filePath, ShaderType shaderType, VkShaderModule* outShaderModule );
 
 public:
 	VkShaderModule vertexShader;
@@ -274,8 +276,6 @@ private:
 	// ImGui
 	//
 	void CreateImGui();
-	ImFont* m_mainFont;
-	ImFont* m_monospaceFont;
 
 	//
 	// Vulkan memory allocator
@@ -360,28 +360,56 @@ public:
 
 	// ----------------------------------------
 
+	/// <inheritdoc />
 	RenderStatus Startup() override;
+	/// <inheritdoc />
 	RenderStatus Shutdown() override;
+	/// <inheritdoc />
 	RenderStatus BeginRendering() override;
+	/// <inheritdoc />
 	RenderStatus EndRendering() override;
 
 	// ----------------------------------------
 
+	/// <inheritdoc />
 	RenderStatus BindPipeline( Pipeline p ) override;
+
+	/// <inheritdoc />
 	RenderStatus BindDescriptor( Descriptor d ) override;
+
+	/// <inheritdoc />
 	RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) override;
+
+	/// <inheritdoc />
 	RenderStatus BindVertexBuffer( VertexBuffer vb ) override;
+
+	/// <inheritdoc />
 	RenderStatus BindIndexBuffer( IndexBuffer ib ) override;
+
+	/// <inheritdoc />
 	RenderStatus BindConstants( RenderPushConstants p ) override;
+
+	/// <inheritdoc />
 	RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
+
+	/// <inheritdoc />
 	RenderStatus BindRenderTarget( RenderTexture rt ) override;
+
+	/// <inheritdoc />
 	RenderStatus GetRenderSize( Size2D* outSize ) override;
+
+	/// <inheritdoc />
 	RenderStatus UpdateWindow() override;
+
+	/// <inheritdoc />
 	RenderStatus GetGPUInfo( GPUInfo* outInfo ) override;
 
 	// ----------------------------------------
 
+	/// <inheritdoc />
 	RenderStatus BeginImGui() override;
+	/// <inheritdoc />
 	RenderStatus EndImGui() override;
+	/// <inheritdoc />
 	RenderStatus RenderImGui() override;
 };

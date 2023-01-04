@@ -105,25 +105,17 @@ void ShaderCompiler::InitResources( TBuiltInResource& Resources )
 	Resources.limits.generalConstantMatrixVectorIndexing = 1;
 }
 
-EShLanguage ShaderCompiler::FindLanguage( const VkShaderStageFlagBits shader_type )
+EShLanguage ShaderCompiler::FindLanguage( const ShaderType shader_type )
 {
 	switch ( shader_type )
 	{
-	case VK_SHADER_STAGE_VERTEX_BIT:
+	case SHADER_TYPE_VERTEX:
 		return EShLangVertex;
-	case VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT:
-		return EShLangTessControl;
-	case VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT:
-		return EShLangTessEvaluation;
-	case VK_SHADER_STAGE_GEOMETRY_BIT:
-		return EShLangGeometry;
-	case VK_SHADER_STAGE_FRAGMENT_BIT:
+	case SHADER_TYPE_FRAGMENT:
 		return EShLangFragment;
-	case VK_SHADER_STAGE_COMPUTE_BIT:
-		return EShLangCompute;
-	default:
-		return EShLangVertex;
 	}
+
+	assert( false && "Shader type not yet supported." );
 }
 
 std::string ShaderCompiler::GetPreamble( EShLanguage language )
@@ -138,27 +130,15 @@ std::string ShaderCompiler::GetPreamble( EShLanguage language )
 	case EShLangVertex:
 		preamble += "#define VERTEX\n";
 		break;
-	case EShLangTessControl:
-		preamble += "#define TESS_CONTROL\n";
-		break;
-	case EShLangTessEvaluation:
-		preamble += "#define TESS_EVALUATION\n";
-		break;
-	case EShLangGeometry:
-		preamble += "#define GEOMETRY\n";
-		break;
 	case EShLangFragment:
 		preamble += "#define FRAGMENT\n";
-		break;
-	case EShLangCompute:
-		preamble += "#define COMPUTE\n";
 		break;
 	}
 
 	return preamble;
 }
 
-bool ShaderCompiler::Compile( const VkShaderStageFlagBits shader_type, const char* pshader, std::vector<uint32_t>& spirv )
+bool ShaderCompiler::Compile( const ShaderType shader_type, const char* pshader, std::vector<uint32_t>& spirv )
 {
 	EShLanguage stage = FindLanguage( shader_type );
 	glslang::TShader shader( stage );
@@ -173,7 +153,7 @@ bool ShaderCompiler::Compile( const VkShaderStageFlagBits shader_type, const cha
 	shader.setStrings( shaderStrings, 1 );
 
 	//
-	// Set pre-amble so that each shader knows what it is and what it is being compiled for
+	// Set preamble so that each shader knows what it is and what it is being compiled for
 	//
 	std::string preamble = GetPreamble( stage );
 	shader.setPreamble( preamble.c_str() );

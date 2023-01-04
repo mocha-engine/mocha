@@ -121,6 +121,8 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 {
 	SetParent( parent );
 
+	size = { textureInfo.width, textureInfo.height };
+
 	VkExtent3D depthImageExtent = {
 	    textureInfo.width,
 	    textureInfo.height,
@@ -447,7 +449,7 @@ void VulkanRenderContext::FinalizeAndCreateDevice( vkb::PhysicalDevice physicalD
 {
 	vkb::DeviceBuilder deviceBuilder( physicalDevice );
 
-	if ( EngineFeatures::Raytracing )
+	if ( EngineProperties::Raytracing )
 	{
 		VkPhysicalDeviceAccelerationStructureFeaturesKHR accelFeature = {};
 		accelFeature.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_ACCELERATION_STRUCTURE_FEATURES_KHR;
@@ -486,7 +488,7 @@ vkb::PhysicalDevice VulkanRenderContext::CreatePhysicalDevice( vkb::Instance vkb
 	//
 	// Set required extensions
 	//
-	if ( EngineFeatures::Raytracing )
+	if ( EngineProperties::Raytracing )
 	{
 #define X( name ) selector = selector.add_required_extension( name );
 		X( VK_KHR_SPIRV_1_4_EXTENSION_NAME );
@@ -1099,7 +1101,34 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	assert( "TODO" );
+	if ( m_isRenderPassActive )
+	{
+		vkCmdEndRendering( m_mainContext.commandBuffer );
+	}
+
+	VulkanRenderTexture renderTexture = *m_renderTextures.Get( rt.m_handle ).get();
+
+	// Transition to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
+	VkImageMemoryBarrier startRenderImageMemoryBarrier =
+	    VKInit::ImageMemoryBarrier( VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture.image );
+
+	vkCmdPipelineBarrier( m_mainContext.commandBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+	    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &startRenderImageMemoryBarrier );
+
+	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+	VkClearValue depthClear = {};
+	depthClear.depthStencil.depth = 1.0f;
+
+	VkRenderingAttachmentInfo colorAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( renderTexture.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	colorAttachmentInfo.clearValue = colorClear;
+
+	VkRenderingAttachmentInfo depthAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_depthTarget.imageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
+	depthAttachmentInfo.clearValue = depthClear;
+
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderTexture.size );
+	vkCmdBeginRendering( m_mainContext.commandBuffer, &renderInfo );
 
 	return RENDER_STATUS_OK;
 }
@@ -1285,7 +1314,7 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-void VulkanShader::LoadShaderModule( const char* filePath, VkShaderStageFlagBits shaderStage, VkShaderModule* outShaderModule )
+RenderStatus VulkanShader::LoadShaderModule( const char* filePath, ShaderType shaderType, VkShaderModule* outShaderModule )
 {
 	VkDevice device = m_parent->m_device;
 
@@ -1300,7 +1329,7 @@ void VulkanShader::LoadShaderModule( const char* filePath, VkShaderStageFlagBits
 	const char* buffer = text.c_str();
 
 	std::vector<unsigned int> shaderBits;
-	if ( !ShaderCompiler::Instance().Compile( shaderStage, buffer, shaderBits ) )
+	if ( !ShaderCompiler::Instance().Compile( shaderType, buffer, shaderBits ) )
 	{
 		std::string error = std::string( filePath ) + " failed to compile.\nCheck the console for more details.";
 		ErrorMessage( error );
@@ -1323,21 +1352,27 @@ void VulkanShader::LoadShaderModule( const char* filePath, VkShaderStageFlagBits
 	if ( vkCreateShaderModule( device, &createInfo, nullptr, &shaderModule ) != VK_SUCCESS )
 	{
 		spdlog::error( "Could not compile shader {}", filePath );
-		return;
+		return RENDER_STATUS_SHADER_COMPILE_FAILED;
 	}
 
 	*outShaderModule = shaderModule;
+
+	return RENDER_STATUS_OK;
 }
 
 VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo )
 {
 	SetParent( parent );
 
-	LoadShaderModule( shaderInfo.shaderPath.c_str(), VK_SHADER_STAGE_FRAGMENT_BIT, &fragmentShader );
-	spdlog::info( "VulkanShader::VulkanShader: Fragment shader compiled successfully" );
+	if ( LoadShaderModule( shaderInfo.shaderPath.c_str(), SHADER_TYPE_FRAGMENT, &fragmentShader ) == RENDER_STATUS_OK )
+		spdlog::info( "VulkanShader::VulkanShader: Fragment shader compiled successfully" );
+	else
+		spdlog::error( "VulkanShader::VulkanShader: Fragment shader failed to compile" );
 
-	LoadShaderModule( shaderInfo.shaderPath.c_str(), VK_SHADER_STAGE_VERTEX_BIT, &vertexShader );
-	spdlog::info( "VulkanShader::VulkanShader: Vertex shader compiled successfully" );
+	if ( LoadShaderModule( shaderInfo.shaderPath.c_str(), SHADER_TYPE_VERTEX, &vertexShader ) == RENDER_STATUS_OK )
+		spdlog::info( "VulkanShader::VulkanShader: Vertex shader compiled successfully" );
+	else
+		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------

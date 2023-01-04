@@ -70,6 +70,12 @@ enum BufferUsageFlags
 	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 5
 };
 
+enum ShaderType
+{
+	SHADER_TYPE_VERTEX,
+	SHADER_TYPE_FRAGMENT
+};
+
 DEFINE_ENUM_FLAG_OPERATORS( BufferUsageFlags );
 
 // ----------------------------------------------------------------------------------------------------
@@ -78,6 +84,8 @@ struct TextureInfo_t
 {
 	uint32_t width;
 	uint32_t height;
+
+	// This should be 1 or greater.
 	uint32_t mipCount;
 };
 
@@ -97,6 +105,9 @@ struct TextureData_t
 	uint32_t width;
 	uint32_t height;
 	uint32_t mipCount;
+
+	// This UtilArray can contain any texture data as long
+	// as it matches the image format specified.
 	UtilArray mipData;
 	int imageFormat;
 };
@@ -268,6 +279,7 @@ enum RenderStatus
 	RENDER_STATUS_NO_VERTEX_BUFFER_BOUND,				// You tried to render without a vertex buffer bound
 	RENDER_STATUS_NO_INDEX_BUFFER_BOUND,				// You tried to render without an index buffer bound and had indexCount > 0
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
+	RENDER_STATUS_SHADER_COMPILE_FAILED,				// The shader failed to compile
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -282,7 +294,8 @@ inline std::string GetRenderContextStatusString( RenderStatus status )
 	    "RENDER_STATUS_NO_PIPELINE_BOUND",
 	    "RENDER_STATUS_NO_VERTEX_BUFFER_BOUND",
 	    "RENDER_STATUS_NO_INDEX_BUFFER_BOUND", 
-		"RENDER_STATUS_INVALID_HANDLE"
+		"RENDER_STATUS_INVALID_HANDLE",
+		"RENDER_STATUS_SHADER_COMPILE_FAILED"
 	};
 
 	return RenderContextStatusStrings[status];
@@ -372,39 +385,84 @@ public:
 	//
 	// Low-level rendering
 	//
-	// Binds a pipeline
+	/// <summary>
+	/// Binds a pipeline
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindPipeline( Pipeline p ) = 0;
 
-	// Binds a descriptor
+	/// <summary>
+	/// Binds a descriptor
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindDescriptor( Descriptor d ) = 0;
 
-	// Updates a descriptor
+	/// <summary>
+	/// Updates a descriptor
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) = 0;
 
-	// Binds a vertex buffer
+	/// <summary>
+	/// Binds a vertex buffer
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindVertexBuffer( VertexBuffer vb ) = 0;
 
-	// Binds an index buffer
+	/// <summary>
+	/// Binds an index buffer
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindIndexBuffer( IndexBuffer ib ) = 0;
 
-	// Bind rendering push constants
+	/// <summary>
+	/// Binds rendering push constants
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindConstants( RenderPushConstants p ) = 0;
 
-	// Draws the contents of the vertex and/or index buffer
+	/// <summary>
+	/// Draws the contents of the vertex and/or index buffer
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) = 0;
 
-	// Call this to set the render target to render to.
+	/// <summary>
+	/// Call this to set the render target to render to.
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
-	// Get information about the GPU.
+	/// <summary>
+	/// Get information about the GPU.
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
 	// ----------------------------------------
 	//
 	// High-level rendering
 	//
+
+	/// <summary>
+	/// Begin the ImGUI drawing pass.
+	/// This will handle all ImGui::NewFrame functions, e.g.
+	/// "ImGui_ImplVulkan_NewFrame()".
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus BeginImGui() = 0;
+
+	/// <summary>
+	/// End the ImGUI drawing pass.
+	/// This will call ImGui::Render and handle multi-viewports.
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus EndImGui() = 0;
+
+	/// <summary>
+	/// This will draw data fetched from ImGUI, e.g. "ImGui_ImplVulkan_RenderDrawData()".
+	/// </summary>
+	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
 	virtual RenderStatus RenderImGui() = 0;
 
 	// ----------------------------------------
@@ -417,6 +475,12 @@ public:
 
 	// Update window, fetch inputs etc..
 	virtual RenderStatus UpdateWindow() = 0;
+
+	// ----------------------------------------
+	// ImGui
+
+	ImFont* m_mainFont;
+	ImFont* m_monospaceFont;
 };
 
 #undef virtual RenderStatus
