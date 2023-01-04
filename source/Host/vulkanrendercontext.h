@@ -388,8 +388,6 @@ public:
 	RenderStatus UpdateWindow() override;
 
 	// ----------------------------------------
-
-	RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) override;
 	
 	RenderStatus BeginImGui() override;
 	RenderStatus EndImGui() override;
