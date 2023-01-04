@@ -25,7 +25,8 @@
 
 #### Requirements
 
-- .NET 6.0
+- .NET 7.0
+- vcpkg
 - Visual Studio 2022
 - Windows
 
@@ -36,10 +37,9 @@
 
 ### Instructions
 
-#### Building with the example project
-
 1. First, clone the repository recursively with `git clone --recursive https://github.com/xezno/mocha`
-2. Once complete, open `Source/Mocha.sln` and build the solution. This will fetch / build any NuGet dependencies automatically, and then build the engine.
+2. Run `vcpkg install`.
+3. Once complete, open `Source/Mocha.sln` and build the solution.
 
 ## Contributing
 
@@ -81,3 +81,4 @@ A copy of this license is available at [Docs/LICENSE.md](https://github.com/xezn
 
 ## Acknowledgements
 * [Badges](https://shields.io)
+* [Icons](https://www.flaticon.com/)
