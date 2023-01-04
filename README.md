@@ -81,7 +81,7 @@ You should have received a copy of the GNU Affero General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ```
 
-A copy of this license is available at [Docs/LICENSE.md](https://github.com/xezno/mocha/blob/main/Docs/LICENSE.md).
+A copy of this license is available at [LICENSE.md](https://github.com/xezno/mocha/blob/master/LICENSE.md).
 
 ## Acknowledgements
 * [Badges](https://shields.io)
