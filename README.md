@@ -35,6 +35,7 @@ I'm doing a monthly series of write-ups about Mocha on my blog. These should giv
 - vcpkg
 - Visual Studio 2022
 - Windows
+- Vulkan SDK
 
 #### Recommendations
 
@@ -44,7 +45,7 @@ I'm doing a monthly series of write-ups about Mocha on my blog. These should giv
 ### Instructions
 
 1. First, clone the repository recursively with `git clone --recursive https://github.com/xezno/mocha`
-2. Run `vcpkg install`.
+2. Run `setup.cmd`.
 3. Once complete, open `Source/Mocha.sln` and build the solution.
 
 ## Contributing

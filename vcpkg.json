@@ -1,0 +1,13 @@
+{
+    "name": "mocha",
+    "version-string": "1.0.0",
+    "description": "Mocha game engine",
+    "dependencies": [
+        "sdl2",
+        "spdlog",
+        "glm",
+        "fmt",
+        "vulkan-memory-allocator",
+        "glslang"
+    ]
+}
