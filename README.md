@@ -10,6 +10,15 @@
 
 ![Mocha Screenshot](https://user-images.githubusercontent.com/12881812/210655312-1e0d25a1-e4bf-49d9-943b-f88f932f7e08.png)
 
+## Features
+
+- Bespoke modern Vulkan 1.3 renderer, with support for VK_KHR_ray query (ray tracing)
+- ImGui-based editor
+- Hot-loading HTML / CSS user interface solution
+- Jolt physics implementation
+- C# scripting with automatic C++ <-> C# interop bindings generator
+- Work-in-progress physically-based shading & material implementation (currently without IBL)
+
 ## Building
 
 ### Prerequisites
