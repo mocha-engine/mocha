@@ -4,11 +4,11 @@
         Mocha
     </h3>
     <p align="center">
-        Yet Another Game Engine
+        A work-in-progress game engine
     </p>
 </p>
 
-![Mocha screenshot](https://user-images.githubusercontent.com/12881812/196738445-fd9be313-09e4-4966-a03a-61e0fea9eb28.png)
+![Mocha Screenshot](https://user-images.githubusercontent.com/12881812/210655312-1e0d25a1-e4bf-49d9-943b-f88f932f7e08.png)
 
 ## Building
 
