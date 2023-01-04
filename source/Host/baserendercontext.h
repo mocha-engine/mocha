@@ -405,6 +405,10 @@ public:
 	// this once and it'll do all the work.
 	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
 	virtual RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) = 0;
+
+	virtual RenderStatus BeginImGui() = 0;
+	virtual RenderStatus EndImGui() = 0;
+	virtual RenderStatus RenderImGui() = 0;
 };
 
 #undef virtual RenderStatus

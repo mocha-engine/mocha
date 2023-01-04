@@ -31,12 +31,13 @@
 #include <glm/ext.hpp>
 #include <spdlog/spdlog.h>
 
-#ifdef _IMGUI
+//
+//
+//
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui.h>
 #include <implot.h>
-#endif
 
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
 FloatCVar maxFramerate( "fps_max", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
@@ -117,6 +118,11 @@ void RenderManager::Render()
 			RenderEntity( entity.get() );
 	} );
 
+	//
+	// Editor UI
+	//
+	m_renderContext->RenderImGui();
+
 	m_renderContext->EndRendering();
 }
 
@@ -161,8 +167,21 @@ void RenderManager::Run()
 		flFrameTime = 0;
 
 		m_renderContext->UpdateWindow();
+		
+		m_renderContext->BeginImGui();
+
+		{
+			ImGui::NewFrame();
+			ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
+
+			g_hostManager->DrawEditor();
+		}
+
 		g_physicsManager->Update();
 		g_hostManager->Render();
+		
+		m_renderContext->EndImGui();
+
 		Render();
 	}
 }
