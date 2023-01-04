@@ -83,7 +83,7 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 	case RENDER_TEXTURE_COLOR_OPAQUE:
 		return VK_FORMAT_R8G8B8_UNORM;
 	case RENDER_TEXTURE_DEPTH:
-		return VK_FORMAT_D32_SFLOAT;
+		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
 
 	assert( true && "Invalid render texture type" );
@@ -121,7 +121,7 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
 
-	vmaCreateImage( *g_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
+	vmaCreateImage( m_parent->m_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
 
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
 	VK_CHECK( vkCreateImageView( parent->m_device, &viewInfo, nullptr, &imageView ) );
@@ -147,6 +147,7 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 	BufferInfo_t bufferInfo = {};
 	bufferInfo.size = imageSize;
 	bufferInfo.type = BUFFER_TYPE_STAGING;
+	bufferInfo.usage = BUFFER_USAGE_FLAG_TRANSFER_SRC;
 
 	Handle bufferHandle;
 	m_parent->CreateBuffer( bufferInfo, &bufferHandle );
@@ -288,7 +289,6 @@ VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
 	VK_CHECK( vkCreateFence( parent->m_device, &fenceInfo, nullptr, &fence ) );
-	vkResetFences( parent->m_device, 1, &fence );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -315,8 +315,7 @@ VulkanSampler::VulkanSampler( VulkanRenderContext* parent, SamplerType samplerTy
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VkBufferUsageFlags usage,
-    VmaMemoryUsage memoryUsage, VmaAllocationCreateFlagBits allocFlags )
+VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VmaMemoryUsage memoryUsage )
 {
 	SetParent( parent );
 
@@ -325,13 +324,37 @@ VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo
 	bufferCreateInfo.pNext = nullptr;
 
 	bufferCreateInfo.size = bufferInfo.size;
-	bufferCreateInfo.usage = usage;
+	bufferCreateInfo.usage = GetBufferUsageFlags( bufferInfo.usage );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = memoryUsage;
-	allocInfo.flags = allocFlags;
+	allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
 
-	VK_CHECK( vmaCreateBuffer( *g_allocator, &bufferCreateInfo, &allocInfo, &buffer, &allocation, nullptr ) );
+	VK_CHECK( vmaCreateBuffer( m_parent->m_allocator, &bufferCreateInfo, &allocInfo, &buffer, &allocation, nullptr ) );
+}
+
+VkBufferUsageFlags VulkanBuffer::GetBufferUsageFlags( BufferUsageFlags flags )
+{
+	VkBufferUsageFlags outFlags = 0;
+
+	if ( ( flags & BUFFER_USAGE_FLAG_VERTEX_BUFFER ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+
+	if ( ( flags & BUFFER_USAGE_FLAG_INDEX_BUFFER ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
+
+	if ( ( flags & BUFFER_USAGE_FLAG_UNIFORM_BUFFER ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
+
+	if ( ( flags & BUFFER_USAGE_FLAG_TRANSFER_SRC ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
+
+	if ( ( flags & BUFFER_USAGE_FLAG_TRANSFER_DST ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	assert( outFlags != 0 && "Flags cannot be 0" );
+
+	return outFlags;
 }
 
 void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
@@ -355,12 +378,12 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
 	VK_CHECK( vmaCreateBuffer(
-	    *g_allocator, &stagingBufferInfo, &vmaallocInfo, &stagingBuffer.buffer, &stagingBuffer.allocation, nullptr ) );
+	    m_parent->m_allocator, &stagingBufferInfo, &vmaallocInfo, &stagingBuffer.buffer, &stagingBuffer.allocation, nullptr ) );
 
 	void* data;
-	vmaMapMemory( *g_allocator, stagingBuffer.allocation, &data );
+	vmaMapMemory( m_parent->m_allocator, stagingBuffer.allocation, &data );
 	memcpy( data, uploadInfo.data.data, uploadInfo.data.size );
-	vmaUnmapMemory( *g_allocator, stagingBuffer.allocation );
+	vmaUnmapMemory( m_parent->m_allocator, stagingBuffer.allocation );
 
 	VkBufferCreateInfo vertexBufferInfo = {};
 	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -373,7 +396,7 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
-	VK_CHECK( vmaCreateBuffer( *g_allocator, &vertexBufferInfo, &vmaallocInfo, &buffer, &allocation, nullptr ) );
+	VK_CHECK( vmaCreateBuffer( m_parent->m_allocator, &vertexBufferInfo, &vmaallocInfo, &buffer, &allocation, nullptr ) );
 
 	m_parent->ImmediateSubmit( [=]( VkCommandBuffer cmd ) -> RenderStatus {
 		VkBufferCopy copy = {};
@@ -410,6 +433,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 
 	volkLoadInstance( m_instance );
 
+	m_window = std::make_unique<Window>( 1280, 720 );
 	m_surface = m_window->CreateSurface( m_instance );
 
 	return vkbInstance;
@@ -512,7 +536,7 @@ vkb::PhysicalDevice VulkanRenderContext::CreatePhysicalDevice( vkb::Instance vkb
 		auto error = physicalDeviceReturn.full_error();
 
 		std::string errorStr = "Couldn't find valid physical device: " + error.type.message();
-		ERRORMESSAGE( errorStr );
+		ErrorMessage( errorStr );
 
 		// Exit
 		exit( error.type.value() );
@@ -531,7 +555,9 @@ void VulkanRenderContext::CreateSwapchain()
 void VulkanRenderContext::CreateCommands()
 {
 	m_mainContext = VulkanCommandContext( this );
+
 	m_uploadContext = VulkanCommandContext( this );
+	vkResetFences( m_device, 1, &m_uploadContext.fence );
 }
 
 void VulkanRenderContext::CreateSyncStructures()
@@ -586,8 +612,6 @@ void VulkanRenderContext::CreateAllocator()
 	allocatorInfo.flags = VMA_ALLOCATOR_CREATE_BUFFER_DEVICE_ADDRESS_BIT;
 
 	vmaCreateAllocator( &allocatorInfo, &m_allocator );
-
-	g_allocator = &m_allocator;
 }
 
 RenderStatus VulkanRenderContext::Startup()
@@ -604,19 +628,14 @@ RenderStatus VulkanRenderContext::Startup()
 		auto instance = CreateInstanceAndSurface();
 		auto physicalDevice = CreatePhysicalDevice( instance );
 		FinalizeAndCreateDevice( physicalDevice );
+		CreateAllocator();
 
 		// Resources
+		CreateSamplers();
 		CreateSwapchain();
 		CreateCommands();
 		CreateSyncStructures();
 		CreateDescriptors();
-	}
-
-	//
-	// Create vulkan memory allocator instance
-	//
-	{
-		CreateAllocator();
 	}
 
 	m_hasInitialized = true;
@@ -707,6 +726,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	depthAttachmentInfo.clearValue = depthClear;
 
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderSize );
+	vkCmdBeginRendering( cmd, &renderInfo );
 
 	m_renderingActive = true;
 	return RENDER_STATUS_OK;
@@ -718,6 +738,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
 	VkCommandBuffer cmd = m_mainContext.commandBuffer;
+	vkCmdEndRendering( cmd );
 
 	//
 	// We want to present the image, so we'll manually transition the layout to
@@ -759,6 +780,9 @@ RenderStatus VulkanRenderContext::EndRendering()
 
 RenderStatus VulkanRenderContext::BindPipeline( Pipeline p )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	m_pipeline = m_pipelines.Get( p.m_handle );
 
 	VulkanPipeline pipeline = *m_pipeline.get();
@@ -770,6 +794,9 @@ RenderStatus VulkanRenderContext::BindPipeline( Pipeline p )
 
 RenderStatus VulkanRenderContext::BindDescriptor( Descriptor d )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	VulkanDescriptor descriptor = *m_descriptors.Get( d.m_handle ).get();
 
 	vkCmdBindDescriptorSets( m_mainContext.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->layout, 0, 1,
@@ -778,8 +805,34 @@ RenderStatus VulkanRenderContext::BindDescriptor( Descriptor d )
 	return RENDER_STATUS_OK;
 }
 
+RenderStatus VulkanRenderContext::UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo )
+{
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
+	BindDescriptor( d );
+
+	VulkanDescriptor descriptor = *m_descriptors.Get( d.m_handle ).get();
+	VulkanImageTexture texture = *m_imageTextures.Get( updateInfo.src->m_handle ).get();
+
+	VkDescriptorImageInfo imageInfo = {};
+	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+	imageInfo.imageView = texture.imageView;
+	imageInfo.sampler = SAMPLER_TYPE_ANISOTROPIC ? m_anisoSampler.sampler : m_pointSampler.sampler; // TODO
+
+	auto descriptorWrite = VKInit::WriteDescriptorImage(
+	    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor.descriptorSet, &imageInfo, updateInfo.binding );
+
+	vkUpdateDescriptorSets( m_device, 1, &descriptorWrite, 0, nullptr );
+
+	return RENDER_STATUS_OK;
+}
+
 RenderStatus VulkanRenderContext::BindVertexBuffer( VertexBuffer vb )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	VulkanBuffer vertexBuffer = *m_buffers.Get( vb.m_handle ).get();
 
 	VkDeviceSize offset = 0;
@@ -790,6 +843,9 @@ RenderStatus VulkanRenderContext::BindVertexBuffer( VertexBuffer vb )
 
 RenderStatus VulkanRenderContext::BindIndexBuffer( IndexBuffer ib )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	VulkanBuffer indexBuffer = *m_buffers.Get( ib.m_handle ).get();
 
 	VkDeviceSize offset = 0;
@@ -798,8 +854,22 @@ RenderStatus VulkanRenderContext::BindIndexBuffer( IndexBuffer ib )
 	return RENDER_STATUS_OK;
 }
 
+RenderStatus VulkanRenderContext::BindConstants( RenderPushConstants p )
+{
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
+	vkCmdPushConstants( m_mainContext.commandBuffer, m_pipeline->layout,
+	    VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0, sizeof( RenderPushConstants ), &p );
+
+	return RENDER_STATUS_OK;
+}
+
 RenderStatus VulkanRenderContext::Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	vkCmdDrawIndexed( m_mainContext.commandBuffer, indexCount, instanceCount, 0, 0, 0 );
 
 	return RENDER_STATUS_OK;
@@ -807,6 +877,9 @@ RenderStatus VulkanRenderContext::Draw( uint32_t vertexCount, uint32_t indexCoun
 
 RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	assert( "TODO" );
 
 	return RENDER_STATUS_OK;
@@ -814,14 +887,41 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 
 RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
 	*outSize = m_window->GetWindowSize();
 
 	return RENDER_STATUS_OK;
 }
 
-RenderStatus VulkanRenderContext::RenderMesh( Mesh* mesh )
+RenderStatus VulkanRenderContext::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
+
+	// JIT pipeline creation
+	if ( !mesh->material.m_pipeline.IsValid() )
+	{
+		spdlog::trace( "VulkanRenderContext::RenderMesh - Handle wasn't valid, creating JIT render pipeline..." );
+
+		mesh->material.CreateResources();
+	}
+
 	BindPipeline( mesh->material.m_pipeline );
+	BindDescriptor( mesh->material.m_descriptor );
+
+	for ( int i = 0; i < mesh->material.m_textures.size(); ++i )
+	{
+		DescriptorUpdateInfo_t updateInfo = {};
+		updateInfo.binding = i;
+		updateInfo.samplerType = SAMPLER_TYPE_POINT;
+		updateInfo.src = &mesh->material.m_textures[i].m_image;
+
+		UpdateDescriptor( mesh->material.m_descriptor, updateInfo );
+	}
+
+	BindConstants( constants );
 	BindVertexBuffer( mesh->vertexBuffer );
 	BindIndexBuffer( mesh->indexBuffer );
 
@@ -832,6 +932,8 @@ RenderStatus VulkanRenderContext::RenderMesh( Mesh* mesh )
 
 RenderStatus VulkanRenderContext::CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
 	VulkanImageTexture imageTexture( this, textureInfo );
 
 	*outHandle = m_imageTextures.Add( imageTexture );
@@ -841,6 +943,8 @@ RenderStatus VulkanRenderContext::CreateImageTexture( ImageTextureInfo_t texture
 
 RenderStatus VulkanRenderContext::CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
 	VulkanRenderTexture renderTexture( this, textureInfo );
 
 	*outHandle = m_renderTextures.Add( renderTexture );
@@ -878,7 +982,8 @@ RenderStatus VulkanRenderContext::CopyImageTexture( Handle handle, TextureCopyDa
 
 RenderStatus VulkanRenderContext::CreateBuffer( BufferInfo_t bufferInfo, Handle* outHandle )
 {
-	VulkanBuffer buffer( this, bufferInfo, ( VkBufferUsageFlags )0, VMA_MEMORY_USAGE_AUTO, ( VmaAllocationCreateFlagBits )0 );
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	VulkanBuffer buffer( this, bufferInfo, VMA_MEMORY_USAGE_AUTO );
 
 	*outHandle = m_buffers.Add( buffer );
 
@@ -887,8 +992,8 @@ RenderStatus VulkanRenderContext::CreateBuffer( BufferInfo_t bufferInfo, Handle*
 
 RenderStatus VulkanRenderContext::CreateVertexBuffer( BufferInfo_t bufferInfo, Handle* outHandle )
 {
-	VulkanBuffer buffer(
-	    this, bufferInfo, VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VMA_MEMORY_USAGE_AUTO, ( VmaAllocationCreateFlagBits )0 );
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	VulkanBuffer buffer( this, bufferInfo, VMA_MEMORY_USAGE_AUTO );
 
 	*outHandle = m_buffers.Add( buffer );
 
@@ -897,8 +1002,8 @@ RenderStatus VulkanRenderContext::CreateVertexBuffer( BufferInfo_t bufferInfo, H
 
 RenderStatus VulkanRenderContext::CreateIndexBuffer( BufferInfo_t bufferInfo, Handle* outHandle )
 {
-	VulkanBuffer buffer(
-	    this, bufferInfo, VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VMA_MEMORY_USAGE_AUTO, ( VmaAllocationCreateFlagBits )0 );
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+	VulkanBuffer buffer( this, bufferInfo, VMA_MEMORY_USAGE_AUTO );
 
 	*outHandle = m_buffers.Add( buffer );
 
@@ -921,6 +1026,8 @@ RenderStatus VulkanRenderContext::UploadBuffer( Handle handle, BufferUploadInfo_
 
 RenderStatus VulkanRenderContext::CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
 	VulkanPipeline pipeline( this, pipelineInfo );
 
 	*outHandle = m_pipelines.Add( pipeline );
@@ -930,6 +1037,8 @@ RenderStatus VulkanRenderContext::CreatePipeline( PipelineInfo_t pipelineInfo, H
 
 RenderStatus VulkanRenderContext::CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
 	VulkanDescriptor descriptor( this, pipelineInfo );
 
 	*outHandle = m_descriptors.Add( descriptor );
@@ -939,6 +1048,8 @@ RenderStatus VulkanRenderContext::CreateDescriptor( DescriptorInfo_t pipelineInf
 
 RenderStatus VulkanRenderContext::CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle )
 {
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
 	VulkanShader shader( this, pipelineInfo );
 
 	*outHandle = m_shaders.Add( shader );
@@ -948,8 +1059,27 @@ RenderStatus VulkanRenderContext::CreateShader( ShaderInfo_t pipelineInfo, Handl
 
 RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( VkCommandBuffer commandBuffer )> func )
 {
-	// TODO
-	return func( m_uploadContext.commandBuffer );
+	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
+	RenderStatus status;
+
+	VkCommandBuffer cmd = m_uploadContext.commandBuffer;
+	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
+	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
+
+	status = func( cmd );
+
+	VK_CHECK( vkEndCommandBuffer( cmd ) );
+
+	VkSubmitInfo submit = VKInit::SubmitInfo( &cmd );
+	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_uploadContext.fence ) );
+
+	vkWaitForFences( m_device, 1, &m_uploadContext.fence, true, 9999999999 );
+	vkResetFences( m_device, 1, &m_uploadContext.fence );
+
+	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
+
+	return status;
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -972,7 +1102,7 @@ void VulkanShader::LoadShaderModule( const char* filePath, VkShaderStageFlagBits
 	if ( !ShaderCompiler::Instance().Compile( shaderStage, buffer, shaderBits ) )
 	{
 		std::string error = std::string( filePath ) + " failed to compile.\nCheck the console for more details.";
-		ERRORMESSAGE( error );
+		ErrorMessage( error );
 		exit( 1 );
 	}
 
@@ -998,12 +1128,23 @@ void VulkanShader::LoadShaderModule( const char* filePath, VkShaderStageFlagBits
 	*outShaderModule = shaderModule;
 }
 
-VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo ) {}
+VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo )
+{
+	SetParent( parent );
+
+	LoadShaderModule( shaderInfo.shaderPath.c_str(), VK_SHADER_STAGE_FRAGMENT_BIT, &fragmentShader );
+	spdlog::info( "VulkanShader::VulkanShader: Fragment shader compiled successfully" );
+
+	LoadShaderModule( shaderInfo.shaderPath.c_str(), VK_SHADER_STAGE_VERTEX_BIT, &vertexShader );
+	spdlog::info( "VulkanShader::VulkanShader: Vertex shader compiled successfully" );
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo )
 {
+	SetParent( parent );
+	
 	std::vector<VkDescriptorSetLayoutBinding> bindings = {};
 
 	for ( int i = 0; i < descriptorInfo.bindings.size(); ++i )
@@ -1018,9 +1159,8 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 		bindings.push_back( binding );
 	}
 
-	VkDescriptorSetLayoutCreateInfo textureLayoutInfo =
-	    VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), bindings.size() );
-	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &textureLayoutInfo, nullptr, &descriptorSetLayout ) );
+	VkDescriptorSetLayoutCreateInfo layoutInfo = VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), bindings.size() );
+	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
 
 	VkDescriptorSetAllocateInfo allocInfo =
 	    VKInit::DescriptorSetAllocateInfo( m_parent->m_descriptorPool, &descriptorSetLayout, 1 );
@@ -1091,96 +1231,91 @@ uint32_t VulkanPipeline::GetSizeOf( VertexAttributeFormat format )
 
 VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipelineInfo )
 {
+	SetParent( parent );
+
 	PipelineBuilder builder;
 
+	VkPipelineLayoutCreateInfo pipeline_layout_info = VKInit::PipelineLayoutCreateInfo();
+	VkPushConstantRange push_constant = {};
+
+	push_constant.offset = 0;
+	push_constant.size = sizeof( RenderPushConstants );
+	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+
+	pipeline_layout_info.pPushConstantRanges = &push_constant;
+	pipeline_layout_info.pushConstantRangeCount = 1;
+
+	std::vector<VkDescriptorSetLayout> setLayouts;
+
+	for ( auto& descriptor : pipelineInfo.descriptors )
 	{
-		VkPipelineLayoutCreateInfo pipeline_layout_info = VKInit::PipelineLayoutCreateInfo();
-		VkPushConstantRange push_constant = {};
+		VulkanDescriptor vkDescriptor = *m_parent->m_descriptors.Get( descriptor->m_handle ).get();
 
-		pipeline_layout_info.pPushConstantRanges = &push_constant;
-		pipeline_layout_info.pushConstantRangeCount = 1;
-
-		std::vector<VkDescriptorSetLayout> setLayouts;
-
-		for ( auto& descriptorInfo : pipelineInfo.descriptors )
-		{
-			Descriptor descriptor( descriptorInfo );
-			VulkanDescriptor vkDescriptor = *m_parent->m_descriptors.Get( descriptor.m_handle ).get();
-
-			setLayouts.push_back( vkDescriptor.descriptorSetLayout );
-		}
-
-		pipeline_layout_info.pSetLayouts = setLayouts.data();
-		pipeline_layout_info.setLayoutCount = setLayouts.size();
-
-		VK_CHECK( vkCreatePipelineLayout( m_parent->m_device, &pipeline_layout_info, nullptr, &builder.m_pipelineLayout ) );
-
-		layout = builder.m_pipelineLayout;
+		setLayouts.push_back( vkDescriptor.descriptorSetLayout );
 	}
 
+	pipeline_layout_info.pSetLayouts = setLayouts.data();
+	pipeline_layout_info.setLayoutCount = setLayouts.size();
+
+	VK_CHECK( vkCreatePipelineLayout( m_parent->m_device, &pipeline_layout_info, nullptr, &builder.m_pipelineLayout ) );
+
+	layout = builder.m_pipelineLayout;
+
+	builder.m_rasterizer = VKInit::PipelineRasterizationStateCreateInfo( VK_POLYGON_MODE_FILL );
+	builder.m_multisampling = VKInit::PipelineMultisampleStateCreateInfo();
+	builder.m_colorBlendAttachment = VKInit::PipelineColorBlendAttachmentState();
+
+	VulkanShader shader( m_parent, pipelineInfo.shaderInfo );
+
+	std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+
+	shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_FRAGMENT_BIT, shader.fragmentShader ) );
+	shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_VERTEX_BIT, shader.vertexShader ) );
+
+	builder.m_shaderStages = shaderStages;
+
+	// Calculate stride size
+	size_t stride = 0;
+	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{
-		builder.m_rasterizer = VKInit::PipelineRasterizationStateCreateInfo( VK_POLYGON_MODE_FILL );
-		builder.m_multisampling = VKInit::PipelineMultisampleStateCreateInfo();
-		builder.m_colorBlendAttachment = VKInit::PipelineColorBlendAttachmentState();
+		stride += GetSizeOf( ( VertexAttributeFormat )pipelineInfo.vertexAttributes[i].format );
 	}
 
+	VulkanVertexInputDescription description = {};
+
+	VkVertexInputBindingDescription mainBinding = {};
+	mainBinding.binding = 0;
+	mainBinding.stride = stride;
+	mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
+
+	description.bindings.push_back( mainBinding );
+
+	size_t offset = 0;
+
+	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{
-		VulkanShader shader( m_parent, pipelineInfo.shaderInfo );
+		auto attribute = pipelineInfo.vertexAttributes[i];
 
-		std::vector<VkPipelineShaderStageCreateInfo> shaderStages;
+		VkVertexInputAttributeDescription positionAttribute = {};
+		positionAttribute.binding = 0;
+		positionAttribute.location = i;
+		positionAttribute.format = GetVulkanFormat( ( VertexAttributeFormat )attribute.format );
+		positionAttribute.offset = offset;
+		description.attributes.push_back( positionAttribute );
 
-		shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_FRAGMENT_BIT, shader.fragmentShader ) );
-		shaderStages.push_back( VKInit::PipelineShaderStageCreateInfo( VK_SHADER_STAGE_VERTEX_BIT, shader.vertexShader ) );
-
-		builder.m_shaderStages = shaderStages;
+		offset += GetSizeOf( ( VertexAttributeFormat )attribute.format );
 	}
 
-	{
-		// Calculate stride size
-		size_t stride = 0;
-		for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
-		{
-			stride += GetSizeOf( ( VertexAttributeFormat )pipelineInfo.vertexAttributes[i].format );
-		}
+	builder.m_vertexInputInfo = VKInit::PipelineVertexInputStateCreateInfo();
+	builder.m_vertexInputInfo.pVertexAttributeDescriptions = description.attributes.data();
+	builder.m_vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>( description.attributes.size() );
 
-		VulkanVertexInputDescription description = {};
+	builder.m_vertexInputInfo.pVertexBindingDescriptions = description.bindings.data();
+	builder.m_vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( description.bindings.size() );
 
-		VkVertexInputBindingDescription mainBinding = {};
-		mainBinding.binding = 0;
-		mainBinding.stride = stride;
-		mainBinding.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-		description.bindings.push_back( mainBinding );
-
-		size_t offset = 0;
-
-		for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
-		{
-			auto attribute = pipelineInfo.vertexAttributes[i];
-
-			VkVertexInputAttributeDescription positionAttribute = {};
-			positionAttribute.binding = 0;
-			positionAttribute.location = i;
-			positionAttribute.format = GetVulkanFormat( ( VertexAttributeFormat )attribute.format );
-			positionAttribute.offset = offset;
-			description.attributes.push_back( positionAttribute );
-
-			offset += GetSizeOf( ( VertexAttributeFormat )attribute.format );
-		}
-
-		builder.m_vertexInputInfo = VKInit::PipelineVertexInputStateCreateInfo();
-		builder.m_vertexInputInfo.pVertexAttributeDescriptions = description.attributes.data();
-		builder.m_vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>( description.attributes.size() );
-
-		builder.m_vertexInputInfo.pVertexBindingDescriptions = description.bindings.data();
-		builder.m_vertexInputInfo.vertexBindingDescriptionCount = static_cast<uint32_t>( description.bindings.size() );
-	}
-
-	{
-		builder.m_inputAssembly = VKInit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
-		builder.m_depthStencil =
-		    VKInit::DepthStencilCreateInfo( !pipelineInfo.ignoreDepth, !pipelineInfo.ignoreDepth, VK_COMPARE_OP_LESS_OR_EQUAL );
-	}
+	builder.m_inputAssembly = VKInit::PipelineInputAssemblyStateCreateInfo( VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST );
+	builder.m_depthStencil =
+	    VKInit::DepthStencilCreateInfo( !pipelineInfo.ignoreDepth, !pipelineInfo.ignoreDepth, VK_COMPARE_OP_LESS_OR_EQUAL );
 
 	pipeline = builder.Build(
 	    m_parent->m_device, m_parent->m_swapchain.m_swapchainTextures[0].format, m_parent->m_swapchain.m_depthTexture.format );

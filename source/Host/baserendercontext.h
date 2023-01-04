@@ -22,6 +22,7 @@ enum RenderObjectStatus
 struct Mesh;
 class BaseRenderContext;
 class ImageTexture;
+class Descriptor;
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -58,6 +59,15 @@ enum VertexAttributeFormat
 	VERTEX_ATTRIBUTE_FORMAT_FLOAT2,
 	VERTEX_ATTRIBUTE_FORMAT_FLOAT3,
 	VERTEX_ATTRIBUTE_FORMAT_FLOAT4
+};
+
+enum BufferUsageFlags
+{
+	BUFFER_USAGE_FLAG_VERTEX_BUFFER = 1 << 0,
+	BUFFER_USAGE_FLAG_INDEX_BUFFER = 1 << 1,
+	BUFFER_USAGE_FLAG_UNIFORM_BUFFER = 1 << 2,
+	BUFFER_USAGE_FLAG_TRANSFER_SRC = 1 << 3,
+	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 4
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -104,6 +114,7 @@ struct BufferInfo_t
 {
 	uint32_t size;
 	BufferType type;
+	BufferUsageFlags usage;
 };
 
 struct BufferUploadInfo_t
@@ -114,13 +125,19 @@ struct BufferUploadInfo_t
 struct DescriptorBindingInfo_t
 {
 	DescriptorBindingType type;
-	SamplerType samplerType;
 	ImageTexture* texture;
 };
 
 struct DescriptorInfo_t
 {
 	std::vector<DescriptorBindingInfo_t> bindings;
+};
+
+struct DescriptorUpdateInfo_t
+{
+	int binding;
+	ImageTexture* src;
+	SamplerType samplerType;
 };
 
 struct ShaderInfo_t
@@ -137,9 +154,23 @@ struct VertexAttributeInfo_t
 struct PipelineInfo_t
 {
 	ShaderInfo_t shaderInfo;
-	std::vector<DescriptorInfo_t> descriptors;
+	std::vector<Descriptor*> descriptors;
 	std::vector<VertexAttributeInfo_t> vertexAttributes;
 	bool ignoreDepth;
+};
+
+struct RenderPushConstants
+{
+	glm::vec4 data;
+
+	glm::mat4 modelMatrix;
+
+	glm::mat4 renderMatrix;
+
+	glm::vec3 cameraPos;
+	float time;
+
+	glm::vec4 vLightInfoWS[4];
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -147,7 +178,9 @@ struct PipelineInfo_t
 class RenderObject
 {
 public:
-	Handle m_handle;
+	Handle m_handle = HANDLE_INVALID;
+
+	inline bool IsValid() { return m_handle != HANDLE_INVALID; }
 };
 
 class ImageTexture : public RenderObject
@@ -230,9 +263,6 @@ enum RenderStatus
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
 };
 
-#define RENDERCONTEXT_FUNC virtual RenderStatus
-
-// clang-format on
 // ----------------------------------------------------------------------------------------------------
 
 inline std::string GetRenderContextStatusString( RenderStatus status )
@@ -244,12 +274,14 @@ inline std::string GetRenderContextStatusString( RenderStatus status )
 	    "RENDER_STATUS_BEGIN_END_MISMATCH",
 	    "RENDER_STATUS_NO_PIPELINE_BOUND",
 	    "RENDER_STATUS_NO_VERTEX_BUFFER_BOUND",
-	    "RENDER_STATUS_NO_INDEX_BUFFER_BOUND",
+	    "RENDER_STATUS_NO_INDEX_BUFFER_BOUND", 
+		"RENDER_STATUS_INVALID_HANDLE"
 	};
 
 	return RenderContextStatusStrings[status];
 }
 
+// clang-format on
 // ----------------------------------------------------------------------------------------------------
 
 inline void ErrorIf( bool condition, RenderStatus status )
@@ -257,7 +289,7 @@ inline void ErrorIf( bool condition, RenderStatus status )
 	if ( condition )
 	{
 		std::string error = "RenderContext Error: " + GetRenderContextStatusString( status );
-		ERRORMESSAGE( error );
+		ErrorMessage( error );
 	}
 }
 
@@ -286,75 +318,81 @@ protected:
 	// ----------------------------------------
 	// Objects
 	// ----------------------------------------
-	RENDERCONTEXT_FUNC CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC SetImageTextureData( Handle handle, TextureData_t pipelineInfo ) = 0;
-	RENDERCONTEXT_FUNC CopyImageTexture( Handle handle, TextureCopyData_t pipelineInfo ) = 0;
+	virtual RenderStatus CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus SetImageTextureData( Handle handle, TextureData_t pipelineInfo ) = 0;
+	virtual RenderStatus CopyImageTexture( Handle handle, TextureCopyData_t pipelineInfo ) = 0;
 
-	RENDERCONTEXT_FUNC CreateBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC CreateVertexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC CreateIndexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC UploadBuffer( Handle handle, BufferUploadInfo_t pipelineInfo ) = 0;
+	virtual RenderStatus CreateBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreateVertexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreateIndexBuffer( BufferInfo_t bufferInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus UploadBuffer( Handle handle, BufferUploadInfo_t pipelineInfo ) = 0;
 
-	RENDERCONTEXT_FUNC CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle ) = 0;
-	RENDERCONTEXT_FUNC CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle ) = 0;
+	virtual RenderStatus CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) = 0;
 
 public:
-#define FRIEND( x ) friend class x
 	// All render types should be able to access render context internals
 	// for object creation etc.
-	FRIEND( ImageTexture );
-	FRIEND( RenderTexture );
-	FRIEND( BaseBuffer );
-	FRIEND( VertexBuffer );
-	FRIEND( IndexBuffer );
-	FRIEND( Pipeline );
-	FRIEND( Descriptor );
-	FRIEND( Shader );
-#undef FRIEND
+	friend ImageTexture;
+	friend RenderTexture;
+	friend BaseBuffer;
+	friend VertexBuffer;
+	friend IndexBuffer;
+	friend Pipeline;
+	friend Descriptor;
+	friend Shader;
+
+	// ----------------------------------------
 
 	// ----------------------------------------
 	// Startup / shutdown
 	// ----------------------------------------
 
-	RENDERCONTEXT_FUNC Startup() = 0;
-	RENDERCONTEXT_FUNC Shutdown() = 0;
+	virtual RenderStatus Startup() = 0;
+	virtual RenderStatus Shutdown() = 0;
 
 	// ----------------------------------------
 	// Rendering commands
 	// ----------------------------------------
 
 	// Call this before invoking any render functions.
-	RENDERCONTEXT_FUNC BeginRendering() = 0;
+	virtual RenderStatus BeginRendering() = 0;
 
 	// Call this after you're done.
-	RENDERCONTEXT_FUNC EndRendering() = 0;
+	virtual RenderStatus EndRendering() = 0;
 
 	// ----------------------------------------
 	//
 	// Low-level rendering
 	//
 	// Binds a pipeline
-	RENDERCONTEXT_FUNC BindPipeline( Pipeline p ) = 0;
+	virtual RenderStatus BindPipeline( Pipeline p ) = 0;
 
 	// Binds a descriptor
-	RENDERCONTEXT_FUNC BindDescriptor( Descriptor d ) = 0;
+	virtual RenderStatus BindDescriptor( Descriptor d ) = 0;
+
+	// Updates a descriptor
+	virtual RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) = 0;
 
 	// Binds a vertex buffer
-	RENDERCONTEXT_FUNC BindVertexBuffer( VertexBuffer vb ) = 0;
+	virtual RenderStatus BindVertexBuffer( VertexBuffer vb ) = 0;
 
 	// Binds an index buffer
-	RENDERCONTEXT_FUNC BindIndexBuffer( IndexBuffer ib ) = 0;
+	virtual RenderStatus BindIndexBuffer( IndexBuffer ib ) = 0;
+
+	// Bind rendering push constants
+	virtual RenderStatus BindConstants( RenderPushConstants p ) = 0;
 
 	// Draws the contents of the vertex and/or index buffer
-	RENDERCONTEXT_FUNC Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) = 0;
+	virtual RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) = 0;
 
 	// Call this to set the render target to render to.
-	RENDERCONTEXT_FUNC BindRenderTarget( RenderTexture rt ) = 0;
+	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
 	// This will return the size for the current render target.
-	RENDERCONTEXT_FUNC GetRenderSize( Size2D* outSize ) = 0;
+	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
 
 	// ----------------------------------------
 	//
@@ -363,7 +401,7 @@ public:
 	// Render a mesh. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
 	// this once and it'll do all the work.
 	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
-	RENDERCONTEXT_FUNC RenderMesh( Mesh* mesh ) = 0;
+	virtual RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) = 0;
 };
 
-#undef RENDERCONTEXT_FUNC
+#undef virtual RenderStatus

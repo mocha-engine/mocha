@@ -4,6 +4,21 @@
 #include <texture.h>
 #include <vector>
 
+struct InteropVertexAttributeInfo
+{
+	const char* name;
+	VertexAttributeFormat format;
+
+	VertexAttributeInfo_t ToNative()
+	{
+		VertexAttributeInfo_t native = {};
+		native.name = name;
+		native.format = format;
+
+		return native;
+	}
+};
+
 //@InteropGen generate class
 class Material
 {

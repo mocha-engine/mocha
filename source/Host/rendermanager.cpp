@@ -46,6 +46,8 @@ void RenderManager::Startup()
 	g_renderManager = this;
 
 	m_renderContext = std::make_unique<VulkanRenderContext>();
+	g_renderContext = m_renderContext.get();
+
 	m_renderContext->Startup();
 }
 
@@ -56,9 +58,34 @@ void RenderManager::Shutdown()
 
 void RenderManager::RenderEntity( ModelEntity* entity )
 {
-	for ( auto& mesh : entity->GetModel().m_meshes )
+	// Create and bind constants
+	RenderPushConstants constants = {};
+	constants.modelMatrix = entity->GetTransform().GetModelMatrix();
+	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
+	constants.cameraPos = g_cameraPos.ToGLM();
+	constants.time = g_curTime;
+	constants.data.x = ( int )g_debugView;
+
+	std::vector<Vector3> lightPositions = {};
+	lightPositions.push_back( { 0, 4, 4 } );
+	lightPositions.push_back( { 4, 0, 4 } );
+	lightPositions.push_back( { 0, -4, 4 } );
+	lightPositions.push_back( { -4, 0, 4 } );
+
+	std::vector<glm::vec4> packedLightInfo = {};
+	for ( int i = 0; i < 4; ++i )
 	{
-		m_renderContext->RenderMesh( &mesh );
+		packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 50.0f } );
+	}
+
+	constants.vLightInfoWS[0] = packedLightInfo[0];
+	constants.vLightInfoWS[1] = packedLightInfo[1];
+	constants.vLightInfoWS[2] = packedLightInfo[2];
+	constants.vLightInfoWS[3] = packedLightInfo[3];
+
+	for ( auto& mesh : entity->GetModel()->m_meshes )
+	{
+		m_renderContext->RenderMesh( constants, mesh );
 	}
 }
 

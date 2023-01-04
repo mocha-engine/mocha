@@ -27,7 +27,7 @@ private:
 
 public:
 	void SetModel( Model model ) { m_model = model; }
-	Model GetModel() { return m_model; };
+	Model* GetModel() { return &m_model; }
 
 	//
 	// Getters & setters

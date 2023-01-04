@@ -19,7 +19,12 @@ Material::Material(
 
 	m_shaderPath = std::string( shaderPath );
 
-	m_vertexAttribInfo = vertexAttributes.GetData<VertexAttributeInfo_t>();
+	auto vertexAttribInfo = vertexAttributes.GetData<InteropVertexAttributeInfo>();
+	for ( int i = 0; i < vertexAttributes.count; i++ )
+	{
+		m_vertexAttribInfo.push_back( vertexAttribInfo[i].ToNative() );
+	}
+
 	m_samplerType = samplerType;
 	m_ignoreDepth = ignoreDepth;
 }
@@ -41,11 +46,13 @@ void Material::CreateResources()
 
 		DescriptorBindingInfo_t bindingInfo = {};
 		bindingInfo.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
-		bindingInfo.samplerType = m_samplerType;
 		bindingInfo.texture = &texture.m_image;
 
 		descriptorInfo.bindings.push_back( bindingInfo );
 	}
+
+	m_descriptor = Descriptor( descriptorInfo );
+	pipelineInfo.descriptors.push_back( &m_descriptor );
 
 	m_pipeline = Pipeline( pipelineInfo );
 }

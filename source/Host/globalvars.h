@@ -31,7 +31,6 @@ struct Quaternion;
 // Global vars
 //
 extern GameSettings* g_gameSettings;
-extern VmaAllocator* g_allocator;
 extern RenderManager* g_renderManager;
 extern LogManager* g_logManager;
 extern HostManager* g_hostManager;
