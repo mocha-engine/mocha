@@ -1,8 +1,5 @@
-
 <p align="center">
-    <h3 align="center">
-        Mocha
-    </h3>
+    <img src="https://user-images.githubusercontent.com/12881812/210657651-f18ba070-1591-419f-a5ea-c3a27aadb96b.png" />
     <p align="center">
         A work-in-progress game engine
     </p>
