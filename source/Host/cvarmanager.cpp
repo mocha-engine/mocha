@@ -2,12 +2,12 @@
 
 #include <sstream>
 
-size_t CVarManager::GetHash( std::string string )
+size_t CVarSystem::GetHash( std::string string )
 {
 	return std::hash<std::string>{}( string );
 }
 
-void CVarManager::ForEach( std::function<void( CVarEntry& entry )> func )
+void CVarSystem::ForEach( std::function<void( CVarEntry& entry )> func )
 {
 	for ( auto& entry : m_cvarEntries )
 	{
@@ -15,10 +15,10 @@ void CVarManager::ForEach( std::function<void( CVarEntry& entry )> func )
 	}
 }
 
-void CVarManager::ForEach( std::string filter, std::function<void( CVarEntry& entry )> func )
+void CVarSystem::ForEach( std::string filter, std::function<void( CVarEntry& entry )> func )
 {
 	std::vector<CVarEntry> matchingEntries = {};
-	
+
 	for ( auto& item : m_cvarEntries )
 	{
 		if ( item.second.m_name.find( filter ) == std::string::npos )
@@ -33,10 +33,10 @@ void CVarManager::ForEach( std::string filter, std::function<void( CVarEntry& en
 	}
 }
 
-void CVarManager::FromString( std::string name, std::string valueStr )
+void CVarSystem::FromString( std::string name, std::string valueStr )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
-	
+
 	std::stringstream valueStream( valueStr );
 	size_t hash = GetHash( name );
 	CVarEntry& entry = m_cvarEntries[hash];
@@ -47,8 +47,21 @@ void CVarManager::FromString( std::string name, std::string valueStr )
 	{
 		float value;
 		valueStream >> value;
-		
+
 		Set<float>( entry.m_name, value );
+	}
+	else if ( type == typeid( bool ) )
+	{
+		bool value;
+
+		if ( valueStr == "true" || valueStr == "1" || valueStr == "yes" )
+			value = true;
+		else if ( valueStr == "false" || valueStr == "0" || valueStr == "no" )
+			value = false;
+		else
+			assert( false ); // Invalid bool value
+
+		Set<bool>( entry.m_name, value );
 	}
 	else if ( type == typeid( std::string ) )
 	{
@@ -56,7 +69,7 @@ void CVarManager::FromString( std::string name, std::string valueStr )
 	}
 }
 
-std::string CVarManager::ToString( std::string name )
+std::string CVarSystem::ToString( std::string name )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
 
@@ -70,6 +83,18 @@ std::string CVarManager::ToString( std::string name )
 		valueStr = std::any_cast<std::string>( entry.m_value );
 	else if ( type == typeid( float ) )
 		valueStr = std::to_string( std::any_cast<float>( entry.m_value ) );
+	else if ( type == typeid( bool ) )
+		valueStr = std::any_cast<bool>( entry.m_value ) ? "true" : "false";
 
 	return valueStr;
+}
+
+void CVarManager::Startup()
+{
+	CVarSystem::Instance().Startup();
+}
+
+void CVarManager::Shutdown()
+{
+	CVarSystem::Instance().Shutdown();
 }

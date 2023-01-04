@@ -12,16 +12,15 @@
 enum CVarFlags
 {
 	None = 0,
+
+	// Save this convar to cvars.json
 	Archive = 1 << 0,
-	UserInfo = 1 << 1,
-	ServerInfo = 1 << 2,
-	Init = 1 << 3,
-	Latch = 1 << 4,
-	ReadOnly = 1 << 5,
-	UserCreated = 1 << 6,
-	Temp = 1 << 7,
-	Cheat = 1 << 8,
-	NoRestart = 1 << 9
+
+	// TODO
+	Cheat = 1 << 1,
+
+	// TODO
+	Temp = 1 << 2
 };
 
 struct CVarEntry
@@ -40,10 +39,17 @@ protected:
 	std::string m_name;
 
 public:
-	friend class CVarManager;
+	friend class CVarSystem;
 };
 
-class CVarManager
+class CVarManager : ISubSystem
+{
+public:
+	void Startup() override;
+	void Shutdown() override;
+};
+
+class CVarSystem
 {
 private:
 	std::unordered_map<std::size_t, CVarEntry> m_cvarEntries;
@@ -62,12 +68,12 @@ public:
 	friend class StringCVar;
 
 	//
-	// CVarManager is a singleton because it needs creating *as soon as* it's referenced
+	// CVarSystem is a singleton because it needs creating *as soon as* it's referenced
 	// and not after.
 	//
-	static CVarManager& Instance()
+	static CVarSystem& Instance()
 	{
-		static CVarManager instance;
+		static CVarSystem instance;
 		return instance;
 	}
 
@@ -145,12 +151,13 @@ public:
 	{
 		m_name = name;
 
-		CVarManager::Instance().RegisterString( name, value, flags, description );
+		CVarSystem::Instance().RegisterString( name, value, flags, description );
 	}
 
-	std::string GetValue() { return CVarManager::Instance().GetString( m_name ); }
+	std::string GetValue() { return CVarSystem::Instance().GetString( m_name ); }
+	void SetValue( std::string value ) { CVarSystem::Instance().SetString( m_name, value ); }
 
-	void SetValue( std::string value ) { CVarManager::Instance().SetString( m_name, value ); }
+	operator std::string() { return GetValue(); }
 };
 
 class FloatCVar : CVarParameter
@@ -160,12 +167,13 @@ public:
 	{
 		m_name = name;
 
-		CVarManager::Instance().RegisterFloat( name, value, flags, description );
+		CVarSystem::Instance().RegisterFloat( name, value, flags, description );
 	}
 
-	float GetValue() { return CVarManager::Instance().GetFloat( m_name ); }
-
-	void SetValue( float value ) { CVarManager::Instance().SetFloat( m_name, value ); }
+	float GetValue() { return CVarSystem::Instance().GetFloat( m_name ); }
+	void SetValue( float value ) { CVarSystem::Instance().SetFloat( m_name, value ); }
+	
+	operator float() { return GetValue(); }
 };
 
 class BoolCVar : CVarParameter
@@ -175,15 +183,17 @@ public:
 	{
 		m_name = name;
 
-		CVarManager::Instance().RegisterBool( name, value, flags, description );
+		CVarSystem::Instance().RegisterBool( name, value, flags, description );
 	}
 
-	bool GetValue() { return CVarManager::Instance().GetBool( m_name ); }
-	void SetValue( bool value ) { CVarManager::Instance().SetBool( m_name, value ); }
+	bool GetValue() { return CVarSystem::Instance().GetBool( m_name ); }
+	void SetValue( bool value ) { CVarSystem::Instance().SetBool( m_name, value ); }
+
+	operator bool() { return GetValue(); };
 };
 
 template <typename T>
-inline void CVarManager::Register( std::string name, T value, CVarFlags flags, std::string description )
+inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description )
 {
 	CVarEntry entry = {};
 	entry.m_name = name;
@@ -196,7 +206,7 @@ inline void CVarManager::Register( std::string name, T value, CVarFlags flags, s
 }
 
 template <typename T>
-inline T CVarManager::Get( std::string name )
+inline T CVarSystem::Get( std::string name )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
 
@@ -207,7 +217,7 @@ inline T CVarManager::Get( std::string name )
 }
 
 template <typename T>
-inline void CVarManager::Set( std::string name, T value )
+inline void CVarSystem::Set( std::string name, T value )
 {
 	assert( Exists( name ) ); // Doesn't exist! Register it first
 

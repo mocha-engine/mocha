@@ -15,11 +15,9 @@
 #include <rendermanager.h>
 #include <stdlib.h>
 
-//
 // These global variables are all defined in globalvars.h,
 // because the naming makes more sense (imagine if we
 // included Root.h everywhere!)
-//
 RenderManager* g_renderManager;
 LogManager* g_logManager;
 HostManager* g_hostManager;
@@ -27,7 +25,8 @@ RenderdocManager* g_renderdocManager;
 EntityManager* g_entityDictionary;
 PhysicsManager* g_physicsManager;
 InputManager* g_inputManager;
-BaseRenderContext* g_renderContext; // TODO??
+BaseRenderContext* g_renderContext; // TODO: Remove
+CVarManager* g_cvarManager;
 
 float g_curTime;
 float g_frameTime;
@@ -42,14 +41,12 @@ void Root::Startup()
 {
 	g_logManager = new LogManager();
 	g_logManager->Startup();
+	
+	g_cvarManager = new CVarManager();
+	g_cvarManager->Startup();
 
-	// HACK: CvarManager needs to start up before *everything* excluding logger
-	CVarManager::Instance().Startup();
-
-#ifdef _RENDERDOC
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
-#endif
 
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
@@ -77,14 +74,8 @@ void Root::Shutdown()
 	g_inputManager->Shutdown();
 	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
-
-#if _RENDERDOC
 	g_renderdocManager->Shutdown();
-#endif
-
-	// HACK: CvarManager needs to shut down after *everything* excluding logger
-	CVarManager::Instance().Shutdown();
-
+	g_cvarManager->Shutdown();
 	g_logManager->Shutdown();
 
 	_CrtDumpMemoryLeaks();
