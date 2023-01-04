@@ -19,6 +19,12 @@
 - C# scripting with automatic C++ <-> C# interop bindings generator
 - Work-in-progress physically-based shading & material implementation (currently without IBL)
 
+## Technical Information
+
+I'm doing a monthly series of write-ups about Mocha on my blog. These should give some good insights on how Mocha works and how I plan on expanding it in the future.
+
+- [Mocha - December 2022](https://blog.gu3.me/mocha/)
+
 ## Building
 
 ### Prerequisites
