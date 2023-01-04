@@ -6,10 +6,10 @@
 #include <globalvars.h>
 #include <handlemap.h>
 #include <mathtypes.h>
+#include <vk_mem_alloc.h>
 #include <vkinit.h>
 #include <vulkan/vulkan.h>
 #include <window.h>
-#include <vk_mem_alloc.h>
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
@@ -230,7 +230,7 @@ public:
 	VkPipeline pipeline;
 	VkPipelineLayout layout;
 
-	VulkanPipeline(){}
+	VulkanPipeline() {}
 	VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipelineInfo );
 };
 
@@ -271,6 +271,13 @@ private:
 	void CreateSamplers();
 
 	//
+	// ImGui
+	//
+	void CreateImGui();
+	ImFont* m_mainFont;
+	ImFont* m_monospaceFont;
+
+	//
 	// Vulkan memory allocator
 	//
 	VmaAllocator m_allocator;
@@ -284,6 +291,9 @@ private:
 	VulkanRenderTexture m_swapchainTarget;
 	// Current swapchain target depth buffer.
 	VulkanRenderTexture m_depthTarget;
+
+	// Do we currently have a dynamic render pass instance active?
+	bool m_isRenderPassActive = false;
 
 	// Current pipeline. Used when binding descriptors
 	std::shared_ptr<VulkanPipeline> m_pipeline;
@@ -380,4 +390,8 @@ public:
 	// ----------------------------------------
 
 	RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) override;
+	
+	RenderStatus BeginImGui() override;
+	RenderStatus EndImGui() override;
+	RenderStatus RenderImGui() override;
 };

@@ -8,6 +8,14 @@
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
+#ifdef _IMGUI
+#include <backends/imgui_impl_sdl.h>
+#include <backends/imgui_impl_vulkan.h>
+#include <imgui.h>
+#include <implot.h>
+#endif
+#include <fontawesome.h>
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 void VulkanSwapchain::CreateMainSwapchain( Size2D size )
@@ -596,6 +604,205 @@ void VulkanRenderContext::CreateSamplers()
 	m_anisoSampler = VulkanSampler( this, SAMPLER_TYPE_ANISOTROPIC );
 }
 
+void VulkanRenderContext::CreateImGui()
+{
+	VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 }, { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 }, { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 }, { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 } };
+
+	VkDescriptorPoolCreateInfo pool_info = {};
+	pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+	pool_info.maxSets = 1000;
+	pool_info.poolSizeCount = ( uint32_t )std::size( pool_sizes );
+	pool_info.pPoolSizes = pool_sizes;
+
+	VkDescriptorPool imguiPool;
+	VK_CHECK( vkCreateDescriptorPool( m_device, &pool_info, nullptr, &imguiPool ) );
+
+	ImGui::CreateContext();
+	ImPlot::CreateContext();
+
+	auto& io = ImGui::GetIO();
+	m_mainFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
+
+	ImFontConfig iconConfig = {};
+	iconConfig.MergeMode = 1;
+	iconConfig.GlyphMinAdvanceX = 16.0f;
+
+	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
+
+	m_monospaceFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+
+	io.Fonts->Build();
+
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigViewportsNoDecoration = false;
+	io.ConfigViewportsNoAutoMerge = true;
+	io.ConfigDockingWithShift = true;
+
+	ImGui_ImplSDL2_InitForVulkan( m_window->GetSDLWindow() );
+
+	ImGui_ImplVulkan_InitInfo init_info = {};
+	init_info.Instance = m_instance;
+	init_info.PhysicalDevice = m_chosenGPU;
+	init_info.Device = m_device;
+	init_info.Queue = m_graphicsQueue;
+	init_info.DescriptorPool = imguiPool;
+	init_info.MinImageCount = 3;
+	init_info.ImageCount = 3;
+	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+	init_info.UseDynamicRendering = true;
+	init_info.ColorAttachmentFormat = m_swapchain.m_swapchainTextures[0].format;
+
+	ImGui_ImplVulkan_LoadFunctions(
+	    []( const char* function_name, void* user_data ) {
+		    return vkGetInstanceProcAddr( ( VkInstance )user_data, function_name );
+	    },
+	    m_instance );
+	ImGui_ImplVulkan_Init( &init_info, nullptr );
+	ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
+		ImGui_ImplVulkan_CreateFontsTexture( cmd );
+		return RENDER_STATUS_OK;
+	} );
+	ImGui_ImplVulkan_DestroyFontUploadObjects();
+
+	auto& style = ImGui::GetStyle();
+	style.WindowPadding = { 8.00f, 8.00f };
+	style.FramePadding = { 12.00f, 6.00f };
+	style.CellPadding = { 4.00f, 4.00f };
+	style.ItemSpacing = { 4.00f, 4.00f };
+	style.ItemInnerSpacing = { 2.00f, 2.00f };
+	style.TouchExtraPadding = { 0.00f, 0.00f };
+	style.IndentSpacing = 25;
+	style.ScrollbarSize = 12;
+	style.GrabMinSize = 12;
+	style.WindowBorderSize = 1;
+	style.ChildBorderSize = 0;
+	style.PopupBorderSize = 0;
+	style.FrameBorderSize = 0;
+	style.TabBorderSize = 0;
+	style.WindowRounding = 6;
+	style.ChildRounding = 4;
+	style.FrameRounding = 3;
+	style.PopupRounding = 4;
+	style.ScrollbarRounding = 9;
+	style.GrabRounding = 3;
+	style.LogSliderDeadzone = 4;
+	style.TabRounding = 4;
+	style.WindowTitleAlign = { 0.5f, 0.5f };
+	style.WindowMenuButtonPosition = ImGuiDir_None;
+	style.AntiAliasedLinesUseTex = false;
+
+	auto& colors = style.Colors;
+	colors[ImGuiCol_Text] = { 1.00f, 1.00f, 1.00f, 1.00f };
+	colors[ImGuiCol_TextDisabled] = { 0.50f, 0.50f, 0.50f, 1.00f };
+	colors[ImGuiCol_WindowBg] = { 0.17f, 0.17f, 0.18f, 1.00f };
+	colors[ImGuiCol_ChildBg] = { 0.10f, 0.11f, 0.11f, 1.00f };
+	colors[ImGuiCol_PopupBg] = { 0.24f, 0.24f, 0.25f, 1.00f };
+	colors[ImGuiCol_Border] = { 0.00f, 0.00f, 0.00f, 0.5f };
+	colors[ImGuiCol_BorderShadow] = { 0.00f, 0.00f, 0.00f, 0.24f };
+	colors[ImGuiCol_FrameBg] = { 0.10f, 0.11f, 0.11f, 1.00f };
+	colors[ImGuiCol_FrameBgHovered] = { 0.19f, 0.19f, 0.19f, 0.54f };
+	colors[ImGuiCol_FrameBgActive] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_TitleBg] = { 0.0f, 0.0f, 0.0f, 1.00f };
+	colors[ImGuiCol_TitleBgActive] = { 0.00f, 0.00f, 0.00f, 1.00f };
+	colors[ImGuiCol_TitleBgCollapsed] = { 0.00f, 0.00f, 0.00f, 1.00f };
+	colors[ImGuiCol_MenuBarBg] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_ScrollbarBg] = { 0.05f, 0.05f, 0.05f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrab] = { 0.34f, 0.34f, 0.34f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrabHovered] = { 0.40f, 0.40f, 0.40f, 0.54f };
+	colors[ImGuiCol_ScrollbarGrabActive] = { 0.56f, 0.56f, 0.56f, 0.54f };
+	colors[ImGuiCol_CheckMark] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_SliderGrab] = { 0.34f, 0.34f, 0.34f, 0.54f };
+	colors[ImGuiCol_SliderGrabActive] = { 0.56f, 0.56f, 0.56f, 0.54f };
+	colors[ImGuiCol_Button] = { 0.24f, 0.24f, 0.25f, 1.00f };
+	colors[ImGuiCol_ButtonHovered] = { 0.19f, 0.19f, 0.19f, 0.54f };
+	colors[ImGuiCol_ButtonActive] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_Header] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_HeaderHovered] = { 0.00f, 0.00f, 0.00f, 0.36f };
+	colors[ImGuiCol_HeaderActive] = { 0.20f, 0.22f, 0.23f, 0.33f };
+	colors[ImGuiCol_Separator] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	colors[ImGuiCol_SeparatorHovered] = { 0.44f, 0.44f, 0.44f, 0.29f };
+	colors[ImGuiCol_SeparatorActive] = { 0.40f, 0.44f, 0.47f, 1.00f };
+	colors[ImGuiCol_ResizeGrip] = { 0.28f, 0.28f, 0.28f, 0.29f };
+	colors[ImGuiCol_ResizeGripHovered] = { 0.44f, 0.44f, 0.44f, 0.29f };
+	colors[ImGuiCol_ResizeGripActive] = { 0.40f, 0.44f, 0.47f, 1.00f };
+	colors[ImGuiCol_Tab] = { 0.08f, 0.08f, 0.09f, 1.00f };
+	colors[ImGuiCol_TabHovered] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_TabActive] = { 0.17f, 0.17f, 0.18f, 1.00f };
+	colors[ImGuiCol_TabUnfocused] = { 0.08f, 0.08f, 0.09f, 1.00f };
+	colors[ImGuiCol_TabUnfocusedActive] = { 0.14f, 0.14f, 0.14f, 1.00f };
+	colors[ImGuiCol_DockingPreview] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_DockingEmptyBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotLines] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotLinesHovered] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotHistogram] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_PlotHistogramHovered] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_TableHeaderBg] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_TableBorderStrong] = { 0.00f, 0.00f, 0.00f, 0.52f };
+	colors[ImGuiCol_TableBorderLight] = { 0.28f, 0.28f, 0.28f, 0.29f };
+	colors[ImGuiCol_TableRowBg] = { 0.00f, 0.00f, 0.00f, 0.00f };
+	colors[ImGuiCol_TableRowBgAlt] = { 1.00f, 1.00f, 1.00f, 0.06f };
+	colors[ImGuiCol_TextSelectedBg] = { 0.20f, 0.22f, 0.23f, 1.00f };
+	colors[ImGuiCol_DragDropTarget] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavHighlight] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavWindowingHighlight] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_NavWindowingDimBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
+	colors[ImGuiCol_ModalWindowDimBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
+}
+
+RenderStatus VulkanRenderContext::BeginImGui()
+{
+	ImGui_ImplVulkan_NewFrame();
+	ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::EndImGui()
+{
+	ImGui::Render();
+
+	if ( ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable )
+	{
+		ImGui::UpdatePlatformWindows();
+		ImGui::RenderPlatformWindowsDefault();
+	}
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::RenderImGui()
+{
+	VkCommandBuffer cmd = m_mainContext.commandBuffer;
+
+	if ( m_isRenderPassActive )
+	{
+		vkCmdEndRendering( cmd );
+		m_isRenderPassActive = false;
+	}
+
+	// Draw UI
+	VkRenderingAttachmentInfo uiAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	uiAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD; // Preserve existing color data (3d scene)
+
+	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, m_window->GetWindowSize() );
+
+	vkCmdBeginRendering( cmd, &imguiRenderInfo );
+	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
+	vkCmdEndRendering( cmd );
+
+	return RENDER_STATUS_OK;
+}
+
 void VulkanRenderContext::CreateAllocator()
 {
 	VmaAllocatorCreateInfo allocatorInfo = {};
@@ -628,15 +835,17 @@ RenderStatus VulkanRenderContext::Startup()
 		FinalizeAndCreateDevice( physicalDevice );
 		CreateAllocator();
 
+		m_hasInitialized = true;
+
 		// Resources
 		CreateSamplers();
 		CreateSwapchain();
 		CreateCommands();
 		CreateSyncStructures();
 		CreateDescriptors();
+		CreateImGui();
 	}
 
-	m_hasInitialized = true;
 	return RENDER_STATUS_OK;
 }
 
@@ -729,6 +938,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderSize );
 	vkCmdBeginRendering( cmd, &renderInfo );
 
+	m_isRenderPassActive = true;
 	m_renderingActive = true;
 	return RENDER_STATUS_OK;
 }
@@ -739,7 +949,12 @@ RenderStatus VulkanRenderContext::EndRendering()
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
 	VkCommandBuffer cmd = m_mainContext.commandBuffer;
-	vkCmdEndRendering( cmd );
+
+	if ( m_isRenderPassActive )
+	{
+		vkCmdEndRendering( cmd );
+		m_isRenderPassActive = false;
+	}
 
 	//
 	// We want to present the image, so we'll manually transition the layout to
