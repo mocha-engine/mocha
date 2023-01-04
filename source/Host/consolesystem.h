@@ -1,18 +1,18 @@
 #pragma once
 
 #include <cvarmanager.h>
+#include <defs.h>
 #include <globalvars.h>
 #include <sstream>
 #include <string>
 
-//@InteropGen generate class
 namespace ConsoleSystem
 {
 	// Run a console command.
 	// The following formats are currently supported:
 	// - [convar name]: Output the current value for a console variable
 	// - [convar name] [value]: Update a console variable with a new value
-	inline void Run( const char* command )
+	GENERATE_BINDINGS inline void Run( const char* command )
 	{
 		std::string inputString = std::string( command );
 

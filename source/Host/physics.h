@@ -2,10 +2,9 @@
 #include <globalvars.h>
 #include <physicsmanager.h>
 
-//@InteropGen generate class
 namespace Physics
 {
-	inline TraceResult Trace( TraceInfo traceInfo )
+	GENERATE_BINDINGS inline TraceResult Trace( TraceInfo traceInfo )
 	{
 		return g_physicsManager->Trace( traceInfo );
 	}

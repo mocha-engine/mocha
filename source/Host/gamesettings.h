@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cvarmanager.h>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include <string>

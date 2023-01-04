@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
 
-//@InteropGen generate struct
 struct UtilArray
 {
 	// How many items are in this array?

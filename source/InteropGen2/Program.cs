@@ -8,11 +8,6 @@
 	{
 		Console.WriteLine( $"\t Processing header {path}" );
 
-		var fileContents = File.ReadAllText( path );
-
-		if ( !fileContents.Contains( "//@InteropGen" ) )
-			return; // Fast early bail
-
 		var units = Parser.GetUnits( path );
 		var fileName = Path.GetFileNameWithoutExtension( path );
 
@@ -31,27 +26,30 @@
 		Units.AddRange( units );
 	}
 
-	private static void ProcessDirectory( string baseDir, string directoryPath )
+	private static void QueueDirectory( ref List<string> queue, string directory )
 	{
-		foreach ( var file in Directory.GetFiles( directoryPath ) )
+		foreach ( var file in Directory.GetFiles( directory ) )
 		{
 			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
 			{
-				var start = DateTime.Now;
+				var fileContents = File.ReadAllText( file );
 
-				ProcessHeader( baseDir, file );
+				if ( !fileContents.Contains( "GENERATE_BINDINGS", StringComparison.CurrentCultureIgnoreCase ) )
+					continue; // Fast early bail
 
-				var end = DateTime.Now;
-
-				var totalTime = (end - start);
-				Console.WriteLine( $"\t Took {totalTime.TotalSeconds} seconds." );
+				QueueFile( ref queue, file );
 			}
 		}
 
-		foreach ( var subDirectory in Directory.GetDirectories( directoryPath ) )
+		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
 		{
-			ProcessDirectory( baseDir, subDirectory );
+			QueueDirectory( ref queue, subDirectory );
 		}
+	}
+
+	private static void QueueFile( ref List<string> queue, string path )
+	{
+		queue.Add( path );
 	}
 
 	public static void Main( string[] args )
@@ -70,7 +68,23 @@
 		Directory.CreateDirectory( destHeaderDir );
 		Directory.CreateDirectory( destCsDir );
 
-		ProcessDirectory( args[0], args[0] );
+		List<string> queue = new();
+		QueueDirectory( ref queue, args[0] );
+
+		int completedThreads = 0;
+
+		var dispatcher = new Mocha.Common.ThreadDispatcher<string>( ( files ) =>
+		{
+			foreach ( var path in files )
+			{
+				ProcessHeader( args[0], path );
+			}
+
+			completedThreads++;
+		}, queue );
+
+		while ( !dispatcher.IsComplete )
+			Thread.Sleep( 500 );
 
 		// Expand methods out into list of (method name, method)
 		var methods = Units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();

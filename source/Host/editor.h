@@ -13,26 +13,25 @@
 #include <sstream>
 #include <texture.h>
 
-//@InteropGen generate class
 namespace Editor
 {
 	// Get the current pointer to an ImGUI context.
 	// This is used in order to effectively "link" managed ImGUI
 	// to our native ImGUI instance.
-	inline void* GetContextPointer()
+	GENERATE_BINDINGS inline void* GetContextPointer()
 	{
 		auto ctx = ImGui::GetCurrentContext();
 		return ( void* )ctx;
 	};
 
-	inline void TextBold( const char* text )
+	GENERATE_BINDINGS inline void TextBold( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mBoldFont );
 		ImGui::Text( "%s", text );
 		// ImGui::PopFont();
 	};
 
-	inline void TextSubheading( const char* text )
+	GENERATE_BINDINGS inline void TextSubheading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mSubheadingFont );
 		ImGui::Text( "%s", text );
@@ -40,7 +39,7 @@ namespace Editor
 		// ImGui::PopFont();
 	};
 
-	inline void TextHeading( const char* text )
+	GENERATE_BINDINGS inline void TextHeading( const char* text )
 	{
 		// ImGui::PushFont( g_Imgui->mHeadingFont );
 		ImGui::Text( "%s", text );
@@ -48,21 +47,21 @@ namespace Editor
 		// ImGui::PopFont();
 	};
 
-	inline void TextMonospace( const char* text )
+	GENERATE_BINDINGS inline void TextMonospace( const char* text )
 	{
 		ImGui::PushFont( g_renderContext->m_monospaceFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
 
-	inline void TextLight( const char* text )
+	GENERATE_BINDINGS inline void TextLight( const char* text )
 	{
 		ImGui::PushStyleColor( ImGuiCol_Text, ImVec4( 1, 1, 1, 0.75f ) );
 		ImGui::Text( "%s", text );
 		ImGui::PopStyleColor();
 	}
 
-	inline const char* GetGPUName()
+	GENERATE_BINDINGS inline const char* GetGPUName()
 	{
 		std::string gpuName = g_renderManager->GetGPUName();
 		char* ret;
@@ -76,14 +75,14 @@ namespace Editor
 		return ret;
 	}
 
-	inline char* InputText( const char* name, char* inputBuf, int inputLength )
+	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )
 	{
 		ImGui::InputText( name, inputBuf, inputLength, ImGuiInputTextFlags_EnterReturnsTrue );
 
 		return inputBuf;
 	}
 
-	inline void RenderViewDropdown()
+	GENERATE_BINDINGS inline void RenderViewDropdown()
 	{
 		if ( ImGui::BeginMenu( "Debug View" ) )
 		{
@@ -112,24 +111,24 @@ namespace Editor
 		}
 	}
 
-	inline Vector2 GetWindowSize()
+	GENERATE_BINDINGS inline Vector2 GetWindowSize()
 	{
 		// TODO
 		return { 1280, 720 };
 	}
 
-	inline const char* GetVersionName()
+	GENERATE_BINDINGS inline const char* GetVersionName()
 	{
 		return GAME_VERSION;
 	}
 
-	inline void Image( Texture* texture, int x, int y )
+	GENERATE_BINDINGS inline void Image( Texture* texture, int x, int y )
 	{
 		// TODO
 		// ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
 	}
 
-	inline bool BeginMainStatusBar()
+	GENERATE_BINDINGS inline bool BeginMainStatusBar()
 	{
 		ImGuiViewportP* viewport = ( ImGuiViewportP* )( void* )ImGui::GetMainViewport();
 		ImGuiWindowFlags window_flags =
@@ -147,7 +146,7 @@ namespace Editor
 		return false;
 	}
 
-	inline void DrawGraph( const char* name, Vector4 color, UtilArray values )
+	GENERATE_BINDINGS inline void DrawGraph( const char* name, Vector4 color, UtilArray values )
 	{
 		const std::vector<float> plotValues = values.GetData<float>();
 		const float MARKERS[] = { 30.0f, 60.0f, 144.0f };

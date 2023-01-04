@@ -12,7 +12,6 @@
 #include <texture.h>
 #include <vector>
 
-//@InteropGen generate class
 class Model
 {
 private:
@@ -23,8 +22,7 @@ public:
 	bool m_hasIndexBuffer;
 	bool m_isInitialized;
 
-	void AddMesh( UtilArray vertices, UtilArray indices, Material* material );
+	GENERATE_BINDINGS void AddMesh( UtilArray vertices, UtilArray indices, Material* material );
 
-	//@InteropGen ignore
 	const std::vector<Mesh> GetMeshes() { return m_meshes; }
 };

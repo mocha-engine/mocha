@@ -6,21 +6,16 @@ public static class Parser
 
 	private static string[] GetLaunchArgs()
 	{
+		// TODO: Generate from vcxproj
+
 		// Locate vcpkg
 		var vcpkgRoot = Environment.GetEnvironmentVariable( "VCPKG_ROOT" );
 
-		if ( vcpkgRoot == null )
-		{
-			// Use default
-			vcpkgRoot = @"C:\Users\" + Environment.UserName + @"\vcpkg";
-		}
+		// Use default if null
+		vcpkgRoot ??= @"C:\Users\" + Environment.UserName + @"\vcpkg";
 
 		// Locate vulkan sdk
 		var vulkanSdk = Environment.GetEnvironmentVariable( "VULKAN_SDK" );
-
-		Console.WriteLine( "VCPKG_ROOT: " + vcpkgRoot );
-		Console.WriteLine( "VULKAN_SDK: " + vulkanSdk );
-
 		var includeDirs = new string[]
 		{
 			$"{vcpkgRoot}\\installed\\x64-windows\\include",
@@ -40,7 +35,7 @@ public static class Parser
 			"-x",
 			"c++",
 			"-fparse-all-comments",
-			"-std=c++17",
+			"-std=c++20",
 			"-DVK_NO_PROTOTYPES",
 			"-DNOMINMAX",
 			"-DVK_USE_PLATFORM_WIN32_KHR"
@@ -82,29 +77,32 @@ public static class Parser
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
 
-			if ( cursor.RawCommentText.ToString() == "//@InteropGen ignore" )
-				return CXChildVisitResult.CXChildVisit_Continue;
-
 			switch ( cursor.Kind )
 			{
 				case CXCursorKind.CXCursor_ClassDecl:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate class" )
-						units.Add( new Class( cursor.Spelling.ToString() ) );
+					units.Add( new Class( cursor.Spelling.ToString() ) );
 					break;
 				case CXCursorKind.CXCursor_StructDecl:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate struct" )
-						units.Add( new Structure( cursor.Spelling.ToString() ) );
+					units.Add( new Structure( cursor.Spelling.ToString() ) );
 					break;
 				case CXCursorKind.CXCursor_Namespace:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate class" )
-						units.Add( new Class( cursor.Spelling.ToString() )
-						{
-							IsNamespace = true
-						} );
+					units.Add( new Class( cursor.Spelling.ToString() )
+					{
+						IsNamespace = true
+					} );
 					break;
+
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
+
+					if ( !cursor.HasAttrs )
+						return CXChildVisitResult.CXChildVisit_Continue;
+
+					var attr = cursor.GetAttr( 0 );
+					if ( attr.Spelling.CString != "generate_bindings" )
+						return CXChildVisitResult.CXChildVisit_Continue;
+
 					{
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var o = units.FirstOrDefault( x => x.Name == oName );
@@ -243,6 +241,11 @@ public static class Parser
 			o.Methods = o.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
 			o.Fields = o.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
 		}
+
+		//
+		// Remove any units that have no methods or fields
+		//
+		units = units.Where( x => x.Methods.Count > 0 || x.Fields.Count > 0 ).ToList();
 
 		return units;
 	}
