@@ -76,7 +76,7 @@ public partial class ModelEntity : BaseEntity
 		Glue.Entities.SetSpherePhysics( NativeHandle, radius, isStatic );
 	}
 
-	// TODO: SHIT!!
+	// TODO: Replace...
 	public void SetMeshPhysics( string path )
 	{
 		using var _ = new Stopwatch( "Mocha phys model generation" );

@@ -8,11 +8,19 @@ public class ConsoleWindow : EditorWindow
 	private const int MAX_INPUT_LENGTH = 512;
 	private static string consoleInput = "";
 	private Vector4 graphColor = Theme.Green;
+	private bool consoleDirty = false;
 
 	private void DrawOutput()
 	{
 		if ( !ImGui.BeginChild( "##console_output", new Vector2( -1, -32 ) ) )
 			return;
+
+		if ( consoleDirty )
+		{
+			ImGui.SetScrollY( ImGui.GetScrollMaxY() );
+
+			consoleDirty = false;
+		}
 
 		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg ) )
 		{
@@ -60,6 +68,7 @@ public class ConsoleWindow : EditorWindow
 
 			ConsoleSystem.Run( consoleInput );
 
+			consoleDirty = true;
 			consoleInput = "";
 		}
 	}

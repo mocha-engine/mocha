@@ -1,4 +1,6 @@
-﻿namespace Mocha;
+﻿using Mocha.UI;
+
+namespace Mocha;
 
 public class World
 {
@@ -25,14 +27,14 @@ public class World
 		map.Mass = 1000.0f;
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
-		// var ui = new UIManager();
+		var ui = new UIManager();
 
 		var player = new Player();
 	}
 
 	public void Update()
 	{
-		// UIManager.Instance.Render();
+		UIManager.Instance.Render();
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
 }
