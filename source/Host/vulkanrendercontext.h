@@ -34,6 +34,7 @@ protected:
 	VulkanRenderContext* m_parent; // This MUST never be null. If an object exists, then it should have
 	                               // a parent context.
 
+	// Set the parent render context for this object
 	void SetParent( VulkanRenderContext* parent )
 	{
 		assert( parent != nullptr && "Parent was nullptr" );

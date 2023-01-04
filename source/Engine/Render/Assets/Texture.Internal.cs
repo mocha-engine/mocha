@@ -54,34 +54,17 @@ public partial class Texture
 
 	public static Texture CreateMissingTexture()
 	{
-		var missingTextureData = new byte[]
-		{
-			//
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
+		var colorA = new byte[] { 200, 200, 200, 255 };
+		var colorB = new byte[] { 100, 100, 100, 255 };
 
-			//
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,		// B
+		var missingTextureData = new List<byte>();
+		missingTextureData.AddRange( colorA );
+		missingTextureData.AddRange( colorB );
 
-			//
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
+		missingTextureData.AddRange( colorB );
+		missingTextureData.AddRange( colorA );
 
-			//
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,		// B
-			255, 0, 255, 255,	// P
-			0, 0, 0, 255,       // B
-		};
-
-		missingTexture = new Texture( 4, 4, missingTextureData );
+		missingTexture = new Texture( 2, 2, missingTextureData.ToArray() );
 		return missingTexture;
 	}
 }

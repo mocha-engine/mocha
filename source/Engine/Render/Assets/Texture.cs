@@ -75,7 +75,6 @@ public partial class Texture : Asset
 
 	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )
 	{
-		// TODO: This actually just blits because copying does not ignore texture format differences. Is this a performance issue?
 		NativeTexture.Copy( srcX, srcY, dstX, dstY, width, height, src.NativeTexture );
 	}
 
@@ -87,7 +86,6 @@ public partial class Texture : Asset
 	//
 	// Texture caching
 	// TODO: This should really be handled by the C++ side, but this will do for now
-	//
 	private static Dictionary<string, Texture> CachedTextures { get; } = new();
 
 	public static Texture FromCache( string fontName )

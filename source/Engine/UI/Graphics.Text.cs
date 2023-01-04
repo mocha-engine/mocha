@@ -118,14 +118,8 @@ partial class Graphics
 			x += (float)glyph.Advance * fontData.Atlas.Size;
 		}
 
-		//
-		// HACK: If texture is blank, allocate one anyway
-		//
-		if ( size.X < 1 )
-			size.X = 1;
-
-		if ( size.Y < 1 )
-			size.Y = 1;
+		size.X = size.X.Clamp( 1, 1000f );
+		size.Y = size.Y.Clamp( 1, 1000f );
 
 		return size * scale;
 	}

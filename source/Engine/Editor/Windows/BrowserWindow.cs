@@ -35,7 +35,6 @@ internal class BrowserWindow : EditorWindow
 	public static void SetSelectedObject( object obj )
 	{
 		// TODO: Use reflection for this
-
 		if ( obj is Texture texture )
 			Instance.Inspector = new TextureInspector( texture );
 		else if ( obj is Model model )
