@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/12881812/210657651-f18ba070-1591-419f-a5ea-c3a27aadb96b.png" />
+    <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
     <p align="center">
         A work-in-progress game engine
     </p>
