@@ -1,10 +1,14 @@
 #include "renderdocmanager.h"
 
+#include <defs.h>
 #include <renderdoc_app.h>
 #include <spdlog/spdlog.h>
 
 void RenderdocManager::Startup()
 {
+	if ( !EngineProperties::Renderdoc )
+		return;
+
 	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
 	auto renderdocDll = LoadLibrary( L"renderdoc.dll" );
@@ -27,4 +31,8 @@ void RenderdocManager::Startup()
 	assert( ret == 1 );
 }
 
-void RenderdocManager::Shutdown() {}
+void RenderdocManager::Shutdown()
+{
+	if ( !EngineProperties::Renderdoc )
+		return;
+}

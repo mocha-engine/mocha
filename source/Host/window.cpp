@@ -32,7 +32,7 @@ Window::Window( uint32_t width, uint32_t height )
 	}
 	else
 	{
-		spdlog::info( "No icon provided, so not using one. Make sure GameSettings has been loaded and filled correctly." );
+		spdlog::warn( "No icon provided, so not using one. Make sure GameSettings has been filled correctly." );
 	}
 }
 

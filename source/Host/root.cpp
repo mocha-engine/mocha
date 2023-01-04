@@ -37,6 +37,13 @@ float g_cameraZNear;
 float g_cameraZFar;
 RenderDebugViews g_debugView;
 
+namespace EngineProperties
+{
+	StringCVar GameConfig( "game.config", "spacegame.json", CVarFlags::Archive, "Which game config should we use?" );
+	BoolCVar Raytracing( "render.raytracing", true, CVarFlags::Archive, "Enable raytracing" );
+	BoolCVar Renderdoc( "render.renderdoc", false, CVarFlags::Archive, "Enable renderdoc" );
+} // namespace EngineProperties
+
 void Root::Startup()
 {
 	g_logManager = new LogManager();
@@ -51,9 +58,6 @@ void Root::Startup()
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
 
-	// HACK: This goes BEFORE the ctor because we need it before
-	// fields on PhysicsManager get assigned to..
-	PhysicsManager::PreInit();
 	g_physicsManager = new PhysicsManager();
 	g_physicsManager->Startup();
 
@@ -63,7 +67,7 @@ void Root::Startup()
 	g_renderManager = new RenderManager();
 	g_renderManager->Startup();
 
-	g_hostManager = new HostManager( MANAGED_PATH, MANAGED_CLASS );
+	g_hostManager = new HostManager();
 	g_hostManager->Startup();
 }
 

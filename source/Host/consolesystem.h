@@ -8,6 +8,10 @@
 //@InteropGen generate class
 namespace ConsoleSystem
 {
+	// Run a console command.
+	// The following formats are currently supported:
+	// - [convar name]: Output the current value for a console variable
+	// - [convar name] [value]: Update a console variable with a new value
 	inline void Run( const char* command )
 	{
 		std::string inputString = std::string( command );
@@ -19,7 +23,15 @@ namespace ConsoleSystem
 
 		std::stringstream valueStream( cvarValue );
 
-		if ( !CVarManager::Instance().Exists( cvarName ) )
+		if ( cvarName == "list" )
+		{
+			// List all available cvars
+			CVarSystem::Instance().ForEach( [&]( CVarEntry& entry ) {
+				spdlog::info( "- '{}': '{}'", entry.m_name, CVarSystem::Instance().ToString( entry.m_name ) );
+				spdlog::info( "\t{}", entry.m_description );
+			} );
+		}
+		else if ( !CVarSystem::Instance().Exists( cvarName ) )
 		{
 			spdlog::info( "{} is not a valid command or variable", cvarName );
 		}
@@ -27,11 +39,11 @@ namespace ConsoleSystem
 		{
 			if ( valueStream.str().size() > 0 )
 			{
-				CVarManager::Instance().FromString( cvarName, cvarValue );
+				CVarSystem::Instance().FromString( cvarName, cvarValue );
 			}
 			else
 			{
-				cvarValue = CVarManager::Instance().ToString( cvarName );
+				cvarValue = CVarSystem::Instance().ToString( cvarName );
 				spdlog::info( "{} is '{}'", cvarName, cvarValue );
 			}
 		}
