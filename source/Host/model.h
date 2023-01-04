@@ -12,20 +12,6 @@
 #include <texture.h>
 #include <vector>
 
-struct MeshPushConstants
-{
-	glm::vec4 data;
-
-	glm::mat4 modelMatrix;
-
-	glm::mat4 renderMatrix;
-
-	glm::vec3 cameraPos;
-	float time;
-
-	glm::vec4 vLightInfoWS[4];
-};
-
 //@InteropGen generate class
 class Model
 {

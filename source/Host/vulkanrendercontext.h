@@ -45,12 +45,15 @@ protected:
 
 struct VulkanBuffer : public VulkanObject
 {
+private:
+	VkBufferUsageFlags GetBufferUsageFlags( BufferUsageFlags flags );
+
+public:
 	VkBuffer buffer;
 	VmaAllocation allocation;
 
 	VulkanBuffer() {}
-	VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VkBufferUsageFlags usage, VmaMemoryUsage memoryUsage,
-	    VmaAllocationCreateFlagBits allocFlags );
+	VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VmaMemoryUsage memoryUsage );
 
 	void SetData( BufferUploadInfo_t uploadInfo );
 };
@@ -164,9 +167,9 @@ private:
 	void CreateDepthTexture( Size2D size );
 
 public:
-	VkSwapchainKHR m_swapchain;
-	std::vector<VulkanRenderTexture> m_swapchainTextures;
+	VkSwapchainKHR m_swapchain = 0;
 	VulkanRenderTexture m_depthTexture;
+	std::vector<VulkanRenderTexture> m_swapchainTextures;
 
 	uint32_t AcquireSwapchainImageIndex( VkDevice device, VkSemaphore presentSemaphore, VulkanCommandContext mainContext )
 	{
@@ -192,6 +195,8 @@ private:
 public:
 	VkDescriptorSet descriptorSet;
 	VkDescriptorSetLayout descriptorSetLayout;
+
+	SamplerType samplerType;
 
 	VulkanDescriptor() {}
 	VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo );
@@ -328,22 +333,21 @@ protected:
 	RenderStatus CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) override;
 
 public:
-#define FRIEND( x ) friend class x
 	// All vulkan types should be able to access render context internals.
 	// This saves us having to pass things like m_device around whenever we want
 	// to do anything
+	friend VulkanObject;
+	friend VulkanSwapchain;
+	friend VulkanBuffer;
+	friend VulkanSampler;
+	friend VulkanCommandContext;
+	friend VulkanImageTexture;
+	friend VulkanRenderTexture;
+	friend VulkanDescriptor;
+	friend VulkanPipeline;
+	friend VulkanShader;
 
-	FRIEND( VulkanObject );
-	FRIEND( VulkanSwapchain );
-	FRIEND( VulkanBuffer );
-	FRIEND( VulkanSampler );
-	FRIEND( VulkanCommandContext );
-	FRIEND( VulkanImageTexture );
-	FRIEND( VulkanRenderTexture );
-	FRIEND( VulkanDescriptor );
-	FRIEND( VulkanPipeline );
-	FRIEND( VulkanShader );
-#undef FRIEND
+	// ----------------------------------------
 
 	RenderStatus Startup() override;
 	RenderStatus Shutdown() override;
@@ -356,9 +360,13 @@ public:
 
 	RenderStatus BindDescriptor( Descriptor d ) override;
 
+	RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) override;
+
 	RenderStatus BindVertexBuffer( VertexBuffer vb ) override;
 
 	RenderStatus BindIndexBuffer( IndexBuffer ib ) override;
+
+	RenderStatus BindConstants( RenderPushConstants p ) override;
 
 	RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) override;
 
@@ -368,5 +376,5 @@ public:
 
 	// ----------------------------------------
 
-	RenderStatus RenderMesh( Mesh* mesh ) override;
+	RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) override;
 };

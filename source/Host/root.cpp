@@ -20,9 +20,6 @@
 // because the naming makes more sense (imagine if we
 // included Root.h everywhere!)
 //
-
-VmaAllocator* g_allocator; // Ugly duckling
-
 RenderManager* g_renderManager;
 LogManager* g_logManager;
 HostManager* g_hostManager;
@@ -42,12 +39,7 @@ float g_cameraZFar;
 RenderDebugViews g_debugView;
 
 void Root::Startup()
-{	
-	//
-	// TODO: How do we start up g_allocator like this?
-	//		 Should we have a wrapper around VmaAllocator?
-	//		 Should it be part of a 'RenderSystem'?
-	//
+{
 	g_logManager = new LogManager();
 	g_logManager->Startup();
 
