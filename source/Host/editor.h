@@ -68,7 +68,13 @@ namespace Editor
 		std::string gpuName = g_renderManager->GetGPUName();
 		char* ret;
 		ret = _strdup( gpuName.c_str() );
-		return ret;		
+
+		defer
+		{
+			free( ret );
+		};
+
+		return ret;
 	}
 
 	inline char* InputText( const char* name, char* inputBuf, int inputLength )
