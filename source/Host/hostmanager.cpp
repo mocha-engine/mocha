@@ -57,7 +57,7 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 		close_fptr( cxt );
 		return nullptr;
 	}
-	
+
 	// Add "build" to cwd
 	std::wstring buildPath = cwd;
 	buildPath += L"\\build";
@@ -78,8 +78,15 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 	return ( load_assembly_and_get_function_pointer_fn )load_assembly_and_get_function_pointer;
 }
 
-HostManager::HostManager( std::wstring basePath, std::wstring signature )
+HostManager::HostManager()
 {
+	// Convert from std::string to std::wstring
+	std::wstring basePath =
+	    std::wstring( GameSettings::Get()->managed.path.begin(), GameSettings::Get()->managed.path.end() );
+	
+	std::wstring signature =
+	    std::wstring( GameSettings::Get()->managed.signature.begin(), GameSettings::Get()->managed.signature.end() );
+
 	m_dllPath = basePath + L".dll";
 	m_configPath = basePath + L".runtimeconfig.json";
 	m_signature = signature;

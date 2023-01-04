@@ -55,12 +55,15 @@
     <Filter Include="Util">
       <UniqueIdentifier>{7f4b2273-d77c-4a42-80df-5d0ae84ac90d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Managed\Bindings">
+      <UniqueIdentifier>{adff9618-14a2-4b36-b617-c90e0464d6a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="edict.cpp">
+    <ClCompile Include="entitymanager.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
     <ClCompile Include="modelentity.cpp">
@@ -539,7 +542,7 @@
     <ClInclude Include="baseentity.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="edict.h">
+    <ClInclude Include="entitymanager.h">
       <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="window.h">
@@ -1364,23 +1367,11 @@
     <ClInclude Include="gitdefs.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="entities.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
-    <ClInclude Include="physics.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
     <ClInclude Include="handlemap.h">
       <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="inputmanager.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
-    <ClInclude Include="managedwrappers.h">
-      <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">
       <Filter>Rendering\Assets</Filter>
@@ -1396,9 +1387,6 @@
     </ClInclude>
     <ClInclude Include="mathtypes.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="editor.h">
-      <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="hostmanager.h">
       <Filter>Managed</Filter>
@@ -1417,9 +1405,6 @@
     </ClInclude>
     <ClInclude Include="gamesettings.h">
       <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="consolesystem.h">
-      <Filter>Managed</Filter>
     </ClInclude>
     <ClInclude Include="vulkanrendercontext.h">
       <Filter>Rendering\Platform\Vulkan</Filter>
@@ -1451,7 +1436,24 @@
     <ClInclude Include="mesh.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="defer.h" />
+    <ClInclude Include="defer.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="consolesystem.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="editor.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="entities.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="physics.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

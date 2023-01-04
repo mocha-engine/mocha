@@ -19,20 +19,19 @@ static void TraceImpl( const char* inFMT, ... )
 	spdlog::info( "{}", buffer );
 }
 
-void PhysicsManager::PreInit()
+PhysicsManager::PhysicsManager()
 {
 	JPH::RegisterDefaultAllocator();
 	JPH::Trace = TraceImpl;
 	JPH::Factory::sInstance = new JPH::Factory();
 	JPH::RegisterTypes();
-}
 
-PhysicsManager::PhysicsManager()
-{
-	m_tempAllocator = new JPH::TempAllocatorImpl( 10 * 1024 * 1024 );
+	m_physicsInstance = std::make_shared<PhysicsInstance>();
+
+	m_physicsInstance->m_tempAllocator = new JPH::TempAllocatorImpl( 10 * 1024 * 1024 );
 
 	// JobSystemThreadPool is an example implementation.
-	m_jobSystem =
+	m_physicsInstance->m_jobSystem =
 	    new JPH::JobSystemThreadPool( JPH::cMaxPhysicsJobs, JPH::cMaxPhysicsBarriers, JPH::thread::hardware_concurrency() - 1 );
 }
 
@@ -44,10 +43,10 @@ void PhysicsManager::Startup()
 	const JPH::uint maxBodies = 65536;
 
 	// Create the actual physics system.
-	m_physicsSystem.Init( maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints, m_broadPhaseLayerInterface,
-	    MyBroadPhaseCanCollide, MyObjectCanCollide );
+	m_physicsInstance->m_physicsSystem.Init( maxBodies, numBodyMutexes, maxBodyPairs, maxContactConstraints,
+	    m_physicsInstance->m_broadPhaseLayerInterface, MyBroadPhaseCanCollide, MyObjectCanCollide );
 
-	m_physicsSystem.SetGravity( JPH::Vec3( 0, 0, -9.8f ) );
+	m_physicsInstance->m_physicsSystem.SetGravity( JPH::Vec3( 0, 0, -9.8f ) );
 
 	spdlog::info( "Physics system has init" );
 }
@@ -66,7 +65,7 @@ void PhysicsManager::Shutdown()
 
 void PhysicsManager::Update()
 {
-	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+	auto& bodyInterface = m_physicsInstance->m_physicsSystem.GetBodyInterface();
 
 	// We will default to 4 but this should be 1 collision step per 1 / 60th of a second (round up).
 	const int collisionSteps = 4;
@@ -101,7 +100,8 @@ void PhysicsManager::Update()
 
 	// Step the world
 	const float timeScale = 1.0f;
-	m_physicsSystem.Update( g_frameTime * timeScale, collisionSteps, integrationSubSteps, m_tempAllocator, m_jobSystem );
+	m_physicsInstance->m_physicsSystem.Update( g_frameTime * timeScale, collisionSteps, integrationSubSteps,
+	    m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
 	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
@@ -147,7 +147,7 @@ void PhysicsManager::Update()
 uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 {
 	// Add the body to the physics world
-	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+	auto& bodyInterface = m_physicsInstance->m_physicsSystem.GetBodyInterface();
 
 	// These basic properties are used across all types - they're just based on whether we want the physics body
 	// to move and interact with things or not.
@@ -292,7 +292,7 @@ uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
 
 TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 {
-	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
+	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsInstance->m_physicsSystem.GetNarrowPhaseQuery();
 
 	auto origin = JoltConversions::MochaToJoltVec3( traceInfo.startPosition );
 	auto direction = JoltConversions::MochaToJoltVec3( traceInfo.endPosition ) - origin;
@@ -307,7 +307,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 	JPH::AllHitCollisionCollector<JPH::CastRayCollector> collector;
 	sceneQuery.CastRay( ray, rayCastSettings, collector );
 
-	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+	auto& bodyInterface = m_physicsInstance->m_physicsSystem.GetBodyInterface();
 
 	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
@@ -326,7 +326,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 		const JPH::RayCastResult& result = raycastResults[i];
 
 		auto bodyID = result.mBodyID.GetIndexAndSequenceNumber();
-		JPH::BodyLockRead bodyLock( m_physicsSystem.GetBodyLockInterface(), result.mBodyID );
+		JPH::BodyLockRead bodyLock( m_physicsInstance->m_physicsSystem.GetBodyLockInterface(), result.mBodyID );
 		const JPH::Body& hitBody = bodyLock.GetBody();
 
 		// Is this body ignored in the trace filter?
@@ -369,7 +369,7 @@ TraceResult PhysicsManager::TraceRay( TraceInfo traceInfo )
 
 TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 {
-	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsSystem.GetNarrowPhaseQuery();
+	const JPH::NarrowPhaseQuery& sceneQuery = m_physicsInstance->m_physicsSystem.GetNarrowPhaseQuery();
 
 	auto origin = JoltConversions::MochaToJoltVec3( traceInfo.startPosition );
 	auto direction = JoltConversions::MochaToJoltVec3( traceInfo.endPosition ) - origin;
@@ -383,7 +383,7 @@ TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 	JPH::AllHitCollisionCollector<JPH::CastShapeCollector> collector;
 	sceneQuery.CastShape( shapeCast, shapeCastSettings, collector );
 
-	auto& bodyInterface = m_physicsSystem.GetBodyInterface();
+	auto& bodyInterface = m_physicsInstance->m_physicsSystem.GetBodyInterface();
 
 	// Did we hit anything at all? If not, bail now
 	if ( !collector.HadHit() )
@@ -402,7 +402,7 @@ TraceResult PhysicsManager::TraceBox( TraceInfo traceInfo )
 		const JPH::ShapeCastResult& result = shapeCastResults[i];
 
 		auto bodyID = result.mBodyID2.GetIndexAndSequenceNumber();
-		JPH::BodyLockRead bodyLock( m_physicsSystem.GetBodyLockInterface(), result.mBodyID2 );
+		JPH::BodyLockRead bodyLock( m_physicsInstance->m_physicsSystem.GetBodyLockInterface(), result.mBodyID2 );
 		const JPH::Body& hitBody = bodyLock.GetBody();
 
 		// Is this body ignored in the trace filter?

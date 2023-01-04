@@ -1,7 +1,7 @@
 #pragma once
 #include <Jolt/Jolt.h>
-#include <mathtypes.h>
 #include <handlemap.h>
+#include <mathtypes.h>
 #include <memory>
 #include <modelentity.h>
 #include <spdlog/spdlog.h>
@@ -86,7 +86,7 @@ struct TraceResult
 	static TraceResult Empty( Vector3 _startPosition, Vector3 _endPosition )
 	{
 		TraceResult result = { false, _startPosition, _endPosition, 1.0f, -1, false, false };
-		
+
 		result.entityHandle = UINT32_MAX;
 
 		return result;
@@ -281,10 +281,15 @@ namespace JoltConversions
 class PhysicsManager : HandleMap<PhysicsBody>, ISubSystem
 {
 private:
-	JPH::TempAllocator* m_tempAllocator;
-	JPH::JobSystem* m_jobSystem;
-	JPH::PhysicsSystem m_physicsSystem;
-	BPLayerInterfaceImpl m_broadPhaseLayerInterface;
+	struct PhysicsInstance
+	{
+		JPH::TempAllocator* m_tempAllocator;
+		JPH::JobSystem* m_jobSystem;
+		JPH::PhysicsSystem m_physicsSystem;
+		BPLayerInterfaceImpl m_broadPhaseLayerInterface;
+	};
+
+	std::shared_ptr<PhysicsInstance> m_physicsInstance;
 
 	uint32_t FindEntityHandleForBodyId( JPH::BodyID bodyId );
 

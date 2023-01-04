@@ -2,7 +2,8 @@
     "name": "SpaceGame",
     "icon": "content/core/icon.ico",
     "milestone": "Prototype",
-    "features": {
-        "raytracing": false
+    "managed": {
+        "path": ".\\build\\Engine",
+        "signature": "Mocha.Main, Engine"
     }
 }

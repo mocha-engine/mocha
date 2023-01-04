@@ -29,26 +29,17 @@ inline void ErrorMessage( std::string str, const std::source_location& location 
 //
 // Engine features
 //
-namespace EngineFeatures
+namespace EngineProperties
 {
-	#define ENGINE_FEATURE( name, value )\
-		static bool name = value;
-
-	ENGINE_FEATURE( Raytracing, GameSettings::Get()->features.raytracing )
+	extern BoolCVar Raytracing;
+	extern BoolCVar Renderdoc;
 };
-
-//
-// Game properties
-//
-#define GAME_MILESTONE					"Prototype"
-#define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define MANAGED_PATH					L".\\build\\Engine"
-#define MANAGED_CLASS					L"Mocha.Main, Engine"
 
 //
 // Engine properties
 //
 #define ENGINE_NAME						"Mocha"
+#define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
 #define WINDOW_TITLE					std::string( GameSettings::Get()->name + " [" + GameSettings::Get()->milestone + "] - " GAME_VERSION ).c_str()
 
 //

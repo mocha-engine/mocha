@@ -1,6 +1,7 @@
 #pragma once
 #include <vk_mem_alloc.h>
 
+// TODO: Remove
 enum RenderDebugViews
 {
 	NONE = 0,
@@ -18,11 +19,11 @@ class RenderdocManager;
 class HostManager;
 class LogManager;
 class EntityManager;
-class CVarManager;
 class PhysicsManager;
 class InputManager;
 class BaseRenderContext;
 class GameSettings;
+class CVarManager;
 
 struct Vector3;
 struct Quaternion;
@@ -36,10 +37,10 @@ extern LogManager* g_logManager;
 extern HostManager* g_hostManager;
 extern RenderdocManager* g_renderdocManager;
 extern EntityManager* g_entityDictionary;
-extern CVarManager* g_cvarManager;
 extern PhysicsManager* g_physicsManager;
 extern InputManager* g_inputManager;
 extern BaseRenderContext* g_renderContext;
+extern CVarManager* g_cvarManager;
 
 extern float g_curTime;
 extern float g_frameTime;

@@ -1,11 +1,11 @@
 #include <root.h>
 #undef main
 
-#if _WIN32
+#if _WINDOWS
 #include <Windows.h>
-int main()
-#else
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
+#else
+int main()
 #endif
 {
 	auto& root = Root::GetInstance();

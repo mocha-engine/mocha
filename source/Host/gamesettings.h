@@ -4,9 +4,15 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-struct GameFeatures
+namespace EngineProperties
 {
-	bool raytracing;
+	extern StringCVar GameConfig;
+} // namespace EngineProperties
+
+struct ManagedSettings
+{
+	std::string path;
+	std::string signature;
 };
 
 struct Settings
@@ -15,7 +21,7 @@ struct Settings
 	std::string icon;
 	std::string milestone;
 
-	GameFeatures features;
+	ManagedSettings managed;
 
 	void Deserialize( const nlohmann::json& j )
 	{
@@ -23,7 +29,9 @@ struct Settings
 		icon = j["icon"].get<std::string>();
 		milestone = j["milestone"].get<std::string>();
 
-		features.raytracing = j["features"]["raytracing"].get<bool>();
+		managed = {};
+		managed.path = j["managed"]["path"].get<std::string>();
+		managed.signature = j["managed"]["signature"].get<std::string>();
 	}
 
 	Settings( std::string path )
@@ -42,7 +50,7 @@ class GameSettings
 public:
 	static Settings* Get()
 	{
-		static Settings settings( "spacegame.json" );
+		static Settings settings( EngineProperties::GameConfig );
 
 		return &settings;
 	}

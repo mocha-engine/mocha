@@ -168,7 +168,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
   <ItemGroup>
     <ClCompile Include="baseentity.cpp" />
     <ClCompile Include="cvarmanager.cpp" />
-    <ClCompile Include="edict.cpp" />
+    <ClCompile Include="entitymanager.cpp" />
     <ClCompile Include="hostmanager.cpp" />
     <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
@@ -331,7 +331,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defer.h" />
     <ClInclude Include="defs.h" />
-    <ClInclude Include="edict.h" />
+    <ClInclude Include="entitymanager.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="entities.h" />
     <ClInclude Include="fontawesome.h" />
@@ -346,7 +346,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="rendering.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="utilarray.h" />
-    <ClInclude Include="managedwrappers.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="modelentity.h" />
