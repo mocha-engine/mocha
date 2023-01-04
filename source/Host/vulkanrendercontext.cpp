@@ -1121,41 +1121,6 @@ RenderStatus VulkanRenderContext::UpdateWindow()
 	return RENDER_STATUS_OK;
 }
 
-RenderStatus VulkanRenderContext::RenderMesh( RenderPushConstants constants, Mesh* mesh )
-{
-	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
-	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
-
-	// JIT pipeline creation
-	if ( !mesh->material.m_pipeline.IsValid() )
-	{
-		spdlog::trace( "VulkanRenderContext::RenderMesh - Handle wasn't valid, creating JIT render pipeline..." );
-
-		mesh->material.CreateResources();
-	}
-
-	BindPipeline( mesh->material.m_pipeline );
-	BindDescriptor( mesh->material.m_descriptor );
-
-	for ( int i = 0; i < mesh->material.m_textures.size(); ++i )
-	{
-		DescriptorUpdateInfo_t updateInfo = {};
-		updateInfo.binding = i;
-		updateInfo.samplerType = SAMPLER_TYPE_POINT;
-		updateInfo.src = &mesh->material.m_textures[i].m_image;
-
-		UpdateDescriptor( mesh->material.m_descriptor, updateInfo );
-	}
-
-	BindConstants( constants );
-	BindVertexBuffer( mesh->vertexBuffer );
-	BindIndexBuffer( mesh->indexBuffer );
-
-	Draw( mesh->vertices.count, mesh->indices.count, 1 );
-
-	return RENDER_STATUS_OK;
-}
-
 RenderStatus VulkanRenderContext::CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle )
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );

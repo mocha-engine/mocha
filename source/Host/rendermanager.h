@@ -21,6 +21,11 @@ private:
 
 	void RenderEntity( ModelEntity* entity );
 
+	// Render a mesh. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
+	// this once and it'll do all the work.
+	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
+	void RenderMesh( RenderPushConstants constants, Mesh* mesh );
+
 public:
 	void Startup();
 	void Shutdown();

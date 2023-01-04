@@ -42,6 +42,36 @@
 FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
 FloatCVar maxFramerate( "fps_max", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
+void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
+{
+	// JIT pipeline creation
+	if ( !mesh->material.m_pipeline.IsValid() )
+	{
+		spdlog::trace( "RenderManager::RenderMesh - Handle wasn't valid, creating JIT render pipeline..." );
+
+		mesh->material.CreateResources();
+	}
+
+	m_renderContext->BindPipeline( mesh->material.m_pipeline );
+	m_renderContext->BindDescriptor( mesh->material.m_descriptor );
+
+	for ( int i = 0; i < mesh->material.m_textures.size(); ++i )
+	{
+		DescriptorUpdateInfo_t updateInfo = {};
+		updateInfo.binding = i;
+		updateInfo.samplerType = SAMPLER_TYPE_POINT;
+		updateInfo.src = &mesh->material.m_textures[i].m_image;
+
+		m_renderContext->UpdateDescriptor( mesh->material.m_descriptor, updateInfo );
+	}
+
+	m_renderContext->BindConstants( constants );
+	m_renderContext->BindVertexBuffer( mesh->vertexBuffer );
+	m_renderContext->BindIndexBuffer( mesh->indexBuffer );
+
+	m_renderContext->Draw( mesh->vertices.count, mesh->indices.count, 1 );
+}
+
 void RenderManager::Startup()
 {
 	g_renderManager = this;
@@ -86,7 +116,7 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 
 	for ( auto& mesh : entity->GetModel()->m_meshes )
 	{
-		m_renderContext->RenderMesh( constants, &mesh );
+		RenderMesh( constants, &mesh );
 	}
 }
 

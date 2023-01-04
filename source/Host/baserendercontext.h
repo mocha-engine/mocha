@@ -345,8 +345,6 @@ public:
 	friend Shader;
 
 	// ----------------------------------------
-
-	// ----------------------------------------
 	// Startup / shutdown
 	// ----------------------------------------
 
@@ -391,24 +389,24 @@ public:
 	// Call this to set the render target to render to.
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
+	// ----------------------------------------
+	//
+	// High-level rendering
+	//
+	virtual RenderStatus BeginImGui() = 0;
+	virtual RenderStatus EndImGui() = 0;
+	virtual RenderStatus RenderImGui() = 0;
+
+	// ----------------------------------------
+	//
+	// Windowing
+	//
+	// TODO: Move this elsewhere
 	// This will return the size for the current render target.
 	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
 
 	// Update window, fetch inputs etc..
 	virtual RenderStatus UpdateWindow() = 0;
-
-	// ----------------------------------------
-	//
-	// High-level rendering
-	//
-	// Render a mesh. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
-	// this once and it'll do all the work.
-	// Note that this will render to whatever render target is currently bound (see BindRenderTarget).
-	virtual RenderStatus RenderMesh( RenderPushConstants constants, Mesh* mesh ) = 0;
-
-	virtual RenderStatus BeginImGui() = 0;
-	virtual RenderStatus EndImGui() = 0;
-	virtual RenderStatus RenderImGui() = 0;
 };
 
 #undef virtual RenderStatus
