@@ -1,6 +1,6 @@
 #include "baseentity.h"
 
-#include <edict.h>
+#include <entitymanager.h>
 #include <globalvars.h>
 
 BaseEntity::BaseEntity()

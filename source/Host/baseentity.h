@@ -2,7 +2,6 @@
 #include <mathtypes.h>
 #include <stdint.h>
 #include <string>
-#include <volk.h>
 
 enum EntityFlags : int
 {

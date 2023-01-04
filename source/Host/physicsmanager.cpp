@@ -1,8 +1,7 @@
 #include "physicsmanager.h"
 
-// STL includes
 #include <cstdarg>
-#include <edict.h>
+#include <entitymanager.h>
 #include <globalvars.h>
 #include <iostream>
 #include <thread>

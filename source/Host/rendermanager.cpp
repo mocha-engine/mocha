@@ -6,7 +6,7 @@
 #include <baseentity.h>
 #include <cvarmanager.h>
 #include <defs.h>
-#include <edict.h>
+#include <entitymanager.h>
 #include <fontawesome.h>
 #include <gamesettings.h>
 #include <globalvars.h>
@@ -39,8 +39,8 @@
 #include <imgui.h>
 #include <implot.h>
 
-FloatCVar timescale( "timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
-FloatCVar maxFramerate( "fps_max", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
+FloatCVar timescale( "game.timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
+FloatCVar maxFramerate( "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
 void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 {

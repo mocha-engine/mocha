@@ -4,7 +4,7 @@
 
 #include <crtdbg.h>
 #include <defs.h>
-#include <edict.h>
+#include <entitymanager.h>
 #include <gamesettings.h>
 #include <globalvars.h>
 #include <hostmanager.h>

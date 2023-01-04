@@ -1,4 +1,4 @@
-#include "edict.h"
+#include "entitymanager.h"
 
 #include <baseentity.h>
 #include <globalvars.h>

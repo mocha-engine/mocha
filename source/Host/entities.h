@@ -1,8 +1,10 @@
 #pragma once
 #include <baseentity.h>
-#include <edict.h>
+#include <entitymanager.h>
 #include <globalvars.h>
 #include <modelentity.h>
+
+// TODO: I hate this
 
 //@InteropGen generate class
 namespace Entities

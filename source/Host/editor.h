@@ -1,9 +1,8 @@
 #pragma once
-#include <backends/imgui_impl_vulkan.h>
 #include <baseentity.h>
 #include <defer.h>
 #include <defs.h>
-#include <edict.h>
+#include <entitymanager.h>
 #include <fontawesome.h>
 #include <globalvars.h>
 #include <imgui.h>
@@ -13,11 +12,13 @@
 #include <spdlog/spdlog.h>
 #include <sstream>
 #include <texture.h>
-#include <volk.h>
 
 //@InteropGen generate class
 namespace Editor
 {
+	// Get the current pointer to an ImGUI context.
+	// This is used in order to effectively "link" managed ImGUI
+	// to our native ImGUI instance.
 	inline void* GetContextPointer()
 	{
 		auto ctx = ImGui::GetCurrentContext();
@@ -49,11 +50,9 @@ namespace Editor
 
 	inline void TextMonospace( const char* text )
 	{
-		// TODO
-
-		// ImGui::PushFont( g_renderManager->m_monospaceFont );
+		ImGui::PushFont( g_renderContext->m_monospaceFont );
 		ImGui::Text( "%s", text );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	inline void TextLight( const char* text )
@@ -115,9 +114,8 @@ namespace Editor
 
 	inline Vector2 GetWindowSize()
 	{
+		// TODO
 		return { 1280, 720 };
-		// VkExtent2D extent = g_renderManager->GetWindowExtent();
-		// return { ( float )extent.width, ( float )extent.height };
 	}
 
 	inline const char* GetVersionName()
@@ -127,6 +125,7 @@ namespace Editor
 
 	inline void Image( Texture* texture, int x, int y )
 	{
+		// TODO
 		// ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
 	}
 
