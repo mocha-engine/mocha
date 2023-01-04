@@ -12,6 +12,6 @@
 		{                                                                                                 \
 			std::string result = std::string( "Vulkan error: " ) + std::string( string_VkResult( err ) ); \
 			ErrorMessage( result );                                                                       \
-			abort();                                                                                      \
+			__debugbreak();                                                                               \
 		}                                                                                                 \
 	} while ( 0 )
