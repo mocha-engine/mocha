@@ -108,7 +108,9 @@ bool Window::Update()
 
 				// Push event so that renderer etc. knows we've resized the window
 				Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
-				m_onWindowResized( windowExtents );
+
+				if ( m_onWindowResized != nullptr )
+					m_onWindowResized( windowExtents );
 			}
 		}
 		else if ( e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP )

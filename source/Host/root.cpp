@@ -46,7 +46,7 @@ void Root::Startup()
 	// HACK: CvarManager needs to start up before *everything* excluding logger
 	CVarManager::Instance().Startup();
 
-#if _RENDERDOC
+#ifdef _RENDERDOC
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
 #endif

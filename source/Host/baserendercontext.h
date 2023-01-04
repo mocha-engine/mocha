@@ -394,6 +394,9 @@ public:
 	// This will return the size for the current render target.
 	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
 
+	// Update window, fetch inputs etc..
+	virtual RenderStatus UpdateWindow() = 0;
+
 	// ----------------------------------------
 	//
 	// High-level rendering

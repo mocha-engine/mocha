@@ -85,7 +85,7 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 
 	for ( auto& mesh : entity->GetModel()->m_meshes )
 	{
-		m_renderContext->RenderMesh( constants, mesh );
+		m_renderContext->RenderMesh( constants, &mesh );
 	}
 }
 
@@ -160,9 +160,9 @@ void RenderManager::Run()
 		flFilteredTime = 0;
 		flFrameTime = 0;
 
+		m_renderContext->UpdateWindow();
 		g_physicsManager->Update();
 		g_hostManager->Render();
-
 		Render();
 	}
 }

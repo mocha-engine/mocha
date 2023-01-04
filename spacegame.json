@@ -3,6 +3,6 @@
     "icon": "content/core/icon.ico",
     "milestone": "Prototype",
     "features": {
-        "raytracing": true
+        "raytracing": false
     }
 }

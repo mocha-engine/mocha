@@ -58,6 +58,12 @@ VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
 	CreateDepthTexture( size );
 }
 
+void VulkanSwapchain::Update( Size2D newSize )
+{
+	CreateMainSwapchain( newSize );
+	CreateDepthTexture( newSize );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType type )
@@ -324,7 +330,7 @@ VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo
 	bufferCreateInfo.pNext = nullptr;
 
 	bufferCreateInfo.size = bufferInfo.size;
-	bufferCreateInfo.usage = GetBufferUsageFlags( bufferInfo.usage );
+	bufferCreateInfo.usage = GetBufferUsageFlags( bufferInfo );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = memoryUsage;
@@ -333,24 +339,27 @@ VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo
 	VK_CHECK( vmaCreateBuffer( m_parent->m_allocator, &bufferCreateInfo, &allocInfo, &buffer, &allocation, nullptr ) );
 }
 
-VkBufferUsageFlags VulkanBuffer::GetBufferUsageFlags( BufferUsageFlags flags )
+VkBufferUsageFlags VulkanBuffer::GetBufferUsageFlags( BufferInfo_t bufferInfo )
 {
 	VkBufferUsageFlags outFlags = 0;
 
-	if ( ( flags & BUFFER_USAGE_FLAG_VERTEX_BUFFER ) != 0 )
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_VERTEX_BUFFER ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
 
-	if ( ( flags & BUFFER_USAGE_FLAG_INDEX_BUFFER ) != 0 )
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_INDEX_BUFFER ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
 
-	if ( ( flags & BUFFER_USAGE_FLAG_UNIFORM_BUFFER ) != 0 )
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_UNIFORM_BUFFER ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 
-	if ( ( flags & BUFFER_USAGE_FLAG_TRANSFER_SRC ) != 0 )
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_TRANSFER_SRC ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
 
-	if ( ( flags & BUFFER_USAGE_FLAG_TRANSFER_DST ) != 0 )
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_TRANSFER_DST ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+	if ( bufferInfo.type == BUFFER_TYPE_VERTEX_INDEX_DATA )
+		assert( ( outFlags & VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) != 0 || ( outFlags & VK_BUFFER_USAGE_VERTEX_BUFFER_BIT ) != 0 );
 
 	assert( outFlags != 0 && "Flags cannot be 0" );
 
@@ -384,19 +393,6 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 	vmaMapMemory( m_parent->m_allocator, stagingBuffer.allocation, &data );
 	memcpy( data, uploadInfo.data.data, uploadInfo.data.size );
 	vmaUnmapMemory( m_parent->m_allocator, stagingBuffer.allocation );
-
-	VkBufferCreateInfo vertexBufferInfo = {};
-	vertexBufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
-	vertexBufferInfo.pNext = nullptr;
-
-	vertexBufferInfo.size = uploadInfo.data.size;
-	vertexBufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT |
-	                         VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT |
-	                         VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_BUILD_INPUT_READ_ONLY_BIT_KHR;
-
-	vmaallocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-
-	VK_CHECK( vmaCreateBuffer( m_parent->m_allocator, &vertexBufferInfo, &vmaallocInfo, &buffer, &allocation, nullptr ) );
 
 	m_parent->ImmediateSubmit( [=]( VkCommandBuffer cmd ) -> RenderStatus {
 		VkBufferCopy copy = {};
@@ -550,6 +546,8 @@ void VulkanRenderContext::CreateSwapchain()
 	Size2D size = m_window->GetWindowSize();
 
 	m_swapchain = VulkanSwapchain( this, size );
+
+	m_window->m_onWindowResized = [&]( Size2D newSize ) { m_swapchain.Update( newSize ); };
 }
 
 void VulkanRenderContext::CreateCommands()
@@ -673,7 +671,10 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	Size2D renderSize = m_window->GetWindowSize();
 
 	if ( !CanRender() )
+	{
+		m_renderingActive = true;
 		return RENDER_STATUS_OK; // We handled this internally, so don't return an error.
+	}
 
 	// Wait until we can render ( 1 second timeout )
 	VK_CHECK( vkWaitForFences( m_device, 1, &m_mainContext.fence, true, 1000000000 ) );
@@ -770,7 +771,10 @@ RenderStatus VulkanRenderContext::EndRendering()
 	VkPresentInfoKHR presentInfo = VKInit::PresentInfo( &m_swapchain.m_swapchain, &m_renderSemaphore, &m_swapchainImageIndex );
 
 	if ( !CanRender() )
+	{
+		m_renderingActive = false;
 		return RENDER_STATUS_OK; // We handled this internally, so don't return an error.
+	}
 
 	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
 
@@ -891,6 +895,13 @@ RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
 	*outSize = m_window->GetWindowSize();
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::UpdateWindow()
+{
+	m_window->Update();
 
 	return RENDER_STATUS_OK;
 }
@@ -1144,7 +1155,7 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo )
 {
 	SetParent( parent );
-	
+
 	std::vector<VkDescriptorSetLayoutBinding> bindings = {};
 
 	for ( int i = 0; i < descriptorInfo.bindings.size(); ++i )

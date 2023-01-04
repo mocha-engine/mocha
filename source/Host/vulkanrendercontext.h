@@ -46,7 +46,7 @@ protected:
 struct VulkanBuffer : public VulkanObject
 {
 private:
-	VkBufferUsageFlags GetBufferUsageFlags( BufferUsageFlags flags );
+	VkBufferUsageFlags GetBufferUsageFlags( BufferInfo_t bufferInfo );
 
 public:
 	VkBuffer buffer;
@@ -183,6 +183,7 @@ public:
 
 	VulkanSwapchain() {}
 	VulkanSwapchain( VulkanRenderContext* parent, Size2D size );
+	void Update( Size2D newSize );
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -373,6 +374,8 @@ public:
 	RenderStatus BindRenderTarget( RenderTexture rt ) override;
 
 	RenderStatus GetRenderSize( Size2D* outSize ) override;
+
+	RenderStatus UpdateWindow() override;
 
 	// ----------------------------------------
 
