@@ -6,7 +6,7 @@ public class ThreadDispatcher<T>
 	private int threadCount = 16;
 
 	private int threadsCompleted = 0;
-	public bool IsComplete => threadsCompleted == threadCount - 1;
+	public bool IsComplete => threadsCompleted == threadCount;
 
 	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
 	{
