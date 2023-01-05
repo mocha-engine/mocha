@@ -366,15 +366,26 @@ FodyWeavers.xsd
 
 # Imgui
 [Ii]mgui.ini
+
+# Models
 content/models/sponza
 content/models/rainier
+
+# InteropGen
 *.generated.h
 *.generated.cs
+[Ss]ource/Common/Glue/UnmanagedArgs.cs
+
+# Builds
 build/
-*.dxbc
-vcpkg_installed/
 source/Host/tmp
+
+# vcpkg
+vcpkg_installed/
+
+# AssetCompiler
 *.*_c
-source/Common/Glue/UnmanagedArgs.cs
-source/Host/gitdefs.h
+
+# Auto-generated content
+[Ss]ource/Host/gitdefs.h
 cvars.json
