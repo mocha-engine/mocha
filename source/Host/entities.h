@@ -5,11 +5,9 @@
 #include <modelentity.h>
 
 // TODO: I hate this
-
-//@InteropGen generate class
 namespace Entities
 {
-	inline uint32_t CreateBaseEntity()
+	GENERATE_BINDINGS inline uint32_t CreateBaseEntity()
 	{
 		BaseEntity baseEntity = {};
 		baseEntity.AddFlag( ENTITY_MANAGED );
@@ -20,7 +18,7 @@ namespace Entities
 		return g_entityDictionary->AddEntity<BaseEntity>( baseEntity );
 	}
 
-	inline uint32_t CreateModelEntity()
+	GENERATE_BINDINGS inline uint32_t CreateModelEntity()
 	{
 		ModelEntity modelEntity = {};
 		modelEntity.AddFlag( ENTITY_MANAGED );
@@ -32,7 +30,7 @@ namespace Entities
 		return g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
 	}
 
-	inline void SetViewmodel( uint32_t handle, bool isViewmodel )
+	GENERATE_BINDINGS inline void SetViewmodel( uint32_t handle, bool isViewmodel )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -43,7 +41,7 @@ namespace Entities
 			entity->RemoveFlag( ENTITY_VIEWMODEL );
 	}
 
-	inline void SetUI( uint32_t handle, bool isUI )
+	GENERATE_BINDINGS inline void SetUI( uint32_t handle, bool isUI )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -54,7 +52,7 @@ namespace Entities
 			entity->RemoveFlag( ENTITY_UI );
 	}
 
-	inline void SetPosition( uint32_t handle, Vector3 position )
+	GENERATE_BINDINGS inline void SetPosition( uint32_t handle, Vector3 position )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -64,7 +62,7 @@ namespace Entities
 		entity->SetTransform( transform );
 	}
 
-	inline void SetRotation( uint32_t handle, Quaternion rotation )
+	GENERATE_BINDINGS inline void SetRotation( uint32_t handle, Quaternion rotation )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -74,7 +72,7 @@ namespace Entities
 		entity->SetTransform( transform );
 	}
 
-	inline void SetScale( uint32_t handle, Vector3 scale )
+	GENERATE_BINDINGS inline void SetScale( uint32_t handle, Vector3 scale )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -84,14 +82,14 @@ namespace Entities
 		entity->SetTransform( transform );
 	}
 
-	inline void SetName( uint32_t handle, const char* name )
+	GENERATE_BINDINGS inline void SetName( uint32_t handle, const char* name )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 
 		entity->SetName( name );
 	}
 
-	inline Vector3 GetPosition( uint32_t handle )
+	GENERATE_BINDINGS inline Vector3 GetPosition( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -99,7 +97,7 @@ namespace Entities
 		return transform.position;
 	}
 
-	inline Quaternion GetRotation( uint32_t handle )
+	GENERATE_BINDINGS inline Quaternion GetRotation( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -107,7 +105,7 @@ namespace Entities
 		return transform.rotation;
 	}
 
-	inline Vector3 GetScale( uint32_t handle )
+	GENERATE_BINDINGS inline Vector3 GetScale( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->GetTransform();
@@ -115,13 +113,13 @@ namespace Entities
 		return transform.scale;
 	}
 
-	inline const char* GetName( uint32_t handle )
+	GENERATE_BINDINGS inline const char* GetName( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 		return entity->GetName();
 	}
 
-	inline void SetModel( uint32_t handle, Model model )
+	GENERATE_BINDINGS inline void SetModel( uint32_t handle, Model model )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -133,67 +131,67 @@ namespace Entities
 		entity->SetModel( model );
 	}
 
-	inline void SetCameraPosition( Vector3 position )
+	GENERATE_BINDINGS inline void SetCameraPosition( Vector3 position )
 	{
 		g_cameraPos = position;
 	}
 
-	inline Vector3 GetCameraPosition()
+	GENERATE_BINDINGS inline Vector3 GetCameraPosition()
 	{
 		return g_cameraPos;
 	}
 
-	inline void SetCameraRotation( Quaternion rotation )
+	GENERATE_BINDINGS inline void SetCameraRotation( Quaternion rotation )
 	{
 		g_cameraRot = rotation;
 	}
 
-	inline Quaternion GetCameraRotation()
+	GENERATE_BINDINGS inline Quaternion GetCameraRotation()
 	{
 		return g_cameraRot;
 	}
 
-	inline void SetCameraFieldOfView( float fov )
+	GENERATE_BINDINGS inline void SetCameraFieldOfView( float fov )
 	{
 		g_cameraFov = fov;
 	}
 
-	inline float GetCameraFieldOfView()
+	GENERATE_BINDINGS inline float GetCameraFieldOfView()
 	{
 		return g_cameraFov;
 	}
 
-	inline void SetCameraZNear( float znear )
+	GENERATE_BINDINGS inline void SetCameraZNear( float znear )
 	{
 		g_cameraZNear = znear;
 	}
 
-	inline float GetCameraZNear()
+	GENERATE_BINDINGS inline float GetCameraZNear()
 	{
 		return g_cameraZNear;
 	}
 
-	inline void SetCameraZFar( float zfar )
+	GENERATE_BINDINGS inline void SetCameraZFar( float zfar )
 	{
 		g_cameraZFar = zfar;
 	}
 
-	inline float GetCameraZFar()
+	GENERATE_BINDINGS inline float GetCameraZFar()
 	{
 		return g_cameraZFar;
 	}
 
-	inline float GetCurrentTime()
+	GENERATE_BINDINGS inline float GetCurrentTime()
 	{
 		return g_curTime;
 	}
 
-	inline float GetDeltaTime()
+	GENERATE_BINDINGS inline float GetDeltaTime()
 	{
 		return g_frameTime;
 	}
 
-	inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )
+	GENERATE_BINDINGS inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -205,7 +203,7 @@ namespace Entities
 		entity->SetCubePhysics( bounds, isStatic );
 	}
 
-	inline void SetSpherePhysics( uint32_t handle, float radius, bool isStatic )
+	GENERATE_BINDINGS inline void SetSpherePhysics( uint32_t handle, float radius, bool isStatic )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -217,7 +215,7 @@ namespace Entities
 		entity->SetSpherePhysics( radius, isStatic );
 	}
 
-	inline void SetMeshPhysics( uint32_t handle, int vertexSize, void* vertexData )
+	GENERATE_BINDINGS inline void SetMeshPhysics( uint32_t handle, int vertexSize, void* vertexData )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -237,7 +235,7 @@ namespace Entities
 		entity->SetMeshPhysics( vertexList );
 	}
 
-	inline void SetVelocity( uint32_t handle, Vector3 velocity )
+	GENERATE_BINDINGS inline void SetVelocity( uint32_t handle, Vector3 velocity )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -249,7 +247,7 @@ namespace Entities
 		entity->SetVelocity( velocity );
 	}
 
-	inline Vector3 GetVelocity( uint32_t handle )
+	GENERATE_BINDINGS inline Vector3 GetVelocity( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -261,7 +259,7 @@ namespace Entities
 		return entity->GetVelocity();
 	}
 
-	inline float GetMass( uint32_t handle )
+	GENERATE_BINDINGS inline float GetMass( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -273,7 +271,7 @@ namespace Entities
 		return entity->GetMass();
 	}
 
-	inline float GetFriction( uint32_t handle )
+	GENERATE_BINDINGS inline float GetFriction( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -285,7 +283,7 @@ namespace Entities
 		return entity->GetFriction();
 	}
 
-	inline float GetRestitution( uint32_t handle )
+	GENERATE_BINDINGS inline float GetRestitution( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -297,7 +295,7 @@ namespace Entities
 		return entity->GetRestitution();
 	}
 
-	inline void SetMass( uint32_t handle, float mass )
+	GENERATE_BINDINGS inline void SetMass( uint32_t handle, float mass )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -309,7 +307,7 @@ namespace Entities
 		entity->SetMass( mass );
 	}
 
-	inline void SetFriction( uint32_t handle, float friction )
+	GENERATE_BINDINGS inline void SetFriction( uint32_t handle, float friction )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -321,7 +319,7 @@ namespace Entities
 		entity->SetFriction( friction );
 	}
 
-	inline void SetRestitution( uint32_t handle, float restitution )
+	GENERATE_BINDINGS inline void SetRestitution( uint32_t handle, float restitution )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -333,7 +331,7 @@ namespace Entities
 		entity->SetRestitution( restitution );
 	}
 
-	inline bool GetIgnoreRigidbodyPosition( uint32_t handle )
+	GENERATE_BINDINGS inline bool GetIgnoreRigidbodyPosition( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -345,7 +343,7 @@ namespace Entities
 		return entity->GetIgnoreRigidbodyPosition();
 	}
 
-	inline bool GetIgnoreRigidbodyRotation( uint32_t handle )
+	GENERATE_BINDINGS inline bool GetIgnoreRigidbodyRotation( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -357,7 +355,7 @@ namespace Entities
 		return entity->GetIgnoreRigidbodyRotation();
 	}
 
-	inline void SetIgnoreRigidbodyPosition( uint32_t handle, bool ignore )
+	GENERATE_BINDINGS inline void SetIgnoreRigidbodyPosition( uint32_t handle, bool ignore )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
@@ -369,7 +367,7 @@ namespace Entities
 		entity->SetIgnoreRigidbodyPosition( ignore );
 	}
 
-	inline void SetIgnoreRigidbodyRotation( uint32_t handle, bool ignore )
+	GENERATE_BINDINGS inline void SetIgnoreRigidbodyRotation( uint32_t handle, bool ignore )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )

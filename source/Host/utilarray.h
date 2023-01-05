@@ -1,16 +1,17 @@
 #pragma once
+#include <defs.h>
 #include <vector>
 
 struct UtilArray
 {
 	// How many items are in this array?
-	int count;
+	GENERATE_BINDINGS int count;
 
 	// How big is this array (in bytes)
-	int size;
+	GENERATE_BINDINGS int size;
 
 	// A pointer to the data that this array contains
-	void* data;
+	GENERATE_BINDINGS void* data;
 
 	// Convert this array to a vector of T
 	template <typename T>

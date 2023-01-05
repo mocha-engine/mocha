@@ -25,11 +25,14 @@ namespace ConsoleSystem
 
 		if ( cvarName == "list" )
 		{
+// This fails on libclang so we'll ignore it for now...
+#ifndef __clang__
 			// List all available cvars
 			CVarSystem::Instance().ForEach( [&]( CVarEntry& entry ) {
 				spdlog::info( "- '{}': '{}'", entry.m_name, CVarSystem::Instance().ToString( entry.m_name ) );
 				spdlog::info( "\t{}", entry.m_description );
 			} );
+#endif
 		}
 		else if ( !CVarSystem::Instance().Exists( cvarName ) )
 		{
