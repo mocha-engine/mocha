@@ -33,6 +33,7 @@ public partial class Texture : Asset
 
 		var mipData = textureFormat.Data.MipData;
 		var mipCount = textureFormat.Data.MipCount;
+		var format = textureFormat.Data.Format;
 
 		NativeTexture = new( DataWidth, DataHeight );
 
@@ -43,15 +44,15 @@ public partial class Texture : Asset
 			textureData.AddRange( mipData[i] );
 		}
 
-		TextureFormat format = TextureFormat.BC3_SRGB;
-		if ( path.Contains( "icon" ) )
-			format = TextureFormat.BC3_UNORM;
-		if ( path.Contains( "normal" ) )
-			format = TextureFormat.BC5_UNORM;
-		else if ( path.Contains( "font" ) )
-			format = TextureFormat.R8G8B8A8_SRGB;
-		else if ( path.Contains( "noise" ) )
-			format = TextureFormat.R8G8B8A8_SRGB;
+		Log.Trace( $"""
+			
+			Loading texture {path}
+				- Width: {Width} (Data: {DataWidth})
+				- Height: {Height} (Data: {DataHeight})
+				- Format: {format}
+				- Mip count: {mipCount}
+				
+			""" );
 
 		NativeTexture.SetData( DataWidth, DataHeight, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}

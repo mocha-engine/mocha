@@ -3,19 +3,34 @@ using BCnEncoder.Shared;
 using Mocha.Common.Serialization;
 using StbImageSharp;
 using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
 [Handles( new[] { ".png", ".jpg" } )]
-public class TextureCompiler : BaseCompiler
+public partial class TextureCompiler : BaseCompiler
 {
-	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, CompressionFormat compressionFormat )
+
+	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
+	{
+		return format switch
+		{
+			TextureFormat.BC3_SRGB => CompressionFormat.Bc3,
+			TextureFormat.BC3_UNORM => CompressionFormat.Bc3,
+			TextureFormat.BC5_UNORM => CompressionFormat.Bc5,
+			TextureFormat.R8G8B8A8_SRGB => CompressionFormat.Rgba,
+
+			_ => throw new Exception( $"Unsupported texture format {format}" ),
+		};
+	}
+
+	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, TextureFormat format )
 	{
 		BcEncoder encoder = new BcEncoder();
 
 		encoder.OutputOptions.GenerateMipMaps = true;
 		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
-		encoder.OutputOptions.Format = compressionFormat;
+		encoder.OutputOptions.Format = TextureFormatToCompressionFormat( format );
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
 		return encoder.EncodeToRawBytes( data, (int)width, (int)height, PixelFormat.Rgba32, (int)mip, out _, out _ );
@@ -42,6 +57,8 @@ public class TextureCompiler : BaseCompiler
 		Log.Processing( "Texture", path );
 
 		var destFileName = Path.ChangeExtension( path, "mtex_c" );
+		var metaFileName = Path.ChangeExtension( path, "meta" );
+		var textureMeta = new TextureMetadata();
 		var textureFormat = new TextureInfo();
 
 		// Load image
@@ -65,6 +82,13 @@ public class TextureCompiler : BaseCompiler
 			}
 		}
 
+		// Check for meta, load if it exists
+		if ( File.Exists( metaFileName ) )
+		{
+			var metaFile = File.ReadAllText( metaFileName );
+			textureMeta = JsonSerializer.Deserialize<TextureMetadata>( metaFile );
+		}
+
 		textureFormat.DataWidth = (uint)image.Width;
 		textureFormat.DataHeight = (uint)image.Height;
 		textureFormat.Width = (uint)image.Width;
@@ -72,6 +96,7 @@ public class TextureCompiler : BaseCompiler
 		textureFormat.MipCount = 5;
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
+		textureFormat.Format = textureMeta.Format;
 
 		// If image is not POT, then pad the image with transparent pixels
 		if ( !IsPowerOfTwo( image.Width ) || !IsPowerOfTwo( image.Height ) )
@@ -111,15 +136,7 @@ public class TextureCompiler : BaseCompiler
 
 		for ( uint i = 0; i < textureFormat.MipCount; ++i )
 		{
-			var compressionFormat = CompressionFormat.Bc3;
-
-			// TODO: Add .meta files that set compression format etc.
-			if ( path.Contains( "normal" ) )
-				compressionFormat = CompressionFormat.Bc5;
-			else if ( path.Contains( "font" ) || path.Contains( "noise" ) )
-				compressionFormat = CompressionFormat.Rgba;
-
-			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, compressionFormat );
+			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, textureMeta.Format );
 			textureFormat.MipDataLength[i] = textureFormat.MipData[i].Length;
 		}
 

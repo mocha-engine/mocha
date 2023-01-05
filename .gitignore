@@ -361,9 +361,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-
-[Cc]ontent/game/models/
-
 # Imgui
 [Ii]mgui.ini
 
@@ -389,3 +386,6 @@ vcpkg_installed/
 # Auto-generated content
 [Ss]ource/Host/gitdefs.h
 cvars.json
+
+# Content meta files
+![Cc]ontent/**/*.meta

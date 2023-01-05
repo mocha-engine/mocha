@@ -43,4 +43,9 @@ public struct TextureInfo
 	/// The data for each mipmap.
 	/// </summary>
 	public byte[][] MipData { get; set; }
+
+	/// <summary>
+	/// The format for the data in the texture.
+	/// </summary>
+	public TextureFormat Format { get; set; }
 }

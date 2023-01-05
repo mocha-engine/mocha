@@ -13,8 +13,9 @@ public class FontCompiler : BaseCompiler
 	{
 		Log.Processing( "Font", path );
 
-		var destJsonFileName = Path.ChangeExtension( path, ".temp.json" );
-		var destAtlasFileName = Path.ChangeExtension( path, ".png" );
+		var destJsonFileName = Path.ChangeExtension( path, "temp.json" );
+		var destAtlasFileName = Path.ChangeExtension( path, "png" );
+		var destAtlasMeta = Path.ChangeExtension( path, "meta" );
 		var destFileName = Path.ChangeExtension( path, "mfnt_c" );
 
 		// TODO: Move to a nice generic function somewhere
@@ -43,11 +44,7 @@ public class FontCompiler : BaseCompiler
 
 		// Don't output
 		startInfo.UseShellExecute = true;
-
-		// Set the file name to the path of the executable
 		startInfo.FileName = exePath;
-
-		// Set the arguments to specify the input font file and the output file names
 		startInfo.Arguments = $"-font {fontPath} -imageout {destAtlasFileName} -json {destJsonFileName}";
 
 		// Do we have a character set? If so, use it
@@ -62,15 +59,22 @@ public class FontCompiler : BaseCompiler
 		// Wait for the process to finish
 		process.WaitForExit();
 
-		// Check the exit code of the process
 		if ( process.ExitCode != 0 )
 		{
 			// There was an error generating the atlas
 			throw new Exception();
 		}
 
+		// Write atlas metadata
+		var textureMeta = new TextureMetadata()
+		{
+			Format = TextureFormat.R8G8B8A8_SRGB
+		};
+
+		File.WriteAllText( destAtlasMeta, JsonSerializer.Serialize( textureMeta ) );
+
 		// Compile atlas
-		Program.CompileFile( destAtlasFileName );
+		OfflineCompiler.Current.CompileFile( destAtlasFileName );
 
 		// Load json
 		var fileData = File.ReadAllText( destJsonFileName );
