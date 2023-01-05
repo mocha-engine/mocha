@@ -8,6 +8,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <subsystem.h>
+#include <defs.h>
 
 #define MAX_LOG_MESSAGES 50
 
@@ -25,7 +26,6 @@ struct LogHistory
 	LogEntryInterop* items;
 };
 
-//@InteropGen generate class
 class LogManager : ISubSystem
 {
 public:
@@ -34,14 +34,14 @@ public:
 	void Startup();
 	void Shutdown();
 
-	static void ManagedInfo( std::string str );
-	static void ManagedWarning( std::string str );
-	static void ManagedError( std::string str );
-	static void ManagedTrace( std::string str );
-
 	std::vector<LogEntryInterop> m_logHistory;
-
-	inline static LogHistory GetLogHistory()
+	
+	GENERATE_BINDINGS static void ManagedInfo( std::string str );
+	GENERATE_BINDINGS static void ManagedWarning( std::string str );
+	GENERATE_BINDINGS static void ManagedError( std::string str );
+	GENERATE_BINDINGS static void ManagedTrace( std::string str );
+	
+	GENERATE_BINDINGS inline static LogHistory GetLogHistory()
 	{
 		LogHistory logHistory = {};
 		logHistory.count = g_logManager->m_logHistory.size();
@@ -71,8 +71,7 @@ protected:
 
 		return ts;
 	}
-
-	//@InteropGen ignore
+	
 	inline static void CopyString( char** dest, std::string source )
 	{
 		size_t destSize = source.size() + 1;

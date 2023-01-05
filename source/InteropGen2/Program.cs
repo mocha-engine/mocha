@@ -8,11 +8,6 @@
 	{
 		Console.WriteLine( $"\t Processing header {path}" );
 
-		var fileContents = File.ReadAllText( path );
-
-		if ( !fileContents.Contains( "//@InteropGen" ) )
-			return; // Fast early bail
-
 		var units = Parser.GetUnits( path );
 		var fileName = Path.GetFileNameWithoutExtension( path );
 
@@ -31,36 +26,136 @@
 		Units.AddRange( units );
 	}
 
-	private static void ProcessDirectory( string baseDir, string directoryPath )
+	private static void QueueDirectory( ref List<string> queue, string directory )
 	{
-		foreach ( var file in Directory.GetFiles( directoryPath ) )
+		foreach ( var file in Directory.GetFiles( directory ) )
 		{
 			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
 			{
-				var start = DateTime.Now;
+				var fileContents = File.ReadAllText( file );
 
-				ProcessHeader( baseDir, file );
+				if ( !fileContents.Contains( "GENERATE_BINDINGS", StringComparison.CurrentCultureIgnoreCase ) )
+					continue; // Fast early bail
 
-				var end = DateTime.Now;
-
-				var totalTime = (end - start);
-				Console.WriteLine( $"\t Took {totalTime.TotalSeconds} seconds." );
+				QueueFile( ref queue, file );
 			}
 		}
 
-		foreach ( var subDirectory in Directory.GetDirectories( directoryPath ) )
+		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
 		{
-			ProcessDirectory( baseDir, subDirectory );
+			QueueDirectory( ref queue, subDirectory );
 		}
 	}
 
-	public static void Main( string[] args )
+	private static void QueueFile( ref List<string> queue, string path )
 	{
-		var start = DateTime.Now;
-		Console.WriteLine( "Generating C# <--> C++ interop code..." );
+		queue.Add( path );
+	}
 
-		var destCsDir = $"{args[0]}\\Common\\Glue\\";
-		var destHeaderDir = $"{args[0]}\\Host\\generated\\";
+	private static void Parse( string baseDir )
+	{
+		List<string> queue = new();
+		QueueDirectory( ref queue, baseDir );
+
+		var dispatcher = new Mocha.Common.ThreadDispatcher<string>( ( files ) =>
+		{
+			foreach ( var path in files )
+			{
+				ProcessHeader( baseDir, path );
+			}
+		}, queue );
+
+		// Wait for all threads to finish...
+		while ( !dispatcher.IsComplete )
+			Thread.Sleep( 500 );
+	}
+
+	private static void WriteManagedStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	{
+		var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
+
+		managedStructWriter.WriteLine( $"using System.Runtime.InteropServices;" );
+		managedStructWriter.WriteLine();
+		managedStructWriter.WriteLine( $"[StructLayout( LayoutKind.Sequential )]" );
+		managedStructWriter.WriteLine( $"public struct UnmanagedArgs" );
+		managedStructWriter.WriteLine( $"{{" );
+
+		managedStructWriter.Indent++;
+
+		var managedStructBody = string.Join( "\r\n\t", methods.Select( x => $"public IntPtr __{x.Name}_{x.method.Name}MethodPtr;" ) );
+		managedStructWriter.Write( managedStructBody );
+		managedStructWriter.WriteLine();
+
+		managedStructWriter.Indent--;
+
+		managedStructWriter.WriteLine( $"}}" );
+		managedStructWriter.Dispose();
+
+		File.WriteAllText( $"{baseDir}/Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
+	}
+
+	private static void WriteNativeStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	{
+		var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
+
+		nativeStructWriter.WriteLine( "#ifndef __GENERATED_UNMANAGED_ARGS_H" );
+		nativeStructWriter.WriteLine( "#define __GENERATED_UNMANAGED_ARGS_H" );
+		nativeStructWriter.WriteLine( "#include \"InteropList.generated.h\"" );
+		nativeStructWriter.WriteLine();
+		nativeStructWriter.WriteLine( "struct UnmanagedArgs" );
+		nativeStructWriter.WriteLine( $"{{" );
+		nativeStructWriter.Indent++;
+
+		var nativeStructBody = string.Join( "\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr;" ) );
+		nativeStructWriter.Write( nativeStructBody );
+		nativeStructWriter.WriteLine();
+
+		nativeStructWriter.Indent--;
+		nativeStructWriter.WriteLine( $"}};" );
+		nativeStructWriter.WriteLine();
+
+		nativeStructWriter.WriteLine( "inline UnmanagedArgs args" );
+		nativeStructWriter.WriteLine( $"{{" );
+		nativeStructWriter.Indent++;
+
+		nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}" ) );
+		nativeStructWriter.Write( nativeStructBody );
+		nativeStructWriter.WriteLine();
+
+		nativeStructWriter.Indent--;
+		nativeStructWriter.WriteLine( $"}};" );
+
+		nativeStructWriter.WriteLine();
+		nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
+		nativeStructWriter.Dispose();
+
+		File.WriteAllText( $"{baseDir}/Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+	}
+
+	private static void WriteNativeIncludes( string baseDir, ref List<(string Name, Method method)> methods )
+	{
+		var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
+
+		nativeListWriter.WriteLine( "#ifndef __GENERATED_INTEROPLIST_H" );
+		nativeListWriter.WriteLine( "#define __GENERATED_INTEROPLIST_H" );
+		nativeListWriter.WriteLine();
+		nativeListWriter.Indent++;
+
+		var nativeListBody = string.Join( "\r\n\t", Files.Select( x => $"#include \"{x}.generated.h\"" ) );
+		nativeListWriter.Write( nativeListBody );
+		nativeListWriter.WriteLine();
+
+		nativeListWriter.Indent--;
+		nativeListWriter.WriteLine();
+		nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
+
+		File.WriteAllText( $"{baseDir}/Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
+	}
+
+	private static void DeleteExistingFiles( string baseDir )
+	{
+		var destCsDir = $"{baseDir}\\Common\\Glue\\";
+		var destHeaderDir = $"{baseDir}\\Host\\generated\\";
 
 		if ( Directory.Exists( destHeaderDir ) )
 			Directory.Delete( destHeaderDir, true );
@@ -69,103 +164,36 @@
 
 		Directory.CreateDirectory( destHeaderDir );
 		Directory.CreateDirectory( destCsDir );
+	}
 
-		ProcessDirectory( args[0], args[0] );
+	public static void Main( string[] args )
+	{
+		var baseDir = args[0];
+		var start = DateTime.Now;
 
+		Console.WriteLine( "Generating C# <--> C++ interop code..." );
+
+		//
+		// Prep
+		//
+		DeleteExistingFiles( baseDir );
+		Parse( baseDir );
+
+		//
 		// Expand methods out into list of (method name, method)
+		//
 		var methods = Units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
 		//
-		// Write managed struct
+		// Write files
 		//
-		{
-			var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
+		WriteManagedStruct( baseDir, ref methods );
+		WriteNativeStruct( baseDir, ref methods );
+		WriteNativeIncludes( baseDir, ref methods );
 
-			managedStructWriter.WriteLine( $"using System.Runtime.InteropServices;" );
-			managedStructWriter.WriteLine();
-			managedStructWriter.WriteLine( $"[StructLayout( LayoutKind.Sequential )]" );
-			managedStructWriter.WriteLine( $"public struct UnmanagedArgs" );
-			managedStructWriter.WriteLine( $"{{" );
-
-			managedStructWriter.Indent++;
-
-			var managedStructBody = string.Join( "\r\n\t", methods.Select( x => $"public IntPtr __{x.Name}_{x.method.Name}MethodPtr;" ) );
-			managedStructWriter.Write( managedStructBody );
-			managedStructWriter.WriteLine();
-
-			managedStructWriter.Indent--;
-
-			managedStructWriter.WriteLine( $"}}" );
-			managedStructWriter.Dispose();
-
-			File.WriteAllText( $"{args[0]}/Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
-		}
-
-		//
-		// Write native struct
-		//
-		{
-			var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
-
-			nativeStructWriter.WriteLine( "#ifndef __GENERATED_UNMANAGED_ARGS_H" );
-			nativeStructWriter.WriteLine( "#define __GENERATED_UNMANAGED_ARGS_H" );
-			nativeStructWriter.WriteLine( "#include \"InteropList.generated.h\"" );
-			nativeStructWriter.WriteLine();
-			nativeStructWriter.WriteLine( "struct UnmanagedArgs" );
-			nativeStructWriter.WriteLine( $"{{" );
-			nativeStructWriter.Indent++;
-
-			var nativeStructBody = string.Join( "\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr;" ) );
-			nativeStructWriter.Write( nativeStructBody );
-			nativeStructWriter.WriteLine();
-
-			nativeStructWriter.Indent--;
-			nativeStructWriter.WriteLine( $"}};" );
-			nativeStructWriter.WriteLine();
-
-			nativeStructWriter.WriteLine( "inline UnmanagedArgs args" );
-			nativeStructWriter.WriteLine( $"{{" );
-			nativeStructWriter.Indent++;
-
-			nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}" ) );
-			nativeStructWriter.Write( nativeStructBody );
-			nativeStructWriter.WriteLine();
-
-			nativeStructWriter.Indent--;
-			nativeStructWriter.WriteLine( $"}};" );
-
-			nativeStructWriter.WriteLine();
-			nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
-			nativeStructWriter.Dispose();
-
-			File.WriteAllText( $"{args[0]}/Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
-		}
-
-		//
-		// Write native includes
-		//
-		{
-			var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
-
-			nativeListWriter.WriteLine( "#ifndef __GENERATED_INTEROPLIST_H" );
-			nativeListWriter.WriteLine( "#define __GENERATED_INTEROPLIST_H" );
-			nativeListWriter.WriteLine();
-			nativeListWriter.Indent++;
-
-			var nativeListBody = string.Join( "\r\n\t", Files.Select( x => $"#include \"{x}.generated.h\"" ) );
-			nativeListWriter.Write( nativeListBody );
-			nativeListWriter.WriteLine();
-
-			nativeListWriter.Indent--;
-			nativeListWriter.WriteLine();
-			nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
-
-			File.WriteAllText( $"{args[0]}/Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
-		}
-
+		// Track time & output total duration
 		var end = DateTime.Now;
-
-		var totalTime = (end - start);
+		var totalTime = end - start;
 		Console.WriteLine( $"-- Took {totalTime.TotalSeconds} seconds." );
 	}
 }

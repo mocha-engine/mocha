@@ -29,7 +29,6 @@ public static class Program
 		var attr = File.GetAttributes( path );
 
 		List<string> queue = new();
-		int threadCount = 10;
 
 		if ( attr.HasFlag( FileAttributes.Directory ) )
 		{
@@ -43,42 +42,20 @@ public static class Program
 		}
 
 		var completedThreads = 0;
-		var batchSize = queue.Count / threadCount - 1;
 
-		// Bail to avoid division by zero
-		if ( batchSize == 0 )
+		var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
 		{
-			Log.Results( (DateTime.Now - start) );
-			return;
-		}
+			foreach ( var item in threadQueue )
+			{
+				CompileFile( item );
+			}
 
-		var batched = queue
-			.Select( ( Value, Index ) => new { Value, Index } )
-			.GroupBy( p => p.Index / batchSize )
-			.Select( g => g.Select( p => p.Value ).ToList() )
-			.ToList();
+			completedThreads++;
+		}, queue );
 
-		for ( int i = 0; i < batched.Count; i++ )
-		{
-			var threadQueue = batched[i];
-			var thread = new Thread( () =>
-			 {
-				 foreach ( var item in threadQueue )
-				 {
-					 CompileFile( item );
-				 }
-
-				 completedThreads++;
-			 } );
-			thread.Start();
-		}
-
-		while ( completedThreads < threadCount )
-		{
+		while ( !dispatcher.IsComplete )
 			Thread.Sleep( 500 );
-		}
 
-		Thread.Sleep( 1000 );
 		Log.Results( (DateTime.Now - start) );
 	}
 

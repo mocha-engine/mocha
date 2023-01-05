@@ -1,18 +1,18 @@
 #pragma once
 
 #include <cvarmanager.h>
+#include <defs.h>
 #include <globalvars.h>
 #include <sstream>
 #include <string>
 
-//@InteropGen generate class
 namespace ConsoleSystem
 {
 	// Run a console command.
 	// The following formats are currently supported:
 	// - [convar name]: Output the current value for a console variable
 	// - [convar name] [value]: Update a console variable with a new value
-	inline void Run( const char* command )
+	GENERATE_BINDINGS inline void Run( const char* command )
 	{
 		std::string inputString = std::string( command );
 
@@ -25,11 +25,14 @@ namespace ConsoleSystem
 
 		if ( cvarName == "list" )
 		{
+// This fails on libclang so we'll ignore it for now...
+#ifndef __clang__
 			// List all available cvars
 			CVarSystem::Instance().ForEach( [&]( CVarEntry& entry ) {
 				spdlog::info( "- '{}': '{}'", entry.m_name, CVarSystem::Instance().ToString( entry.m_name ) );
 				spdlog::info( "\t{}", entry.m_description );
 			} );
+#endif
 		}
 		else if ( !CVarSystem::Instance().Exists( cvarName ) )
 		{

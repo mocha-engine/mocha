@@ -19,15 +19,14 @@ struct InteropVertexAttributeInfo
 	}
 };
 
-//@InteropGen generate class
 class Material
 {
 public:
 	std::vector<Texture> m_textures;
 	std::string m_shaderPath;
 
-	void CreateResources();
-	void ReloadShaders();
+	GENERATE_BINDINGS void CreateResources();
+	GENERATE_BINDINGS void ReloadShaders();
 
 	SamplerType m_samplerType = {};
 	Descriptor m_descriptor = {};
@@ -37,6 +36,6 @@ public:
 
 	bool m_ignoreDepth;
 
-	Material(
+	GENERATE_BINDINGS Material(
 	    const char* shaderPath, UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth );
 };

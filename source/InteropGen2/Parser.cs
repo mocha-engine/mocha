@@ -2,25 +2,17 @@
 
 public static class Parser
 {
-	private static bool Debug => false;
-
+	// TODO: Generate from vcxproj
 	private static string[] GetLaunchArgs()
 	{
 		// Locate vcpkg
 		var vcpkgRoot = Environment.GetEnvironmentVariable( "VCPKG_ROOT" );
 
-		if ( vcpkgRoot == null )
-		{
-			// Use default
-			vcpkgRoot = @"C:\Users\" + Environment.UserName + @"\vcpkg";
-		}
+		// Use default if null
+		vcpkgRoot ??= @"C:\Users\" + Environment.UserName + @"\vcpkg";
 
 		// Locate vulkan sdk
 		var vulkanSdk = Environment.GetEnvironmentVariable( "VULKAN_SDK" );
-
-		Console.WriteLine( "VCPKG_ROOT: " + vcpkgRoot );
-		Console.WriteLine( "VULKAN_SDK: " + vulkanSdk );
-
 		var includeDirs = new string[]
 		{
 			$"{vcpkgRoot}\\installed\\x64-windows\\include",
@@ -40,7 +32,7 @@ public static class Parser
 			"-x",
 			"c++",
 			"-fparse-all-comments",
-			"-std=c++17",
+			"-std=c++20",
 			"-DVK_NO_PROTOTYPES",
 			"-DNOMINMAX",
 			"-DVK_USE_PLATFORM_WIN32_KHR"
@@ -66,46 +58,51 @@ public static class Parser
 
 		var cursor = unit.Cursor;
 
-		//
-		// Display all tokens
-		//
-
-		if ( Debug )
-		{
-			Console.WriteLine();
-			Console.WriteLine( $"{"Kind",32} {"Spelling",24} {"Location",48} {"Lexical Parent",32}" );
-			Console.WriteLine( new string( '-', 32 + 24 + 48 + 32 + 3 ) );
-		}
-
 		CXCursorVisitor cursorVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
 		{
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
 
-			if ( cursor.RawCommentText.ToString() == "//@InteropGen ignore" )
-				return CXChildVisitResult.CXChildVisit_Continue;
+			bool HasGenerateBindingsAttribute()
+			{
+				if ( !cursor.HasAttrs )
+					return false;
+
+				var attr = cursor.GetAttr( 0 );
+				if ( attr.Spelling.CString != "generate_bindings" )
+					return false;
+
+				return true;
+			}
 
 			switch ( cursor.Kind )
 			{
+				//
+				// Struct / class / namespace
+				//
 				case CXCursorKind.CXCursor_ClassDecl:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate class" )
-						units.Add( new Class( cursor.Spelling.ToString() ) );
+					units.Add( new Class( cursor.Spelling.ToString() ) );
 					break;
 				case CXCursorKind.CXCursor_StructDecl:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate struct" )
-						units.Add( new Structure( cursor.Spelling.ToString() ) );
+					units.Add( new Structure( cursor.Spelling.ToString() ) );
 					break;
 				case CXCursorKind.CXCursor_Namespace:
-					if ( cursor.RawCommentText.ToString() == "//@InteropGen generate class" )
-						units.Add( new Class( cursor.Spelling.ToString() )
-						{
-							IsNamespace = true
-						} );
+					units.Add( new Class( cursor.Spelling.ToString() )
+					{
+						IsNamespace = true
+					} );
 					break;
+
+				//
+				// Methods
+				//
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
 					{
+						if ( !HasGenerateBindingsAttribute() )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var o = units.FirstOrDefault( x => x.Name == oName );
 						var m = new Method( cursor.Spelling.ToString(), cursor.ReturnType.Spelling.ToString() )
@@ -149,8 +146,15 @@ public static class Parser
 
 						break;
 					}
+
+				//
+				// Field
+				//
 				case CXCursorKind.CXCursor_FieldDecl:
 					{
+						if ( !HasGenerateBindingsAttribute() )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var s = units.FirstOrDefault( x => x.Name == oName );
 
@@ -162,62 +166,25 @@ public static class Parser
 					}
 			}
 
-			if ( Debug )
-			{
-				Console.WriteLine( $"{cursor.Kind,32} {cursor.Spelling,24} {cursor.Type,48} {cursor.LexicalParent.Kind,32}" );
-			}
-
 			return CXChildVisitResult.CXChildVisit_Recurse;
 		};
 
 		cursor.VisitChildren( cursorVisitor, default );
 
-		if ( Debug )
+		//
+		// Remove all items with duplicate names
+		//
+		for ( int i = 0; i < units.Count; i++ )
 		{
-			//
-			// Classes
-			//
-			Console.WriteLine();
-			Console.WriteLine( "Objects:" );
-			foreach ( var o in units )
-			{
-				if ( o is not Class c )
-					continue;
-
-				Console.WriteLine( $"Class {c}:" );
-
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
-
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
-
-			//
-			// Structs
-			//
-			foreach ( var o in units )
-			{
-				if ( o is not Structure s )
-					continue;
-
-				Console.WriteLine( $"Struct {s}:" );
-
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
-
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
+			var o = units[i];
+			o.Methods = o.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
+			o.Fields = o.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
 		}
+
+		//
+		// Remove any units that have no methods or fields
+		//
+		units = units.Where( x => x.Methods.Count > 0 || x.Fields.Count > 0 ).ToList();
 
 		//
 		// Post-processing
@@ -232,16 +199,6 @@ public static class Parser
 					IsConstructor = true
 				} );
 			}
-		}
-
-		//
-		// Remove all items with duplicate names
-		//
-		for ( int i = 0; i < units.Count; i++ )
-		{
-			var o = units[i];
-			o.Methods = o.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
-			o.Fields = o.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
 		}
 
 		return units;
