@@ -2,12 +2,9 @@
 
 public static class Parser
 {
-	private static bool Debug => true;
-
+	// TODO: Generate from vcxproj
 	private static string[] GetLaunchArgs()
 	{
-		// TODO: Generate from vcxproj
-
 		// Locate vcpkg
 		var vcpkgRoot = Environment.GetEnvironmentVariable( "VCPKG_ROOT" );
 
@@ -61,24 +58,28 @@ public static class Parser
 
 		var cursor = unit.Cursor;
 
-		//
-		// Display all tokens
-		//
-
-		if ( Debug )
-		{
-			Console.WriteLine();
-			Console.WriteLine( $"{"Kind",32} {"Spelling",24} {"Location",48} {"Lexical Parent",32}" );
-			Console.WriteLine( new string( '-', 32 + 24 + 48 + 32 + 3 ) );
-		}
-
 		CXCursorVisitor cursorVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
 		{
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
 
+			bool HasGenerateBindingsAttribute()
+			{
+				if ( !cursor.HasAttrs )
+					return false;
+
+				var attr = cursor.GetAttr( 0 );
+				if ( attr.Spelling.CString != "generate_bindings" )
+					return false;
+
+				return true;
+			}
+
 			switch ( cursor.Kind )
 			{
+				//
+				// Struct / class / namespace
+				//
 				case CXCursorKind.CXCursor_ClassDecl:
 					units.Add( new Class( cursor.Spelling.ToString() ) );
 					break;
@@ -92,15 +93,14 @@ public static class Parser
 					} );
 					break;
 
+				//
+				// Methods
+				//
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
 					{
-						if ( !cursor.HasAttrs )
-							return CXChildVisitResult.CXChildVisit_Continue;
-
-						var attr = cursor.GetAttr( 0 );
-						if ( attr.Spelling.CString != "generate_bindings" )
+						if ( !HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
 						var oName = cursor.LexicalParent.Spelling.ToString();
@@ -146,13 +146,13 @@ public static class Parser
 
 						break;
 					}
+
+				//
+				// Field
+				//
 				case CXCursorKind.CXCursor_FieldDecl:
 					{
-						if ( !cursor.HasAttrs )
-							return CXChildVisitResult.CXChildVisit_Continue;
-
-						var attr = cursor.GetAttr( 0 );
-						if ( attr.Spelling.CString != "generate_bindings" )
+						if ( !HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
 						var oName = cursor.LexicalParent.Spelling.ToString();
@@ -166,62 +166,10 @@ public static class Parser
 					}
 			}
 
-			if ( Debug )
-			{
-				Console.WriteLine( $"{cursor.Kind,32} {cursor.Spelling,24} {cursor.Type,48} {cursor.LexicalParent.Kind,32}" );
-			}
-
 			return CXChildVisitResult.CXChildVisit_Recurse;
 		};
 
 		cursor.VisitChildren( cursorVisitor, default );
-
-		if ( Debug )
-		{
-			//
-			// Classes
-			//
-			Console.WriteLine();
-			Console.WriteLine( "Objects:" );
-			foreach ( var o in units )
-			{
-				if ( o is not Class c )
-					continue;
-
-				Console.WriteLine( $"Class {c}:" );
-
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
-
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
-
-			//
-			// Structs
-			//
-			foreach ( var o in units )
-			{
-				if ( o is not Structure s )
-					continue;
-
-				Console.WriteLine( $"Struct {s}:" );
-
-				foreach ( var m in o.Methods )
-				{
-					Console.WriteLine( $"\tMethod - {m}" );
-				}
-
-				foreach ( var f in o.Fields )
-				{
-					Console.WriteLine( $"\tField - {f}" );
-				}
-			}
-		}
 
 		//
 		// Remove all items with duplicate names
