@@ -11,7 +11,8 @@
 #define ADD_QUOTES_HELPER( s ) #s
 #define ADD_QUOTES( s ) ADD_QUOTES_HELPER( s )
 
-#if defined( __clang__ ) // We only need this to be accessible from within InteropGen, which runs off libclang.
+#if defined( __clang__ )
+// We only need this to be accessible from within InteropGen, which runs off libclang.
 #define GENERATE_BINDINGS __attribute__((annotate("generate_bindings")))
 #else
 #define GENERATE_BINDINGS
@@ -21,7 +22,8 @@
 #include <windows.h>
 #include <source_location>
 
-#if defined( __clang__ ) // Clang does not currently support std::source_location, so we'll define an empty function for InteropGen
+#if defined( __clang__ )
+// Clang does not currently support std::source_location, so we'll define an empty function for InteropGen
 inline void ErrorMessage( std::string str ) {}
 #else
 // Display message box
