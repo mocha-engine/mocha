@@ -74,7 +74,7 @@
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha</TargetName>
     <ExternalIncludePath>C:\VulkanSDK\1.3.224.1\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(VcpkgRoot)\installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)vcpkg_installed\$(Platform)-windows\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -85,6 +85,10 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg" />
+  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <VcpkgTriplet>x64-windows</VcpkgTriplet>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -7,7 +7,11 @@ public class Logger
 	private int FailCount = 0;
 	private int UpToDateCount = 0;
 
-	private void Log( string prefix, string message ) => Console.WriteLine( $"{"[" + prefix.ToUpper() + "]",-16}{message}" );
+	private void Log( string prefix, string message )
+	{
+		Console.WriteLine( $"{"[" + prefix.ToUpper() + "]",-16}{message}" );
+	}
+
 	public void Skip( string path )
 	{
 		UpToDateCount++;
@@ -26,7 +30,19 @@ public class Logger
 		Log( "Success", $"Compiled '{path}'" );
 	}
 
-	public void Processing( string type, string path ) => Log( "PROCESS", $"Processing '{path}' as {type}" );
+	public void Processing( string type, string path )
+	{
+		Log( "PROCESS", $"Processing '{path}' as {type}" );
+	}
 
-	public void Results( TimeSpan totalTime ) => Log( "Results", $"========== Build: {SuccessCount} succeeded, {FailCount} failed, {UpToDateCount} up-to-date, {SkipCount} skipped ==========\nBuild took {totalTime.TotalSeconds} seconds." );
+	public void Results( TimeSpan totalTime )
+	{
+		Log( "Results", $"========== Build: " +
+			$"{SuccessCount} succeeded, " +
+			$"{FailCount} failed, " +
+			$"{UpToDateCount} up-to-date, " +
+			$"{SkipCount} skipped " +
+			$"==========\n" +
+			$"Build took {totalTime.TotalSeconds} seconds." );
+	}
 }

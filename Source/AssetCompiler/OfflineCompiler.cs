@@ -3,19 +3,14 @@ using System.Reflection;
 
 namespace Mocha.AssetCompiler;
 
-public static class Program
+public class OfflineCompiler
 {
-	private static List<BaseCompiler> Compilers = new();
+	public static OfflineCompiler Current { get; private set; }
+	private List<BaseCompiler> Compilers = new();
 
-	public static void Main( string[] args )
+	public OfflineCompiler()
 	{
-		var start = DateTime.Now;
-
-		if ( args.Length == 0 )
-		{
-			Console.WriteLine( "Expected filename" );
-			return;
-		}
+		Current = this;
 
 		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes().Where( x => x.BaseType == typeof( BaseCompiler ) ) )
 		{
@@ -24,42 +19,48 @@ public static class Program
 			if ( instance != null )
 				Compilers.Add( instance );
 		}
+	}
 
-		var path = args[0];
-		var attr = File.GetAttributes( path );
+	public void Run( Options options )
+	{
+		var start = DateTime.Now;
+
+		if ( !Path.Exists( options.Target ) )
+		{
+			Console.WriteLine( $"'{options.Target}' is not a valid target." );
+			return;
+		}
+
+		var attr = File.GetAttributes( options.Target );
 
 		List<string> queue = new();
 
 		if ( attr.HasFlag( FileAttributes.Directory ) )
 		{
-			// Directory
-			QueueDirectory( ref queue, path );
+			// Target is directory
+			QueueDirectory( ref queue, options.Target );
+
+			var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
+			{
+				foreach ( var item in threadQueue )
+				{
+					CompileFile( item );
+				}
+			}, queue );
+
+			while ( !dispatcher.IsComplete )
+				Thread.Sleep( 500 );
 		}
 		else
 		{
-			// Single file
-			CompileFile( path );
+			// Target is single file
+			CompileFile( options.Target );
 		}
-
-		var completedThreads = 0;
-
-		var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
-		{
-			foreach ( var item in threadQueue )
-			{
-				CompileFile( item );
-			}
-
-			completedThreads++;
-		}, queue );
-
-		while ( !dispatcher.IsComplete )
-			Thread.Sleep( 500 );
 
 		Log.Results( (DateTime.Now - start) );
 	}
 
-	private static void QueueDirectory( ref List<string> queue, string directory )
+	private void QueueDirectory( ref List<string> queue, string directory )
 	{
 		foreach ( var file in Directory.GetFiles( directory ) )
 		{
@@ -72,7 +73,7 @@ public static class Program
 		}
 	}
 
-	private static bool GetCompiler( string fileExtension, out BaseCompiler? foundCompiler )
+	private bool GetCompiler( string fileExtension, out BaseCompiler? foundCompiler )
 	{
 		foreach ( var compiler in Compilers )
 		{
@@ -87,7 +88,7 @@ public static class Program
 		return false;
 	}
 
-	private static void QueueFile( ref List<string> queue, string path )
+	private void QueueFile( ref List<string> queue, string path )
 	{
 		var fileExtension = Path.GetExtension( path );
 
@@ -101,7 +102,7 @@ public static class Program
 		}
 	}
 
-	public static void CompileFile( string path )
+	public void CompileFile( string path )
 	{
 		var fileExtension = Path.GetExtension( path );
 
