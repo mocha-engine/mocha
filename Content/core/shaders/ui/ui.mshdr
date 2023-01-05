@@ -7,6 +7,14 @@
 
 #pragma optionNV (unroll all)
 
+#define DEBUG_VIEW_NONE 					0
+#define DEBUG_VIEW_DIFFUSE 					1
+#define DEBUG_VIEW_NORMAL 					2
+#define DEBUG_VIEW_AMBIENTOCCLUSION 		3
+#define DEBUG_VIEW_METALNESS 				4
+#define DEBUG_VIEW_ROUGHNESS 				5
+#define DEBUG_VIEW_OTHER					63
+
 //
 // Common
 //
@@ -26,6 +34,21 @@ struct VS_OUT {
     vec2 vPanelPos;
     vec2 vPanelSize;
 };
+
+//push constants block
+layout( push_constant ) uniform constants
+{
+	vec4 data;				// 4
+
+	mat4 model_matrix;		// 16
+
+	mat4 render_matrix;		// 16
+
+	vec3 vCameraPosWS;		// 3
+	float flTime;			// 1
+
+	vec4[4] vLightInfoWS;	// 16
+} PushConstants;
 
 //
 // Flags
@@ -196,6 +219,15 @@ void main()
         
         fragColor.rgb = smoothstep( 1.0, 0.99, a ).xxx;
     }
+
+	int debugView = int( floor( PushConstants.data.x ) );
+
+	if ( debugView == DEBUG_VIEW_DIFFUSE )
+		fragColor = vec4( texSample.rgb, 1 );
+    else if ( debugView == DEBUG_VIEW_NORMAL )
+        fragColor.a = 1.0;
+	else if ( debugView == DEBUG_VIEW_OTHER )
+		fragColor = vec4( fs_in.vTexCoords.x, fs_in.vTexCoords.y, 0, 1 );
 }
 #endif
 // ==========================================================================================================================
