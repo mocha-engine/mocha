@@ -254,11 +254,12 @@ namespace VKInit
 		return info;
 	}
 
-	inline VkImageMemoryBarrier ImageMemoryBarrier( VkImageLayout oldLayout, VkImageLayout newLayout, VkImage image )
+	inline VkImageMemoryBarrier ImageMemoryBarrier(
+	    VkAccessFlags accessMask, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage image )
 	{
 		VkImageMemoryBarrier imageMemoryBarrier = {};
 		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-		imageMemoryBarrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+		imageMemoryBarrier.srcAccessMask = accessMask;
 		imageMemoryBarrier.oldLayout = oldLayout;
 		imageMemoryBarrier.newLayout = newLayout;
 		imageMemoryBarrier.image = image;
@@ -266,9 +267,9 @@ namespace VKInit
 		imageMemoryBarrier.subresourceRange = {};
 		imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
 		imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
-		imageMemoryBarrier.subresourceRange.levelCount = 1;
+		imageMemoryBarrier.subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
 		imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;
-		imageMemoryBarrier.subresourceRange.layerCount = 1;
+		imageMemoryBarrier.subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
 		return imageMemoryBarrier;
 	}

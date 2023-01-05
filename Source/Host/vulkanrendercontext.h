@@ -1,6 +1,7 @@
 #pragma once
 
 #include <VkBootstrap.h>
+#include <algorithm>
 #include <baserendercontext.h>
 #include <defs.h>
 #include <globalvars.h>
@@ -112,21 +113,21 @@ public:
 class VulkanImageTexture : public VulkanObject
 {
 private:
-	inline int GetTexelBlockSize( VkFormat format )
+	inline int GetBytesPerPixel( VkFormat format )
 	{
 		switch ( format )
 		{
 		case VkFormat::VK_FORMAT_R8G8B8A8_SRGB:
 		case VkFormat::VK_FORMAT_R8G8B8A8_UNORM:
-			return 4;
+			return 4; // 32 bits (4 bytes)
 			break;
 		case VkFormat::VK_FORMAT_BC3_SRGB_BLOCK:
 		case VkFormat::VK_FORMAT_BC3_UNORM_BLOCK:
-			return 1;
+			return 1; // 128-bits = 4x4 pixels - 8 bits (1 byte)
 			break;
 		case VkFormat::VK_FORMAT_BC5_UNORM_BLOCK:
 		case VkFormat::VK_FORMAT_BC5_SNORM_BLOCK:
-			return 1;
+			return 1; // 128-bits = 4x4 pixels - 8 bits (1 byte)
 			break;
 		}
 
@@ -137,18 +138,38 @@ private:
 	inline void GetMipDimensions(
 	    uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, uint32_t* outWidth, uint32_t* outHeight )
 	{
-		*outWidth = inWidth >> mipLevel;
-		*outHeight = inHeight >> mipLevel;
+		uint32_t width = inWidth >> mipLevel;
+		uint32_t height = inHeight >> mipLevel;
+
+		*outWidth = width;
+		*outHeight = height;
 	}
 
 	inline int CalcMipSize( uint32_t inWidth, uint32_t inHeight, uint32_t mipLevel, VkFormat format )
 	{
 		uint32_t outWidth, outHeight;
 		GetMipDimensions( inWidth, inHeight, mipLevel, &outWidth, &outHeight );
-		return outWidth * outHeight * GetTexelBlockSize( format );
+
+		// Is this block compressed?
+		if ( format == VK_FORMAT_BC3_SRGB_BLOCK || format == VK_FORMAT_BC3_UNORM_BLOCK || format == VK_FORMAT_BC5_UNORM_BLOCK ||
+		     format == VK_FORMAT_BC5_SNORM_BLOCK )
+		{
+			// Min size is 4x4
+			outWidth = std::max( outWidth, 4u );
+			outHeight = std::max( outHeight, 4u );
+		}
+
+		return outWidth * outHeight * GetBytesPerPixel( format );
 	}
 
+	inline void TransitionLayout(
+	    VkCommandBuffer& cmd, VkImageLayout newLayout, VkAccessFlags newAccessFlags, VkPipelineStageFlags stageFlags );
+
 public:
+	VkAccessFlags currentAccessMask = 0;
+	VkPipelineStageFlags currentStageMask = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+	VkImageLayout currentLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
 	VkImage image;
 	VmaAllocation allocation;
 	VkImageView imageView;

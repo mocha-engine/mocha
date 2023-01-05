@@ -9,7 +9,7 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".png", ".jpg" } )]
 public class TextureCompiler : BaseCompiler
 {
-	private static byte[] BlockCompression( byte[] data, int width, int height, int mip, CompressionFormat compressionFormat )
+	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, CompressionFormat compressionFormat )
 	{
 		BcEncoder encoder = new BcEncoder();
 
@@ -18,7 +18,23 @@ public class TextureCompiler : BaseCompiler
 		encoder.OutputOptions.Format = compressionFormat;
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
-		return encoder.EncodeToRawBytes( data, width, height, PixelFormat.Rgba32, mip, out _, out _ );
+		return encoder.EncodeToRawBytes( data, (int)width, (int)height, PixelFormat.Rgba32, (int)mip, out _, out _ );
+	}
+
+	private bool IsPowerOfTwo( int x )
+	{
+		return (x & (x - 1)) == 0;
+	}
+
+	private int NextPowerOfTwo( int x )
+	{
+		int i = 0;
+		while ( x > 0 )
+		{
+			x >>= 1;
+			i++;
+		}
+		return 1 << i;
 	}
 
 	public override string CompileFile( string path )
@@ -49,37 +65,61 @@ public class TextureCompiler : BaseCompiler
 			}
 		}
 
+		textureFormat.DataWidth = (uint)image.Width;
+		textureFormat.DataHeight = (uint)image.Height;
 		textureFormat.Width = (uint)image.Width;
 		textureFormat.Height = (uint)image.Height;
 		textureFormat.MipCount = 5;
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
 
-		// Change compression format based on normal map
-		for ( int i = 0; i < textureFormat.MipCount; ++i )
+		// If image is not POT, then pad the image with transparent pixels
+		if ( !IsPowerOfTwo( image.Width ) || !IsPowerOfTwo( image.Height ) )
 		{
-			if ( path.Contains( "normal" ) )
+			var newWidth = NextPowerOfTwo( image.Width );
+			var newHeight = NextPowerOfTwo( image.Height );
+
+			var newData = new byte[newWidth * newHeight * 4];
+			for ( var y = 0; y < newHeight; y++ )
 			{
-				// Do not compress
-				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC5_UNorm;
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc5 );
-			}
-			else if ( path.Contains( "font" ) )
-			{
-				// Do not compress
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
-			}
-			else if ( path.Contains( "noise" ) )
-			{
-				// Do not compress
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Rgba );
-			}
-			else
-			{
-				// textureFormat.CompressionFormat = Veldrid.PixelFormat.BC3_UNorm;
-				textureFormat.MipData[i] = BlockCompression( image.Data, image.Width, image.Height, i, CompressionFormat.Bc3 );
+				for ( var x = 0; x < newWidth; x++ )
+				{
+					var index = (y * newWidth + x) * 4;
+					if ( x < image.Width && y < image.Height )
+					{
+						var origIndex = (y * image.Width + x) * 4;
+
+						newData[index + 0] = image.Data[origIndex + 0];
+						newData[index + 1] = image.Data[origIndex + 1];
+						newData[index + 2] = image.Data[origIndex + 2];
+						newData[index + 3] = image.Data[origIndex + 3];
+					}
+					else
+					{
+						newData[index + 0] = 0;
+						newData[index + 1] = 0;
+						newData[index + 2] = 0;
+						newData[index + 3] = 0;
+					}
+				}
 			}
 
+			image.Data = newData;
+			textureFormat.DataWidth = (uint)newWidth;
+			textureFormat.DataHeight = (uint)newHeight;
+		}
+
+		for ( uint i = 0; i < textureFormat.MipCount; ++i )
+		{
+			var compressionFormat = CompressionFormat.Bc3;
+
+			// TODO: Add .meta files that set compression format etc.
+			if ( path.Contains( "normal" ) )
+				compressionFormat = CompressionFormat.Bc5;
+			else if ( path.Contains( "font" ) || path.Contains( "noise" ) )
+				compressionFormat = CompressionFormat.Rgba;
+
+			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, compressionFormat );
 			textureFormat.MipDataLength[i] = textureFormat.MipData[i].Length;
 		}
 
