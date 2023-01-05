@@ -2,7 +2,7 @@
 
 public static class Parser
 {
-	private static bool Debug => false;
+	private static bool Debug => true;
 
 	private static string[] GetLaunchArgs()
 	{
@@ -95,15 +95,14 @@ public static class Parser
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
-
-					if ( !cursor.HasAttrs )
-						return CXChildVisitResult.CXChildVisit_Continue;
-
-					var attr = cursor.GetAttr( 0 );
-					if ( attr.Spelling.CString != "generate_bindings" )
-						return CXChildVisitResult.CXChildVisit_Continue;
-
 					{
+						if ( !cursor.HasAttrs )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
+						var attr = cursor.GetAttr( 0 );
+						if ( attr.Spelling.CString != "generate_bindings" )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var o = units.FirstOrDefault( x => x.Name == oName );
 						var m = new Method( cursor.Spelling.ToString(), cursor.ReturnType.Spelling.ToString() )
@@ -149,6 +148,13 @@ public static class Parser
 					}
 				case CXCursorKind.CXCursor_FieldDecl:
 					{
+						if ( !cursor.HasAttrs )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
+						var attr = cursor.GetAttr( 0 );
+						if ( attr.Spelling.CString != "generate_bindings" )
+							return CXChildVisitResult.CXChildVisit_Continue;
+
 						var oName = cursor.LexicalParent.Spelling.ToString();
 						var s = units.FirstOrDefault( x => x.Name == oName );
 
@@ -218,21 +224,6 @@ public static class Parser
 		}
 
 		//
-		// Post-processing
-		//
-		foreach ( var o in units )
-		{
-			// Create a default constructor if one wasn't already defined
-			if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
-			{
-				o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
-				{
-					IsConstructor = true
-				} );
-			}
-		}
-
-		//
 		// Remove all items with duplicate names
 		//
 		for ( int i = 0; i < units.Count; i++ )
@@ -246,6 +237,21 @@ public static class Parser
 		// Remove any units that have no methods or fields
 		//
 		units = units.Where( x => x.Methods.Count > 0 || x.Fields.Count > 0 ).ToList();
+
+		//
+		// Post-processing
+		//
+		foreach ( var o in units )
+		{
+			// Create a default constructor if one wasn't already defined
+			if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
+			{
+				o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
+				{
+					IsConstructor = true
+				} );
+			}
+		}
 
 		return units;
 	}
