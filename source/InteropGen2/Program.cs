@@ -86,6 +86,8 @@
 		while ( !dispatcher.IsComplete )
 			Thread.Sleep( 500 );
 
+		Thread.Sleep( 5000 );
+
 		// Expand methods out into list of (method name, method)
 		var methods = Units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
