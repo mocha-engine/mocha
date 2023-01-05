@@ -56,7 +56,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common\Common.csproj" />
-		<ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
+		<ProjectReference Include="..\UI\UI.csproj" />
 		<ProjectReference Include="..\VConsoleLib\VConsoleLib\VConsoleLib.csproj" />
 	</ItemGroup>
 

@@ -300,8 +300,6 @@ private:
 public:
 	PhysicsManager();
 
-	static void PreInit();
-
 	void Startup() override;
 	void Shutdown() override;
 
