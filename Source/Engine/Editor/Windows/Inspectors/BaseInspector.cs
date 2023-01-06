@@ -15,7 +15,12 @@ public class BaseInspector
 		DrawButtons( filePath );
 		ImGuiX.Separator();
 
-		ImGui.BeginListBox( "##inspector_table", new( -1, 0 ) );
+		int itemCount = items.Length + 1; // Add one for header
+		float lineHeight = ImGui.GetTextLineHeightWithSpacing() + ImGui.GetStyle().CellPadding.Y;
+		float listBoxHeight = itemCount * lineHeight;
+		listBoxHeight += 8f; // Header spacing
+
+		ImGui.BeginListBox( "##inspector_table", new Vector2( -1, listBoxHeight ) );
 
 		ImGuiX.TextBold( title );
 		DrawTable( items );
