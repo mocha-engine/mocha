@@ -63,11 +63,7 @@ namespace Editor
 
 	GENERATE_BINDINGS inline const char* GetGPUName()
 	{
-		std::string gpuName = g_renderManager->GetGPUName();
-		char* ret;
-		ret = _strdup( gpuName.c_str() );
-		
-		return ret;
+		return g_renderManager->GetGPUName();
 	}
 
 	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )

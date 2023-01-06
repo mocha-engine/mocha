@@ -1374,7 +1374,7 @@ RenderStatus VulkanRenderContext::CreateShader( ShaderInfo_t pipelineInfo, Handl
 RenderStatus VulkanRenderContext::GetGPUInfo( GPUInfo* outInfo )
 {
 	GPUInfo info = {};
-	info.name = std::string( m_deviceProperties.deviceName );
+	info.gpuName = m_deviceProperties.deviceName;
 
 	*outInfo = info;
 

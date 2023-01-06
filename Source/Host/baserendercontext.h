@@ -188,7 +188,7 @@ struct RenderPushConstants
 
 struct GPUInfo
 {
-	std::string name;
+	const char* gpuName;
 };
 
 // ----------------------------------------------------------------------------------------------------
