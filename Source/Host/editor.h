@@ -15,9 +15,12 @@
 
 namespace Editor
 {
-	// Get the current pointer to an ImGUI context.
-	// This is used in order to effectively "link" managed ImGUI
-	// to our native ImGUI instance.
+	/// <summary>
+	/// Get the current pointer to an ImGUI context.
+	/// This is used in order to effectively "link" managed ImGUI
+	/// to our native ImGUI instance.
+	/// </summary>
+	/// <returns></returns>
 	GENERATE_BINDINGS inline void* GetContextPointer()
 	{
 		auto ctx = ImGui::GetCurrentContext();
@@ -26,25 +29,25 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextBold( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mBoldFont );
+		ImGui::PushFont( g_renderContext->m_boldFont );
 		ImGui::Text( "%s", text );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextSubheading( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mSubheadingFont );
+		ImGui::PushFont( g_renderContext->m_subheadingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextHeading( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mHeadingFont );
+		ImGui::PushFont( g_renderContext->m_headingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextMonospace( const char* text )

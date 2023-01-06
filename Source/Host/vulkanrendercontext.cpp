@@ -715,6 +715,20 @@ void VulkanRenderContext::CreateSamplers()
 	m_anisoSampler = VulkanSampler( this, SAMPLER_TYPE_ANISOTROPIC );
 }
 
+void VulkanRenderContext::CreateImGuiIconFont()
+{
+	auto& io = ImGui::GetIO();
+
+	ImFontConfig iconConfig = {};
+	iconConfig.MergeMode = 1;
+	iconConfig.GlyphMinAdvanceX = 16.0f;
+
+	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
+}
+
 void VulkanRenderContext::CreateImGui()
 {
 	VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -738,18 +752,17 @@ void VulkanRenderContext::CreateImGui()
 	ImPlot::CreateContext();
 
 	auto& io = ImGui::GetIO();
-	m_mainFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
 
-	ImFontConfig iconConfig = {};
-	iconConfig.MergeMode = 1;
-	iconConfig.GlyphMinAdvanceX = 16.0f;
+#define ADD_FONT( name, path, size )                   \
+	name = io.Fonts->AddFontFromFileTTF( path, size ); \
+	CreateImGuiIconFont();
 
-	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-
-	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
-	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
-
-	m_monospaceFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+	ADD_FONT( m_mainFont, "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
+	ADD_FONT( m_boldFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 16.0f );
+	ADD_FONT( m_subheadingFont, "C:\\Windows\\Fonts\\seguisb.ttf", 22.0f );
+	ADD_FONT( m_headingFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 26.0f );
+	ADD_FONT( m_monospaceFont, "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+#undef ADD_FONT
 
 	io.Fonts->Build();
 

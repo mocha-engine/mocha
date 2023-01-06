@@ -300,6 +300,7 @@ private:
 	//
 	// ImGui
 	//
+	void CreateImGuiIconFont();
 	void CreateImGui();
 
 	//

@@ -513,4 +513,7 @@ public:
 
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;
+	ImFont* m_headingFont;
+	ImFont* m_boldFont;
+	ImFont* m_subheadingFont;
 };
