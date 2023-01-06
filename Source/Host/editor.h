@@ -114,11 +114,18 @@ namespace Editor
 		return GAME_VERSION;
 	}
 
-	GENERATE_BINDINGS inline void Image( Texture* texture, int x, int y )
+	GENERATE_BINDINGS inline void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 	{
 		void* imguiTextureID;
 		g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
-		ImGui::Image( imguiTextureID, { ( float )x, ( float )y } );
+
+		// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
+		// This is done because the C++ side isn't aware of any padding applied in order to get
+		// the image to become POT
+		float u = ( float )textureWidth / ( float )texture->m_size.x;
+		float v = ( float )textureWidth / ( float )texture->m_size.y;
+
+		ImGui::Image( imguiTextureID, { ( float )x, ( float )y }, { 0, 0 }, { u, v } );
 	}
 
 	GENERATE_BINDINGS inline bool BeginMainStatusBar()

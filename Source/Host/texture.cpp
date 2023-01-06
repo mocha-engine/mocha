@@ -10,6 +10,7 @@ Texture::Texture( uint32_t width, uint32_t height )
 	info.width = width;
 	info.height = height;
 
+	m_size = { width, height };
 	m_image = ImageTexture( info );
 }
 
