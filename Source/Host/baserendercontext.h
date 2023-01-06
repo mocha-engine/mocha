@@ -491,6 +491,12 @@ public:
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus RenderImGui() = 0;
 
+	/// <summary>
+	/// This will return a pointer that ImGui can use to draw a texture.
+	/// </summary>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
+	virtual RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) = 0;
+
 	// ----------------------------------------
 	//
 	// Windowing

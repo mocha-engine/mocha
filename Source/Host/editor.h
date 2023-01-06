@@ -116,8 +116,9 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void Image( Texture* texture, int x, int y )
 	{
-		// TODO
-		// ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
+		void* imguiTextureID;
+		g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+		ImGui::Image( imguiTextureID, { ( float )x, ( float )y } );
 	}
 
 	GENERATE_BINDINGS inline bool BeginMainStatusBar()

@@ -113,6 +113,8 @@ public:
 class VulkanImageTexture : public VulkanObject
 {
 private:
+	VkDescriptorSet m_imGuiDescriptorSet;
+	
 	inline int GetBytesPerPixel( VkFormat format )
 	{
 		switch ( format )
@@ -180,6 +182,7 @@ public:
 
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
+	void* GetImGuiTextureID();
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -434,4 +437,7 @@ public:
 	RenderStatus EndImGui() override;
 	/// <inheritdoc />
 	RenderStatus RenderImGui() override;
+
+	/// <inheritdoc />
+	RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) override;
 };

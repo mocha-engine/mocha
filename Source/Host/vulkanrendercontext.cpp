@@ -366,6 +366,20 @@ void VulkanImageTexture::Copy( TextureCopyData_t copyData )
 	} );
 }
 
+void* VulkanImageTexture::GetImGuiTextureID()
+{
+	//
+	// Create a descriptor for ImGUI if we do not already have one
+	//
+	if ( m_imGuiDescriptorSet == VK_NULL_HANDLE )
+	{
+		m_imGuiDescriptorSet = ImGui_ImplVulkan_AddTexture(
+		    m_parent->m_anisoSampler.sampler, imageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+	}
+
+	return ( void* )m_imGuiDescriptorSet;
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
@@ -1377,6 +1391,14 @@ RenderStatus VulkanRenderContext::GetGPUInfo( GPUInfo* outInfo )
 	info.gpuName = m_deviceProperties.deviceName;
 
 	*outInfo = info;
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::GetImGuiTextureID( ImageTexture* texture, void** outTextureId )
+{
+	VulkanImageTexture* vkTexture = m_imageTextures.Get( texture->m_handle ).get();
+	*outTextureId = vkTexture->GetImGuiTextureID();
 
 	return RENDER_STATUS_OK;
 }
