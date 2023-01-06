@@ -3,7 +3,7 @@
 public class ThreadDispatcher<T>
 {
 	public delegate void ThreadCallback( List<T> threadQueue );
-	private int threadCount = 16;
+	private int threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
 
 	private int threadsCompleted = 0;
 	public bool IsComplete => threadsCompleted == threadCount;
@@ -21,8 +21,7 @@ public class ThreadDispatcher<T>
 			.Select( g => g.Select( p => p.Value ).ToList() )
 			.ToList();
 
-		if ( batched.Count < threadCount )
-			threadCount = batched.Count; // Min. 1 per thread
+		threadCount = batched.Count;
 
 		for ( int i = 0; i < batched.Count; i++ )
 		{
