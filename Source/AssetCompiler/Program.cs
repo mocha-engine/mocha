@@ -47,7 +47,14 @@ public static class Program
 		{
 			foreach ( var item in threadQueue )
 			{
-				CompileFile( item );
+				try
+				{
+					CompileFile( item );
+				}
+				catch( Exception e )
+				{
+					Log.Fail( item, e );
+				}
 			}
 		}, queue );
 
