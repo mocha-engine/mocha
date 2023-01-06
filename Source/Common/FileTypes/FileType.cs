@@ -1,42 +1,13 @@
 ﻿namespace Mocha.Common;
 
-public struct FileType
+public partial struct FileType
 {
-	public FileType( string name, string extension, string iconLg, string iconSm, Vector4 color )
-	{
-		Name = name;
-		Extension = extension;
-		IconLg = iconLg;
-		IconSm = iconSm;
-		Color = color;
-	}
-
 	public string Name { get; set; }
 	public string Extension { get; set; }
+	public string[] SourceExtensions { get; set; }
 	public string IconLg { get; set; }
 	public string IconSm { get; set; }
 	public Vector4 Color { get; set; }
-
-	public static FileType Shader =>
-		new FileType( "Shader", "mshdr", "core/ui/icons/shader.mtex", FontAwesome.Glasses, MathX.GetColor( "#ffc710" ) );
-
-	public static FileType Material =>
-		new FileType( "Material", "mmat", "core/ui/icons/material.mtex", FontAwesome.Circle, MathX.GetColor( "#f7b239" ) );
-
-	public static FileType Texture =>
-		new FileType( "Texture", "mtex", "core/ui/icons/image.mtex", FontAwesome.Image, MathX.GetColor( "#5292fa" ) );
-
-	public static FileType Model =>
-		new FileType( "Model", "mmdl", "core/ui/icons/model.mtex", FontAwesome.Cube, MathX.GetColor( "#1ee3a5" ) );
-
-	public static FileType Default =>
-		new FileType( "Unknown", "*", "core/ui/icons/document.mtex", FontAwesome.File, MathX.GetColor( "#ffffff" ) );
-
-	public static FileType Sound =>
-		new FileType( "Sound", "msnd", "core/ui/icons/sound.mtex", FontAwesome.VolumeHigh, MathX.GetColor( "#fe646f" ) );
-
-	public static FileType Font =>
-		new FileType( "Font", "mfnt", "core/ui/icons/font.mtex", FontAwesome.Font, MathX.GetColor( "#acb4bc" ) );
 
 	public static FileType[] All
 	{

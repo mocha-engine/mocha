@@ -18,52 +18,48 @@ public class FileSystem
 
 	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, bool ignoreCompiledFiles = false )
 	{
-		bool isAsset = false;
-		string path = Path.Combine( this.BasePath, relativePath ).NormalizePath();
-		string sourcePath = path;
+		string path = Path.Combine( BasePath, relativePath ).NormalizePath();
 
 		if ( !ignoreCompiledFiles )
 		{
-			switch ( Path.GetExtension( relativePath ) )
-			{
-				case ".mmdl":
-				case ".mmat":
-				case ".mtex":
-				case ".mfnt":
-					// Load compiled assets
-					isAsset = true;
-					path += "_c";
-					break;
-			}
+			var extension = Path.GetExtension( relativePath );
+			var matchingType = FileType.GetFileTypeForExtension( extension );
 
-			// HACK: Is this an image? If so, check for a source .ttf, .jpg, or .png, and set that
-			// as the source path.
-			if ( Path.GetExtension( relativePath ) == ".mtex" )
+			//
+			// Check if this path has a registered file type, compile it if it does
+			//
+			if ( matchingType.HasValue )
 			{
-				var jpgPath = Path.ChangeExtension( sourcePath, "jpg" );
-				var pngPath = Path.ChangeExtension( sourcePath, "png" );
-				var ttfPath = Path.ChangeExtension( sourcePath, "ttf" );
+				var type = matchingType.Value;
 
-				if ( Path.Exists( jpgPath ) )
-					sourcePath = jpgPath;
-				else if ( Path.Exists( pngPath ) )
-					sourcePath = pngPath;
-				else if ( Path.Exists( ttfPath ) )
-					sourcePath = ttfPath;
-			}
+				// This is a mocha file so we'll add the compiled extension to it
+				path += "_c";
 
-			// HACK: Is this a font? 
-			if ( Path.GetExtension( relativePath ) == ".mfnt" )
-			{
-				var ttfPath = Path.ChangeExtension( sourcePath, "ttf" );
-				if ( Path.Exists( ttfPath ) )
-					sourcePath = ttfPath;
-			}
+				//
+				// Try to locate a potential source asset for the resource we're trying to find
+				//
+				string sourcePath = path;
+				foreach ( var sourceExtension in type.SourceExtensions )
+				{
+					var lookPath = Path.ChangeExtension( sourcePath, sourceExtension );
+					if ( Path.Exists( lookPath ) )
+					{
+						sourcePath = lookPath;
+						break;
+					}
+				}
 
-			// Compile asset if needed
-			if ( isAsset && File.Exists( sourcePath ) )
-			{
-				AssetCompiler.CompileFile( sourcePath );
+				//
+				// Did we find a valid source path for this file?
+				//
+				if ( sourcePath != path )
+				{
+					// Compile asset if needed
+					if ( File.Exists( sourcePath ) )
+					{
+						AssetCompiler.CompileFile( sourcePath );
+					}
+				}
 			}
 		}
 

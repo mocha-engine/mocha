@@ -2,7 +2,7 @@
 
 public interface IAssetCompiler
 {
-	static IAssetCompiler Current { get; set; }
+	static IAssetCompiler? Current { get; set; }
 
 	void CompileFile( string path );
 }
