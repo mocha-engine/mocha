@@ -24,6 +24,15 @@ Window::Window( uint32_t width, uint32_t height )
 
 	m_window = SDL_CreateWindow( WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 
+	// Check for any window creation errors and display them to the user. This can be things like, "we failed to create a
+	// window because you don't have a Vulkan-capable GPU", so it's good to catch this early on.
+	if ( m_window == nullptr )
+	{
+		const char* error = SDL_GetError();
+		ErrorMessage( std::string( error ) );
+		abort();
+	}
+
 	if ( !GameSettings::Get()->icon.empty() )
 	{
 		SDL_Surface* icon;
