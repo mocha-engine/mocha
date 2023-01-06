@@ -11,7 +11,7 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
-	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex" );
+	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex", false );
 
 	public Glue.Material NativeMaterial { get; private set; }
 
@@ -69,7 +69,7 @@ public class Material : Asset
 			false
 		);
 
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", NativeMaterial.ReloadShaders );
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ => NativeMaterial.ReloadShaders() );
 	}
 
 	/// <summary>
@@ -96,7 +96,7 @@ public class Material : Asset
 			RoughnessTexture.NativeTexture
 		};
 
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", () =>
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ =>
 		{
 			NativeMaterial.ReloadShaders();
 		} );

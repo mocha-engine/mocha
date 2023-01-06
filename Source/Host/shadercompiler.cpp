@@ -115,7 +115,7 @@ EShLanguage ShaderCompiler::FindLanguage( const ShaderType shader_type )
 		return EShLangFragment;
 	}
 
-	assert( false && "Shader type not yet supported." );
+	__debugbreak(); // Invalid / unsupported shader type
 }
 
 std::string ShaderCompiler::GetPreamble( EShLanguage language )

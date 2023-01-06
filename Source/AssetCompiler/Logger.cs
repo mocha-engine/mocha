@@ -15,19 +15,19 @@ public class Logger
 	public void UpToDate( string path )
 	{
 		UpToDateCount++;
-		Log( "Up-to-date", $"Not compiling '{path}' as it matches compiled version" );
+		Log( "Up-to-date", $"'{path}' is up to date, skipping" );
 	}
 
 	public void UnknownType( string path )
 	{
 		SkipCount++;
-		Log( "Skip", $"Don't know what '{path}' is so not touching it" );
+		Log( "Skip", $"'{path}' has an unknown resource type" );
 	}
 
 	public void Compiled( string path )
 	{
 		SuccessCount++;
-		Log( "Success", $"Compiled '{path}'" );
+		Log( "Success", $"'{path}' compiled" );
 	}
 
 	public void Fail( string path, Exception? e = null )
@@ -37,9 +37,9 @@ public class Logger
 	}
 
 	public void Processing( string type, string path )
- 	{
- 		Log( "PROCESS", $"Processing '{path}' as {type}" );
- 	}
+	{
+		Log( "Process", $"'{path}' is a {type}" );
+	}
 
 	public void Results( TimeSpan totalTime )
 	{

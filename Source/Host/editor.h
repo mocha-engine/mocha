@@ -15,9 +15,12 @@
 
 namespace Editor
 {
-	// Get the current pointer to an ImGUI context.
-	// This is used in order to effectively "link" managed ImGUI
-	// to our native ImGUI instance.
+	/// <summary>
+	/// Get the current pointer to an ImGUI context.
+	/// This is used in order to effectively "link" managed ImGUI
+	/// to our native ImGUI instance.
+	/// </summary>
+	/// <returns></returns>
 	GENERATE_BINDINGS inline void* GetContextPointer()
 	{
 		auto ctx = ImGui::GetCurrentContext();
@@ -26,25 +29,25 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextBold( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mBoldFont );
+		ImGui::PushFont( g_renderContext->m_boldFont );
 		ImGui::Text( "%s", text );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextSubheading( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mSubheadingFont );
+		ImGui::PushFont( g_renderContext->m_subheadingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextHeading( const char* text )
 	{
-		// ImGui::PushFont( g_Imgui->mHeadingFont );
+		ImGui::PushFont( g_renderContext->m_headingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
-		// ImGui::PopFont();
+		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextMonospace( const char* text )
@@ -63,16 +66,7 @@ namespace Editor
 
 	GENERATE_BINDINGS inline const char* GetGPUName()
 	{
-		std::string gpuName = g_renderManager->GetGPUName();
-		char* ret;
-		ret = _strdup( gpuName.c_str() );
-
-		defer
-		{
-			free( ret );
-		};
-
-		return ret;
+		return g_renderManager->GetGPUName();
 	}
 
 	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )
@@ -123,10 +117,18 @@ namespace Editor
 		return GAME_VERSION;
 	}
 
-	GENERATE_BINDINGS inline void Image( Texture* texture, int x, int y )
+	GENERATE_BINDINGS inline void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 	{
-		// TODO
-		// ImGui::Image( texture->GetImGuiID(), { ( float )x, ( float )y } );
+		void* imguiTextureID;
+		g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+
+		// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
+		// This is done because the C++ side isn't aware of any padding applied in order to get
+		// the image to become POT
+		float u = ( float )textureWidth / ( float )texture->m_size.x;
+		float v = ( float )textureWidth / ( float )texture->m_size.y;
+
+		ImGui::Image( imguiTextureID, { ( float )x, ( float )y }, { 0, 0 }, { u, v } );
 	}
 
 	GENERATE_BINDINGS inline bool BeginMainStatusBar()
@@ -152,7 +154,7 @@ namespace Editor
 		const std::vector<float> plotValues = values.GetData<float>();
 		const float MARKERS[] = { 30.0f, 60.0f, 144.0f };
 		const int MARKER_COUNT = 3;
-		const int sampleCount = plotValues.size();
+		const int sampleCount = static_cast<const int>( plotValues.size() );
 
 		auto startPos = ImGui::GetCursorPos();
 

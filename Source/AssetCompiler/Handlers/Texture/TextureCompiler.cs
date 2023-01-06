@@ -16,10 +16,9 @@ public partial class TextureCompiler : BaseCompiler
 	{
 		return format switch
 		{
-			TextureFormat.BC3_SRGB => CompressionFormat.Bc3,
-			TextureFormat.BC3_UNORM => CompressionFormat.Bc3,
-			TextureFormat.BC5_UNORM => CompressionFormat.Bc5,
-			TextureFormat.R8G8B8A8_SRGB => CompressionFormat.Rgba,
+			TextureFormat.BC3 => CompressionFormat.Bc3,
+			TextureFormat.BC5 => CompressionFormat.Bc5,
+			TextureFormat.RGBA => CompressionFormat.Rgba,
 
 			_ => throw new Exception( $"Unsupported texture format {format}" ),
 		};
@@ -147,11 +146,19 @@ public partial class TextureCompiler : BaseCompiler
 		using ( var md5 = MD5.Create() )
 			mochaFile.AssetHash = md5.ComputeHash( fileData );
 
-		// Write result
-		using var fileStream = new FileStream( destFileName, FileMode.Create );
-		using var binaryWriter = new BinaryWriter( fileStream );
+		// TODO: Runtime compiler will often catch this before we do, this needs fixing
+		try
+		{
+			// Write result
+			using var fileStream = new FileStream( destFileName, FileMode.Create );
+			using var binaryWriter = new BinaryWriter( fileStream );
+			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
+		}
+		catch ( Exception ex )
+		{
+			return Failed( path, exception: ex );
+		}
 
-		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
 		return Succeeded( path, destFileName );
 	}
 }

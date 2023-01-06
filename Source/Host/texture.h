@@ -6,6 +6,7 @@ class Texture
 {
 public:
 	ImageTexture m_image;
+	Size2D m_size;
 
 	Texture(){};
 

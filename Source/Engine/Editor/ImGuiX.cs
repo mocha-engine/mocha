@@ -126,24 +126,24 @@ public static class ImGuiX
 		return false;
 	}
 
+	public static void Image( Texture texture, Vector2 size )
+	{
+		Glue.Editor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
+	}
+
+	public static void Image( Texture texture, Vector2 size, Vector4 tint )
+	{
+		Glue.Editor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
+	}
+
 	public static void Image( string texturePath, Vector2 size )
 	{
 		Image( Texture.FromCache( texturePath ), size );
 	}
 
-	public static void Image( Texture texture, Vector2 size )
-	{
-		Glue.Editor.Image( texture.NativeTexture, (int)size.X, (int)size.Y );
-	}
-
 	public static void Image( string texture, Vector2 size, Vector4 tint )
 	{
 		Image( Texture.FromCache( texture ), size, tint );
-	}
-
-	public static void Image( Texture texture, Vector2 size, Vector4 tint )
-	{
-		Glue.Editor.Image( texture.NativeTexture, (int)size.X, (int)size.Y );
 	}
 
 	public static void Separator()

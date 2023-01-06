@@ -7,6 +7,80 @@ size_t CVarSystem::GetHash( std::string string )
 	return std::hash<std::string>{}( string );
 }
 
+void CVarSystem::Startup()
+{
+	// Load all archive cvars from disk
+	nlohmann::json cvarArchive;
+
+	std::ifstream cvarFile( "cvars.json" );
+
+	// Does the cvars file exist?
+	if ( !cvarFile.good() )
+	{
+		spdlog::info( "No cvars.json file was found -- using default values for all archived cvars" );
+		return;
+	}
+
+	// File exists so let's load it
+	cvarFile >> cvarArchive;
+
+	for ( auto& [name, value] : cvarArchive.items() )
+	{
+		assert( Exists( name ) ); // Doesn't exist! Register it first
+
+		size_t hash = GetHash( name );
+		CVarEntry& entry = m_cvarEntries[hash];
+
+		if ( entry.m_flags & CVarFlags::Archive )
+			FromString( name, value );
+	}
+}
+
+void CVarSystem::Shutdown()
+{
+	// Save all archive cvars to disk
+	nlohmann::json cvarArchive;
+
+	for ( auto& entry : m_cvarEntries )
+	{
+		if ( entry.second.m_flags & CVarFlags::Archive )
+			cvarArchive[entry.second.m_name] = ToString( entry.second.m_name );
+	}
+
+	std::ofstream cvarFile( "cvars.json" );
+	cvarFile << std::setw( 4 ) << cvarArchive << std::endl;
+}
+
+void CVarSystem::RegisterString( std::string name, std::string value, CVarFlags flags, std::string description )
+{
+	Register<std::string>( name, value, flags, description );
+}
+
+void CVarSystem::RegisterFloat( std::string name, float value, CVarFlags flags, std::string description )
+{
+	Register<float>( name, value, flags, description );
+}
+
+void CVarSystem::RegisterBool( std::string name, bool value, CVarFlags flags, std::string description )
+{
+	Register<bool>( name, value, flags, description );
+}
+
+std::string CVarSystem::GetString( std::string name )
+{
+	return Get<std::string>( name );
+}
+
+float CVarSystem::GetFloat( std::string name )
+{
+	return Get<float>( name );
+}
+
+bool CVarSystem::GetBool( std::string name )
+{
+	return Get<bool>( name );
+}
+
 void CVarSystem::ForEach( std::function<void( CVarEntry& entry )> func )
 {
 	for ( auto& entry : m_cvarEntries )
@@ -31,6 +105,11 @@ void CVarSystem::ForEach( std::string filter, std::function<void( CVarEntry& ent
 	{
 		func( entry );
 	}
+}
+
+bool CVarSystem::Exists( std::string name )
+{
+	return m_cvarEntries.find( GetHash( name ) ) != m_cvarEntries.end();
 }
 
 void CVarSystem::FromString( std::string name, std::string valueStr )
@@ -87,6 +166,21 @@ std::string CVarSystem::ToString( std::string name )
 		valueStr = std::any_cast<bool>( entry.m_value ) ? "true" : "false";
 
 	return valueStr;
+}
+
+void CVarSystem::SetString( std::string name, std::string value )
+{
+	Set<std::string>( name, value );
+}
+
+void CVarSystem::SetFloat( std::string name, float value )
+{
+	Set<float>( name, value );
+}
+
+void CVarSystem::SetBool( std::string name, bool value )
+{
+	Set<bool>( name, value );
 }
 
 void CVarManager::Startup()

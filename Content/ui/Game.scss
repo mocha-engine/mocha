@@ -42,9 +42,9 @@ weapon {
 
 weaponimage {
     height: 48px;
-    aspect-ratio: 2.388;
+    aspect-ratio: 3;
 
-    background-image: "ui/banner.png";
+    background-image: "ui/m4.png";
 }
 
 row {
@@ -56,6 +56,7 @@ col {
     flex-direction: column;
     justify-content: flex-end;
     margin-left: 20px;
+    flex-grow: 1;
 }
 
 vr {

@@ -1,4 +1,5 @@
 ﻿using Mocha.AssetCompiler;
+using System.Text;
 using System.Text.Json;
 
 namespace Mocha.Common;
@@ -73,19 +74,25 @@ public class FileSystem
 		return path;
 	}
 
-	public string ReadAllText( string relativePath )
+	public FileStream OpenRead( string relativePath )
 	{
-		return File.ReadAllText( GetAbsolutePath( relativePath ) );
+		return new FileStream( GetAbsolutePath( relativePath ), FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
 	}
 
 	public byte[] ReadAllBytes( string relativePath )
 	{
-		return File.ReadAllBytes( GetAbsolutePath( relativePath ) );
+		using ( var fileStream = OpenRead( relativePath ) )
+		{
+			var buffer = new byte[fileStream.Length];
+			fileStream.Read( buffer, 0, buffer.Length );
+			return buffer;
+		}
 	}
 
-	public FileStream OpenRead( string relativePath )
+	public string ReadAllText( string relativePath )
 	{
-		return File.OpenRead( GetAbsolutePath( relativePath ) );
+		var bytes = ReadAllBytes( relativePath );
+		return Encoding.Default.GetString( bytes );
 	}
 
 	public bool Exists( string relativePath )
@@ -93,7 +100,7 @@ public class FileSystem
 		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
 	}
 
-	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action onChange )
+	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange )
 	{
 		var directoryName = GetAbsolutePath( relativeDir );
 		var watcher = new FileSystemWatcher( directoryName, filter );
@@ -109,7 +116,12 @@ public class FileSystem
 							 | NotifyFilters.Size;
 
 		watcher.EnableRaisingEvents = true;
-		watcher.Changed += ( _, _ ) => onChange();
+		watcher.Changed += ( _, e ) =>
+		{
+			var path = Path.Combine( BasePath, e.Name );
+
+			onChange( path );
+		};
 
 		Watchers.Add( watcher );
 

@@ -86,7 +86,7 @@ VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType ty
 		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported Invalid render texture type
 }
 
 VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
@@ -101,7 +101,7 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported render texture type
 }
 
 VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
@@ -115,7 +115,7 @@ VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
 		return VK_IMAGE_ASPECT_DEPTH_BIT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported render texture type
 }
 
 VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTextureInfo_t textureInfo )
@@ -154,9 +154,9 @@ VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextur
 void VulkanImageTexture::SetData( TextureData_t textureData )
 {
 	VkFormat imageFormat = ( VkFormat )textureData.imageFormat;
-	VkDeviceSize imageSize = 0;
+	uint32_t imageSize = 0;
 
-	for ( int i = 0; i < textureData.mipCount; ++i )
+	for ( uint32_t i = 0; i < textureData.mipCount; ++i )
 	{
 		imageSize += CalcMipSize( textureData.width, textureData.height, i, imageFormat );
 	}
@@ -366,6 +366,20 @@ void VulkanImageTexture::Copy( TextureCopyData_t copyData )
 	} );
 }
 
+void* VulkanImageTexture::GetImGuiTextureID()
+{
+	//
+	// Create a descriptor for ImGUI if we do not already have one
+	//
+	if ( m_imGuiDescriptorSet == VK_NULL_HANDLE )
+	{
+		m_imGuiDescriptorSet = ImGui_ImplVulkan_AddTexture(
+		    m_parent->m_anisoSampler.sampler, imageView, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL );
+	}
+
+	return ( void* )m_imGuiDescriptorSet;
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
@@ -410,7 +424,7 @@ VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
 	if ( samplerType == SAMPLER_TYPE_ANISOTROPIC )
 		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
 
-	assert( true && "Invalid sampler type." );
+	__debugbreak(); // Invalid / unsupported sampler type.
 }
 
 VulkanSampler::VulkanSampler( VulkanRenderContext* parent, SamplerType samplerType )
@@ -701,6 +715,20 @@ void VulkanRenderContext::CreateSamplers()
 	m_anisoSampler = VulkanSampler( this, SAMPLER_TYPE_ANISOTROPIC );
 }
 
+void VulkanRenderContext::CreateImGuiIconFont()
+{
+	auto& io = ImGui::GetIO();
+
+	ImFontConfig iconConfig = {};
+	iconConfig.MergeMode = 1;
+	iconConfig.GlyphMinAdvanceX = 16.0f;
+
+	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
+	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
+}
+
 void VulkanRenderContext::CreateImGui()
 {
 	VkDescriptorPoolSize pool_sizes[] = { { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -724,18 +752,17 @@ void VulkanRenderContext::CreateImGui()
 	ImPlot::CreateContext();
 
 	auto& io = ImGui::GetIO();
-	m_mainFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
 
-	ImFontConfig iconConfig = {};
-	iconConfig.MergeMode = 1;
-	iconConfig.GlyphMinAdvanceX = 16.0f;
+#define ADD_FONT( name, path, size )                   \
+	name = io.Fonts->AddFontFromFileTTF( path, size ); \
+	CreateImGuiIconFont();
 
-	ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-
-	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-solid-900.ttf", 12.0f, &iconConfig, iconRanges );
-	io.Fonts->AddFontFromFileTTF( "content/core/fonts/fa-regular-400.ttf", 12.0f, &iconConfig, iconRanges );
-
-	m_monospaceFont = io.Fonts->AddFontFromFileTTF( "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+	ADD_FONT( m_mainFont, "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
+	ADD_FONT( m_boldFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 16.0f );
+	ADD_FONT( m_subheadingFont, "C:\\Windows\\Fonts\\seguisb.ttf", 22.0f );
+	ADD_FONT( m_headingFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 26.0f );
+	ADD_FONT( m_monospaceFont, "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+#undef ADD_FONT
 
 	io.Fonts->Build();
 
@@ -1002,8 +1029,8 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	VkViewport viewport = {};
 	viewport.minDepth = 0.0;
 	viewport.maxDepth = 1.0;
-	viewport.width = renderSize.x;
-	viewport.height = renderSize.y;
+	viewport.width = static_cast<float>( renderSize.x );
+	viewport.height = static_cast<float>( renderSize.y );
 
 	VkRect2D scissor = { { 0, 0 }, { renderSize.x, renderSize.y } };
 	vkCmdSetScissor( cmd, 0, 1, &scissor );
@@ -1236,7 +1263,10 @@ RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
 
 RenderStatus VulkanRenderContext::UpdateWindow()
 {
-	m_window->Update();
+	if ( m_window->Update() )
+	{
+		return RENDER_STATUS_WINDOW_CLOSE;
+	}
 
 	return RENDER_STATUS_OK;
 }
@@ -1371,9 +1401,17 @@ RenderStatus VulkanRenderContext::CreateShader( ShaderInfo_t pipelineInfo, Handl
 RenderStatus VulkanRenderContext::GetGPUInfo( GPUInfo* outInfo )
 {
 	GPUInfo info = {};
-	info.name = std::string( m_deviceProperties.deviceName );
+	info.gpuName = m_deviceProperties.deviceName;
 
 	*outInfo = info;
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::GetImGuiTextureID( ImageTexture* texture, void** outTextureId )
+{
+	VulkanImageTexture* vkTexture = m_imageTextures.Get( texture->m_handle ).get();
+	*outTextureId = vkTexture->GetImGuiTextureID();
 
 	return RENDER_STATUS_OK;
 }
@@ -1486,7 +1524,8 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 		bindings.push_back( binding );
 	}
 
-	VkDescriptorSetLayoutCreateInfo layoutInfo = VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), bindings.size() );
+	VkDescriptorSetLayoutCreateInfo layoutInfo =
+	    VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), static_cast<uint32_t>( bindings.size() ) );
 	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
 
 	VkDescriptorSetAllocateInfo allocInfo =
@@ -1503,7 +1542,7 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	}
 
-	assert( false && "Invalid descriptor binding type" );
+	__debugbreak(); // Invalid / unsupported descriptor binding type
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -1582,7 +1621,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	}
 
 	pipeline_layout_info.pSetLayouts = setLayouts.data();
-	pipeline_layout_info.setLayoutCount = setLayouts.size();
+	pipeline_layout_info.setLayoutCount = static_cast<uint32_t>( setLayouts.size() );
 
 	VK_CHECK( vkCreatePipelineLayout( m_parent->m_device, &pipeline_layout_info, nullptr, &builder.m_pipelineLayout ) );
 
@@ -1602,7 +1641,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	builder.m_shaderStages = shaderStages;
 
 	// Calculate stride size
-	size_t stride = 0;
+	uint32_t stride = 0;
 	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{
 		stride += GetSizeOf( ( VertexAttributeFormat )pipelineInfo.vertexAttributes[i].format );
@@ -1617,7 +1656,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 
 	description.bindings.push_back( mainBinding );
 
-	size_t offset = 0;
+	uint32_t offset = 0;
 
 	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{

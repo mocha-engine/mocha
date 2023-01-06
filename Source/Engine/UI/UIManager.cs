@@ -6,7 +6,7 @@ internal partial class UIManager
 
 	internal static UIManager Instance { get; private set; }
 
-	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex" );
+	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex", false );
 
 	private IRenderer Renderer { get; } = new UIEntity();
 	public LayoutNode RootPanel { get; private set; }
@@ -24,7 +24,7 @@ internal partial class UIManager
 		Graphics.Init();
 
 		var directory = System.IO.Path.GetDirectoryName( Path );
-		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", LoadTemplate );
+		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", _ => LoadTemplate() );
 
 		LoadTemplate();
 	}

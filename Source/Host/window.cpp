@@ -107,19 +107,28 @@ bool Window::Update()
 			}
 			else if ( we.event == SDL_WINDOWEVENT_SIZE_CHANGED )
 			{
-				if ( we.windowID != SDL_GetWindowID( m_window ) )
-					continue;
+				if ( we.windowID == SDL_GetWindowID( m_window ) )
+				{
+					auto width = we.data1;
+					auto height = we.data2;
 
-				auto width = we.data1;
-				auto height = we.data2;
+					spdlog::info( "Window was resized to {}x{}", width, height );
 
-				spdlog::info( "Window was resized to {}x{}", width, height );
+					// Push event so that renderer etc. knows we've resized the window
+					Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
 
-				// Push event so that renderer etc. knows we've resized the window
-				Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
-
-				if ( m_onWindowResized != nullptr )
-					m_onWindowResized( windowExtents );
+					if ( m_onWindowResized != nullptr )
+						m_onWindowResized( windowExtents );				
+				}
+			}
+			else if ( we.event == SDL_WINDOWEVENT_CLOSE )
+			{
+				// We don't want to quit if an editor window is closed
+				if ( we.windowID == SDL_GetWindowID( m_window ) )
+				{
+					// Main window was closed, so quit
+					bQuit = true;
+				}
 			}
 		}
 		else if ( e.type == SDL_MOUSEBUTTONDOWN || e.type == SDL_MOUSEBUTTONUP )
@@ -145,7 +154,7 @@ bool Window::Update()
 
 			inputState.keys[scanCode] = isDown;
 
-			if ( kbe.keysym.scancode == SDL_SCANCODE_F10 && isDown )
+			if ( kbe.keysym.scancode == SDL_SCANCODE_GRAVE && isDown )
 				m_captureMouse = !m_captureMouse;
 		}
 		else if ( e.type == SDL_MOUSEMOTION )
@@ -166,5 +175,5 @@ bool Window::Update()
 
 	g_inputManager->SetState( inputState );
 
-	return false;
+	return bQuit;
 }
