@@ -64,7 +64,7 @@ public class FontCompiler : BaseCompiler
 		// Write atlas metadata
 		var textureMeta = new TextureMetadata()
 		{
-			Format = TextureFormat.R8G8B8A8_SRGB
+			Format = TextureFormat.RGBA
 		};
 
 		File.WriteAllText( destAtlasMeta, JsonSerializer.Serialize( textureMeta ) );

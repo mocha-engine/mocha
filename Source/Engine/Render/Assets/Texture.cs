@@ -17,7 +17,7 @@ public partial class Texture : Asset
 	/// <summary>
 	/// Loads a texture from an MTEX (compiled) file.
 	/// </summary>
-	public Texture( string path )
+	public Texture( string path, bool isSrgb = true )
 	{
 		Path = path;
 		All.Add( this );
@@ -33,7 +33,7 @@ public partial class Texture : Asset
 
 		var mipData = textureFormat.Data.MipData;
 		var mipCount = textureFormat.Data.MipCount;
-		var format = textureFormat.Data.Format;
+		var format = GetRenderTextureFormat( textureFormat.Data.Format, isSrgb );
 
 		NativeTexture = new( DataWidth, DataHeight );
 
@@ -60,15 +60,16 @@ public partial class Texture : Asset
 	/// <summary>
 	/// Creates a texture with a specified size, containing RGBA data.
 	/// </summary>
-	public Texture( uint width, uint height, byte[] data ) : this( width, height )
+	public Texture( uint width, uint height, byte[] data, bool isSrgb = true ) : this( width, height, isSrgb )
 	{
-		NativeTexture.SetData( Width, Height, 1, data.ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
+		var textureFormat = GetRenderTextureFormat( TextureFormat.RGBA, isSrgb );
+		NativeTexture.SetData( Width, Height, 1, data.ToInterop(), (int)textureFormat );
 	}
 
 	/// <summary>
 	/// Creates a blank (no data) texture with a specified size
 	/// </summary>
-	public Texture( uint width, uint height )
+	public Texture( uint width, uint height, bool isSrgb = true )
 	{
 		Path = "Procedural Texture";
 		All.Add( this );
@@ -76,8 +77,9 @@ public partial class Texture : Asset
 		Width = width;
 		Height = height;
 
+		var textureFormat = GetRenderTextureFormat( TextureFormat.RGBA, isSrgb );
 		NativeTexture = new( width, height );
-		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)TextureFormat.R8G8B8A8_SRGB );
+		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)textureFormat );
 	}
 
 	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )
@@ -88,6 +90,30 @@ public partial class Texture : Asset
 	public void Delete()
 	{
 		Asset.All.Remove( this );
+	}
+
+	private static RenderTextureFormat GetRenderTextureFormat( TextureFormat textureFormat, bool isSrgb )
+	{
+		if ( isSrgb )
+		{
+			return textureFormat switch
+			{
+				TextureFormat.RGBA => RenderTextureFormat.R8G8B8A8_SRGB,
+				TextureFormat.BC3 => RenderTextureFormat.BC3_SRGB,
+				TextureFormat.BC5 => RenderTextureFormat.BC5_UNORM, // BC5 does not support sRGB
+				_ => throw new Exception( $"Invalid or unsupported texture SRGB format '{textureFormat}'" )
+			};
+		}
+		else
+		{
+			return textureFormat switch
+			{
+				TextureFormat.RGBA => RenderTextureFormat.R8G8B8A8_UNORM,
+				TextureFormat.BC3 => RenderTextureFormat.BC3_UNORM,
+				TextureFormat.BC5 => RenderTextureFormat.BC5_UNORM,
+				_ => throw new Exception( $"Invalid or unsupported texture SRGB format '{textureFormat}'" )
+			};
+		}
 	}
 
 	//
@@ -102,7 +128,7 @@ public partial class Texture : Asset
 			return cachedTexture;
 		}
 
-		var loadedTexture = new Texture( fontName );
+		var loadedTexture = new Texture( fontName, false );
 		return CachedTextures[fontName] = loadedTexture;
 	}
 }

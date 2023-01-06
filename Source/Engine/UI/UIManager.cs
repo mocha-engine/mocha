@@ -6,7 +6,7 @@ internal partial class UIManager
 
 	internal static UIManager Instance { get; private set; }
 
-	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex" );
+	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex", false );
 
 	private IRenderer Renderer { get; } = new UIEntity();
 	public LayoutNode RootPanel { get; private set; }

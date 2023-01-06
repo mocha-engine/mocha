@@ -11,7 +11,7 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
-	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex" );
+	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex", false );
 
 	public Glue.Material NativeMaterial { get; private set; }
 

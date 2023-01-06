@@ -16,10 +16,9 @@ public partial class TextureCompiler : BaseCompiler
 	{
 		return format switch
 		{
-			TextureFormat.BC3_SRGB => CompressionFormat.Bc3,
-			TextureFormat.BC3_UNORM => CompressionFormat.Bc3,
-			TextureFormat.BC5_UNORM => CompressionFormat.Bc5,
-			TextureFormat.R8G8B8A8_SRGB => CompressionFormat.Rgba,
+			TextureFormat.BC3 => CompressionFormat.Bc3,
+			TextureFormat.BC5 => CompressionFormat.Bc5,
+			TextureFormat.RGBA => CompressionFormat.Rgba,
 
 			_ => throw new Exception( $"Unsupported texture format {format}" ),
 		};

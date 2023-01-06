@@ -28,7 +28,7 @@ public static partial class Graphics
 			return cachedTexture;
 		}
 
-		var texture = new Texture( path );
+		var texture = new Texture( path, false );
 		CachedTextures.Add( path, texture );
 
 		return texture;
