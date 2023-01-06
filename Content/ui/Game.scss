@@ -1,5 +1,7 @@
 $background: #000000;
 $bar: #ffffff;
+$text: #ffffff;
+$text-light: #bbbbbb;
 
 $safe-area-x: 50px;
 $safe-area-y: 50px;
@@ -17,8 +19,6 @@ vitals, weapon {
     border-radius: 10px;
     flex-direction: column;
 
-    background-color: $background;
-
     padding: 10px;
     padding-top: 0;
     padding-bottom: 5px;
@@ -35,32 +35,58 @@ image {
 }
 
 weapon {
-    width: -1px;
+    width: 384px;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+weaponimage {
+    height: 48px;
+    aspect-ratio: 2.388;
+
+    background-image: "ui/banner.png";
 }
 
 row {
     flex-grow: 1;
     flex-direction: column;
-    align-items: flex-end;
+}
+
+col {
+    flex-direction: column;
+    justify-content: flex-end;
+    margin-left: 20px;
+}
+
+vr {
+    width: 2px;
+    height: -1px;
+    background-color: $text-light;
+    margin-left: 20px;
+}
+
+b {
+    font-size: 64px;
+    margin-top: -15px;
 }
 
 p, b {
-    font-size: 10px;
     font-weight: 500;
-    color: $bar;
+    color: $text;
 
-    font-family: "QuinqueFive";
+    font-family: "ProFontWindows";
+}
+
+p {
+    font-size: 24px;
+    color: $text-light;
     margin-top: 10px;
     margin-bottom: 5px;
 }
 
-b {
-    font-size: 16px;
-}
-
 bar {
-    width: 236px;
-    height: 10px;
+    width: 384px;
+    height: 20px;
     flex-grow: 1;
 }
 
@@ -69,6 +95,6 @@ bar.health {
 }
 
 bar.oxygen {
-    height: 2px;
     background-color: $bar;
+    height: 10px;
 }
