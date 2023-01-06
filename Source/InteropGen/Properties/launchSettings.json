@@ -2,7 +2,8 @@
   "profiles": {
     "InteropGen2": {
       "commandName": "Project",
-      "commandLineArgs": "$(SolutionDir)"
+      "commandLineArgs": "$(SolutionDir)",
+      "workingDirectory": "F:\\Projects\\mocha-native\\Source\\InteropGen"
     }
   }
 }

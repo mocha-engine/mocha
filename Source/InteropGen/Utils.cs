@@ -43,7 +43,7 @@ static class Utils
 
 		// Check if the native type is a reference
 		if ( nativeType.EndsWith( "&" ) )
-			return GetManagedType( nativeType[0..^1] ); // TODO: Should we return "ref"?
+			return GetManagedType( nativeType[0..^1] );
 
 		// Check if the native type is in the lookup table
 		if ( lookupTable.ContainsKey( nativeType ) )

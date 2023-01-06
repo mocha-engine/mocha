@@ -1,31 +1,16 @@
 ﻿using ClangSharp.Interop;
+using InteropGen;
 
 public static class Parser
 {
-	// TODO: Generate from vcxproj
+	/// <summary>
+	/// Cached launch arguments so that we don't have to regenerate them every time
+	/// </summary>
+	private static string[] LaunchArgs = GetLaunchArgs();
 	private static string[] GetLaunchArgs()
 	{
-		// Locate vcpkg
-		var vcpkgRoot = Environment.GetEnvironmentVariable( "VCPKG_ROOT" );
-
-		// Use default if null
-		vcpkgRoot ??= @"C:\Users\" + Environment.UserName + @"\vcpkg";
-
-		// Locate vulkan sdk
-		var vulkanSdk = Environment.GetEnvironmentVariable( "VULKAN_SDK" );
-		var includeDirs = new string[]
-		{
-			$"{vcpkgRoot}\\installed\\x64-windows\\include",
-			$"{vcpkgRoot}\\installed\\x64-windows\\include\\SDL2",
-			$"{vulkanSdk}\\Include",
-			"../Host/",
-			"../Host/ThirdParty/Renderdoc",
-			"../Host/ThirdParty/vk-bootstrap/src",
-			"../Host/ThirdParty/imgui",
-			"../Host/ThirdParty/ImPlot",
-			"../Host/ThirdParty/JoltPhysics",
-			"../Host/ThirdParty/volk",
-		};
+		// Generate includes from vcxproj
+		var includeDirs = VcxprojParser.ParseIncludes( "../Host/Host.vcxproj" );
 
 		var args = new List<string>
 		{
@@ -48,7 +33,7 @@ public static class Parser
 		List<IUnit> units = new();
 
 		using var index = CXIndex.Create();
-		using var unit = CXTranslationUnit.Parse( index, path, GetLaunchArgs(), ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+		using var unit = CXTranslationUnit.Parse( index, path, LaunchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
 
 		for ( int i = 0; i < unit.NumDiagnostics; ++i )
 		{
