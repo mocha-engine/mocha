@@ -95,7 +95,8 @@ public class ConsoleWindow : EditorWindow
 		{
 			foreach ( var entity in BaseEntity.All )
 			{
-				ImGui.Selectable( entity.Name );
+				if ( ImGui.Selectable( entity.Name ) )
+					BrowserWindow.SetSelectedObject( entity );
 			}
 
 			ImGui.EndTabItem();
