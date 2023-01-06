@@ -8,7 +8,8 @@ public class Logger
 	private int UpToDateCount = 0;
 
 	private void Log( string prefix, string message ) => Console.WriteLine( $"{"[" + prefix.ToUpper() + "]",-16}{message}" );
-	public void Skip( string path )
+
+	public void UpToDate( string path )
 	{
 		UpToDateCount++;
 		Log( "Up-to-date", $"Not compiling '{path}' as it matches compiled version" );
