@@ -9,6 +9,19 @@ void RenderdocManager::Startup()
 	if ( !EngineProperties::Renderdoc )
 		return;
 
+	//
+	// Renderdoc is not compatible with any of the raytracing
+	// extensions, and will break everything if we try to attach.
+	// https://github.com/baldurk/renderdoc/issues/2317
+	//
+	// If you want to attach renderdoc, disable raytracing.
+	//
+	if ( EngineProperties::Raytracing )
+	{
+		spdlog::info( "Renderdoc and raytracing are not compatible with each other - disabling renderdoc" );
+		return;
+	}
+
 	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
 	auto renderdocDll = LoadLibrary( L"renderdoc.dll" );
@@ -33,6 +46,9 @@ void RenderdocManager::Startup()
 
 void RenderdocManager::Shutdown()
 {
+	if ( EngineProperties::Raytracing )
+		return;
+
 	if ( !EngineProperties::Renderdoc )
 		return;
 }
