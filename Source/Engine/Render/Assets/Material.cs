@@ -69,7 +69,7 @@ public class Material : Asset
 			false
 		);
 
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", NativeMaterial.ReloadShaders );
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ => NativeMaterial.ReloadShaders() );
 	}
 
 	/// <summary>
@@ -96,7 +96,7 @@ public class Material : Asset
 			RoughnessTexture.NativeTexture
 		};
 
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", () =>
+		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ =>
 		{
 			NativeMaterial.ReloadShaders();
 		} );

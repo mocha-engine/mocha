@@ -93,7 +93,7 @@ public class FileSystem
 		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
 	}
 
-	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action onChange )
+	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange )
 	{
 		var directoryName = GetAbsolutePath( relativeDir );
 		var watcher = new FileSystemWatcher( directoryName, filter );
@@ -109,7 +109,12 @@ public class FileSystem
 							 | NotifyFilters.Size;
 
 		watcher.EnableRaisingEvents = true;
-		watcher.Changed += ( _, _ ) => onChange();
+		watcher.Changed += ( _, e ) =>
+		{
+			var path = Path.Combine( BasePath, e.Name );
+
+			onChange( path );
+		};
 
 		Watchers.Add( watcher );
 

@@ -24,7 +24,7 @@ internal partial class UIManager
 		Graphics.Init();
 
 		var directory = System.IO.Path.GetDirectoryName( Path );
-		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", LoadTemplate );
+		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", _ => LoadTemplate() );
 
 		LoadTemplate();
 	}
