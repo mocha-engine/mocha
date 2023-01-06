@@ -1,5 +1,6 @@
 ﻿namespace Mocha.Editor;
 
+[Inspector<Texture>]
 public class TextureInspector : BaseInspector
 {
 	private Texture texture;

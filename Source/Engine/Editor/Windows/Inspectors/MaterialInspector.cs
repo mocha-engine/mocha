@@ -1,5 +1,6 @@
 ﻿namespace Mocha.Editor;
 
+[Inspector<Material>]
 public class MaterialInspector : BaseInspector
 {
 	private Material material;
