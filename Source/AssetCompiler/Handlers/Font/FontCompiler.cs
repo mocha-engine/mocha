@@ -90,11 +90,18 @@ public class FontCompiler : BaseCompiler
 		using ( var md5 = MD5.Create() )
 			mochaFile.AssetHash = md5.ComputeHash( Encoding.Default.GetBytes( fileData ) );
 
-		// Write result
-		using var fileStream = new FileStream( destFileName, FileMode.Create );
-		using var binaryWriter = new BinaryWriter( fileStream );
+		try
+		{
+			// Write result
+			using var fileStream = new FileStream( destFileName, FileMode.Create );
+			using var binaryWriter = new BinaryWriter( fileStream );
 
-		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
+			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
+		}
+		catch ( Exception ex )
+		{
+			return Failed( path, exception: ex );
+		}
 
 		//
 		// Cleanup
