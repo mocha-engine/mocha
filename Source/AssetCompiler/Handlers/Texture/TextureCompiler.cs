@@ -147,11 +147,19 @@ public partial class TextureCompiler : BaseCompiler
 		using ( var md5 = MD5.Create() )
 			mochaFile.AssetHash = md5.ComputeHash( fileData );
 
-		// Write result
-		using var fileStream = new FileStream( destFileName, FileMode.Create );
-		using var binaryWriter = new BinaryWriter( fileStream );
+		// TODO: Runtime compiler will often catch this before we do, this needs fixing
+		try
+		{
+			// Write result
+			using var fileStream = new FileStream( destFileName, FileMode.Create );
+			using var binaryWriter = new BinaryWriter( fileStream );
+			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
+		}
+		catch ( Exception ex )
+		{
+			return Failed( path, exception: ex );
+		}
 
-		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
 		return Succeeded( path, destFileName );
 	}
 }
