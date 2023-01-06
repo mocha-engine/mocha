@@ -245,7 +245,7 @@ public partial struct Rotation : IEquatable<Rotation>
 		sb.Append( "( " );
 
 		sb.Append( $"Pitch: {euler.X}, " );
-		sb.Append( $"Yaw: {euler.Y}" );
+		sb.Append( $"Yaw: {euler.Y}, " );
 		sb.Append( $"Roll: {euler.Z}" );
 
 		sb.Append( " )" );
