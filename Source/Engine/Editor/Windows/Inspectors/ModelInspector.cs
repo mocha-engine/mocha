@@ -1,5 +1,6 @@
 ﻿namespace Mocha.Editor;
 
+[Inspector<Model>]
 public class ModelInspector : BaseInspector
 {
 	private Model model;
