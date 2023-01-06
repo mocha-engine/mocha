@@ -281,6 +281,7 @@ enum RenderStatus
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
 	RENDER_STATUS_SHADER_COMPILE_FAILED,				// The shader failed to compile
 	RENDER_STATUS_WINDOW_SIZE_INVALID,					// The window size is invalid. It might be minimized. This shouldn't be treated as an error.
+	RENDER_STATUS_WINDOW_CLOSE,							// The window was closed. This shouldn't be treated as an error.
 };
 
 // ----------------------------------------------------------------------------------------------------

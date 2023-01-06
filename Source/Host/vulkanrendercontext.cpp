@@ -1236,7 +1236,10 @@ RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
 
 RenderStatus VulkanRenderContext::UpdateWindow()
 {
-	m_window->Update();
+	if ( m_window->Update() )
+	{
+		return RENDER_STATUS_WINDOW_CLOSE;
+	}
 
 	return RENDER_STATUS_OK;
 }

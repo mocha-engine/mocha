@@ -40,7 +40,8 @@
 #include <implot.h>
 
 FloatCVar timescale( "game.timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
-FloatCVar maxFramerate( "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
+FloatCVar maxFramerate(
+    "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
 void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 {
@@ -199,8 +200,12 @@ void RenderManager::Run()
 		flFilteredTime = 0;
 		flFrameTime = 0;
 
-		m_renderContext->UpdateWindow();
-		
+		if ( m_renderContext->UpdateWindow() == RENDER_STATUS_WINDOW_CLOSE )
+		{
+			bQuit = true;
+			break;
+		}
+
 		m_renderContext->BeginImGui();
 
 		{
@@ -212,7 +217,7 @@ void RenderManager::Run()
 
 		g_physicsManager->Update();
 		g_hostManager->Render();
-		
+
 		m_renderContext->EndImGui();
 
 		Render();
