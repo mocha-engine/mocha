@@ -66,7 +66,20 @@ public class Editor
 		if ( ImGuiX.BeginMainStatusBar() )
 		{
 			ImGui.Text( $"{Screen.Size.X}x{Screen.Size.Y}" );
+
+			ImGui.Dummy( new Vector2( 4, 0 ) );
+			ImGui.Separator();
+			ImGui.Dummy( new Vector2( 4, 0 ) );
 			ImGui.Text( $"{Time.FPS} FPS" );
+
+			// Filler
+			var windowWidth = ImGui.GetWindowWidth();
+			var cursorX = ImGui.GetCursorPosX();
+			ImGui.Dummy( new Vector2( windowWidth - cursorX - 150f, 0 ) );
+
+			ImGui.Separator();
+			ImGui.Dummy( new Vector2( 4, 0 ) );
+			ImGui.Text( "Press ~ to toggle cursor" );
 		}
 
 		ImGuiX.EndMainStatusBar();

@@ -66,12 +66,7 @@ namespace Editor
 		std::string gpuName = g_renderManager->GetGPUName();
 		char* ret;
 		ret = _strdup( gpuName.c_str() );
-
-		defer
-		{
-			free( ret );
-		};
-
+		
 		return ret;
 	}
 

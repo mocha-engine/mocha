@@ -145,7 +145,7 @@ bool Window::Update()
 
 			inputState.keys[scanCode] = isDown;
 
-			if ( kbe.keysym.scancode == SDL_SCANCODE_F10 && isDown )
+			if ( kbe.keysym.scancode == SDL_SCANCODE_GRAVE && isDown )
 				m_captureMouse = !m_captureMouse;
 		}
 		else if ( e.type == SDL_MOUSEMOTION )
