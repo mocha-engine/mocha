@@ -1,4 +1,5 @@
 ﻿global using Mocha.Common;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Mocha.AssetCompiler;
@@ -107,14 +108,24 @@ public static class Program
 
 		// TODO: Check if we have an original asset & if it needs recompiling
 
-		if ( GetCompiler( fileExtension, out var compiler ) )
+		if ( !GetCompiler( fileExtension, out var compiler ) )
+			return;
+
+		Log.Processing( compiler.AssetName, path );
+		var result = compiler.CompileFile( path );
+
+		switch ( result.State )
 		{
-			var destFile = compiler?.CompileFile( path );
-
-			if ( destFile == null )
+			case CompileState.UpToDate:
+				Log.UpToDate( result.DestinationPath! );
+				break;
+			case CompileState.Succeeded:
+				Log.Compiled( result.DestinationPath! );
+				break;
+			case CompileState.Failed:
 				throw new Exception( "Failed to compile?" );
-
-			Log.Compiled( destFile );
+			default:
+				throw new UnreachableException();
 		}
 	}
 }

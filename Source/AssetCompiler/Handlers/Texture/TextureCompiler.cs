@@ -9,6 +9,8 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".png", ".jpg" } )]
 public class TextureCompiler : BaseCompiler
 {
+	public override string AssetName => "Texture";
+
 	private static byte[] BlockCompression( byte[] data, int width, int height, int mip, CompressionFormat compressionFormat )
 	{
 		BcEncoder encoder = new BcEncoder();
@@ -21,10 +23,8 @@ public class TextureCompiler : BaseCompiler
 		return encoder.EncodeToRawBytes( data, width, height, PixelFormat.Rgba32, mip, out _, out _ );
 	}
 
-	public override string CompileFile( string path )
+	public override CompileResult CompileFile( string path )
 	{
-		Log.Processing( "Texture", path );
-
 		var destFileName = Path.ChangeExtension( path, "mtex_c" );
 		var textureFormat = new TextureInfo();
 
@@ -42,11 +42,7 @@ public class TextureCompiler : BaseCompiler
 			using var md5 = MD5.Create();
 			var computedHash = md5.ComputeHash( fileData );
 			if ( Enumerable.SequenceEqual( deserializedFile.AssetHash, computedHash ) )
-			{
-				Log.Skip( path );
-
-				return destFileName;
-			}
+				return UpToDate( path, destFileName );
 		}
 
 		textureFormat.Width = (uint)image.Width;
@@ -100,6 +96,6 @@ public class TextureCompiler : BaseCompiler
 		using var binaryWriter = new BinaryWriter( fileStream );
 
 		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
-		return destFileName;
+		return Succeeded( path, destFileName );
 	}
 }
