@@ -10,7 +10,6 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".png", ".jpg" } )]
 public partial class TextureCompiler : BaseCompiler
 {
-
 	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
 	{
 		return format switch

@@ -61,8 +61,7 @@ public class FontCompiler : BaseCompiler
 
 		if ( process.ExitCode != 0 )
 		{
-			// There was an error generating the atlas
-			throw new Exception();
+			throw new Exception( $"There was an error generating the atlas: {process.ExitCode}" );
 		}
 
 		// Write atlas metadata
