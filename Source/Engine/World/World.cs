@@ -34,6 +34,7 @@ public class World
 
 	public void Update()
 	{
+		DebugOverlay.NewFrame();
 		UIManager.Instance.Render();
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
