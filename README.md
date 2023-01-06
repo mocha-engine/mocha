@@ -42,7 +42,7 @@ I'm doing a monthly series of write-ups about Mocha on my blog. These should giv
 ### Instructions
 
 1. First, clone the repository recursively with `git clone --recursive https://github.com/xezno/mocha`
-2. Run **setup.cmd**.
+2. Run **Source/setup_x64.cmd** if building for 64-bit (recommended), or **Source/setup_x86.cmd** if building for 32-bit.
 3. Once complete, open **Source/Mocha.sln** and build the solution.
 4. Run **Host** to start the engine and run SpaceGame.
 
