@@ -1,5 +1,6 @@
 ﻿global using Mocha.Common;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Mocha.AssetCompiler;
@@ -42,16 +43,12 @@ public static class Program
 			CompileFile( path );
 		}
 
-		var completedThreads = 0;
-
 		var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
 		{
 			foreach ( var item in threadQueue )
 			{
 				CompileFile( item );
 			}
-
-			completedThreads++;
 		}, queue );
 
 		while ( !dispatcher.IsComplete )
@@ -73,7 +70,7 @@ public static class Program
 		}
 	}
 
-	private static bool GetCompiler( string fileExtension, out BaseCompiler? foundCompiler )
+	private static bool GetCompiler( string fileExtension, [NotNullWhen( true )] out BaseCompiler? foundCompiler )
 	{
 		foreach ( var compiler in Compilers )
 		{
