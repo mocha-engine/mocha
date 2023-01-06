@@ -26,6 +26,12 @@ public class Logger
 		Log( "Success", $"Compiled '{path}'" );
 	}
 
+	public void Fail( string path, Exception? e = null )
+	{
+		FailCount++;
+		Log( "Fail", $"{path} failed to compile. Error was: {e?.Message ?? "Unknown"}" );
+	}
+
 	public void Processing( string type, string path ) => Log( "PROCESS", $"Processing '{path}' as {type}" );
 
 	public void Results( TimeSpan totalTime ) => Log( "Results", $"========== Build: {SuccessCount} succeeded, {FailCount} failed, {UpToDateCount} up-to-date, {SkipCount} skipped ==========\nBuild took {totalTime.TotalSeconds} seconds." );
