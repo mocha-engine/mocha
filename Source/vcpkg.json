@@ -9,7 +9,12 @@
         "glslang",
         "nethost",
         "nlohmann-json",
-        "sdl2",
+        {
+            "name": "sdl2",
+            "features": [
+                "vulkan"
+            ]
+        },
         "sdl2-image",
         "spdlog",
         "vulkan-memory-allocator"
