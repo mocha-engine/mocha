@@ -978,8 +978,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 
 	if ( !CanRender() )
 	{
-		m_renderingActive = true;
-		return RENDER_STATUS_OK; // We handled this internally, so don't return an error.
+		return RENDER_STATUS_WINDOW_SIZE_INVALID;
 	}
 
 	// Wait until we can render ( 1 second timeout )
@@ -1085,7 +1084,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	if ( !CanRender() )
 	{
 		m_renderingActive = false;
-		return RENDER_STATUS_OK; // We handled this internally, so don't return an error.
+		return RENDER_STATUS_WINDOW_SIZE_INVALID;
 	}
 
 	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );

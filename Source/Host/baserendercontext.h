@@ -280,6 +280,7 @@ enum RenderStatus
 	RENDER_STATUS_NO_INDEX_BUFFER_BOUND,				// You tried to render without an index buffer bound and had indexCount > 0
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
 	RENDER_STATUS_SHADER_COMPILE_FAILED,				// The shader failed to compile
+	RENDER_STATUS_WINDOW_SIZE_INVALID,					// The window size is invalid. It might be minimized. This shouldn't be treated as an error.
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -295,7 +296,8 @@ inline std::string GetRenderContextStatusString( RenderStatus status )
 	    "RENDER_STATUS_NO_VERTEX_BUFFER_BOUND",
 	    "RENDER_STATUS_NO_INDEX_BUFFER_BOUND", 
 		"RENDER_STATUS_INVALID_HANDLE",
-		"RENDER_STATUS_SHADER_COMPILE_FAILED"
+		"RENDER_STATUS_SHADER_COMPILE_FAILED",
+		"RENDER_STATUS_WINDOW_SIZE_INVALID"
 	};
 
 	return RenderContextStatusStrings[status];
@@ -376,9 +378,32 @@ public:
 	// ----------------------------------------
 
 	// Call this before invoking any render functions.
+
+	/// <summary>
+	/// Begins rendering. This should be matched with a call to EndRendering.
+	/// </summary>
+	/// <returns>
+	/// <para>
+	/// RENDER_STATUS_OK if successful
+	/// </para>
+	/// <para>
+	/// RENDER_STATUS_WINDOW_SIZE_INVALID if the window has been minimized or made too small.
+	/// Do not call EndRendering if this is returned.
+	/// </para>
+	/// </returns>
 	virtual RenderStatus BeginRendering() = 0;
 
-	// Call this after you're done.
+	/// <summary>
+	/// Ends rendering. This should be matched with a call to BeginRendering.
+	/// </summary>
+	/// <returns>
+	/// <para>
+	/// RENDER_STATUS_OK if successful
+	/// </para>
+	/// <para>
+	/// RENDER_STATUS_WINDOW_SIZE_INVALID if the window has been minimized or made too small.
+	/// </para>
+	/// </returns>
 	virtual RenderStatus EndRendering() = 0;
 
 	// ----------------------------------------

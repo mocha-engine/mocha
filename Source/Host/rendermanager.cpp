@@ -122,7 +122,10 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 
 void RenderManager::Render()
 {
-	m_renderContext->BeginRendering();
+	RenderStatus res = m_renderContext->BeginRendering();
+
+	if ( res == RENDER_STATUS_WINDOW_SIZE_INVALID )
+		return;
 
 	auto viewProjMatrix = CalculateViewProjMatrix();
 	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
