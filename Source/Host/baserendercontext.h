@@ -507,5 +507,3 @@ public:
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;
 };
-
-#undef virtual RenderStatus

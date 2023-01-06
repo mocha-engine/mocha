@@ -152,7 +152,7 @@ namespace Editor
 		const std::vector<float> plotValues = values.GetData<float>();
 		const float MARKERS[] = { 30.0f, 60.0f, 144.0f };
 		const int MARKER_COUNT = 3;
-		const int sampleCount = plotValues.size();
+		const int sampleCount = static_cast<const int>( plotValues.size() );
 
 		auto startPos = ImGui::GetCursorPos();
 

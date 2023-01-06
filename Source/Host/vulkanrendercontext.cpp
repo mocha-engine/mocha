@@ -86,7 +86,7 @@ VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType ty
 		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported Invalid render texture type
 }
 
 VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
@@ -101,7 +101,7 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported render texture type
 }
 
 VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
@@ -115,7 +115,7 @@ VkImageAspectFlags VulkanRenderTexture::GetAspectFlags( RenderTextureType type )
 		return VK_IMAGE_ASPECT_DEPTH_BIT;
 	}
 
-	assert( true && "Invalid render texture type" );
+	__debugbreak(); // Invalid / unsupported render texture type
 }
 
 VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTextureInfo_t textureInfo )
@@ -154,9 +154,9 @@ VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextur
 void VulkanImageTexture::SetData( TextureData_t textureData )
 {
 	VkFormat imageFormat = ( VkFormat )textureData.imageFormat;
-	VkDeviceSize imageSize = 0;
+	uint32_t imageSize = 0;
 
-	for ( int i = 0; i < textureData.mipCount; ++i )
+	for ( uint32_t i = 0; i < textureData.mipCount; ++i )
 	{
 		imageSize += CalcMipSize( textureData.width, textureData.height, i, imageFormat );
 	}
@@ -410,7 +410,7 @@ VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
 	if ( samplerType == SAMPLER_TYPE_ANISOTROPIC )
 		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
 
-	assert( true && "Invalid sampler type." );
+	__debugbreak(); // Invalid / unsupported sampler type.
 }
 
 VulkanSampler::VulkanSampler( VulkanRenderContext* parent, SamplerType samplerType )
@@ -1002,8 +1002,8 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	VkViewport viewport = {};
 	viewport.minDepth = 0.0;
 	viewport.maxDepth = 1.0;
-	viewport.width = renderSize.x;
-	viewport.height = renderSize.y;
+	viewport.width = static_cast<float>( renderSize.x );
+	viewport.height = static_cast<float>( renderSize.y );
 
 	VkRect2D scissor = { { 0, 0 }, { renderSize.x, renderSize.y } };
 	vkCmdSetScissor( cmd, 0, 1, &scissor );
@@ -1486,7 +1486,8 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 		bindings.push_back( binding );
 	}
 
-	VkDescriptorSetLayoutCreateInfo layoutInfo = VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), bindings.size() );
+	VkDescriptorSetLayoutCreateInfo layoutInfo =
+	    VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), static_cast<uint32_t>( bindings.size() ) );
 	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
 
 	VkDescriptorSetAllocateInfo allocInfo =
@@ -1503,7 +1504,7 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	}
 
-	assert( false && "Invalid descriptor binding type" );
+	__debugbreak(); // Invalid / unsupported descriptor binding type
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -1582,7 +1583,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	}
 
 	pipeline_layout_info.pSetLayouts = setLayouts.data();
-	pipeline_layout_info.setLayoutCount = setLayouts.size();
+	pipeline_layout_info.setLayoutCount = static_cast<uint32_t>( setLayouts.size() );
 
 	VK_CHECK( vkCreatePipelineLayout( m_parent->m_device, &pipeline_layout_info, nullptr, &builder.m_pipelineLayout ) );
 
@@ -1602,7 +1603,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	builder.m_shaderStages = shaderStages;
 
 	// Calculate stride size
-	size_t stride = 0;
+	uint32_t stride = 0;
 	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{
 		stride += GetSizeOf( ( VertexAttributeFormat )pipelineInfo.vertexAttributes[i].format );
@@ -1617,7 +1618,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 
 	description.bindings.push_back( mainBinding );
 
-	size_t offset = 0;
+	uint32_t offset = 0;
 
 	for ( int i = 0; i < pipelineInfo.vertexAttributes.size(); ++i )
 	{
