@@ -39,8 +39,8 @@ public class FontCompiler : BaseCompiler
 		// Create a new ProcessStartInfo object
 		ProcessStartInfo startInfo = new ProcessStartInfo();
 
-		// Don't output
-		startInfo.UseShellExecute = true;
+		// Don't make a new window. This won't stop output, but RedirectStandardOutput causes the process to never finish
+		startInfo.UseShellExecute = false;
 		startInfo.FileName = exePath;
 		startInfo.Arguments = $"-font {fontPath} -imageout {destAtlasFileName} -json {destJsonFileName}";
 
