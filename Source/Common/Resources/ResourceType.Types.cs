@@ -1,8 +1,8 @@
 ﻿namespace Mocha.Common;
 
-partial struct FileType
+partial struct ResourceType
 {
-	public static FileType Shader => new FileType()
+	public static ResourceType Shader => new ResourceType()
 	{
 		Name = "Shader",
 		Extension = "mshdr",
@@ -12,7 +12,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#ffc710" )
 	};
 
-	public static FileType Material => new FileType()
+	public static ResourceType Material => new ResourceType()
 	{
 		Name = "Material",
 		Extension = "mmat",
@@ -22,7 +22,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#f7b239" )
 	};
 
-	public static FileType Texture => new FileType()
+	public static ResourceType Texture => new ResourceType()
 	{
 		Name = "Texture",
 		Extension = "mtex",
@@ -32,7 +32,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#5292fa" )
 	};
 
-	public static FileType Model => new FileType()
+	public static ResourceType Model => new ResourceType()
 	{
 		Name = "Model",
 		Extension = "mmdl",
@@ -42,7 +42,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#1ee3a5" )
 	};
 
-	public static FileType Sound => new FileType()
+	public static ResourceType Sound => new ResourceType()
 	{
 		Name = "Sound",
 		Extension = "msnd",
@@ -52,7 +52,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#fe646f" )
 	};
 
-	public static FileType Font => new FileType()
+	public static ResourceType Font => new ResourceType()
 	{
 		Name = "Font",
 		Extension = "mfnt",
@@ -62,7 +62,7 @@ partial struct FileType
 		Color = MathX.GetColor( "#acb4bc" )
 	};
 
-	public static FileType Default => new FileType()
+	public static ResourceType Default => new ResourceType()
 	{
 		Name = "Unknown",
 		Extension = "*",

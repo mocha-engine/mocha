@@ -264,13 +264,13 @@ public static class ImGuiX
 		ImGui.PopStyleVar( 3 );
 	}
 
-	public static void InspectorTitle( string text, string subtext, FileType fileType )
+	public static void InspectorTitle( string text, string subtext, ResourceType resourceType )
 	{
 		const float heightTop = 56;
 		const float heightBottom = 24;
 		const float iconSize = 64;
 
-		var color = fileType.Color * 0.75f;
+		var color = resourceType.Color * 0.75f;
 
 		var windowPos = ImGui.GetWindowContentRegionMin() + ImGui.GetWindowPos();
 		var windowWidth = ImGui.GetWindowContentRegionMax().X;
@@ -299,7 +299,7 @@ public static class ImGuiX
 		);
 
 		var cursorPos = ImGui.GetCursorPos();
-		Image( fileType.IconLg, new( iconSize ) );
+		Image( resourceType.IconLg, new( iconSize ) );
 
 		ImGui.SetCursorPos( cursorPos );
 		SetCursorPosXRelative( iconSize );

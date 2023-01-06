@@ -16,7 +16,7 @@ public class TextureInspector : BaseInspector
 		ImGuiX.InspectorTitle(
 			$"{Path.GetFileName( texture.Path.NormalizePath() )}",
 			"This is a texture.",
-			FileType.Texture
+			ResourceType.Texture
 		);
 
 		var items = new (string, string)[]

@@ -38,7 +38,7 @@ public class MaterialInspector : BaseInspector
 		ImGuiX.InspectorTitle(
 			$"{Path.GetFileName( material.Path )}",
 			"This is a material.",
-			FileType.Material
+			ResourceType.Material
 		);
 
 		DrawButtons( material.Path );

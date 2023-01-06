@@ -14,7 +14,7 @@ public class ModelInspector : BaseInspector
 		ImGuiX.InspectorTitle(
 			$"{Path.GetFileName( model.Path.NormalizePath() )}",
 			"This is a model.",
-			FileType.Model
+			ResourceType.Model
 		);
 
 		var items = new[]

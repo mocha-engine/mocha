@@ -23,7 +23,7 @@ public class FileSystem
 		if ( !ignoreCompiledFiles )
 		{
 			var extension = Path.GetExtension( relativePath );
-			var matchingType = FileType.GetFileTypeForExtension( extension );
+			var matchingType = ResourceType.GetResourceForExtension( extension );
 
 			//
 			// Check if this path has a registered file type, compile it if it does

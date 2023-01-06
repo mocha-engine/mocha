@@ -12,7 +12,7 @@ internal class BrowserWindow : EditorWindow
 	private Vector2 baseIconSize => new( 100f, 150f );
 	private Vector2 iconSize;
 
-	private List<FileType> assetFilter = new();
+	private List<ResourceType> assetFilter = new();
 
 	private enum SortModes
 	{
@@ -139,7 +139,7 @@ internal class BrowserWindow : EditorWindow
 		var fileExtension = Path.GetExtension( name );
 		var fileName = Path.GetFileNameWithoutExtension( name );
 
-		var fileType = FileType.GetFileTypeForExtension( fileExtension ) ?? FileType.Default;
+		var resourceType = ResourceType.GetResourceForExtension( fileExtension ) ?? ResourceType.Default;
 
 		var drawList = ImGui.GetWindowDrawList();
 		var startPos = new System.Numerics.Vector2( x, y );
@@ -147,16 +147,16 @@ internal class BrowserWindow : EditorWindow
 		var windowPos = ImGui.GetWindowPos();
 		var scrollPos = new System.Numerics.Vector2( 0, ImGui.GetScrollY() );
 
-		var icon = fileType.IconLg;
+		var icon = resourceType.IconLg;
 
 		{
 			drawList.AddRectFilledMultiColor(
 				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
 				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
-				ImGui.GetColorU32( fileType.Color * 0.6f ),
-				ImGui.GetColorU32( fileType.Color * 0.6f ),
-				ImGui.GetColorU32( fileType.Color * 0.4f ),
-				ImGui.GetColorU32( fileType.Color * 0.4f )
+				ImGui.GetColorU32( resourceType.Color * 0.6f ),
+				ImGui.GetColorU32( resourceType.Color * 0.6f ),
+				ImGui.GetColorU32( resourceType.Color * 0.4f ),
+				ImGui.GetColorU32( resourceType.Color * 0.4f )
 			);
 
 			drawList.AddRect(
@@ -171,7 +171,7 @@ internal class BrowserWindow : EditorWindow
 			drawList.AddRectFilled(
 				windowPos + startPos + new System.Numerics.Vector2( -8, iconSize.Y + 4 ) - scrollPos,
 				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
-				ImGui.GetColorU32( fileType.Color * 0.75f ),
+				ImGui.GetColorU32( resourceType.Color * 0.75f ),
 				4f,
 				ImDrawFlags.RoundCornersBottom );
 		}
@@ -216,9 +216,9 @@ internal class BrowserWindow : EditorWindow
 		ImGui.PopTextWrapPos();
 
 		{
-			ImGui.PushStyleColor( ImGuiCol.Text, fileType.Color );
+			ImGui.PushStyleColor( ImGuiCol.Text, resourceType.Color );
 			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 4, 0 ) );
-			ImGui.Text( fileType.IconSm );
+			ImGui.Text( resourceType.IconSm );
 			ImGui.PopStyleColor();
 
 			float xOff = 16;
@@ -273,7 +273,7 @@ internal class BrowserWindow : EditorWindow
 				if ( ImGui.Button( "All", new System.Numerics.Vector2( -1, 0 ) ) )
 				{
 					assetFilter.Clear();
-					assetFilter.AddRange( FileType.All );
+					assetFilter.AddRange( ResourceType.All );
 				}
 
 				ImGui.TableNextColumn();
@@ -292,31 +292,31 @@ internal class BrowserWindow : EditorWindow
 				ImGui.TableSetupColumn( "asset_name", ImGuiTableColumnFlags.WidthStretch, 1f );
 				ImGui.TableSetupColumn( "asset_solo", ImGuiTableColumnFlags.WidthFixed, 75f );
 
-				foreach ( var fileType in FileType.All )
+				foreach ( var resourceType in ResourceType.All )
 				{
 					ImGui.TableNextRow();
 					ImGui.TableNextColumn();
 
-					bool selected = assetFilter.Contains( fileType );
-					if ( ImGui.Checkbox( $"##{fileType.Name}_selected", ref selected ) )
+					bool selected = assetFilter.Contains( resourceType );
+					if ( ImGui.Checkbox( $"##{resourceType.Name}_selected", ref selected ) )
 					{
 						if ( selected )
-							assetFilter.Add( fileType );
+							assetFilter.Add( resourceType );
 						else
-							assetFilter.Remove( fileType );
+							assetFilter.Remove( resourceType );
 					}
 
 					ImGui.TableNextColumn();
-					ImGui.PushStyleColor( ImGuiCol.Text, fileType.Color );
-					ImGui.Text( $"{fileType.IconSm.PadRight( 2 )} {fileType.Name.PadRight( 32 )}" );
+					ImGui.PushStyleColor( ImGuiCol.Text, resourceType.Color );
+					ImGui.Text( $"{resourceType.IconSm.PadRight( 2 )} {resourceType.Name.PadRight( 32 )}" );
 					ImGui.PopStyleColor();
 
 					ImGui.TableNextColumn();
 
-					if ( ImGui.Button( $"Solo##{fileType.Name}_solo", new System.Numerics.Vector2( -1, 0 ) ) )
+					if ( ImGui.Button( $"Solo##{resourceType.Name}_solo", new System.Numerics.Vector2( -1, 0 ) ) )
 					{
 						assetFilter.Clear();
-						assetFilter.Add( fileType );
+						assetFilter.Add( resourceType );
 					}
 				}
 
@@ -531,8 +531,8 @@ internal class BrowserWindow : EditorWindow
 
 					if ( assetFilter.Count > 0 )
 					{
-						var fileType = FileType.GetFileTypeForExtension( Path.GetExtension( name ) ) ?? FileType.Default;
-						if ( !assetFilter.Contains( fileType ) )
+						var resourceType = ResourceType.GetResourceForExtension( Path.GetExtension( name ) ) ?? ResourceType.Default;
+						if ( !assetFilter.Contains( resourceType ) )
 							continue;
 					}
 
