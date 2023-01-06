@@ -1,6 +1,6 @@
-﻿namespace Mocha.Renderer;
+﻿namespace Mocha.Common;
 
-enum TextureFormat
+public enum TextureFormat
 {
 	R8G8B8A8_SRGB = 43,
 	BC3_UNORM = 137,

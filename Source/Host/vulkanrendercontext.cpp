@@ -1,5 +1,6 @@
 #include "vulkanrendercontext.h"
 
+#include <hostmanager.h>
 #include <mesh.h>
 #include <pipeline.h>
 #include <shadercompiler.h>
@@ -172,7 +173,7 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 
 	void* mappedData;
 	vmaMapMemory( m_parent->m_allocator, stagingBuffer->allocation, &mappedData );
-	memcpy( mappedData, textureData.mipData.data, static_cast<size_t>( imageSize ) );
+	memcpy( mappedData, textureData.mipData.data, static_cast<size_t>( textureData.mipData.size ) );
 	vmaUnmapMemory( m_parent->m_allocator, stagingBuffer->allocation );
 
 	VkExtent3D imageExtent;
@@ -180,8 +181,11 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 	imageExtent.height = textureData.height;
 	imageExtent.depth = 1;
 
-	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo(
-	    imageFormat, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, imageExtent, textureData.mipCount );
+	VkImageUsageFlags usageFlags = VK_IMAGE_USAGE_SAMPLED_BIT |
+	                               /* We want to be able to copy to/from this image */
+	                               VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT;
+
+	VkImageCreateInfo imageCreateInfo = VKInit::ImageCreateInfo( imageFormat, usageFlags, imageExtent, textureData.mipCount );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
@@ -189,26 +193,13 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 	vmaCreateImage( m_parent->m_allocator, &imageCreateInfo, &allocInfo, &image, &allocation, nullptr );
 
 	m_parent->ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
-		VkImageSubresourceRange range;
-		range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-		range.baseMipLevel = 0;
-		range.levelCount = textureData.mipCount;
-		range.baseArrayLayer = 0;
-		range.layerCount = 1;
+		{
+			VkImageMemoryBarrier transitionBarrier =
+			    VKInit::ImageMemoryBarrier( 0, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, image );
 
-		VkImageMemoryBarrier imageBarrier_toTransfer = {};
-		imageBarrier_toTransfer.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
-
-		imageBarrier_toTransfer.oldLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-		imageBarrier_toTransfer.newLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		imageBarrier_toTransfer.image = image;
-		imageBarrier_toTransfer.subresourceRange = range;
-
-		imageBarrier_toTransfer.srcAccessMask = 0;
-		imageBarrier_toTransfer.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-
-		vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0, nullptr,
-		    1, &imageBarrier_toTransfer );
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
 
 		std::vector<VkBufferImageCopy> mipRegions = {};
 
@@ -252,16 +243,13 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 		vkCmdCopyBufferToImage(
 		    cmd, stagingBuffer->buffer, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, mipRegions.size(), mipRegions.data() );
 
-		VkImageMemoryBarrier imageBarrier_toReadable = imageBarrier_toTransfer;
+		{
+			VkImageMemoryBarrier transitionBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_TRANSFER_WRITE_BIT,
+			    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, image );
 
-		imageBarrier_toReadable.oldLayout = VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL;
-		imageBarrier_toReadable.newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-
-		imageBarrier_toReadable.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
-		imageBarrier_toReadable.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
-
-		vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
-		    nullptr, 1, &imageBarrier_toReadable );
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
 
 		return RENDER_STATUS_OK;
 	} );
@@ -272,7 +260,111 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 
 	spdlog::info( "Created texture with size {}x{}", textureData.width, textureData.height );
 }
-void VulkanImageTexture::Copy( TextureCopyData_t copyData ) {}
+
+inline void VulkanImageTexture::TransitionLayout(
+    VkCommandBuffer& cmd, VkImageLayout newLayout, VkAccessFlags newAccessMask, VkPipelineStageFlags stageMask )
+{
+	VkImageSubresourceRange range;
+	range.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	range.baseMipLevel = 0;
+	range.levelCount = VK_REMAINING_MIP_LEVELS;
+	range.baseArrayLayer = 0;
+	range.layerCount = 1;
+
+	VkImageMemoryBarrier imageBarrier = {};
+	imageBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+
+	imageBarrier.oldLayout = currentLayout;
+	imageBarrier.newLayout = newLayout;
+	imageBarrier.image = image;
+	imageBarrier.subresourceRange = range;
+
+	imageBarrier.srcAccessMask = currentAccessMask;
+	imageBarrier.dstAccessMask = newAccessMask;
+
+	vkCmdPipelineBarrier( cmd, currentStageMask, stageMask, 0, 0, nullptr, 0, nullptr, 1, &imageBarrier );
+
+	currentStageMask = stageMask;
+	currentAccessMask = newAccessMask;
+	currentLayout = newLayout;
+}
+
+void VulkanImageTexture::Copy( TextureCopyData_t copyData )
+{
+	m_parent->ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
+		auto src = m_parent->m_imageTextures.Get( copyData.src->m_handle );
+
+		//
+		// Transition source image to VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL
+		//
+		{
+			VkImageMemoryBarrier transitionBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_SHADER_READ_BIT,
+			    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, src->image );
+
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
+
+		//
+		// Transition destination image to VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL
+		//
+		{
+			VkImageMemoryBarrier transitionBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_SHADER_READ_BIT,
+			    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, image );
+
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
+
+		//
+		// Copy image
+		//
+		VkImageSubresourceLayers srcSubresource = {};
+		srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		srcSubresource.mipLevel = 0;
+		srcSubresource.baseArrayLayer = 0;
+		srcSubresource.layerCount = 1;
+
+		VkImageSubresourceLayers dstSubresource = srcSubresource;
+
+		VkOffset3D srcOffset = { ( int32_t )copyData.srcX, ( int32_t )copyData.srcY, 0 };
+		VkOffset3D dstOffset = { ( int32_t )copyData.dstX, ( int32_t )copyData.dstY, 0 };
+
+		VkExtent3D extent = { copyData.width, copyData.height, 1 };
+
+		VkImageBlit region = {};
+		region.srcSubresource = srcSubresource;
+		region.srcOffsets[0] = srcOffset;
+		region.srcOffsets[1] = { srcOffset.x + ( int32_t )copyData.width, srcOffset.y + ( int32_t )copyData.height, 1 };
+		region.dstSubresource = dstSubresource;
+		region.dstOffsets[0] = dstOffset;
+		region.dstOffsets[1] = { dstOffset.x + ( int32_t )copyData.width, dstOffset.y + ( int32_t )copyData.height, 1 };
+
+		vkCmdBlitImage( cmd, src->image, VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, image, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1,
+		    &region, VK_FILTER_NEAREST );
+
+		//
+		// Return images to initial layouts
+		//
+		{
+			VkImageMemoryBarrier transitionBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_TRANSFER_WRITE_BIT,
+			    VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, src->image );
+
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
+
+		{
+			VkImageMemoryBarrier transitionBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_TRANSFER_WRITE_BIT,
+			    VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, image );
+
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TRANSFER_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
+
+		return RENDER_STATUS_OK;
+	} );
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
@@ -557,7 +649,10 @@ void VulkanRenderContext::CreateSwapchain()
 
 	m_swapchain = VulkanSwapchain( this, size );
 
-	m_window->m_onWindowResized = [&]( Size2D newSize ) { m_swapchain.Update( newSize ); };
+	m_window->m_onWindowResized = [&]( Size2D newSize ) {
+		m_swapchain.Update( newSize );
+		g_hostManager->FireEvent( "Event.Window.Resized" );
+	};
 }
 
 void VulkanRenderContext::CreateCommands()
@@ -919,7 +1014,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	// We want to draw the image, so we'll manually transition the layout to
 	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
 	//
-	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_swapchainTarget.image );
 
 	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr,
@@ -962,7 +1057,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	// We want to present the image, so we'll manually transition the layout to
 	// VK_IMAGE_LAYOUT_PRESENT_SRC_KHR before presenting
 	//
-	VkImageMemoryBarrier endRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier(
+	VkImageMemoryBarrier endRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 	    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_PRESENT_SRC_KHR, m_swapchainTarget.image );
 
 	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_BOTTOM_OF_PIPE_BIT, 0, 0,
@@ -1109,8 +1204,8 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 	VulkanRenderTexture renderTexture = *m_renderTextures.Get( rt.m_handle ).get();
 
 	// Transition to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
-	VkImageMemoryBarrier startRenderImageMemoryBarrier =
-	    VKInit::ImageMemoryBarrier( VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture.image );
+	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture.image );
 
 	vkCmdPipelineBarrier( m_mainContext.commandBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 	    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &startRenderImageMemoryBarrier );
@@ -1135,9 +1230,6 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 
 RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
 {
-	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
-	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
-
 	*outSize = m_window->GetWindowSize();
 
 	return RENDER_STATUS_OK;

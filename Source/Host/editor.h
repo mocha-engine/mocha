@@ -113,8 +113,9 @@ namespace Editor
 
 	GENERATE_BINDINGS inline Vector2 GetWindowSize()
 	{
-		// TODO
-		return { 1280, 720 };
+		Size2D size;
+		g_renderContext->GetRenderSize( &size );
+		return { ( float )size.x, ( float )size.y };
 	}
 
 	GENERATE_BINDINGS inline const char* GetVersionName()

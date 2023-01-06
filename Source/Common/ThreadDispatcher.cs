@@ -6,7 +6,7 @@ public class ThreadDispatcher<T>
 	private int threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
 
 	private int threadsCompleted = 0;
-	public bool IsComplete => threadsCompleted == threadCount;
+	public bool IsComplete => threadsCompleted >= threadCount;
 
 	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
 	{
