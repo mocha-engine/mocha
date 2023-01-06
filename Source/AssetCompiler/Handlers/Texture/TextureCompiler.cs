@@ -11,7 +11,7 @@ namespace Mocha.AssetCompiler;
 public partial class TextureCompiler : BaseCompiler
 {
 	public override string AssetName => "Texture";
-	
+
 	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
 	{
 		return format switch

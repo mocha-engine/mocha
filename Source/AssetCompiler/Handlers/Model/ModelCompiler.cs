@@ -26,7 +26,7 @@ public class ModelCompiler : BaseCompiler
 		var fileData = File.ReadAllText( path );
 		var modelData = JsonSerializer.Deserialize<ModelInfo>( fileData );
 
-		var meshes = Primitives.Assimp.GenerateModels( Directory.GetCurrentDirectory(), modelData );
+		var meshes = Assimp.GenerateModels( modelData );
 
 		binaryWriter.Write( 0 ); // Pad
 		binaryWriter.Write( meshes.Count ); // Mesh count

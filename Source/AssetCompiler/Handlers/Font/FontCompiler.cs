@@ -70,7 +70,7 @@ public class FontCompiler : BaseCompiler
 		File.WriteAllText( destAtlasMeta, JsonSerializer.Serialize( textureMeta ) );
 
 		// Compile atlas
-		OfflineCompiler.Current.CompileFile( destAtlasFileName );
+		IAssetCompiler.Current.CompileFile( destAtlasFileName );
 
 		// Load json
 		var fileData = File.ReadAllText( destJsonFileName );

@@ -2,8 +2,8 @@
   "profiles": {
     "Mocha.AssetCompiler": {
       "commandName": "Project",
-      "commandLineArgs": "--target \".\"",
-      "workingDirectory": "$(SolutionDir)..\\content\\",
+      "commandLineArgs": "--target \"content\"",
+      "workingDirectory": "$(SolutionDir)..",
       "remoteDebugEnabled": false
     }
   }

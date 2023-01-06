@@ -17,7 +17,7 @@ public static class CommandLine
 {
 	static void Main( string[] args )
 	{
-		var offlineCompiler = new OfflineCompiler();
+		var offlineCompiler = new OfflineAssetCompiler();
 		Parser.Default.ParseArguments<Options>( args ).WithParsed( offlineCompiler.Run );
 	}
 }

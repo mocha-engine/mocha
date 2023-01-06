@@ -1,13 +1,15 @@
-﻿using System.Text.Json;
+﻿using Mocha.AssetCompiler;
+using System.Text.Json;
 
 namespace Mocha.Common;
 
 public class FileSystem
 {
-	public static FileSystem Game => new FileSystem( "content\\" );
+	public static FileSystem Game { get; set; }
 	private List<FileSystemWatcher> Watchers { get; } = new();
 
 	private string BasePath { get; }
+	public IAssetCompiler AssetCompiler { get; set; }
 
 	public FileSystem( string relativePath )
 	{
@@ -16,7 +18,9 @@ public class FileSystem
 
 	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, bool ignoreCompiledFiles = false )
 	{
-		var path = Path.Combine( this.BasePath, relativePath ).NormalizePath();
+		bool isAsset = false;
+		string path = Path.Combine( this.BasePath, relativePath ).NormalizePath();
+		string sourcePath = path;
 
 		if ( !ignoreCompiledFiles )
 		{
@@ -26,13 +30,49 @@ public class FileSystem
 				case ".mmat":
 				case ".mtex":
 				case ".mfnt":
-					path += "_c"; // Load compiled assets
+					// Load compiled assets
+					isAsset = true;
+					path += "_c";
 					break;
+			}
+
+			// HACK: Is this an image? If so, check for a source .ttf, .jpg, or .png, and set that
+			// as the source path.
+			if ( Path.GetExtension( relativePath ) == ".mtex" )
+			{
+				var jpgPath = Path.ChangeExtension( sourcePath, "jpg" );
+				var pngPath = Path.ChangeExtension( sourcePath, "png" );
+				var ttfPath = Path.ChangeExtension( sourcePath, "ttf" );
+
+				if ( Path.Exists( jpgPath ) )
+					sourcePath = jpgPath;
+				else if ( Path.Exists( pngPath ) )
+					sourcePath = pngPath;
+				else if ( Path.Exists( ttfPath ) )
+					sourcePath = ttfPath;
+			}
+
+			// HACK: Is this a font? 
+			if ( Path.GetExtension( relativePath ) == ".mfnt" )
+			{
+				var ttfPath = Path.ChangeExtension( sourcePath, "ttf" );
+				if ( Path.Exists( ttfPath ) )
+					sourcePath = ttfPath;
+			}
+
+			// Compile asset if needed
+			if ( isAsset && File.Exists( sourcePath ) )
+			{
+				AssetCompiler.CompileFile( sourcePath );
 			}
 		}
 
+		// Check if path exists (we do this after compiling the asset in case
+		// asset compilation creates the file)
 		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound )
+		{
 			Log.Warning( $"Path not found: {path}. Continuing anyway." );
+		}
 
 		return path;
 	}
