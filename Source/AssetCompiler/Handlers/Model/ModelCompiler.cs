@@ -5,10 +5,10 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".mmdl" } )]
 public class ModelCompiler : BaseCompiler
 {
-	public override string CompileFile( string path )
-	{
-		Log.Processing( "Model", path );
+	public override string AssetName => "Model";
 
+	public override CompileResult CompileFile( string path )
+	{
 		var destFileName = Path.ChangeExtension( path, "mmdl_c" );
 
 		using var fileStream = new FileStream( destFileName, FileMode.Create );
@@ -88,6 +88,6 @@ public class ModelCompiler : BaseCompiler
 			}
 		}
 
-		return destFileName;
+		return Succeeded( path, destFileName );
 	}
 }

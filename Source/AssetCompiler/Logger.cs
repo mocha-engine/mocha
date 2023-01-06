@@ -8,7 +8,8 @@ public class Logger
 	private int UpToDateCount = 0;
 
 	private void Log( string prefix, string message ) => Console.WriteLine( $"{"[" + prefix.ToUpper() + "]",-16}{message}" );
-	public void Skip( string path )
+
+	public void UpToDate( string path )
 	{
 		UpToDateCount++;
 		Log( "Up-to-date", $"Not compiling '{path}' as it matches compiled version" );
@@ -24,6 +25,12 @@ public class Logger
 	{
 		SuccessCount++;
 		Log( "Success", $"Compiled '{path}'" );
+	}
+
+	public void Fail( string path, Exception? e = null )
+	{
+		FailCount++;
+		Log( "Fail", $"{path} failed to compile. Error was: {e?.Message ?? "Unknown"}" );
 	}
 
 	public void Processing( string type, string path ) => Log( "PROCESS", $"Processing '{path}' as {type}" );

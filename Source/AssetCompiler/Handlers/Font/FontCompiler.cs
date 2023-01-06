@@ -9,10 +9,10 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".ttf" } )]
 public class FontCompiler : BaseCompiler
 {
-	public override string CompileFile( string path )
-	{
-		Log.Processing( "Font", path );
+	public override string AssetName => "Font";
 
+	public override CompileResult CompileFile( string path )
+	{
 		var destJsonFileName = Path.ChangeExtension( path, ".temp.json" );
 		var destAtlasFileName = Path.ChangeExtension( path, ".png" );
 		var destFileName = Path.ChangeExtension( path, "mfnt_c" );
@@ -25,10 +25,7 @@ public class FontCompiler : BaseCompiler
 			var deserializedFile = Serializer.Deserialize<MochaFile<Font.Data>>( existingFile );
 
 			if ( deserializedFile.Data.ModifiedDate == File.GetLastWriteTime( path ).ToString() )
-			{
-				Log.Skip( path );
-				return destFileName;
-			}
+				return UpToDate( path, destFileName );
 		}
 
 		var charSetFileName = Path.ChangeExtension( path, ".txt" );
@@ -105,6 +102,6 @@ public class FontCompiler : BaseCompiler
 
 		// Delete original atlas file
 		File.Delete( destAtlasFileName );
-		return destJsonFileName;
+		return Succeeded( path, destJsonFileName );
 	}
 }

@@ -1,4 +1,6 @@
 ﻿global using Mocha.Common;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Mocha.AssetCompiler;
@@ -41,16 +43,19 @@ public static class Program
 			CompileFile( path );
 		}
 
-		var completedThreads = 0;
-
 		var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
 		{
 			foreach ( var item in threadQueue )
 			{
-				CompileFile( item );
+				try
+				{
+					CompileFile( item );
+				}
+				catch( Exception e )
+				{
+					Log.Fail( item, e );
+				}
 			}
-
-			completedThreads++;
 		}, queue );
 
 		while ( !dispatcher.IsComplete )
@@ -72,7 +77,7 @@ public static class Program
 		}
 	}
 
-	private static bool GetCompiler( string fileExtension, out BaseCompiler? foundCompiler )
+	private static bool GetCompiler( string fileExtension, [NotNullWhen( true )] out BaseCompiler? foundCompiler )
 	{
 		foreach ( var compiler in Compilers )
 		{
@@ -107,14 +112,24 @@ public static class Program
 
 		// TODO: Check if we have an original asset & if it needs recompiling
 
-		if ( GetCompiler( fileExtension, out var compiler ) )
+		if ( !GetCompiler( fileExtension, out var compiler ) )
+			return;
+
+		Log.Processing( compiler.AssetName, path );
+		var result = compiler.CompileFile( path );
+
+		switch ( result.State )
 		{
-			var destFile = compiler?.CompileFile( path );
-
-			if ( destFile == null )
+			case CompileState.UpToDate:
+				Log.UpToDate( result.DestinationPath! );
+				break;
+			case CompileState.Succeeded:
+				Log.Compiled( result.DestinationPath! );
+				break;
+			case CompileState.Failed:
 				throw new Exception( "Failed to compile?" );
-
-			Log.Compiled( destFile );
+			default:
+				throw new UnreachableException();
 		}
 	}
 }

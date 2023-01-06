@@ -8,10 +8,10 @@ namespace Mocha.AssetCompiler;
 [Handles( new[] { ".mmat" } )]
 public class MaterialCompiler : BaseCompiler
 {
-	public override string CompileFile( string path )
-	{
-		Log.Processing( "Material", path );
+	public override string AssetName => "Material";
 
+	public override CompileResult CompileFile( string path )
+	{
 		var destFileName = Path.ChangeExtension( path, "mmat_c" );
 
 		// Load json
@@ -35,6 +35,6 @@ public class MaterialCompiler : BaseCompiler
 		using var binaryWriter = new BinaryWriter( fileStream );
 
 		binaryWriter.Write( Serializer.Serialize( mochaFile ) );
-		return destFileName;
+		return Succeeded( path, destFileName );
 	}
 }
