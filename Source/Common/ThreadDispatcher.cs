@@ -21,8 +21,7 @@ public class ThreadDispatcher<T>
 			.Select( g => g.Select( p => p.Value ).ToList() )
 			.ToList();
 
-		if ( batched.Count < threadCount )
-			threadCount = batched.Count; // Min. 1 per thread
+		threadCount = batched.Count;
 
 		for ( int i = 0; i < batched.Count; i++ )
 		{
