@@ -384,10 +384,10 @@ public:
 	/// </summary>
 	/// <returns>
 	/// <para>
-	/// RENDER_STATUS_OK if successful
+	/// <b>RENDER_STATUS_OK</b> if successful
 	/// </para>
 	/// <para>
-	/// RENDER_STATUS_WINDOW_SIZE_INVALID if the window has been minimized or made too small.
+	/// <b>RENDER_STATUS_WINDOW_SIZE_INVALID</b> if the window has been minimized or made too small.
 	/// Do not call EndRendering if this is returned.
 	/// </para>
 	/// </returns>
@@ -398,10 +398,10 @@ public:
 	/// </summary>
 	/// <returns>
 	/// <para>
-	/// RENDER_STATUS_OK if successful
+	/// <b>RENDER_STATUS_OK</b> if successful
 	/// </para>
 	/// <para>
-	/// RENDER_STATUS_WINDOW_SIZE_INVALID if the window has been minimized or made too small.
+	/// <b>RENDER_STATUS_WINDOW_SIZE_INVALID</b> if the window has been minimized or made too small.
 	/// </para>
 	/// </returns>
 	virtual RenderStatus EndRendering() = 0;
@@ -413,55 +413,55 @@ public:
 	/// <summary>
 	/// Binds a pipeline
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindPipeline( Pipeline p ) = 0;
 
 	/// <summary>
 	/// Binds a descriptor
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindDescriptor( Descriptor d ) = 0;
 
 	/// <summary>
 	/// Updates a descriptor
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus UpdateDescriptor( Descriptor d, DescriptorUpdateInfo_t updateInfo ) = 0;
 
 	/// <summary>
 	/// Binds a vertex buffer
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindVertexBuffer( VertexBuffer vb ) = 0;
 
 	/// <summary>
 	/// Binds an index buffer
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindIndexBuffer( IndexBuffer ib ) = 0;
 
 	/// <summary>
 	/// Binds rendering push constants
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindConstants( RenderPushConstants p ) = 0;
 
 	/// <summary>
 	/// Draws the contents of the vertex and/or index buffer
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus Draw( uint32_t vertexCount, uint32_t indexCount, uint32_t instanceCount ) = 0;
 
 	/// <summary>
 	/// Call this to set the render target to render to.
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
 	/// <summary>
 	/// Get information about the GPU.
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
 	// ----------------------------------------
@@ -474,20 +474,20 @@ public:
 	/// This will handle all ImGui::NewFrame functions, e.g.
 	/// "ImGui_ImplVulkan_NewFrame()".
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus BeginImGui() = 0;
 
 	/// <summary>
 	/// End the ImGUI drawing pass.
 	/// This will call ImGui::Render and handle multi-viewports.
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus EndImGui() = 0;
 
 	/// <summary>
 	/// This will draw data fetched from ImGUI, e.g. "ImGui_ImplVulkan_RenderDrawData()".
 	/// </summary>
-	/// <returns>RENDER_STATUS_OK if successful, otherwise an error code</returns>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus RenderImGui() = 0;
 
 	// ----------------------------------------
