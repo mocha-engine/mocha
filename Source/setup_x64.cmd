@@ -1,4 +1,5 @@
 @echo off
 
 rem Install vcpkg packages from manifest file
-vcpkg install
+vcpkg install --triplet=x64-windows
+pause

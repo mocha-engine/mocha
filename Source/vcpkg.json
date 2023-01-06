@@ -1,0 +1,23 @@
+{
+    "name": "mocha",
+    "version-string": "1.0.0",
+    "description": "Mocha game engine",
+    "builtin-baseline": "0d239eb4d32f125c3da90e612096b14a11ef1474",
+    "dependencies": [
+        "fmt",
+        "glm",
+        "glslang",
+        "nethost",
+        "nlohmann-json",
+        "sdl2",
+        "sdl2-image",
+        "spdlog",
+        "vulkan-memory-allocator"
+    ],
+    "overrides": [
+        {
+            "name": "fmt",
+            "version": "8.1.1"
+        }
+    ]
+}
