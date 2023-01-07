@@ -524,6 +524,18 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
+std::shared_ptr<VulkanCommandContext> VulkanRenderContext::GetUploadContext( std::thread::id thread )
+{
+	if ( m_uploadContexts.find( thread ) == m_uploadContexts.end() )
+	{
+		m_uploadContexts[thread] = std::make_shared<VulkanCommandContext>( this );
+		
+		vkResetFences( m_device, 1, &m_uploadContexts[thread]->fence );
+	}
+
+	return m_uploadContexts[thread];
+}
+
 // Create a Vulkan context, set up devices
 vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 {
@@ -672,9 +684,6 @@ void VulkanRenderContext::CreateSwapchain()
 void VulkanRenderContext::CreateCommands()
 {
 	m_mainContext = VulkanCommandContext( this );
-
-	m_uploadContext = VulkanCommandContext( this );
-	vkResetFences( m_device, 1, &m_uploadContext.fence );
 }
 
 void VulkanRenderContext::CreateSyncStructures()
@@ -1422,7 +1431,10 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 
 	RenderStatus status;
 
-	VkCommandBuffer cmd = m_uploadContext.commandBuffer;
+	// Get a command context for this thread, prevents threading issues
+	std::shared_ptr<VulkanCommandContext> currentContext = GetUploadContext( std::this_thread::get_id() );
+
+	VkCommandBuffer cmd = currentContext->commandBuffer;
 	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
 	VK_CHECK( vkBeginCommandBuffer( cmd, &cmdBeginInfo ) );
 
@@ -1431,12 +1443,12 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 	VK_CHECK( vkEndCommandBuffer( cmd ) );
 
 	VkSubmitInfo submit = VKInit::SubmitInfo( &cmd );
-	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, m_uploadContext.fence ) );
+	VK_CHECK( vkQueueSubmit( m_graphicsQueue, 1, &submit, currentContext->fence ) );
 
-	vkWaitForFences( m_device, 1, &m_uploadContext.fence, true, 9999999999 );
-	vkResetFences( m_device, 1, &m_uploadContext.fence );
+	vkWaitForFences( m_device, 1, &currentContext->fence, true, 9999999999 );
+	vkResetFences( m_device, 1, &currentContext->fence );
 
-	vkResetCommandPool( m_device, m_uploadContext.commandPool, 0 );
+	vkResetCommandPool( m_device, currentContext->commandPool, 0 );
 
 	return status;
 }

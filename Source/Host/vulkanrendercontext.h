@@ -7,6 +7,7 @@
 #include <globalvars.h>
 #include <handlemap.h>
 #include <mathtypes.h>
+#include <unordered_map>
 #include <vk_mem_alloc.h>
 #include <vkinit.h>
 #include <vulkan/vulkan.h>
@@ -114,7 +115,7 @@ class VulkanImageTexture : public VulkanObject
 {
 private:
 	VkDescriptorSet m_imGuiDescriptorSet;
-	
+
 	inline int GetBytesPerPixel( VkFormat format )
 	{
 		switch ( format )
@@ -282,9 +283,11 @@ private:
 
 	std::unique_ptr<Window> m_window;
 	VulkanCommandContext m_mainContext;
-	VulkanCommandContext m_uploadContext;
+	std::unordered_map<std::thread::id, std::shared_ptr<VulkanCommandContext>> m_uploadContexts;
 	VulkanSwapchain m_swapchain;
 	VulkanSampler m_anisoSampler, m_pointSampler;
+
+	std::shared_ptr<VulkanCommandContext> GetUploadContext( std::thread::id thread );
 
 	// Create a Vulkan context, set up devices
 	vkb::Instance CreateInstanceAndSurface();
