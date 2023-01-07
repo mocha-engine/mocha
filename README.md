@@ -1,43 +1,29 @@
 <p align="center">
     <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
-    <p align="center">
-        A work-in-progress game engine
-    </p>
 </p>
+
+Mocha is a work-in-progress game engine that aims to leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.
 
 ![Mocha Screenshot](https://user-images.githubusercontent.com/12881812/210655312-1e0d25a1-e4bf-49d9-943b-f88f932f7e08.png)
 
-## Features
+## Key Features
 
-- Bespoke modern Vulkan 1.3 renderer, with support for VK_KHR_ray query (ray tracing)
-- ImGui-based editor
-- Hot-loading HTML / CSS user interface solution
-- Jolt physics implementation
-- C# scripting with automatic C++ <-> C# interop bindings generator
-- Work-in-progress physically-based shading & material implementation (currently without IBL)
+- High-quality visuals using a modern Vulkan 1.3 renderer with support for ray tracing (VK_KHR_ray query)
+- Flexible C# scripting with automatic C++ <-> C# interop bindings
+- Customizable user interface using hot-loading HTML/CSS
+- Realistic physics simulation with Jolt
+- Work-in-progress physically-based shading and material implementation (currently without IBL)
+- ImGui-based editor for easy customization and customization
 
-## Technical Information
-
-I'm doing a monthly series of write-ups about Mocha on my blog. These should give some good insights on how Mocha works and how I plan on expanding it in the future.
-
-- [Mocha - December 2022](https://blog.gu3.me/mocha/)
-
-## Building
+## Building the Engine
 
 ### Prerequisites
-
-#### Requirements
 
 - .NET 7.0
 - vcpkg
 - Visual Studio 2022
 - Windows
 - Vulkan SDK
-
-#### Recommendations
-
-- Windows 10 / 11
-- A decent graphics card & processor
 
 ### Instructions
 
@@ -54,15 +40,17 @@ Contributions to this project are greatly appreciated; please follow these steps
 2. Create a branch under the name `YourName/FeatureName`
 3. Once you've made all the changes you need to make, go ahead and submit a Pull Request.
 
-## Code Conventions
-
 Throughout this project, the standard [C# coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions) should be observed and used within any pull requests / any other direct contributions.
 
-## Support
+## Issues and Support
 
 Feel free to [open an issue](https://github.com/xezno/mocha/issues/new) if you encounter any bugs or problems, have any feature requests, or have any questions.
 
-## License
+## Free and Open Source
+
+Mocha is an open source game engine distributed under the AGPL-3.0 license. This allows anyone to freely use, modify, and distribute the engine as they see fit. The development of Mocha is driven by the community, with the goal of creating a powerful and flexible tool that meets the needs of developers.
+
+### License
 
 ```
 Mocha Game Engine
