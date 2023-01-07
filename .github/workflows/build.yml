@@ -32,7 +32,7 @@ jobs:
         vcpkgGitCommitId: '0d239eb4d32f125c3da90e612096b14a11ef1474'
     
     - name: Run setup_x64.cmd
-      working-directory: ${{env.GITHUB_WORKSPACE}}/Source/
+      working-directory: source/
       run: Setup_x64.cmd
 
     - name: Add MSBuild to PATH
