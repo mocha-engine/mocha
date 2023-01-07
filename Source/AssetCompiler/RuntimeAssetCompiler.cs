@@ -23,7 +23,7 @@ public class RuntimeAssetCompiler : AssetCompilerBase
 					if ( FileSystem.Game.IsFileReady( path ) )
 						break;
 
-					Thread.Sleep( 100 );
+					Thread.Sleep( 500 );
 				}
 			}
 
