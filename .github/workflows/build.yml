@@ -26,11 +26,14 @@ jobs:
         version: latest
         cache: true
     
-    - name: Restore artifacts, or setup vcpkg (do not install any package)
+    - name: Setup vcpkg
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgGitCommitId: '0d239eb4d32f125c3da90e612096b14a11ef1474'
-        runVcpkgInstall: true
+    
+    - name: Run setup_x64.cmd
+      working-directory: ${{env.GITHUB_WORKSPACE}}
+      run: Source/setup_x64.cmd
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
