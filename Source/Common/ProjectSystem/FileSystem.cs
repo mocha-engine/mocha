@@ -100,20 +100,20 @@ public class FileSystem
 		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
 	}
 
-	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange )
+	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange, NotifyFilters? filters = null )
 	{
 		var directoryName = GetAbsolutePath( relativeDir );
 		var watcher = new FileSystemWatcher( directoryName, filter );
 
 		watcher.IncludeSubdirectories = true;
-		watcher.NotifyFilter = NotifyFilters.Attributes
+		watcher.NotifyFilter = filters ?? (NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
 							 | NotifyFilters.DirectoryName
 							 | NotifyFilters.FileName
 							 | NotifyFilters.LastAccess
 							 | NotifyFilters.LastWrite
 							 | NotifyFilters.Security
-							 | NotifyFilters.Size;
+							 | NotifyFilters.Size);
 
 		watcher.EnableRaisingEvents = true;
 		watcher.Changed += ( _, e ) =>
