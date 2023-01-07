@@ -529,7 +529,7 @@ std::shared_ptr<VulkanCommandContext> VulkanRenderContext::GetUploadContext( std
 	if ( m_uploadContexts.find( thread ) == m_uploadContexts.end() )
 	{
 		m_uploadContexts[thread] = std::make_shared<VulkanCommandContext>( this );
-		
+
 		vkResetFences( m_device, 1, &m_uploadContexts[thread]->fence );
 	}
 
@@ -1136,9 +1136,7 @@ RenderStatus VulkanRenderContext::BindPipeline( Pipeline p )
 
 	m_pipeline = m_pipelines.Get( p.m_handle );
 
-	VulkanPipeline pipeline = *m_pipeline.get();
-
-	vkCmdBindPipeline( m_mainContext.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline.pipeline );
+	vkCmdBindPipeline( m_mainContext.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
 
 	return RENDER_STATUS_OK;
 }
@@ -1148,10 +1146,10 @@ RenderStatus VulkanRenderContext::BindDescriptor( Descriptor d )
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	VulkanDescriptor descriptor = *m_descriptors.Get( d.m_handle ).get();
+	std::shared_ptr<VulkanDescriptor> descriptor = m_descriptors.Get( d.m_handle );
 
 	vkCmdBindDescriptorSets( m_mainContext.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->layout, 0, 1,
-	    &descriptor.descriptorSet, 0, nullptr );
+	    &descriptor->descriptorSet, 0, nullptr );
 
 	return RENDER_STATUS_OK;
 }
@@ -1163,16 +1161,16 @@ RenderStatus VulkanRenderContext::UpdateDescriptor( Descriptor d, DescriptorUpda
 
 	BindDescriptor( d );
 
-	VulkanDescriptor descriptor = *m_descriptors.Get( d.m_handle ).get();
-	VulkanImageTexture texture = *m_imageTextures.Get( updateInfo.src->m_handle ).get();
+	std::shared_ptr<VulkanDescriptor> descriptor = m_descriptors.Get( d.m_handle );
+	std::shared_ptr<VulkanImageTexture> texture = m_imageTextures.Get( updateInfo.src->m_handle );
 
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = texture.imageView;
+	imageInfo.imageView = texture->imageView;
 	imageInfo.sampler = SAMPLER_TYPE_ANISOTROPIC ? m_anisoSampler.sampler : m_pointSampler.sampler; // TODO
 
 	auto descriptorWrite = VKInit::WriteDescriptorImage(
-	    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor.descriptorSet, &imageInfo, updateInfo.binding );
+	    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor->descriptorSet, &imageInfo, updateInfo.binding );
 
 	vkUpdateDescriptorSets( m_device, 1, &descriptorWrite, 0, nullptr );
 
@@ -1184,10 +1182,10 @@ RenderStatus VulkanRenderContext::BindVertexBuffer( VertexBuffer vb )
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	VulkanBuffer vertexBuffer = *m_buffers.Get( vb.m_handle ).get();
+	std::shared_ptr<VulkanBuffer> vertexBuffer = m_buffers.Get( vb.m_handle );
 
 	VkDeviceSize offset = 0;
-	vkCmdBindVertexBuffers( m_mainContext.commandBuffer, 0, 1, &vertexBuffer.buffer, &offset );
+	vkCmdBindVertexBuffers( m_mainContext.commandBuffer, 0, 1, &vertexBuffer->buffer, &offset );
 
 	return RENDER_STATUS_OK;
 }
@@ -1197,10 +1195,10 @@ RenderStatus VulkanRenderContext::BindIndexBuffer( IndexBuffer ib )
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	VulkanBuffer indexBuffer = *m_buffers.Get( ib.m_handle ).get();
+	std::shared_ptr<VulkanBuffer> indexBuffer = m_buffers.Get( ib.m_handle );
 
 	VkDeviceSize offset = 0;
-	vkCmdBindIndexBuffer( m_mainContext.commandBuffer, indexBuffer.buffer, offset, VK_INDEX_TYPE_UINT32 );
+	vkCmdBindIndexBuffer( m_mainContext.commandBuffer, indexBuffer->buffer, offset, VK_INDEX_TYPE_UINT32 );
 
 	return RENDER_STATUS_OK;
 }
@@ -1236,11 +1234,11 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 		vkCmdEndRendering( m_mainContext.commandBuffer );
 	}
 
-	VulkanRenderTexture renderTexture = *m_renderTextures.Get( rt.m_handle ).get();
+	std::shared_ptr<VulkanRenderTexture> renderTexture = m_renderTextures.Get( rt.m_handle );
 
 	// Transition to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture.image );
+	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture->image );
 
 	vkCmdPipelineBarrier( m_mainContext.commandBuffer, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
 	    VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr, 0, nullptr, 1, &startRenderImageMemoryBarrier );
@@ -1250,14 +1248,14 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 	depthClear.depthStencil.depth = 1.0f;
 
 	VkRenderingAttachmentInfo colorAttachmentInfo =
-	    VKInit::RenderingAttachmentInfo( renderTexture.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	    VKInit::RenderingAttachmentInfo( renderTexture->imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 	colorAttachmentInfo.clearValue = colorClear;
 
 	VkRenderingAttachmentInfo depthAttachmentInfo =
 	    VKInit::RenderingAttachmentInfo( m_depthTarget.imageView, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL );
 	depthAttachmentInfo.clearValue = depthClear;
 
-	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderTexture.size );
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, &depthAttachmentInfo, renderTexture->size );
 	vkCmdBeginRendering( m_mainContext.commandBuffer, &renderInfo );
 
 	return RENDER_STATUS_OK;
@@ -1306,7 +1304,7 @@ RenderStatus VulkanRenderContext::SetImageTextureData( Handle handle, TextureDat
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 
-	VulkanImageTexture* imageTexture = m_imageTextures.Get( handle ).get();
+	std::shared_ptr<VulkanImageTexture> imageTexture = m_imageTextures.Get( handle );
 
 	if ( imageTexture == nullptr )
 		return RENDER_STATUS_INVALID_HANDLE;
@@ -1320,7 +1318,7 @@ RenderStatus VulkanRenderContext::CopyImageTexture( Handle handle, TextureCopyDa
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 
-	VulkanImageTexture* imageTexture = m_imageTextures.Get( handle ).get();
+	std::shared_ptr<VulkanImageTexture> imageTexture = m_imageTextures.Get( handle );
 
 	if ( imageTexture == nullptr )
 		return RENDER_STATUS_INVALID_HANDLE;
@@ -1364,7 +1362,7 @@ RenderStatus VulkanRenderContext::UploadBuffer( Handle handle, BufferUploadInfo_
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 
-	VulkanBuffer* buffer = m_buffers.Get( handle ).get();
+	std::shared_ptr<VulkanBuffer> buffer = m_buffers.Get( handle );
 
 	if ( buffer == nullptr )
 		return RENDER_STATUS_INVALID_HANDLE;
@@ -1419,7 +1417,7 @@ RenderStatus VulkanRenderContext::GetGPUInfo( GPUInfo* outInfo )
 
 RenderStatus VulkanRenderContext::GetImGuiTextureID( ImageTexture* texture, void** outTextureId )
 {
-	VulkanImageTexture* vkTexture = m_imageTextures.Get( texture->m_handle ).get();
+	std::shared_ptr<VulkanImageTexture> vkTexture = m_imageTextures.Get( texture->m_handle );
 	*outTextureId = vkTexture->GetImGuiTextureID();
 
 	return RENDER_STATUS_OK;
@@ -1627,9 +1625,9 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 
 	for ( auto& descriptor : pipelineInfo.descriptors )
 	{
-		VulkanDescriptor vkDescriptor = *m_parent->m_descriptors.Get( descriptor->m_handle ).get();
+		std::shared_ptr<VulkanDescriptor> vkDescriptor = m_parent->m_descriptors.Get( descriptor->m_handle );
 
-		setLayouts.push_back( vkDescriptor.descriptorSetLayout );
+		setLayouts.push_back( vkDescriptor->descriptorSetLayout );
 	}
 
 	pipeline_layout_info.pSetLayouts = setLayouts.data();
