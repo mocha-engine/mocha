@@ -1832,5 +1832,12 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	builder.m_depthStencil =
 	    VKInit::DepthStencilCreateInfo( !pipelineInfo.ignoreDepth, !pipelineInfo.ignoreDepth, VK_COMPARE_OP_LESS_OR_EQUAL );
 
-	pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
+	if ( pipelineInfo.renderToSwapchain )
+	{
+		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, VK_FORMAT_UNDEFINED );
+	}
+	else
+	{
+		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
+	}
 }
