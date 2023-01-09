@@ -46,13 +46,6 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 
 		m_swapchainTextures.push_back( renderTexture );
 	}
-}
-
-VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
-{
-	SetParent( parent );
-
-	CreateMainSwapchain( size );
 
 	//
 	// Create render targets
@@ -67,6 +60,13 @@ VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
 
 	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
 	m_parent->m_colorTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
+}
+
+VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
+{
+	SetParent( parent );
+
+	CreateMainSwapchain( size );
 }
 
 void VulkanSwapchain::Update( Size2D newSize )
@@ -1076,7 +1076,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
-	
+
 	Size2D renderSize = m_colorTarget.size;
 
 	if ( !CanRender() )
@@ -1168,7 +1168,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 
 	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
 	    nullptr, 0, nullptr, 1, &readFromColorTargetBarrier );
-	
+
 	//
 	// Set viewport & scissor
 	//
@@ -1206,7 +1206,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	UpdateDescriptor( m_fullScreenTri.descriptor, updateInfo );
 
 	Draw( m_fullScreenTri.vertexCount, m_fullScreenTri.indexCount, 1 );
-	
+
 	//
 	// Render ImGUI
 	//
