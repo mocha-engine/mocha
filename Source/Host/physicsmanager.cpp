@@ -47,10 +47,8 @@ void PhysicsManager::Startup()
 	    m_physicsInstance->m_broadPhaseLayerInterface, MyBroadPhaseCanCollide, MyObjectCanCollide );
 
 	m_physicsInstance->m_physicsSystem.SetGravity( JPH::Vec3( 0, 0, -9.8f ) );
-
-	spdlog::info( "Physics system has init" );
 }
-
+				
 void PhysicsManager::Shutdown()
 {
 	// TODO: Destroy and remove all bodies

@@ -1136,6 +1136,9 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
+	// Show window now that we're done setting up
+	m_window->Show();
+
 	// Render scale change checking
 	{
 		if ( lastRenderScale != renderScale )

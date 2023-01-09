@@ -11,6 +11,8 @@ private:
 	struct SDL_Window* m_window{ nullptr };
 	bool m_captureMouse;
 
+	bool m_visible;
+
 public:
 	Window( uint32_t width, uint32_t height );
 
@@ -19,6 +21,7 @@ public:
 	VkSurfaceKHR CreateSurface( VkInstance instance );
 	void Cleanup();
 	bool Update();
+	void Show();
 
 	inline SDL_Window* GetSDLWindow() { return m_window; }
 
