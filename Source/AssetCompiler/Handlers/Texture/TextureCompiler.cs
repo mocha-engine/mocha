@@ -2,97 +2,56 @@
 using BCnEncoder.Shared;
 using Mocha.Common.Serialization;
 using StbImageSharp;
-using System.Security.Cryptography;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".png", ".jpg" } )]
+/// <summary>
+/// A compiler for .png, .jpg, and .jpeg image files.
+/// </summary>
+[Handles( ".png", ".jpg", ".jpeg" )]
 public partial class TextureCompiler : BaseCompiler
 {
+	/// <inheritdoc/>
 	public override string AssetName => "Texture";
 
-	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
+	/// <inheritdoc/>
+	public override string CompiledExtension => "mtex_c";
+
+	/// <inheritdoc/>
+	public override bool SupportsMochaFile => true;
+
+	/// <inheritdoc/>
+	public override string[] AssociatedFiles => associatedFiles;
+	private static readonly string[] associatedFiles = new string[]
 	{
-		return format switch
-		{
-			TextureFormat.BC3 => CompressionFormat.Bc3,
-			TextureFormat.BC5 => CompressionFormat.Bc5,
-			TextureFormat.RGBA => CompressionFormat.Rgba,
+		"{SourcePathWithoutExt}.meta"
+	};
 
-			_ => throw new Exception( $"Unsupported texture format {format}" ),
-		};
-	}
-
-	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, TextureFormat format )
+	/// <inheritdoc/>
+	public override CompileResult Compile( ref CompileInput input )
 	{
-		BcEncoder encoder = new BcEncoder();
-
-		encoder.OutputOptions.GenerateMipMaps = true;
-		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
-		encoder.OutputOptions.Format = TextureFormatToCompressionFormat( format );
-		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
-
-		return encoder.EncodeToRawBytes( data, (int)width, (int)height, PixelFormat.Rgba32, (int)mip, out _, out _ );
-	}
-
-	private bool IsPowerOfTwo( int x )
-	{
-		return (x & (x - 1)) == 0;
-	}
-
-	private int NextPowerOfTwo( int x )
-	{
-		int i = 0;
-		while ( x > 0 )
-		{
-			x >>= 1;
-			i++;
-		}
-		return 1 << i;
-	}
-
-	public override CompileResult CompileFile( string path )
-	{
-		var destFileName = Path.ChangeExtension( path, "mtex_c" );
-		var metaFileName = Path.ChangeExtension( path, "meta" );
 		var textureMeta = new TextureMetadata();
-		var textureFormat = new TextureInfo();
+		// Check for meta, load if it exists.
+		if ( input.AssociatedData.TryGetValue( "{SourcePathWithoutExt}.meta", out var metaData ) )
+			textureMeta = JsonSerializer.Deserialize<TextureMetadata>( metaData.Span );
 
-		// Load image
-		var fileData = File.ReadAllBytes( path );
-		var image = ImageResult.FromMemory( fileData, ColorComponents.RedGreenBlueAlpha );
-
-		// TODO: Move to a nice generic function somewhere
-		if ( File.Exists( destFileName ) )
+		// Setup image and format.
+		var image = ImageResult.FromMemory( input.SourceData.ToArray(), ColorComponents.RedGreenBlueAlpha );
+		var textureFormat = new TextureInfo
 		{
-			// Read mocha file
-			var existingFile = File.ReadAllBytes( destFileName );
-			var deserializedFile = Serializer.Deserialize<MochaFile<TextureInfo>>( existingFile );
-
-			using var md5 = MD5.Create();
-			var computedHash = md5.ComputeHash( fileData );
-			if ( Enumerable.SequenceEqual( deserializedFile.AssetHash, computedHash ) )
-				return UpToDate( path, destFileName );
-		}
-
-		// Check for meta, load if it exists
-		if ( File.Exists( metaFileName ) )
-		{
-			var metaFile = File.ReadAllText( metaFileName );
-			textureMeta = JsonSerializer.Deserialize<TextureMetadata>( metaFile );
-		}
-
-		textureFormat.DataWidth = (uint)image.Width;
-		textureFormat.DataHeight = (uint)image.Height;
-		textureFormat.Width = (uint)image.Width;
-		textureFormat.Height = (uint)image.Height;
-		textureFormat.MipCount = 5;
+			DataWidth = (uint)image.Width,
+			DataHeight = (uint)image.Height,
+			Width = (uint)image.Width,
+			Height = (uint)image.Height,
+			MipCount = 5,
+			Format = textureMeta.Format
+		};
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
-		textureFormat.Format = textureMeta.Format;
 
-		// If image is not POT, then pad the image with transparent pixels
+		// If image is not POT, then pad the image with transparent pixels.
 		if ( !IsPowerOfTwo( image.Width ) || !IsPowerOfTwo( image.Height ) )
 		{
 			var newWidth = NextPowerOfTwo( image.Width );
@@ -128,37 +87,63 @@ public partial class TextureCompiler : BaseCompiler
 			textureFormat.DataHeight = (uint)newHeight;
 		}
 
+		// Setup mip-maps.
 		for ( uint i = 0; i < textureFormat.MipCount; ++i )
 		{
 			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, textureMeta.Format );
 			textureFormat.MipDataLength[i] = textureFormat.MipData[i].Length;
 		}
 
-		// Wrapper for file
-		var mochaFile = new MochaFile<TextureInfo>()
+		// Wrapper for file.
+		var mochaFile = new MochaFile<TextureInfo>
 		{
 			MajorVersion = 3,
 			MinorVersion = 1,
-			Data = textureFormat
+			Data = textureFormat,
+			AssetHash = input.DataHash
 		};
 
-		// Calculate original asset hash
-		using ( var md5 = MD5.Create() )
-			mochaFile.AssetHash = md5.ComputeHash( fileData );
+		return Succeeded( Serializer.Serialize( mochaFile ) );
+	}
 
-		// TODO: Runtime compiler will often catch this before we do, this needs fixing
-		try
+	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
+	{
+		return format switch
 		{
-			// Write result
-			using var fileStream = new FileStream( destFileName, FileMode.Create );
-			using var binaryWriter = new BinaryWriter( fileStream );
-			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
-		}
-		catch ( Exception ex )
+			TextureFormat.BC3 => CompressionFormat.Bc3,
+			TextureFormat.BC5 => CompressionFormat.Bc5,
+			TextureFormat.RGBA => CompressionFormat.Rgba,
+
+			_ => throw new UnreachableException( $"Unsupported texture format {format}" ),
+		};
+	}
+
+	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, TextureFormat format )
+	{
+		var encoder = new BcEncoder();
+
+		encoder.OutputOptions.GenerateMipMaps = true;
+		encoder.OutputOptions.Quality = CompressionQuality.BestQuality;
+		encoder.OutputOptions.Format = TextureFormatToCompressionFormat( format );
+		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
+
+		return encoder.EncodeToRawBytes( data, (int)width, (int)height, PixelFormat.Rgba32, (int)mip, out _, out _ );
+	}
+
+	private static bool IsPowerOfTwo( int x )
+	{
+		return (x & (x - 1)) == 0;
+	}
+
+	private static int NextPowerOfTwo( int x )
+	{
+		int i = 0;
+		while ( x > 0 )
 		{
-			return Failed( path, exception: ex );
+			x >>= 1;
+			i++;
 		}
 
-		return Succeeded( path, destFileName );
+		return 1 << i;
 	}
 }

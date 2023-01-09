@@ -23,23 +23,27 @@ public class OfflineAssetCompiler : AssetCompilerBase
 			// Target is directory
 			QueueDirectory( ref queue, options.Target );
 
-			var dispatcher = new ThreadDispatcher<string>( ( threadQueue ) =>
+			var dispatcher = new ThreadDispatcher<string>( async ( threadQueue ) =>
 			{
+				var tasks = new List<Task>();
+
 				foreach ( var item in threadQueue )
 				{
 					try
 					{
-						CompileFile( item );
+						tasks.Add( CompileFileAsync( item ) );
 					}
 					catch ( Exception e )
 					{
 						Log.Fail( item, e );
 					}
 				}
+
+				await Task.WhenAll( tasks );
 			}, queue );
 
 			while ( !dispatcher.IsComplete )
-				Thread.Sleep( 500 );
+				Thread.Sleep( 5 );
 		}
 		else
 		{
@@ -67,7 +71,7 @@ public class OfflineAssetCompiler : AssetCompilerBase
 	{
 		var fileExtension = Path.GetExtension( path );
 
-		if ( GetCompiler( fileExtension, out var _ ) )
+		if ( TryGetCompiler( fileExtension, out var _ ) )
 		{
 			queue.Add( path );
 		}

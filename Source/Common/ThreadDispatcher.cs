@@ -3,12 +3,24 @@
 public class ThreadDispatcher<T>
 {
 	public delegate void ThreadCallback( List<T> threadQueue );
-	private int threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
+	public delegate Task AsyncThreadCallback( List<T> threadQueue );
 
-	private int threadsCompleted = 0;
 	public bool IsComplete => threadsCompleted >= threadCount;
 
+	private int threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
+	private int threadsCompleted = 0;
+
 	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
+	{
+		Setup( queue, threadQueue => threadStart( threadQueue ) );
+	}
+
+	public ThreadDispatcher( AsyncThreadCallback threadStart, List<T> queue )
+	{
+		Setup( queue, threadQueue => threadStart( threadQueue ).Wait() );
+	}
+
+	private void Setup( List<T> queue, Action<List<T>> threadStart )
 	{
 		var batchSize = queue.Count / threadCount - 1;
 
@@ -29,7 +41,6 @@ public class ThreadDispatcher<T>
 			var thread = new Thread( () =>
 			{
 				threadStart( threadQueue );
-
 				threadsCompleted++;
 			} );
 

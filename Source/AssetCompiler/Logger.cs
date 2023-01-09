@@ -33,7 +33,9 @@ public class Logger
 	public void Fail( string path, Exception? e = null )
 	{
 		FailCount++;
-		Log( "Fail", $"{path} failed to compile. Error was: {e?.Message ?? "Unknown"}" );
+		Log( "Fail", $"{path} failed to compile. Error was: {e?.Message ?? "Unknown."}" );
+		if ( e.StackTrace is not null )
+			Log( "StackTrace", e.StackTrace );
 	}
 
 	public void Processing( string type, string path )
