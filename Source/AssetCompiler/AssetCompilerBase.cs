@@ -8,32 +8,39 @@ public class AssetCompilerBase : IAssetCompiler
 {
 	protected List<BaseCompiler> Compilers = new();
 
+	private readonly Dictionary<string, BaseCompiler> ExtensionToCompilerCache = new();
+
 	public AssetCompilerBase()
 	{
 		IAssetCompiler.Current = this;
 
+		// Fetch all compilers and cache them.
 		foreach ( var type in Assembly.GetExecutingAssembly().GetTypes().Where( x => x.BaseType == typeof( BaseCompiler ) ) )
 		{
-			var instance = Activator.CreateInstance( type ) as BaseCompiler;
+			if ( Activator.CreateInstance( type ) is not BaseCompiler instance )
+				continue;
 
-			if ( instance != null )
-				Compilers.Add( instance );
+			Compilers.Add( instance );
+			var handleAttribute = instance.GetType().GetCustomAttribute<HandlesAttribute>();
+			if ( handleAttribute is null )
+				continue;
+
+			foreach ( var extension in handleAttribute.Extensions )
+				ExtensionToCompilerCache.Add( extension, instance );
 		}
 	}
 
+	/// <summary>
+	/// Attempts to get a compiler that can handle the provided file extension.
+	/// </summary>
+	/// <param name="fileExtension">The file extension to look for a compiler with.</param>
+	/// <param name="foundCompiler">The compiler that was found. Null if none found.</param>
+	/// <returns>Whether or not a compiler was found.</returns>
 	protected bool GetCompiler( string fileExtension, [NotNullWhen( true )] out BaseCompiler? foundCompiler )
 	{
-		foreach ( var compiler in Compilers )
-		{
-			if ( compiler.GetType().GetCustomAttribute<HandlesAttribute>()?.Extensions?.Contains( fileExtension ) ?? false )
-			{
-				foundCompiler = compiler;
-				return true;
-			}
-		}
+		return ExtensionToCompilerCache.TryGetValue( fileExtension, out foundCompiler );
+	}
 
-		foundCompiler = null;
-		return false;
 	}
 
 	public void CompileFile( string path )
