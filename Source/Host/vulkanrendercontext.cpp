@@ -664,6 +664,7 @@ void VulkanRenderContext::CreateSwapchain()
 
 	m_window->m_onWindowResized = [&]( Size2D newSize ) {
 		m_swapchain.Update( newSize );
+		CreateRenderTargets();
 		g_hostManager->FireEvent( "Event.Window.Resized" );
 	};
 }
@@ -707,16 +708,46 @@ void VulkanRenderContext::CreateDescriptors()
 
 void VulkanRenderContext::CreateRenderTargets()
 {
+	// Are we re-creating render targets? If so, delete the originals
+	if ( m_colorTarget.image != VK_NULL_HANDLE )
+	{
+		vkDestroyImageView( m_device, m_colorTarget.imageView, nullptr );
+		vkDestroyImage( m_device, m_colorTarget.image, nullptr );
+		vmaFreeMemory( m_allocator, m_colorTarget.allocation );
+
+		vkDestroyImageView( m_device, m_depthTarget.imageView, nullptr );
+		vkDestroyImage( m_device, m_depthTarget.image, nullptr );
+		vmaFreeMemory( m_allocator, m_depthTarget.allocation );
+	}
+
 	Size2D size = m_window->GetWindowSize();
 
 	//
 	// Create render targets
 	//
-	const float renderScale = 2.0f;
 	RenderTextureInfo_t renderTextureInfo;
 	renderTextureInfo.width = size.x * renderScale;
 	renderTextureInfo.height = size.y * renderScale;
 
+	// BUG: Resizing the window after setting render scale to something high will cause
+	// an engine crash.. even though we're limiting sizes?
+	
+	//
+	// Limit size to something sensible
+	// TODO: Query device support?
+	//
+	const float maxSize = 8192.0f;
+	const float aspect = ( float )size.x / ( float )size.y;
+
+	if ( renderTextureInfo.width > maxSize || renderTextureInfo.height > maxSize )
+	{
+		renderTextureInfo.width = maxSize;
+		renderTextureInfo.height = maxSize / aspect;
+
+		spdlog::warn( "Render target size is too large. Clamping to {}x{}", renderTextureInfo.width,
+		    renderTextureInfo.height );
+	}
+	
 	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
 	m_depthTarget = VulkanRenderTexture( this, renderTextureInfo );
 
@@ -1105,6 +1136,17 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
+	// Render scale change checking
+	{
+		if ( lastRenderScale != renderScale )
+		{
+			// Render scale has changed - re-create render targets
+			CreateRenderTargets();
+		}
+
+		lastRenderScale = renderScale;
+	}
+
 	Size2D renderSize = m_colorTarget.size;
 
 	if ( !CanRender() )
@@ -1220,7 +1262,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	colorAttachmentInfo.clearValue = colorClear;
 
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, nullptr, windowSize );
-	
+
 	vkCmdBeginRendering( cmd, &renderInfo );
 
 	BindVertexBuffer( m_fullScreenTri.vertexBuffer );

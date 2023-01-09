@@ -6,6 +6,11 @@
 #include <util.h>
 
 // ----------------------------------------------------------------------------------------------------
+
+extern FloatCVar renderScale;
+extern float lastRenderScale;
+
+// ----------------------------------------------------------------------------------------------------
 // clang-format off
 
 enum RenderObjectStatus
