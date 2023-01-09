@@ -5,6 +5,10 @@ namespace Mocha;
 public class World
 {
 	public static World Current { get; set; }
+	private bool worldInitialized = false;
+	private bool frameRendered = false;
+
+	private UIManager ui;
 
 	public World()
 	{
@@ -13,7 +17,9 @@ public class World
 		Event.RegisterStatics();
 		Event.Run( Event.Game.LoadAttribute.Name );
 
-		SetupEntities();
+		ui = new UIManager();
+		ui.SetTemplate( "ui/Loading.html" );
+		// SetupEntities();
 	}
 
 	private void SetupEntities()
@@ -27,15 +33,24 @@ public class World
 		map.Mass = 1000.0f;
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
-		var ui = new UIManager();
-
 		var player = new Player();
+
+		ui.SetTemplate( "ui/Game.html" );
 	}
 
 	public void Update()
 	{
+		if ( !worldInitialized && frameRendered )
+		{
+			SetupEntities();
+
+			worldInitialized = true;
+		}
+
 		DebugOverlay.NewFrame();
 		UIManager.Instance.Render();
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
+
+		frameRendered = true;
 	}
 }
