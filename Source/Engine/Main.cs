@@ -54,7 +54,7 @@ public class Main
 	[UnmanagedCallersOnly]
 	public static void Update()
 	{
-		Time.Update( Glue.Engine.GetTickDeltaTime(), Glue.Engine.GetTime(), Glue.Engine.GetFramesPerSecond().CeilToInt() );
+		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 
 		world.Update();
 	}
@@ -62,7 +62,7 @@ public class Main
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		Time.Update( Glue.Engine.GetDeltaTime(), Glue.Engine.GetTime(), Glue.Engine.GetFramesPerSecond().CeilToInt() );
+		Time.UpdateFrom( Glue.Engine.GetDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 

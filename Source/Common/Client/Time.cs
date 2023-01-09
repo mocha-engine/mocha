@@ -8,12 +8,12 @@ public class Time
 
 	public static List<int> FPSHistory { get; } = new();
 
-	public static void Update( float deltaTime, float currentTime, int framesPerSecond )
+	public static void UpdateFrom( float deltaTime )
 	{
 		Delta = deltaTime;
-		Now = currentTime;
+		Now = Glue.Engine.GetTime();
 
-		FPS = framesPerSecond;
+		FPS = Glue.Engine.GetFramesPerSecond().CeilToInt();
 
 		FPSHistory.Add( FPS );
 		if ( FPSHistory.Count > 512 )
