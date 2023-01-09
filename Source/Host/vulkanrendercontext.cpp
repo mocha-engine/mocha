@@ -731,7 +731,7 @@ void VulkanRenderContext::CreateRenderTargets()
 
 	// BUG: Resizing the window after setting render scale to something high will cause
 	// an engine crash.. even though we're limiting sizes?
-	
+
 	//
 	// Limit size to something sensible
 	// TODO: Query device support?
@@ -744,10 +744,9 @@ void VulkanRenderContext::CreateRenderTargets()
 		renderTextureInfo.width = maxSize;
 		renderTextureInfo.height = maxSize / aspect;
 
-		spdlog::warn( "Render target size is too large. Clamping to {}x{}", renderTextureInfo.width,
-		    renderTextureInfo.height );
+		spdlog::warn( "Render target size is too large. Clamping to {}x{}", renderTextureInfo.width, renderTextureInfo.height );
 	}
-	
+
 	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
 	m_depthTarget = VulkanRenderTexture( this, renderTextureInfo );
 
@@ -1111,6 +1110,9 @@ inline bool VulkanRenderContext::CanRender()
 
 void VulkanRenderContext::RenderImGui()
 {
+	if ( m_window->GetCaptureMouse() )
+		return; // Window has mouse capture, so don't render
+
 	VkCommandBuffer cmd = m_mainContext.commandBuffer;
 
 	if ( m_isRenderPassActive )

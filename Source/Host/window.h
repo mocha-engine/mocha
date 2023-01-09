@@ -9,9 +9,8 @@ class Window
 {
 private:
 	struct SDL_Window* m_window{ nullptr };
-	bool m_captureMouse;
-
-	bool m_visible;
+	bool m_visible = false;
+	bool m_captureMouse = true;
 
 public:
 	Window( uint32_t width, uint32_t height );
@@ -19,6 +18,7 @@ public:
 	std::function<void( Size2D newSize )> m_onWindowResized;
 
 	VkSurfaceKHR CreateSurface( VkInstance instance );
+	bool GetCaptureMouse() { return m_captureMouse; }
 	void Cleanup();
 	bool Update();
 	void Show();
