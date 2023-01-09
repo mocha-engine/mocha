@@ -46,31 +46,31 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 
 		m_swapchainTextures.push_back( renderTexture );
 	}
-}
 
-void VulkanSwapchain::CreateDepthTexture( Size2D size )
-{
+	//
+	// Create render targets
+	//
 	RenderTextureInfo_t renderTextureInfo;
 	renderTextureInfo.width = size.x;
 	renderTextureInfo.height = size.y;
-	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
 
-	m_depthTexture = VulkanRenderTexture( m_parent, renderTextureInfo );
+	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
+	m_parent->m_depthTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
+
+	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
+	m_parent->m_colorTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
 }
 
 VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
-    : m_depthTexture( parent )
 {
 	SetParent( parent );
 
 	CreateMainSwapchain( size );
-	CreateDepthTexture( size );
 }
 
 void VulkanSwapchain::Update( Size2D newSize )
 {
 	CreateMainSwapchain( newSize );
-	CreateDepthTexture( newSize );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -94,9 +94,9 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 	switch ( type )
 	{
 	case RENDER_TEXTURE_COLOR:
-		return VK_FORMAT_R8G8B8A8_UNORM;
 	case RENDER_TEXTURE_COLOR_OPAQUE:
-		return VK_FORMAT_R8G8B8_UNORM;
+		// Some cards do not support alpha-less formats, so we use this for compatibility
+		return VK_FORMAT_R8G8B8A8_SRGB;
 	case RENDER_TEXTURE_DEPTH:
 		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
@@ -936,6 +936,96 @@ RenderStatus VulkanRenderContext::RenderImGui()
 	return RENDER_STATUS_OK;
 }
 
+void VulkanRenderContext::CreateFullScreenTri()
+{
+	m_fullScreenTri = {};
+
+	{
+		// clang-format off
+		std::vector<float> vertices = {
+			// Coords			// UVs
+			-1.0f, -1.0f, 0.0f,	0.0f, 0.0f,
+			3.0f, -1.0f, 0.0f,  2.0f, 0.0f,
+			-1.0f, 3.0f, 0.0f,	0.0f, 2.0f
+		};
+		// clang-format on
+		
+		BufferInfo_t bufferInfo = {};
+		bufferInfo.size = sizeof( float ) * vertices.size();
+		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
+		bufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER;
+
+		m_fullScreenTri.vertexBuffer = VertexBuffer( bufferInfo );
+
+		BufferUploadInfo_t uploadInfo = {};
+		uploadInfo.data = {};
+		uploadInfo.data.count = vertices.size();
+		uploadInfo.data.size = vertices.size() * sizeof( float );
+		uploadInfo.data.data = ( void* )vertices.data();
+
+		UploadBuffer( m_fullScreenTri.vertexBuffer.m_handle, uploadInfo );
+
+		m_fullScreenTri.vertexCount = vertices.size();
+	}
+
+	{
+		std::vector<uint32_t> indices = { 0, 1, 2 };
+
+		BufferInfo_t bufferInfo = {};
+		bufferInfo.size = sizeof( uint32_t ) * indices.size();
+		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
+		bufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER;
+
+		m_fullScreenTri.indexBuffer = IndexBuffer( bufferInfo );
+
+		BufferUploadInfo_t uploadInfo = {};
+		uploadInfo.data = {};
+		uploadInfo.data.count = indices.size();
+		uploadInfo.data.size = indices.size() * sizeof( uint32_t );
+		uploadInfo.data.data = ( void* )indices.data();
+
+		UploadBuffer( m_fullScreenTri.indexBuffer.m_handle, uploadInfo );
+
+		m_fullScreenTri.indexCount = indices.size();
+	}
+
+	DescriptorInfo_t descriptorInfo = {};
+	DescriptorBindingInfo_t colorTextureBinding = {};
+
+	// HACK: Horrific hack to get render textures working with descriptor sets for now
+	VulkanImageTexture vkImageTexture;
+	vkImageTexture.image = m_colorTarget.image;
+	vkImageTexture.imageView = m_colorTarget.imageView;
+	vkImageTexture.format = m_colorTarget.format;
+
+	m_fullScreenTri.imageTexture = {};
+	m_fullScreenTri.imageTexture.m_handle = m_imageTextures.Add( vkImageTexture );
+	colorTextureBinding.texture = &m_fullScreenTri.imageTexture;
+	colorTextureBinding.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
+
+	descriptorInfo.bindings = std::vector<DescriptorBindingInfo_t>{ colorTextureBinding };
+
+	m_fullScreenTri.descriptor = Descriptor( descriptorInfo );
+
+	VertexAttributeInfo_t positionAttribute = {};
+	positionAttribute.format = VERTEX_ATTRIBUTE_FORMAT_FLOAT3;
+	positionAttribute.name = "Position";
+
+	VertexAttributeInfo_t uvAttribute = {};
+	uvAttribute.format = VERTEX_ATTRIBUTE_FORMAT_FLOAT2;
+	uvAttribute.name = "UV";
+
+	PipelineInfo_t pipelineInfo = {};
+	pipelineInfo.ignoreDepth = true;
+	pipelineInfo.renderToSwapchain = true;
+	pipelineInfo.descriptors = std::vector<Descriptor*>{ &m_fullScreenTri.descriptor };
+	pipelineInfo.vertexAttributes = std::vector<VertexAttributeInfo_t>{ positionAttribute, uvAttribute };
+	pipelineInfo.shaderInfo = {};
+	pipelineInfo.shaderInfo.shaderPath = "Content/core/shaders/fs.mshdr";
+
+	m_fullScreenTri.pipeline = Pipeline( pipelineInfo );
+}
+
 void VulkanRenderContext::CreateAllocator()
 {
 	VmaAllocatorCreateInfo allocatorInfo = {};
@@ -977,6 +1067,7 @@ RenderStatus VulkanRenderContext::Startup()
 		CreateSyncStructures();
 		CreateDescriptors();
 		CreateImGui();
+		CreateFullScreenTri();
 	}
 
 	return RENDER_STATUS_OK;
@@ -1023,9 +1114,7 @@ RenderStatus VulkanRenderContext::BeginRendering()
 
 	// Acquire swapchain image ( 1 second timeout )
 	m_swapchainImageIndex = m_swapchain.AcquireSwapchainImageIndex( m_device, m_presentSemaphore, m_mainContext );
-
 	m_swapchainTarget = m_swapchain.m_swapchainTextures[m_swapchainImageIndex];
-	m_depthTarget = m_swapchain.m_depthTexture;
 
 	// Begin command buffer
 	VkCommandBuffer cmd = m_mainContext.commandBuffer;
@@ -1049,18 +1138,18 @@ RenderStatus VulkanRenderContext::BeginRendering()
 	// We want to draw the image, so we'll manually transition the layout to
 	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
 	//
-	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
-	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_swapchainTarget.image );
+	VkImageMemoryBarrier writeToColorTargetBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_SHADER_READ_BIT,
+	    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_colorTarget.image );
 
-	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr,
-	    0, nullptr, 1, &startRenderImageMemoryBarrier );
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, 0, 0,
+	    nullptr, 0, nullptr, 1, &writeToColorTargetBarrier );
 
 	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
 	VkClearValue depthClear = {};
 	depthClear.depthStencil.depth = 1.0f;
 
 	VkRenderingAttachmentInfo colorAttachmentInfo =
-	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	    VKInit::RenderingAttachmentInfo( m_colorTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 	colorAttachmentInfo.clearValue = colorClear;
 
 	VkRenderingAttachmentInfo depthAttachmentInfo =
@@ -1087,6 +1176,49 @@ RenderStatus VulkanRenderContext::EndRendering()
 		vkCmdEndRendering( cmd );
 		m_isRenderPassActive = false;
 	}
+
+	//
+	// We want to draw the image, so we'll manually transition the layout to
+	// VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL before presenting
+	//
+	VkImageMemoryBarrier startRenderBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, m_swapchainTarget.image );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, 0, 0, nullptr,
+	    0, nullptr, 1, &startRenderBarrier );
+
+	VkImageMemoryBarrier readFromColorTargetBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+	    VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, m_colorTarget.image );
+
+	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
+	    nullptr, 0, nullptr, 1, &readFromColorTargetBarrier );
+
+	//
+	// Render to fullscreen tri
+	//
+	Size2D renderSize = m_window->GetWindowSize();
+	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
+	VkRenderingAttachmentInfo colorAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	colorAttachmentInfo.clearValue = colorClear;
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, nullptr, renderSize );
+	vkCmdBeginRendering( cmd, &renderInfo );
+
+	BindVertexBuffer( m_fullScreenTri.vertexBuffer );
+	BindIndexBuffer( m_fullScreenTri.indexBuffer );
+	BindPipeline( m_fullScreenTri.pipeline );
+	BindDescriptor( m_fullScreenTri.descriptor );
+
+	DescriptorUpdateInfo_t updateInfo = {};
+	updateInfo.binding = 0;
+	updateInfo.samplerType = SAMPLER_TYPE_POINT;
+	updateInfo.src = &m_fullScreenTri.imageTexture;
+
+	UpdateDescriptor( m_fullScreenTri.descriptor, updateInfo );
+
+	Draw( m_fullScreenTri.vertexCount, m_fullScreenTri.indexCount, 1 );
+
+	vkCmdEndRendering( cmd );
 
 	//
 	// We want to present the image, so we'll manually transition the layout to
@@ -1472,7 +1604,7 @@ RenderStatus VulkanShader::LoadShaderModule( const char* filePath, ShaderType sh
 	{
 		std::string error = std::string( filePath ) + " failed to compile.\nCheck the console for more details.";
 		ErrorMessage( error );
-		exit( 1 );
+		abort();
 	}
 
 	//
@@ -1693,6 +1825,13 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	builder.m_depthStencil =
 	    VKInit::DepthStencilCreateInfo( !pipelineInfo.ignoreDepth, !pipelineInfo.ignoreDepth, VK_COMPARE_OP_LESS_OR_EQUAL );
 
-	pipeline = builder.Build(
-	    m_parent->m_device, m_parent->m_swapchain.m_swapchainTextures[0].format, m_parent->m_swapchain.m_depthTexture.format );
+	if ( pipelineInfo.renderToSwapchain )
+	{
+		pipeline =
+		    builder.Build( m_parent->m_device, m_parent->m_swapchain.m_swapchainTextures[0].format, VK_FORMAT_UNDEFINED );
+	}
+	else
+	{
+		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
+	}
 }

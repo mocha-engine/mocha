@@ -170,6 +170,7 @@ struct PipelineInfo_t
 	std::vector<Descriptor*> descriptors;
 	std::vector<VertexAttributeInfo_t> vertexAttributes;
 	bool ignoreDepth;
+	bool renderToSwapchain;
 };
 
 struct RenderPushConstants
