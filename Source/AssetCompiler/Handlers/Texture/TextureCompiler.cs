@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".png", ".jpg" } )]
+[Handles( ".png", ".jpg", ".jpeg" )]
 public partial class TextureCompiler : BaseCompiler
 {
 	public override string AssetName => "Texture";

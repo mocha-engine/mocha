@@ -2,7 +2,7 @@
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".mmdl" } )]
+[Handles( ".mmdl" )]
 public class ModelCompiler : BaseCompiler
 {
 	public override string AssetName => "Model";

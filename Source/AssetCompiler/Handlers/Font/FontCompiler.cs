@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".ttf" } )]
+[Handles( ".ttf" )]
 public class FontCompiler : BaseCompiler
 {
 	public override string AssetName => "Font";

@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
-[Handles( new[] { ".mmat" } )]
+[Handles( ".mmat" )]
 public class MaterialCompiler : BaseCompiler
 {
 	public override string AssetName => "Material";
