@@ -8,6 +8,9 @@ namespace Mocha.AssetCompiler;
 
 public class AssetCompilerBase : IAssetCompiler
 {
+	/// <summary>
+	/// A list containing all found compilers.
+	/// </summary>
 	protected List<BaseCompiler> Compilers = new();
 
 	private readonly Dictionary<string, BaseCompiler> ExtensionToCompilerCache = new();
