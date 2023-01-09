@@ -24,7 +24,7 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 	vkb::SwapchainBuilder swapchainBuilder( m_parent->m_chosenGPU, m_parent->m_device, m_parent->m_surface );
 
 	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
-	                                  .set_desired_format( { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
+	                                  .set_desired_format( { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
 	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
 	                                  .set_desired_extent( size.x, size.y )
 	                                  .build()
@@ -83,7 +83,7 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 	case RENDER_TEXTURE_COLOR:
 	case RENDER_TEXTURE_COLOR_OPAQUE:
 		// Some cards do not support alpha-less formats, so we use this for compatibility
-		return VK_FORMAT_B8G8R8A8_SRGB;
+		return VK_FORMAT_B8G8R8A8_UNORM;
 	case RENDER_TEXTURE_DEPTH:
 		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
@@ -781,7 +781,7 @@ void VulkanRenderContext::CreateImGui()
 
 	io.Fonts->Build();
 
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable | ImGuiConfigFlags_IsSRGB;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigViewportsNoDecoration = false;
 	io.ConfigViewportsNoAutoMerge = true;
 	io.ConfigDockingWithShift = true;
