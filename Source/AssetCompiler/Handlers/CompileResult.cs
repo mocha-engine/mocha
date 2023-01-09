@@ -11,16 +11,17 @@ public readonly struct CompileResult
 	public CompileState State { get; init; }
 
 	/// <summary>
-	/// The source path of the asset.
-	/// </summary>
-	public string SourcePath { get; init; }
-	/// <summary>
-	/// The destination path of the compiled asset.
-	/// </summary>
-	public string? DestinationPath { get; init; }
-
-	/// <summary>
 	/// An exception that represents the reason for the compile to fail.
 	/// </summary>
-	public Exception? Error { get; init; }
+	public Exception? Exception { get; init; }
+
+	/// <summary>
+	/// The resulting data from the compilation.
+	/// </summary>
+	public ReadOnlyMemory<byte> Data { get; init; }
+
+	/// <summary>
+	/// The resulting data of any other associated portions of the compilation.
+	/// </summary>
+	public IReadOnlyDictionary<string, ReadOnlyMemory<byte>> AssociatedData { get; init; }
 }
