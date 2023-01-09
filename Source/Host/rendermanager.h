@@ -35,14 +35,14 @@ public:
 
 	const char* GetGPUName()
 	{
-		GPUInfo info;
+		GPUInfo info{};
 		assert( m_renderContext->GetGPUInfo( &info ) == RENDER_STATUS_OK );
 		return info.gpuName;
 	}
 
 	Size2D GetWindowExtent()
 	{
-		Size2D size;
+		Size2D size{};
 		assert( m_renderContext->GetRenderSize( &size ) == RENDER_STATUS_OK );
 		return size;
 	}
