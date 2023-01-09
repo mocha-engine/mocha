@@ -1190,13 +1190,15 @@ RenderStatus VulkanRenderContext::EndRendering()
 	vkCmdSetViewport( cmd, 0, 1, &viewport );
 
 	//
-	// Render to fullscreen tri
+	// Render fullscreen tri to screen
 	//
 	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
 	VkRenderingAttachmentInfo colorAttachmentInfo =
 	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 	colorAttachmentInfo.clearValue = colorClear;
+
 	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, nullptr, windowSize );
+	
 	vkCmdBeginRendering( cmd, &renderInfo );
 
 	BindVertexBuffer( m_fullScreenTri.vertexBuffer );
@@ -1834,7 +1836,7 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 
 	if ( pipelineInfo.renderToSwapchain )
 	{
-		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, VK_FORMAT_UNDEFINED );
+		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, VK_FORMAT_D32_SFLOAT_S8_UINT );
 	}
 	else
 	{
