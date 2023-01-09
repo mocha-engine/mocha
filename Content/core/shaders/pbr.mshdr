@@ -402,15 +402,10 @@ void main()
 	// Ambient occlusion
 	fragColor *= ao;
 
-	// Gamma correction
-	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
-	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
-
 	// Tonemap
+	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
 	fragColor = reinhard_jodie( fragColor );
-
-	// Exposure
-	fragColor *= 1.5f;
+	fragColor *= 1.5f; // Exposure
 
 	int debugView = int( floor( PushConstants.data.x ) );
 

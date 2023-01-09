@@ -297,6 +297,7 @@ private:
 	void CreateSyncStructures();
 	void CreateDescriptors();
 	void CreateSamplers();
+	void CreateRenderTargets();
 
 	//
 	// ImGui

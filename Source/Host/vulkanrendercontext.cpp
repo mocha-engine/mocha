@@ -24,7 +24,7 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 	vkb::SwapchainBuilder swapchainBuilder( m_parent->m_chosenGPU, m_parent->m_device, m_parent->m_surface );
 
 	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
-	                                  .set_desired_format( { VK_FORMAT_R8G8B8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
+	                                  .set_desired_format( { VK_FORMAT_B8G8R8A8_SRGB, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
 	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
 	                                  .set_desired_extent( size.x, size.y )
 	                                  .build()
@@ -46,20 +46,6 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 
 		m_swapchainTextures.push_back( renderTexture );
 	}
-
-	//
-	// Create render targets
-	//
-	const float renderScale = 2.0f;
-	RenderTextureInfo_t renderTextureInfo;
-	renderTextureInfo.width = size.x * renderScale;
-	renderTextureInfo.height = size.y * renderScale;
-
-	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
-	m_parent->m_depthTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
-
-	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
-	m_parent->m_colorTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
 }
 
 VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
@@ -97,7 +83,7 @@ VkFormat VulkanRenderTexture::GetFormat( RenderTextureType type )
 	case RENDER_TEXTURE_COLOR:
 	case RENDER_TEXTURE_COLOR_OPAQUE:
 		// Some cards do not support alpha-less formats, so we use this for compatibility
-		return VK_FORMAT_R8G8B8A8_SRGB;
+		return VK_FORMAT_B8G8R8A8_SRGB;
 	case RENDER_TEXTURE_DEPTH:
 		return VK_FORMAT_D32_SFLOAT_S8_UINT;
 	}
@@ -719,6 +705,25 @@ void VulkanRenderContext::CreateDescriptors()
 	VK_CHECK( vkCreateDescriptorPool( m_device, &poolInfo, nullptr, &m_descriptorPool ) );
 }
 
+void VulkanRenderContext::CreateRenderTargets()
+{
+	Size2D size = m_window->GetWindowSize();
+
+	//
+	// Create render targets
+	//
+	const float renderScale = 2.0f;
+	RenderTextureInfo_t renderTextureInfo;
+	renderTextureInfo.width = size.x * renderScale;
+	renderTextureInfo.height = size.y * renderScale;
+
+	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
+	m_depthTarget = VulkanRenderTexture( this, renderTextureInfo );
+
+	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
+	m_colorTarget = VulkanRenderTexture( this, renderTextureInfo );
+}
+
 void VulkanRenderContext::CreateSamplers()
 {
 	m_pointSampler = VulkanSampler( this, SAMPLER_TYPE_POINT );
@@ -776,7 +781,7 @@ void VulkanRenderContext::CreateImGui()
 
 	io.Fonts->Build();
 
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable | ImGuiConfigFlags_IsSRGB;
 	io.ConfigViewportsNoDecoration = false;
 	io.ConfigViewportsNoAutoMerge = true;
 	io.ConfigDockingWithShift = true;
@@ -1044,6 +1049,7 @@ RenderStatus VulkanRenderContext::Startup()
 		CreateSyncStructures();
 		CreateDescriptors();
 		CreateImGui();
+		CreateRenderTargets();
 		CreateFullScreenTri();
 	}
 
@@ -1826,13 +1832,5 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	builder.m_depthStencil =
 	    VKInit::DepthStencilCreateInfo( !pipelineInfo.ignoreDepth, !pipelineInfo.ignoreDepth, VK_COMPARE_OP_LESS_OR_EQUAL );
 
-	if ( pipelineInfo.renderToSwapchain )
-	{
-		pipeline =
-		    builder.Build( m_parent->m_device, m_parent->m_swapchain.m_swapchainTextures[0].format, VK_FORMAT_UNDEFINED );
-	}
-	else
-	{
-		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
-	}
+	pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
 }
