@@ -316,7 +316,7 @@ public partial class QuakeWalkController
 	{
 		// if the player hull point one unit down is solid, the player is on ground
 		// see if standing on something solid
-		var point = Position + Vector3.Down * 1;
+		var point = Position + Vector3.Down * 0.01f;
 		var bumpPos = Position;
 
 		bool moveToEndPos = false;
