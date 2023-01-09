@@ -43,7 +43,7 @@ internal partial class UIManager
 			return;
 
 		Graphics.PanelRenderer.NewFrame();
-		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) ), Crosshair );
+		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) * Screen.UIScale ), Crosshair );
 
 		DrawNode( RootPanel );
 		IsDirty = false;
