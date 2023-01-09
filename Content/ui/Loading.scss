@@ -1,0 +1,24 @@
+$background: #000000;
+$bar: #ffffff;
+$text: #ffffff;
+$text-light: #bbbbbb;
+
+$safe-area-x: 50px;
+$safe-area-y: 50px;
+
+root {
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding-left: $safe-area-x;
+    padding-right: $safe-area-x;
+    padding-bottom: $safe-area-y;
+}
+
+
+image {
+    width: 256px;
+    aspect-ratio: 1;
+
+    background-image: "core/logo.png";
+}
