@@ -487,12 +487,6 @@ public:
 	virtual RenderStatus EndImGui() = 0;
 
 	/// <summary>
-	/// This will draw data fetched from ImGUI, e.g. "ImGui_ImplVulkan_RenderDrawData()".
-	/// </summary>
-	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
-	virtual RenderStatus RenderImGui() = 0;
-
-	/// <summary>
 	/// This will return a pointer that ImGui can use to draw a texture.
 	/// </summary>
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
@@ -505,6 +499,8 @@ public:
 	// TODO: Move this elsewhere
 	// This will return the size for the current render target.
 	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+
+	virtual RenderStatus GetWindowSize( Size2D* outSize ) = 0;
 
 	// Update window, fetch inputs etc..
 	virtual RenderStatus UpdateWindow() = 0;

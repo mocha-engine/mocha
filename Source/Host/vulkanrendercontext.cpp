@@ -46,19 +46,6 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 
 		m_swapchainTextures.push_back( renderTexture );
 	}
-
-	//
-	// Create render targets
-	//
-	RenderTextureInfo_t renderTextureInfo;
-	renderTextureInfo.width = size.x;
-	renderTextureInfo.height = size.y;
-
-	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
-	m_parent->m_depthTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
-
-	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
-	m_parent->m_colorTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
 }
 
 VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
@@ -66,6 +53,20 @@ VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
 	SetParent( parent );
 
 	CreateMainSwapchain( size );
+
+	//
+	// Create render targets
+	//
+	const float renderScale = 2.0f;
+	RenderTextureInfo_t renderTextureInfo;
+	renderTextureInfo.width = size.x * renderScale;
+	renderTextureInfo.height = size.y * renderScale;
+
+	renderTextureInfo.type = RENDER_TEXTURE_DEPTH;
+	m_parent->m_depthTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
+
+	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
+	m_parent->m_colorTarget = VulkanRenderTexture( m_parent, renderTextureInfo );
 }
 
 void VulkanSwapchain::Update( Size2D newSize )
@@ -912,30 +913,6 @@ RenderStatus VulkanRenderContext::EndImGui()
 	return RENDER_STATUS_OK;
 }
 
-RenderStatus VulkanRenderContext::RenderImGui()
-{
-	VkCommandBuffer cmd = m_mainContext.commandBuffer;
-
-	if ( m_isRenderPassActive )
-	{
-		vkCmdEndRendering( cmd );
-		m_isRenderPassActive = false;
-	}
-
-	// Draw UI
-	VkRenderingAttachmentInfo uiAttachmentInfo =
-	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
-	uiAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD; // Preserve existing color data (3d scene)
-
-	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, m_window->GetWindowSize() );
-
-	vkCmdBeginRendering( cmd, &imguiRenderInfo );
-	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
-	vkCmdEndRendering( cmd );
-
-	return RENDER_STATUS_OK;
-}
-
 void VulkanRenderContext::CreateFullScreenTri()
 {
 	m_fullScreenTri = {};
@@ -949,7 +926,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 			-1.0f, 3.0f, 0.0f,	0.0f, 2.0f
 		};
 		// clang-format on
-		
+
 		BufferInfo_t bufferInfo = {};
 		bufferInfo.size = sizeof( float ) * vertices.size();
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
@@ -1099,9 +1076,8 @@ RenderStatus VulkanRenderContext::BeginRendering()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
-
-	// Get window size ( we use this in a load of places )
-	Size2D renderSize = m_window->GetWindowSize();
+	
+	Size2D renderSize = m_colorTarget.size;
 
 	if ( !CanRender() )
 	{
@@ -1192,16 +1168,29 @@ RenderStatus VulkanRenderContext::EndRendering()
 
 	vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT, VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT, 0, 0,
 	    nullptr, 0, nullptr, 1, &readFromColorTargetBarrier );
+	
+	//
+	// Set viewport & scissor
+	//
+	Size2D windowSize = m_window->GetWindowSize();
+	VkViewport viewport = {};
+	viewport.minDepth = 0.0;
+	viewport.maxDepth = 1.0;
+	viewport.width = static_cast<float>( windowSize.x );
+	viewport.height = static_cast<float>( windowSize.y );
+
+	VkRect2D scissor = { { 0, 0 }, { windowSize.x, windowSize.y } };
+	vkCmdSetScissor( cmd, 0, 1, &scissor );
+	vkCmdSetViewport( cmd, 0, 1, &viewport );
 
 	//
 	// Render to fullscreen tri
 	//
-	Size2D renderSize = m_window->GetWindowSize();
 	VkClearValue colorClear = { { { 0.0f, 0.0f, 0.0f, 1.0f } } };
 	VkRenderingAttachmentInfo colorAttachmentInfo =
 	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
 	colorAttachmentInfo.clearValue = colorClear;
-	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, nullptr, renderSize );
+	VkRenderingInfo renderInfo = VKInit::RenderingInfo( &colorAttachmentInfo, nullptr, windowSize );
 	vkCmdBeginRendering( cmd, &renderInfo );
 
 	BindVertexBuffer( m_fullScreenTri.vertexBuffer );
@@ -1217,6 +1206,11 @@ RenderStatus VulkanRenderContext::EndRendering()
 	UpdateDescriptor( m_fullScreenTri.descriptor, updateInfo );
 
 	Draw( m_fullScreenTri.vertexCount, m_fullScreenTri.indexCount, 1 );
+	
+	//
+	// Render ImGUI
+	//
+	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
 
 	vkCmdEndRendering( cmd );
 
@@ -1394,6 +1388,13 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 }
 
 RenderStatus VulkanRenderContext::GetRenderSize( Size2D* outSize )
+{
+	*outSize = m_colorTarget.size;
+
+	return RENDER_STATUS_OK;
+}
+
+RenderStatus VulkanRenderContext::GetWindowSize( Size2D* outSize )
 {
 	*outSize = m_window->GetWindowSize();
 

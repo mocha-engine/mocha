@@ -32,7 +32,7 @@ internal partial class UIManager
 	[Event.Window.Resized]
 	public void LoadTemplate()
 	{
-		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
+		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		RootPanel = Template.FromFile( Renderer, Path );
 		IsDirty = true;
 	}

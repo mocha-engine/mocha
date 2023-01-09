@@ -152,11 +152,6 @@ void RenderManager::Render()
 			RenderEntity( entity.get() );
 	} );
 
-	//
-	// Editor UI
-	//
-	m_renderContext->RenderImGui();
-
 	m_renderContext->EndRendering();
 }
 

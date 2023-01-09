@@ -56,7 +56,7 @@ public class Main
 	{
 		Input.Update();
 		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
-		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
+		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 
 		// HACK: bail if deltatime is too high. This usually happens when the window
 		// is touched, but can happen with framerate spikes.

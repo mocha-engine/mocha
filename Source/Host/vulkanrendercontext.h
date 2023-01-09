@@ -444,6 +444,9 @@ public:
 	RenderStatus GetRenderSize( Size2D* outSize ) override;
 
 	/// <inheritdoc />
+	RenderStatus GetWindowSize( Size2D* outSize ) override;
+
+	/// <inheritdoc />
 	RenderStatus UpdateWindow() override;
 
 	/// <inheritdoc />
@@ -455,8 +458,6 @@ public:
 	RenderStatus BeginImGui() override;
 	/// <inheritdoc />
 	RenderStatus EndImGui() override;
-	/// <inheritdoc />
-	RenderStatus RenderImGui() override;
 
 	/// <inheritdoc />
 	RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) override;
