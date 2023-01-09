@@ -24,7 +24,7 @@ public class ModelCompiler : BaseCompiler
 	private static readonly char[] indexChunk = new char[] { 'I', 'N', 'D', 'X' };
 
 	/// <inheritdoc/>
-	public override CompileResult CompileFile( ref CompileInput input )
+	public override CompileResult Compile( ref CompileInput input )
 	{
 		// TODO: Fix this
 		if ( input.SourcePath is null )

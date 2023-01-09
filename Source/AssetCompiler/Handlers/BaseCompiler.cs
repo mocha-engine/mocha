@@ -27,7 +27,7 @@ public abstract class BaseCompiler
 	/// </summary>
 	/// <param name="input"></param>
 	/// <returns>The result of the compilation.</returns>
-	public abstract CompileResult CompileFile( ref CompileInput input );
+	public abstract CompileResult Compile( ref CompileInput input );
 
 	/// <summary>
 	/// Returns a <see cref="CompileState.Succeeded"/> result with the provided data.

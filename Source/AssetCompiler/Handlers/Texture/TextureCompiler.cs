@@ -30,7 +30,7 @@ public partial class TextureCompiler : BaseCompiler
 	};
 
 	/// <inheritdoc/>
-	public override CompileResult CompileFile( ref CompileInput input )
+	public override CompileResult Compile( ref CompileInput input )
 	{
 		var textureMeta = new TextureMetadata();
 		// Check for meta, load if it exists.

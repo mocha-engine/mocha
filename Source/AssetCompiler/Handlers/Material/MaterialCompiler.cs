@@ -19,7 +19,7 @@ public class MaterialCompiler : BaseCompiler
 	public override bool SupportsMochaFile => true;
 
 	/// <inheritdoc/>
-	public override CompileResult CompileFile( ref CompileInput input )
+	public override CompileResult Compile( ref CompileInput input )
 	{
 		var materialData = JsonSerializer.Deserialize<MaterialInfo>( input.SourceData.Span );
 		// Wrapper for file

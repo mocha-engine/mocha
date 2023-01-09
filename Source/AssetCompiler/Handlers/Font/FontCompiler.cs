@@ -27,7 +27,7 @@ public class FontCompiler : BaseCompiler
 	};
 
 	/// <inheritdoc/>
-	public override CompileResult CompileFile( ref CompileInput input )
+	public override CompileResult Compile( ref CompileInput input )
 	{
 		// TODO: Fix this
 		if ( input.SourcePath is null )

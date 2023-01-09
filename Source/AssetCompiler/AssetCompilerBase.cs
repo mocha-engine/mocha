@@ -120,7 +120,7 @@ public class AssetCompilerBase : IAssetCompiler
 		CompileResult result;
 		try
 		{
-			result = compiler.CompileFile( ref input );
+			result = compiler.Compile( ref input );
 		}
 		catch( Exception e )
 		{
