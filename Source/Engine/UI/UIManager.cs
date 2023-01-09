@@ -21,7 +21,6 @@ internal partial class UIManager
 		Watcher = FileSystem.Game.CreateWatcher( "", "*.*", LoadTemplate );
 	}
 
-	[Event.Window.Resized]
 	public void LoadTemplate( string? file = null )
 	{
 		bool shouldLoad;
@@ -50,6 +49,12 @@ internal partial class UIManager
 	public void SetTemplate( string path )
 	{
 		this.templatePath = path;
+		LoadTemplate();
+	}
+
+	[Event.Window.Resized]
+	public void OnResized()
+	{
 		LoadTemplate();
 	}
 
