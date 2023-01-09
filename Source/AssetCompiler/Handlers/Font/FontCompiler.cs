@@ -1,63 +1,68 @@
 ﻿using Mocha.Common.Serialization;
 using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
+/// <summary>
+/// A compiler for .ttf font files.
+/// </summary>
 [Handles( ".ttf" )]
 public class FontCompiler : BaseCompiler
 {
+	/// <inheritdoc/>
 	public override string AssetName => "Font";
 
-	public override CompileResult CompileFile( string path )
+	/// <inheritdoc/>
+	public override string CompiledExtension => "mfnt_c";
+
+	/// <inheritdoc/>
+	public override bool SupportsMochaFile => true;
+
+	/// <inheritdoc/>
+	public override string[] AssociatedFiles => associatedFiles;
+	private static readonly string[] associatedFiles = new string[]
 	{
-		var destJsonFileName = Path.ChangeExtension( path, ".temp.json" );
-		var destAtlasFileName = Path.ChangeExtension( path, ".png" );
-		var destAtlasMeta = Path.ChangeExtension( path, "meta" );
-		var destFileName = Path.ChangeExtension( path, "mfnt_c" );
+		"{SourcePathWithoutExt}.txt"
+	};
 
-		// TODO: Move to a nice generic function somewhere
-		if ( File.Exists( destFileName ) )
+	/// <inheritdoc/>
+	public override CompileResult CompileFile( ref CompileInput input )
+	{
+		// TODO: Fix this
+		if ( input.SourcePath is null )
+			throw new NotSupportedException( "Compiling a font requires compiling files on disk" );
+
+		var destJsonFileName = Path.ChangeExtension( input.SourcePath, "temp.json" )!;
+		var destAtlasFileName = Path.ChangeExtension( input.SourcePath, "png" )!;
+
+		// Create the msdf-atlas-gen process.
+		var process = new Process
 		{
-			// Read mocha file
-			var existingFile = File.ReadAllBytes( destFileName );
-			var deserializedFile = Serializer.Deserialize<MochaFile<Font.Data>>( existingFile );
-
-			if ( deserializedFile.Data.ModifiedDate == File.GetLastWriteTime( path ).ToString() )
-				return UpToDate( path, destFileName );
-		}
-
-		var charSetFileName = Path.ChangeExtension( path, ".txt" );
-
-		// Get exe directory
-		var exeDir = Path.GetDirectoryName( Process.GetCurrentProcess().MainModule.FileName );
-		string exePath = exeDir + "\\msdf-atlas-gen.exe";
-		string fontPath = path;
-
-		// Create a new ProcessStartInfo object
-		ProcessStartInfo startInfo = new ProcessStartInfo();
-
-		// Don't make a new window. This won't stop output, but RedirectStandardOutput causes the process to never finish
-		startInfo.UseShellExecute = false;
-		startInfo.FileName = exePath;
-		startInfo.Arguments = $"-font {fontPath} -imageout {destAtlasFileName} -json {destJsonFileName}";
+			StartInfo = new ProcessStartInfo
+			{
+				// Don't make a new window. This won't stop output, but RedirectStandardOutput causes the process to never finish
+				UseShellExecute = false,
+				RedirectStandardOutput = false,
+				FileName = Path.GetDirectoryName( Environment.ProcessPath ) + "\\msdf-atlas-gen.exe",
+				Arguments = $"-font {input.SourcePath} -imageout {destAtlasFileName} -json {destJsonFileName}"
+			}
+		};
 
 		// Do we have a character set? If so, use it
-		if ( File.Exists( charSetFileName ) )
-			startInfo.Arguments += $" -charset {charSetFileName}";
+		if ( input.AssociatedData.ContainsKey( "{SourcePathWithoutExt}.txt" ) )
+			process.StartInfo.Arguments += $" -charset {Path.ChangeExtension( input.SourcePath, "txt" )}";
 
-		// Create a new Process object and start it
-		Process process = new Process();
-		process.StartInfo = startInfo;
 		process.Start();
-
-		// Wait for the process to finish
 		process.WaitForExit();
 
+		// Ensure that the process succeeded. Cleanup and throw if not.
 		if ( process.ExitCode != 0 )
 		{
+			// Delete temporary files.
+			File.Delete( destJsonFileName );
+			File.Delete( destAtlasFileName );
+
 			throw new Exception( $"There was an error generating the atlas: {process.ExitCode}" );
 		}
 
@@ -66,52 +71,29 @@ public class FontCompiler : BaseCompiler
 		{
 			Format = TextureFormat.RGBA
 		};
-
-		File.WriteAllText( destAtlasMeta, JsonSerializer.Serialize( textureMeta ) );
+		File.WriteAllText( Path.ChangeExtension( input.SourcePath, "meta" )!, JsonSerializer.Serialize( textureMeta ) );
 
 		// Compile atlas
-		IAssetCompiler.Current.CompileFile( destAtlasFileName );
+		IAssetCompiler.Current!.CompileFile( destAtlasFileName );
 
 		// Load json
 		var fileData = File.ReadAllText( destJsonFileName );
 		var fontData = JsonSerializer.Deserialize<Font.Data>( fileData );
-
-		fontData.ModifiedDate = File.GetLastWriteTime( path ).ToString();
+		fontData!.ModifiedDate = File.GetLastWriteTime( input.SourcePath ).ToString();
 
 		// Wrapper for file
 		var mochaFile = new MochaFile<Font.Data>()
 		{
 			MajorVersion = 3,
 			MinorVersion = 1,
-			Data = fontData
+			Data = fontData,
+			AssetHash = input.DataHash
 		};
 
-		// Calculate original asset hash
-		using ( var md5 = MD5.Create() )
-			mochaFile.AssetHash = md5.ComputeHash( Encoding.Default.GetBytes( fileData ) );
-
-		try
-		{
-			// Write result
-			using var fileStream = new FileStream( destFileName, FileMode.Create );
-			using var binaryWriter = new BinaryWriter( fileStream );
-
-			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
-		}
-		catch ( Exception ex )
-		{
-			return Failed( path, exception: ex );
-		}
-
-		//
-		// Cleanup
-		//
-
-		// Delete temporary json file
+		// Delete temporary files.
 		File.Delete( destJsonFileName );
-
-		// Delete original atlas file
 		File.Delete( destAtlasFileName );
-		return Succeeded( path, destJsonFileName );
+
+		return Succeeded( Serializer.Serialize( mochaFile ) );
 	}
 }

@@ -1,20 +1,39 @@
-﻿using System.Text.Json;
+﻿using System.Text;
+using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
+/// <summary>
+/// A compiler for .mmdl model files.
+/// </summary>
 [Handles( ".mmdl" )]
 public class ModelCompiler : BaseCompiler
 {
+	/// <inheritdoc/>
 	public override string AssetName => "Model";
 
-	public override CompileResult CompileFile( string path )
+	/// <inheritdoc/>
+	public override string CompiledExtension => "mmdl_c";
+
+	/// <inheritdoc/>
+	public override bool SupportsMochaFile => false;
+
+	private static readonly char[] magicNumber = new char[] { 'M', 'M', 'S', 'H' };
+	private static readonly char[] materialChunk = new char[] { 'M', 'T', 'R', 'L' };
+	private static readonly char[] vertexChunk = new char[] { 'V', 'R', 'T', 'X' };
+	private static readonly char[] indexChunk = new char[] { 'I', 'N', 'D', 'X' };
+
+	/// <inheritdoc/>
+	public override CompileResult CompileFile( ref CompileInput input )
 	{
-		var destFileName = Path.ChangeExtension( path, "mmdl_c" );
+		// TODO: Fix this
+		if ( input.SourcePath is null )
+			throw new NotSupportedException( "Compiling a model requires compiling files on disk" );
 
-		using var fileStream = new FileStream( destFileName, FileMode.Create );
-		using var binaryWriter = new BinaryWriter( fileStream );
+		using var stream = new MemoryStream();
+		using var binaryWriter = new BinaryWriter( stream );
 
-		binaryWriter.Write( new char[] { 'M', 'M', 'S', 'H' } ); // Magic number
+		binaryWriter.Write( magicNumber ); // Magic number
 
 		//
 		// File header
@@ -23,8 +42,7 @@ public class ModelCompiler : BaseCompiler
 		binaryWriter.Write( 0 ); // Version minor
 
 		// Load json
-		var fileData = File.ReadAllText( path );
-		var modelData = JsonSerializer.Deserialize<ModelInfo>( fileData );
+		var modelData = JsonSerializer.Deserialize<ModelInfo>( Encoding.UTF8.GetString( input.SourceData.Span ) );
 
 		var meshes = Assimp.GenerateModels( modelData );
 
@@ -39,14 +57,14 @@ public class ModelCompiler : BaseCompiler
 			//
 			// Material chunk
 			//
-			binaryWriter.Write( new char[] { 'M', 'T', 'R', 'L' } );
+			binaryWriter.Write( materialChunk );
 
 			binaryWriter.Write( mesh.Material );
 
 			//
 			// Vertex chunk
 			//
-			binaryWriter.Write( new char[] { 'V', 'R', 'T', 'X' } );
+			binaryWriter.Write( vertexChunk );
 
 			binaryWriter.Write( mesh.Vertices.Length );
 
@@ -78,16 +96,14 @@ public class ModelCompiler : BaseCompiler
 			//
 			// Index chunk
 			//
-			binaryWriter.Write( new char[] { 'I', 'N', 'D', 'X' } );
+			binaryWriter.Write( indexChunk );
 
 			binaryWriter.Write( mesh.Indices.Length );
 
 			foreach ( var index in mesh.Indices )
-			{
 				binaryWriter.Write( index );
-			}
 		}
 
-		return Succeeded( path, destFileName );
+		return Succeeded( stream.ToArray() );
 	}
 }

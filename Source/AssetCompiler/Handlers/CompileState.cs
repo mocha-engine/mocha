@@ -5,7 +5,6 @@
 /// </summary>
 public enum CompileState
 {
-	UpToDate,
 	Succeeded,
 	Failed
 }

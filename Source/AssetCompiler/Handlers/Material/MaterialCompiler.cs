@@ -1,48 +1,36 @@
 ﻿using Mocha.Common.Serialization;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
 
+/// <summary>
+/// A compiler for .mmat material files.
+/// </summary>
 [Handles( ".mmat" )]
 public class MaterialCompiler : BaseCompiler
 {
+	/// <inheritdoc/>
 	public override string AssetName => "Material";
 
-	public override CompileResult CompileFile( string path )
+	/// <inheritdoc/>
+	public override string CompiledExtension => "mmat_c";
+
+	/// <inheritdoc/>
+	public override bool SupportsMochaFile => true;
+
+	/// <inheritdoc/>
+	public override CompileResult CompileFile( ref CompileInput input )
 	{
-		var destFileName = Path.ChangeExtension( path, "mmat_c" );
-
-		// Load json
-		var fileData = File.ReadAllText( path );
-		var materialData = JsonSerializer.Deserialize<MaterialInfo>( fileData );
-
+		var materialData = JsonSerializer.Deserialize<MaterialInfo>( input.SourceData.Span );
 		// Wrapper for file
 		var mochaFile = new MochaFile<MaterialInfo>()
 		{
 			MajorVersion = 3,
 			MinorVersion = 1,
-			Data = materialData
+			Data = materialData,
+			AssetHash = input.DataHash
 		};
 
-		// Calculate original asset hash
-		using ( var md5 = MD5.Create() )
-			mochaFile.AssetHash = md5.ComputeHash( Encoding.Default.GetBytes( fileData ) );
-
-		try
-		{
-			// Write result
-			using var fileStream = new FileStream( destFileName, FileMode.Create );
-			using var binaryWriter = new BinaryWriter( fileStream );
-
-			binaryWriter.Write( Serializer.Serialize( mochaFile ) );
-		}
-		catch ( Exception ex )
-		{
-			return Failed( path, exception: ex );
-		}
-
-		return Succeeded( path, destFileName );
+		return Succeeded( Serializer.Serialize( mochaFile ) );
 	}
 }

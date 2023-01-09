@@ -8,40 +8,55 @@ public abstract class BaseCompiler
 	public abstract string AssetName { get; }
 
 	/// <summary>
+	/// The file extension attributed to the asset this compiler works with.
+	/// </summary>
+	public abstract string CompiledExtension { get; }
+
+	/// <summary>
+	/// Whether or not the asset uses <see cref="MochaFile{T}"/> for its (de)serialization.
+	/// </summary>
+	public abstract bool SupportsMochaFile { get; }
+
+	/// <summary>
+	/// An array of file patterns that can be associated with the assets compilation.
+	/// </summary>
+	public virtual string[] AssociatedFiles => Array.Empty<string>();
+
+	/// <summary>
 	/// Compiles the asset.
 	/// </summary>
-	/// <param name="path">The path to the source asset.</param>
+	/// <param name="input"></param>
 	/// <returns>The result of the compilation.</returns>
-	public abstract CompileResult CompileFile( string path );
+	public abstract CompileResult CompileFile( ref CompileInput input );
 
-	protected static CompileResult UpToDate( string sourcePath, string destinationPath )
-	{
-		return new CompileResult()
-		{
-			State = CompileState.UpToDate,
-			SourcePath = sourcePath,
-			DestinationPath = destinationPath,
-			Error = null
-		};
-	}
-	protected static CompileResult Succeeded( string sourcePath, string destinationPath )
+	/// <summary>
+	/// Returns a <see cref="CompileState.Succeeded"/> result with the provided data.
+	/// </summary>
+	/// <param name="data">The compiled data.</param>
+	/// <param name="associatedData">The compiled version of any associated data.</param>
+	/// <returns>The created result of the compilation.</returns>
+	protected static CompileResult Succeeded( ReadOnlyMemory<byte> data, IReadOnlyDictionary<string, ReadOnlyMemory<byte>>? associatedData = null )
 	{
 		return new CompileResult()
 		{
 			State = CompileState.Succeeded,
-			SourcePath = sourcePath,
-			DestinationPath = destinationPath,
-			Error = null
+			Exception = null,
+			Data = data,
+			AssociatedData = associatedData ?? new Dictionary<string, ReadOnlyMemory<byte>>( 0 )
 		};
 	}
-	protected static CompileResult Failed( string sourcePath, string? destinationPath = null, Exception? exception = null )
+
+	/// <summary>
+	/// Returns a <see cref="CompileState.Failed"/> result with the provided <see cref="Exception"/>.
+	/// </summary>
+	/// <param name="exception">The exception that occurred during the compilation.</param>
+	/// <returns>The created result of the compilation.</returns>
+	protected static CompileResult Failed( Exception? exception = null )
 	{
 		return new CompileResult()
 		{
 			State = CompileState.Failed,
-			SourcePath = sourcePath,
-			DestinationPath = destinationPath,
-			Error = exception
+			Exception = exception
 		};
 	}
 }
