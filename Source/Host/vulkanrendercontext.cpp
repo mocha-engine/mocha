@@ -1078,6 +1078,28 @@ inline bool VulkanRenderContext::CanRender()
 	return true;
 }
 
+void VulkanRenderContext::RenderImGui()
+{
+	VkCommandBuffer cmd = m_mainContext.commandBuffer;
+
+	if ( m_isRenderPassActive )
+	{
+		vkCmdEndRendering( cmd );
+		m_isRenderPassActive = false;
+	}
+
+	// Draw UI
+	VkRenderingAttachmentInfo uiAttachmentInfo =
+	    VKInit::RenderingAttachmentInfo( m_swapchainTarget.imageView, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL );
+	uiAttachmentInfo.loadOp = VK_ATTACHMENT_LOAD_OP_LOAD; // Preserve existing color data (3d scene)
+
+	VkRenderingInfo imguiRenderInfo = VKInit::RenderingInfo( &uiAttachmentInfo, nullptr, m_window->GetWindowSize() );
+
+	vkCmdBeginRendering( cmd, &imguiRenderInfo );
+	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
+	vkCmdEndRendering( cmd );
+}
+
 RenderStatus VulkanRenderContext::BeginRendering()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
@@ -1215,12 +1237,12 @@ RenderStatus VulkanRenderContext::EndRendering()
 
 	Draw( m_fullScreenTri.vertexCount, m_fullScreenTri.indexCount, 1 );
 
-	//
-	// Render ImGUI
-	//
-	ImGui_ImplVulkan_RenderDrawData( ImGui::GetDrawData(), cmd );
-
 	vkCmdEndRendering( cmd );
+
+	//
+	// Render editor
+	//
+	RenderImGui();
 
 	//
 	// We want to present the image, so we'll manually transition the layout to

@@ -304,6 +304,7 @@ private:
 	//
 	void CreateImGuiIconFont();
 	void CreateImGui();
+	void RenderImGui();
 
 	//
 	// Vulkan memory allocator
