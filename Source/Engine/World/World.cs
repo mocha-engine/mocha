@@ -38,19 +38,43 @@ public class World
 		ui.SetTemplate( "ui/Game.html" );
 	}
 
-	public void Update()
+	public void Render()
 	{
-		if ( !worldInitialized && frameRendered )
+		DebugOverlay.Render();
+		UIManager.Instance.Render();
+
+		if ( !worldInitialized )
 		{
 			SetupEntities();
 
 			worldInitialized = true;
 		}
+	}
 
-		DebugOverlay.NewFrame();
-		UIManager.Instance.Render();
+	public void Update()
+	{
+		// DEBUG
+		// TODO: Remove
+		int ticksPerSecond = (1.0f / Glue.Engine.GetTickDeltaTime()).CeilToInt();
+		int framesPerSecond = (1.0f / Glue.Engine.GetDeltaTime()).CeilToInt();
+
+		DebugOverlay.ScreenText( $"Ticks per second: {ticksPerSecond}" );
+		DebugOverlay.ScreenText( $"Frames per second: {framesPerSecond}" );
+		DebugOverlay.ScreenText( $"Current tick: {Glue.Engine.GetCurrentTick()}" );
+		DebugOverlay.ScreenText( $"Current time: {Glue.Engine.GetTime()}" );
+		DebugOverlay.ScreenText( $"Current tick time: {Glue.Engine.GetTickDeltaTime()}ms" );
+		DebugOverlay.ScreenText( $"Current frame time: {Glue.Engine.GetDeltaTime()}ms" );
+
+		DebugOverlay.ScreenText( $"Time.Now: {Time.Now}" );
+		DebugOverlay.ScreenText( $"Time.Delta: {Time.Delta}ms" );
+		DebugOverlay.ScreenText( $"Time.FPS: {Time.FPS}" );
+
+		// TODO: Entity interpolation
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
+	}
 
-		frameRendered = true;
+	public void FrameUpdate()
+	{
+		BaseEntity.All.ToList().ForEach( entity => entity.FrameUpdate() );
 	}
 }

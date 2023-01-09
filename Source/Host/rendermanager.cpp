@@ -155,67 +155,93 @@ void RenderManager::Render()
 	m_renderContext->EndRendering();
 }
 
+double HiresTimeInSeconds()
+{
+	return std::chrono::duration_cast<std::chrono::duration<double>>(
+	    std::chrono::high_resolution_clock::now().time_since_epoch() )
+	    .count();
+}
+
 void RenderManager::Run()
 {
 	bool bQuit = false;
 
 	g_hostManager->FireEvent( "Event.Game.Load" );
 
+	const int ticksPerSecond = 40; // TODO: convar? ideally shouldn't be changed mid-game
+
+	double curTime = 0.0;
+	double logicDelta = 1.0 / ticksPerSecond;
+
+	double currentTime = HiresTimeInSeconds();
+	double accumulator = 0.0;
+
 	while ( !bQuit )
 	{
-		static auto gameStart = std::chrono::steady_clock::now();
-		static float flFilteredTime = 0;
-		static float flPreviousTime = 0;
-		static float flFrameTime = 0;
-
-		std::chrono::duration<float> timeSinceStart = std::chrono::steady_clock::now() - gameStart;
-		float flCurrentTime = timeSinceStart.count();
-
-		float dt = flCurrentTime - flPreviousTime;
-		flPreviousTime = flCurrentTime;
-
-		flFrameTime += dt;
-
-		if ( flFrameTime < 0.0f )
-			return;
+		double newTime = HiresTimeInSeconds();
+		double frameTime = newTime - currentTime;
 
 		// How quick did we do last frame? Let's limit ourselves if (1.0f / g_frameTime) is more than maxFramerate
-		float fps = 1.0f / flFrameTime;
+		float fps = 1.0f / frameTime;
 		float maxFps = maxFramerate.GetValue();
 
 		if ( maxFps > 0 && fps > maxFps )
 		{
-			flFilteredTime += g_frameTime;
 			continue;
 		}
 
-		g_curTime = flCurrentTime;
-		g_frameTime = flFrameTime;
+		if ( frameTime > 0.25 )
+			frameTime = 0.25;
 
-		flFilteredTime = 0;
-		flFrameTime = 0;
+		currentTime = newTime;
+		accumulator += frameTime;
 
-		if ( m_renderContext->UpdateWindow() == RENDER_STATUS_WINDOW_CLOSE )
+		//
+		// How long has it been since we last updated the game logic?
+		// We want to update as many times as we can in this frame in
+		// order to match the desired tick rate.
+		//
+		while ( accumulator >= logicDelta )
 		{
-			bQuit = true;
-			break;
+			g_tickTime = ( float )logicDelta;
+
+			// Update physics
+			g_physicsManager->Update();
+
+			// Update game
+			g_hostManager->Update();
+
+			// Update window
+			if ( m_renderContext->UpdateWindow() == RENDER_STATUS_WINDOW_CLOSE )
+			{
+				bQuit = true;
+				break;
+			}
+
+			curTime += logicDelta;
+			accumulator -= logicDelta;
+			g_curTick++;
 		}
 
-		m_renderContext->BeginImGui();
+		g_frameTime = ( float )frameTime;
 
+		// Render
 		{
-			ImGui::NewFrame();
-			ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
+			// Draw editor
+			{
+				m_renderContext->BeginImGui();
+				ImGui::NewFrame();
+				ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 
-			g_hostManager->DrawEditor();
+				g_hostManager->Render();
+				g_hostManager->DrawEditor();
+
+				m_renderContext->EndImGui();
+			}
+
+			// Draw game
+			Render();
 		}
-
-		g_physicsManager->Update();
-		g_hostManager->Render();
-
-		m_renderContext->EndImGui();
-
-		Render();
 	}
 }
 

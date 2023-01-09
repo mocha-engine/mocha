@@ -1454,6 +1454,9 @@
     <ClInclude Include="physics.h">
       <Filter>Managed\Bindings</Filter>
     </ClInclude>
+    <ClInclude Include="engine.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

@@ -48,7 +48,7 @@ void PhysicsManager::Startup()
 
 	m_physicsInstance->m_physicsSystem.SetGravity( JPH::Vec3( 0, 0, -9.8f ) );
 }
-				
+
 void PhysicsManager::Shutdown()
 {
 	// TODO: Destroy and remove all bodies
@@ -97,9 +97,8 @@ void PhysicsManager::Update()
 	} );
 
 	// Step the world
-	const float timeScale = 1.0f;
-	m_physicsInstance->m_physicsSystem.Update( g_frameTime * timeScale, collisionSteps, integrationSubSteps,
-	    m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
+	m_physicsInstance->m_physicsSystem.Update(
+	    g_tickTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
 	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?

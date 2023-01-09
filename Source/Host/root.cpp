@@ -30,6 +30,8 @@ CVarManager* g_cvarManager;
 
 float g_curTime;
 float g_frameTime;
+float g_tickTime;
+int g_curTick;
 Vector3 g_cameraPos;
 Quaternion g_cameraRot;
 float g_cameraFov;

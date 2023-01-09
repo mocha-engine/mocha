@@ -52,19 +52,22 @@ public class Main
 	}
 
 	[UnmanagedCallersOnly]
-	public static void Render()
+	public static void Update()
 	{
-		Input.Update();
-		Time.UpdateFrom( Glue.Entities.GetDeltaTime() );
-		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
-
-		// HACK: bail if deltatime is too high. This usually happens when the window
-		// is touched, but can happen with framerate spikes.
-		// Need to eventually look at https://gafferongames.com/post/fix_your_timestep/
-		if ( Time.Delta > 0.1f )
-			return;
+		Time.Update( Glue.Engine.GetTickDeltaTime(), Glue.Engine.GetTime(), Glue.Engine.GetFramesPerSecond().CeilToInt() );
 
 		world.Update();
+	}
+
+	[UnmanagedCallersOnly]
+	public static void Render()
+	{
+		Time.Update( Glue.Engine.GetDeltaTime(), Glue.Engine.GetTime(), Glue.Engine.GetFramesPerSecond().CeilToInt() );
+		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
+		Input.Update();
+
+		world.Render();
+		world.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]

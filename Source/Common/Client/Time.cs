@@ -8,12 +8,12 @@ public class Time
 
 	public static List<int> FPSHistory { get; } = new();
 
-	public static void UpdateFrom( float deltaTime )
+	public static void Update( float deltaTime, float currentTime, int framesPerSecond )
 	{
 		Delta = deltaTime;
-		Now += deltaTime;
+		Now = currentTime;
 
-		FPS = (1.0f / Delta).CeilToInt();
+		FPS = framesPerSecond;
 
 		FPSHistory.Add( FPS );
 		if ( FPSHistory.Count > 512 )

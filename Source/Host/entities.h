@@ -181,16 +181,6 @@ namespace Entities
 		return g_cameraZFar;
 	}
 
-	GENERATE_BINDINGS inline float GetCurrentTime()
-	{
-		return g_curTime;
-	}
-
-	GENERATE_BINDINGS inline float GetDeltaTime()
-	{
-		return g_frameTime;
-	}
-
 	GENERATE_BINDINGS inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )
 	{
 		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );

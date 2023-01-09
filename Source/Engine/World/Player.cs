@@ -46,9 +46,12 @@ public class Player : ModelEntity
 
 	public override void Update()
 	{
-		UpdateCamera();
-
 		WalkController.Update();
+	}
+
+	public override void FrameUpdate()
+	{
+		UpdateCamera();
 	}
 
 	float lastHeight = 1.8f;
