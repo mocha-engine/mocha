@@ -168,10 +168,8 @@ void RenderManager::Run()
 
 	g_hostManager->FireEvent( "Event.Game.Load" );
 
-	const int ticksPerSecond = 40; // TODO: convar? ideally shouldn't be changed mid-game
-
 	double curTime = 0.0;
-	double logicDelta = 1.0 / ticksPerSecond;
+	double logicDelta = 1.0 / GameSettings::Get()->tickRate;
 
 	double currentTime = HiresTimeInSeconds();
 	double accumulator = 0.0;
@@ -203,6 +201,10 @@ void RenderManager::Run()
 		//
 		while ( accumulator >= logicDelta )
 		{
+			// Assign previous transforms to all entities
+			g_entityDictionary->ForEach(
+			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
+
 			g_tickTime = ( float )logicDelta;
 
 			// Update physics
@@ -218,6 +220,10 @@ void RenderManager::Run()
 				break;
 			}
 
+			// Assign current transforms to all entities
+			g_entityDictionary->ForEach(
+			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
+
 			curTime += logicDelta;
 			accumulator -= logicDelta;
 			g_curTick++;
@@ -227,6 +233,14 @@ void RenderManager::Run()
 
 		// Render
 		{
+			const double alpha = accumulator / logicDelta;
+
+			// Assign interpolated transforms to all entities
+			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+				entity->m_transform =
+				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
+			} );
+
 			// Draw editor
 			{
 				m_renderContext->BeginImGui();

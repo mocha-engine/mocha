@@ -18,17 +18,20 @@ struct ManagedSettings
 
 struct Settings
 {
-	std::string name;
-	std::string icon;
-	std::string milestone;
+	std::string name = "Unnamed Game";
+	std::string icon = "";
+	std::string milestone = "Prototype";
 
-	ManagedSettings managed;
+	int tickRate = 60;
+
+	ManagedSettings managed = {};
 
 	void Deserialize( const nlohmann::json& j )
 	{
 		name = j["name"].get<std::string>();
 		icon = j["icon"].get<std::string>();
 		milestone = j["milestone"].get<std::string>();
+		tickRate = j["tickRate"].get<int>();
 
 		managed = {};
 		managed.path = j["managed"]["path"].get<std::string>();
