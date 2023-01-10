@@ -92,7 +92,7 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 {
 	// Create and bind constants
 	RenderPushConstants constants = {};
-	constants.modelMatrix = entity->GetTransform().GetModelMatrix();
+	constants.modelMatrix = entity->m_transform.GetModelMatrix();
 	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
 	constants.cameraPos = g_cameraPos.ToGLM();
 	constants.time = g_curTime;

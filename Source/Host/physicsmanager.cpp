@@ -84,7 +84,7 @@ void PhysicsManager::Update()
 
 		auto body = Get( physicsHandle );
 		auto savedVelocity = modelEntity->GetVelocity();
-		auto savedTransform = modelEntity->GetTransform();
+		auto savedTransform = modelEntity->m_transform;
 
 		JPH::Vec3 velocity = JoltConversions::MochaToJoltVec3( savedVelocity );
 		bodyInterface.SetLinearVelocity( body->bodyId, velocity );
@@ -119,7 +119,7 @@ void PhysicsManager::Update()
 		JPH::Quat rotation = bodyInterface.GetRotation( body->bodyId );
 		JPH::Vec3 velocity = bodyInterface.GetLinearVelocity( body->bodyId );
 
-		Transform tx = modelEntity->GetTransform();
+		Transform tx = modelEntity->m_transform;
 
 		if ( !modelEntity->GetIgnoreRigidbodyPosition() )
 			tx.position = JoltConversions::JoltToMochaVec3( position );
@@ -133,7 +133,7 @@ void PhysicsManager::Update()
 			bodyInterface.SetRotation(
 			    body->bodyId, JoltConversions::MochaToJoltQuat( tx.rotation ), JPH::EActivation::DontActivate );
 
-		modelEntity->SetTransform( tx );
+		modelEntity->m_transform = tx;
 
 		// Save off velocity so that we can make changes to it if we need to
 		if ( body->type == PhysicsType::PHYSICS_MODE_DYNAMIC )
@@ -153,7 +153,7 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 	JPH::EMotionType motionType = isStatic ? JPH::EMotionType::Static : JPH::EMotionType::Dynamic;
 	JPH::uint8 layer = isStatic ? Layers::NON_MOVING : Layers::MOVING;
 
-	auto transform = entity->GetTransform();
+	auto transform = entity->m_transform;
 	auto position = JoltConversions::MochaToJoltVec3( transform.position );
 	auto rotation = JoltConversions::MochaToJoltQuat( transform.rotation );
 
