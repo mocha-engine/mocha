@@ -81,7 +81,7 @@ enum ShaderType
 	SHADER_TYPE_FRAGMENT
 };
 
-DEFINE_ENUM_FLAG_OPERATORS( BufferUsageFlags );
+DEFINE_FLAG_OPERATORS( BufferUsageFlags );
 
 // ----------------------------------------------------------------------------------------------------
 

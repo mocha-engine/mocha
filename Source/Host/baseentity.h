@@ -5,11 +5,14 @@
 
 enum EntityFlags : int
 {
-	ENTITY_MANAGED = 1 << 0,
-	ENTITY_RENDERABLE = 1 << 1,
-	ENTITY_VIEWMODEL = 1 << 2,
-	ENTITY_UI = 1 << 3,
+	ENTITY_NONE = 1 << 0,
+	ENTITY_MANAGED = 1 << 1,
+	ENTITY_RENDERABLE = 1 << 2,
+	ENTITY_VIEWMODEL = 1 << 3,
+	ENTITY_UI = 1 << 4,
 };
+
+DEFINE_FLAG_OPERATORS( EntityFlags );
 
 class Camera;
 
