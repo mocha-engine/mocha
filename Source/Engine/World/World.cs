@@ -51,9 +51,8 @@ public class World
 		}
 	}
 
-	public void Update()
+	private void DrawDebug()
 	{
-		// DEBUG
 		// TODO: Remove
 		int ticksPerSecond = (1.0f / Glue.Engine.GetTickDeltaTime()).CeilToInt();
 		int framesPerSecond = (1.0f / Glue.Engine.GetDeltaTime()).CeilToInt();
@@ -64,10 +63,15 @@ public class World
 		DebugOverlay.ScreenText( $"Current time: {Glue.Engine.GetTime()}" );
 		DebugOverlay.ScreenText( $"Current tick time: {Glue.Engine.GetTickDeltaTime()}ms" );
 		DebugOverlay.ScreenText( $"Current frame time: {Glue.Engine.GetDeltaTime()}ms" );
-
 		DebugOverlay.ScreenText( $"Time.Now: {Time.Now}" );
 		DebugOverlay.ScreenText( $"Time.Delta: {Time.Delta}ms" );
 		DebugOverlay.ScreenText( $"Time.FPS: {Time.FPS}" );
+	}
+
+	public void Update()
+	{
+		DebugOverlay.ScreenText( $"--- Update ---" );
+		DrawDebug();
 
 		// TODO: Entity interpolation
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
@@ -75,6 +79,9 @@ public class World
 
 	public void FrameUpdate()
 	{
+		DebugOverlay.ScreenText( $"--- FrameUpdate ---" );
+		DrawDebug();
+
 		BaseEntity.All.ToList().ForEach( entity => entity.FrameUpdate() );
 	}
 }
