@@ -48,6 +48,7 @@ public:
 	void Startup();
 	void Shutdown();
 
+	void Update();
 	void Render();
 	void DrawEditor();
 	void FireEvent( std::string eventName );

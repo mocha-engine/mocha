@@ -11,9 +11,9 @@ public class Time
 	public static void UpdateFrom( float deltaTime )
 	{
 		Delta = deltaTime;
-		Now += deltaTime;
+		Now = Glue.Engine.GetTime();
 
-		FPS = (1.0f / Delta).CeilToInt();
+		FPS = Glue.Engine.GetFramesPerSecond().CeilToInt();
 
 		FPSHistory.Add( FPS );
 		if ( FPSHistory.Count > 512 )

@@ -2,20 +2,15 @@
 
 internal partial class UIManager
 {
-	public bool Debug { get; set; } = false;
-
 	internal static UIManager Instance { get; private set; }
 
-	private Texture Crosshair { get; } = new Texture( "ui/crosshair.mtex", false );
-
 	private IRenderer Renderer { get; } = new UIEntity();
+	private FileSystemWatcher Watcher { get; }
+	private bool IsDirty { get; set; }
+
 	public LayoutNode RootPanel { get; private set; }
 
-	private const string Path = "ui/Game.html";
-
-	private FileSystemWatcher Watcher { get; }
-
-	private bool IsDirty { get; set; }
+	private string templatePath;
 
 	internal UIManager()
 	{
@@ -23,18 +18,44 @@ internal partial class UIManager
 		Instance = this;
 		Graphics.Init();
 
-		var directory = System.IO.Path.GetDirectoryName( Path );
-		Watcher = FileSystem.Game.CreateWatcher( directory, "*.*", _ => LoadTemplate() );
+		Watcher = FileSystem.Game.CreateWatcher( "", "*.*", LoadTemplate );
+	}
 
+	public void LoadTemplate( string? file = null )
+	{
+		bool shouldLoad;
+
+		if ( file == null )
+		{
+			shouldLoad = true;
+		}
+		else
+		{
+			var relativePath = FileSystem.Game.GetRelativePath( file );
+
+			var templatePath = this.templatePath.NormalizePath();
+			var stylePath = System.IO.Path.ChangeExtension( this.templatePath.NormalizePath(), "scss" );
+			shouldLoad = (relativePath == templatePath || relativePath == stylePath);
+		}
+
+		if ( shouldLoad )
+		{
+			Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
+			RootPanel = Template.FromFile( Renderer, templatePath );
+			IsDirty = true;
+		}
+	}
+
+	public void SetTemplate( string path )
+	{
+		this.templatePath = path;
 		LoadTemplate();
 	}
 
 	[Event.Window.Resized]
-	public void LoadTemplate()
+	public void OnResized()
 	{
-		Screen.UpdateFrom( Glue.Editor.GetWindowSize() );
-		RootPanel = Template.FromFile( Renderer, Path );
-		IsDirty = true;
+		LoadTemplate();
 	}
 
 	internal void Render()
@@ -43,7 +64,6 @@ internal partial class UIManager
 			return;
 
 		Graphics.PanelRenderer.NewFrame();
-		Graphics.DrawTexture( new Rectangle( (Vector2)Screen.Size / 2f - 16f, new Vector2( 32, 32 ) ), Crosshair );
 
 		DrawNode( RootPanel );
 		IsDirty = false;

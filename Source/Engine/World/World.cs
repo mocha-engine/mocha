@@ -5,6 +5,10 @@ namespace Mocha;
 public class World
 {
 	public static World Current { get; set; }
+	private bool worldInitialized = false;
+	private bool frameRendered = false;
+
+	private UIManager ui;
 
 	public World()
 	{
@@ -13,7 +17,9 @@ public class World
 		Event.RegisterStatics();
 		Event.Run( Event.Game.LoadAttribute.Name );
 
-		SetupEntities();
+		ui = new UIManager();
+		ui.SetTemplate( "ui/Loading.html" );
+		// SetupEntities();
 	}
 
 	private void SetupEntities()
@@ -27,15 +33,55 @@ public class World
 		map.Mass = 1000.0f;
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
-		var ui = new UIManager();
-
 		var player = new Player();
+
+		ui.SetTemplate( "ui/Game.html" );
+	}
+
+	public void Render()
+	{
+		DebugOverlay.Render();
+		UIManager.Instance.Render();
+
+		if ( !worldInitialized )
+		{
+			SetupEntities();
+
+			worldInitialized = true;
+		}
+	}
+
+	private void DrawDebug()
+	{
+		// TODO: Remove
+		int ticksPerSecond = (1.0f / Glue.Engine.GetTickDeltaTime()).CeilToInt();
+		int framesPerSecond = (1.0f / Glue.Engine.GetDeltaTime()).CeilToInt();
+
+		DebugOverlay.ScreenText( $"Ticks per second: {ticksPerSecond}" );
+		DebugOverlay.ScreenText( $"Frames per second: {framesPerSecond}" );
+		DebugOverlay.ScreenText( $"Current tick: {Glue.Engine.GetCurrentTick()}" );
+		DebugOverlay.ScreenText( $"Current time: {Glue.Engine.GetTime()}" );
+		DebugOverlay.ScreenText( $"Current tick time: {Glue.Engine.GetTickDeltaTime()}ms" );
+		DebugOverlay.ScreenText( $"Current frame time: {Glue.Engine.GetDeltaTime()}ms" );
+		DebugOverlay.ScreenText( $"Time.Now: {Time.Now}" );
+		DebugOverlay.ScreenText( $"Time.Delta: {Time.Delta}ms" );
+		DebugOverlay.ScreenText( $"Time.FPS: {Time.FPS}" );
 	}
 
 	public void Update()
 	{
-		DebugOverlay.NewFrame();
-		UIManager.Instance.Render();
+		DebugOverlay.ScreenText( $"--- Update ---" );
+		DrawDebug();
+
+		// TODO: Entity interpolation
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
+	}
+
+	public void FrameUpdate()
+	{
+		DebugOverlay.ScreenText( $"--- FrameUpdate ---" );
+		DrawDebug();
+
+		BaseEntity.All.ToList().ForEach( entity => entity.FrameUpdate() );
 	}
 }

@@ -20,7 +20,8 @@ Window::Window( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
 
-	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE );
+	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN );
+	m_visible = false;
 
 	m_window = SDL_CreateWindow( WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 
@@ -55,6 +56,15 @@ VkSurfaceKHR Window::CreateSurface( VkInstance instance )
 void Window::Cleanup()
 {
 	SDL_DestroyWindow( m_window );
+}
+
+void Window::Show()
+{
+	if ( m_visible )
+		return;
+
+	SDL_ShowWindow( m_window );
+	m_visible = true;
 }
 
 bool Window::Update()
@@ -118,7 +128,7 @@ bool Window::Update()
 					Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
 
 					if ( m_onWindowResized != nullptr )
-						m_onWindowResized( windowExtents );				
+						m_onWindowResized( windowExtents );
 				}
 			}
 			else if ( we.event == SDL_WINDOWEVENT_CLOSE )

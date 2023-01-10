@@ -108,6 +108,13 @@ namespace Editor
 	GENERATE_BINDINGS inline Vector2 GetWindowSize()
 	{
 		Size2D size;
+		g_renderContext->GetWindowSize( &size );
+		return { ( float )size.x, ( float )size.y };
+	}
+
+	GENERATE_BINDINGS inline Vector2 GetRenderSize()
+	{
+		Size2D size;
 		g_renderContext->GetRenderSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}

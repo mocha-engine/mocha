@@ -1,5 +1,13 @@
 #include "baserendercontext.h"
 
+float lastRenderScale = 1.0f;
+
+// TODO: Cvar hooks so that we can change things when cvars change (i.e. re-create render targets when
+// render.scale is changed)
+FloatCVar renderScale( "render.scale", 1.0f, CVarFlags::Archive, "Multiplier for render resolution scaling" );
+
+// ----------------------------------------------------------------------------------------------------
+
 ImageTexture::ImageTexture( ImageTextureInfo_t info )
 {
 	g_renderContext->CreateImageTexture( info, &m_handle );

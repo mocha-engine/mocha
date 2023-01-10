@@ -403,10 +403,10 @@ void main()
 	fragColor *= ao;
 
 	// Gamma correction
-	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
 	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
 
 	// Tonemap
+	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
 	fragColor = reinhard_jodie( fragColor );
 
 	// Exposure

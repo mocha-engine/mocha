@@ -6,6 +6,11 @@
 #include <util.h>
 
 // ----------------------------------------------------------------------------------------------------
+
+extern FloatCVar renderScale;
+extern float lastRenderScale;
+
+// ----------------------------------------------------------------------------------------------------
 // clang-format off
 
 enum RenderObjectStatus
@@ -76,17 +81,17 @@ enum ShaderType
 	SHADER_TYPE_FRAGMENT
 };
 
-DEFINE_ENUM_FLAG_OPERATORS( BufferUsageFlags );
+DEFINE_FLAG_OPERATORS( BufferUsageFlags );
 
 // ----------------------------------------------------------------------------------------------------
 
 struct TextureInfo_t
 {
-	uint32_t width;
-	uint32_t height;
+	uint32_t width = 0;
+	uint32_t height = 0;
 
 	// This should be 1 or greater.
-	uint32_t mipCount;
+	uint32_t mipCount = 1;
 };
 
 struct RenderTextureInfo_t : public TextureInfo_t
@@ -97,98 +102,99 @@ struct RenderTextureInfo_t : public TextureInfo_t
 struct ImageTextureInfo_t : public TextureInfo_t
 {
 	// TODO: Replace
-	int imageFormat;
+	int imageFormat = 0;
 };
 
 struct TextureData_t
 {
-	uint32_t width;
-	uint32_t height;
-	uint32_t mipCount;
+	uint32_t width = 0;
+	uint32_t height = 0;
+	uint32_t mipCount = 1;
 
 	// This UtilArray can contain any texture data as long
 	// as it matches the image format specified.
-	UtilArray mipData;
-	int imageFormat;
+	UtilArray mipData = {};
+	int imageFormat = 0;
 };
 
 struct TextureCopyData_t
 {
-	uint32_t srcX;
-	uint32_t srcY;
-	uint32_t dstX;
-	uint32_t dstY;
-	uint32_t width;
-	uint32_t height;
-	ImageTexture* src;
+	uint32_t srcX = 0;
+	uint32_t srcY = 0;
+	uint32_t dstX = 0;
+	uint32_t dstY = 0;
+	uint32_t width = 0;
+	uint32_t height = 0;
+	ImageTexture* src = nullptr;
 };
 
 struct BufferInfo_t
 {
-	uint32_t size;
-	BufferType type;
-	BufferUsageFlags usage;
+	uint32_t size = 0;
+	BufferType type = BUFFER_TYPE_STAGING;
+	BufferUsageFlags usage = BUFFER_USAGE_FLAG_INDEX_BUFFER;
 };
 
 struct BufferUploadInfo_t
 {
-	UtilArray data;
+	UtilArray data = {};
 };
 
 struct DescriptorBindingInfo_t
 {
-	DescriptorBindingType type;
-	ImageTexture* texture;
+	DescriptorBindingType type = DESCRIPTOR_BINDING_TYPE_IMAGE;
+	ImageTexture* texture = nullptr;
 };
 
 struct DescriptorInfo_t
 {
-	std::vector<DescriptorBindingInfo_t> bindings;
+	std::vector<DescriptorBindingInfo_t> bindings = {};
 };
 
 struct DescriptorUpdateInfo_t
 {
-	int binding;
-	ImageTexture* src;
-	SamplerType samplerType;
+	int binding = 0;
+	ImageTexture* src = nullptr;
+	SamplerType samplerType = SAMPLER_TYPE_ANISOTROPIC;
 };
 
 struct ShaderInfo_t
 {
-	std::string shaderPath;
+	std::string shaderPath = "";
 };
 
 struct VertexAttributeInfo_t
 {
-	std::string name;
-	VertexAttributeFormat format;
+	std::string name = "";
+	VertexAttributeFormat format = VERTEX_ATTRIBUTE_FORMAT_FLOAT;
 };
 
 struct PipelineInfo_t
 {
-	ShaderInfo_t shaderInfo;
-	std::vector<Descriptor*> descriptors;
-	std::vector<VertexAttributeInfo_t> vertexAttributes;
-	bool ignoreDepth;
+	ShaderInfo_t shaderInfo = {};
+	std::vector<Descriptor*> descriptors = {};
+	std::vector<VertexAttributeInfo_t> vertexAttributes = {};
+	bool ignoreDepth = false;
+	bool renderToSwapchain = false;
 };
 
 struct RenderPushConstants
 {
-	glm::vec4 data;
+	glm::vec4 data = glm::vec4{ 1.0f };
 
-	glm::mat4 modelMatrix;
+	glm::mat4 modelMatrix = glm::mat4{ 1.0f };
 
-	glm::mat4 renderMatrix;
+	glm::mat4 renderMatrix = glm::mat4{ 1.0f };
 
-	glm::vec3 cameraPos;
-	float time;
+	glm::vec3 cameraPos = glm::vec3{ 1.0f };
+	float time = 0.0f;
 
-	glm::vec4 vLightInfoWS[4];
+	glm::vec4 vLightInfoWS[4] = {};
 };
 
 struct GPUInfo
 {
-	const char* gpuName;
+	const char* gpuName = "Unnamed";
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -486,12 +492,6 @@ public:
 	virtual RenderStatus EndImGui() = 0;
 
 	/// <summary>
-	/// This will draw data fetched from ImGUI, e.g. "ImGui_ImplVulkan_RenderDrawData()".
-	/// </summary>
-	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
-	virtual RenderStatus RenderImGui() = 0;
-
-	/// <summary>
 	/// This will return a pointer that ImGui can use to draw a texture.
 	/// </summary>
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
@@ -504,6 +504,8 @@ public:
 	// TODO: Move this elsewhere
 	// This will return the size for the current render target.
 	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+
+	virtual RenderStatus GetWindowSize( Size2D* outSize ) = 0;
 
 	// Update window, fetch inputs etc..
 	virtual RenderStatus UpdateWindow() = 0;

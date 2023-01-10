@@ -75,6 +75,8 @@ public class BaseEntity : IEntity
 	}
 
 	public virtual void Update() { }
+	public virtual void FrameUpdate() { }
+
 	public virtual void Delete()
 	{
 		Log.Trace( "TODO: Manage entity objects manually" );

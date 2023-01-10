@@ -191,8 +191,8 @@ namespace VKInit
 		return cmdBeginInfo;
 	}
 
-	inline VkImageCreateInfo ImageCreateInfo(
-	    VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent, uint32_t mipLevels )
+	inline VkImageCreateInfo ImageCreateInfo( VkFormat format, VkImageUsageFlags usageFlags, VkExtent3D extent,
+	    uint32_t mipLevels, VkSampleCountFlagBits sampleCount = VK_SAMPLE_COUNT_1_BIT )
 	{
 		VkImageCreateInfo imageInfo = {};
 		imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -205,7 +205,7 @@ namespace VKInit
 
 		imageInfo.mipLevels = mipLevels;
 		imageInfo.arrayLayers = 1;
-		imageInfo.samples = VK_SAMPLE_COUNT_1_BIT;
+		imageInfo.samples = sampleCount;
 		imageInfo.tiling = VK_IMAGE_TILING_OPTIMAL;
 
 		imageInfo.usage = usageFlags;

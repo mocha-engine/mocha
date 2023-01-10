@@ -11,7 +11,7 @@ namespace Entities
 	{
 		BaseEntity baseEntity = {};
 		baseEntity.AddFlag( ENTITY_MANAGED );
-		baseEntity.SetType( "BaseEntity" );
+		baseEntity.m_type = "BaseEntity";
 
 		spdlog::trace( "Created base entity" );
 
@@ -23,7 +23,7 @@ namespace Entities
 		ModelEntity modelEntity = {};
 		modelEntity.AddFlag( ENTITY_MANAGED );
 		modelEntity.AddFlag( ENTITY_RENDERABLE );
-		modelEntity.SetType( "ModelEntity" );
+		modelEntity.m_type = "ModelEntity";
 
 		spdlog::trace( "Created model entity" );
 
@@ -33,7 +33,7 @@ namespace Entities
 	GENERATE_BINDINGS inline void SetViewmodel( uint32_t handle, bool isViewmodel )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		if ( isViewmodel )
 			entity->AddFlag( ENTITY_VIEWMODEL );
@@ -44,7 +44,7 @@ namespace Entities
 	GENERATE_BINDINGS inline void SetUI( uint32_t handle, bool isUI )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		if ( isUI )
 			entity->AddFlag( ENTITY_UI );
@@ -55,44 +55,44 @@ namespace Entities
 	GENERATE_BINDINGS inline void SetPosition( uint32_t handle, Vector3 position )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		transform.position = position;
 
-		entity->SetTransform( transform );
+		entity->m_transform = transform;
 	}
 
 	GENERATE_BINDINGS inline void SetRotation( uint32_t handle, Quaternion rotation )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		transform.rotation = rotation;
 
-		entity->SetTransform( transform );
+		entity->m_transform = transform;
 	}
 
 	GENERATE_BINDINGS inline void SetScale( uint32_t handle, Vector3 scale )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		transform.scale = scale;
 
-		entity->SetTransform( transform );
+		entity->m_transform = transform;
 	}
 
 	GENERATE_BINDINGS inline void SetName( uint32_t handle, const char* name )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
 
-		entity->SetName( name );
+		entity->m_name = name;
 	}
 
 	GENERATE_BINDINGS inline Vector3 GetPosition( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		return transform.position;
 	}
@@ -100,7 +100,7 @@ namespace Entities
 	GENERATE_BINDINGS inline Quaternion GetRotation( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		return transform.rotation;
 	}
@@ -108,7 +108,7 @@ namespace Entities
 	GENERATE_BINDINGS inline Vector3 GetScale( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		auto transform = entity->GetTransform();
+		auto transform = entity->m_transform;
 
 		return transform.scale;
 	}
@@ -116,7 +116,7 @@ namespace Entities
 	GENERATE_BINDINGS inline const char* GetName( uint32_t handle )
 	{
 		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
-		return entity->GetName();
+		return entity->m_name.c_str();
 	}
 
 	GENERATE_BINDINGS inline void SetModel( uint32_t handle, Model model )
@@ -179,16 +179,6 @@ namespace Entities
 	GENERATE_BINDINGS inline float GetCameraZFar()
 	{
 		return g_cameraZFar;
-	}
-
-	GENERATE_BINDINGS inline float GetCurrentTime()
-	{
-		return g_curTime;
-	}
-
-	GENERATE_BINDINGS inline float GetDeltaTime()
-	{
-		return g_frameTime;
 	}
 
 	GENERATE_BINDINGS inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )

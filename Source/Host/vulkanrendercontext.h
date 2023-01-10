@@ -192,11 +192,9 @@ class VulkanSwapchain : public VulkanObject
 {
 private:
 	void CreateMainSwapchain( Size2D size );
-	void CreateDepthTexture( Size2D size );
 
 public:
 	VkSwapchainKHR m_swapchain = 0;
-	VulkanRenderTexture m_depthTexture;
 	std::vector<VulkanRenderTexture> m_swapchainTextures;
 
 	uint32_t AcquireSwapchainImageIndex( VkDevice device, VkSemaphore presentSemaphore, VulkanCommandContext mainContext )
@@ -299,12 +297,14 @@ private:
 	void CreateSyncStructures();
 	void CreateDescriptors();
 	void CreateSamplers();
+	void CreateRenderTargets();
 
 	//
 	// ImGui
 	//
 	void CreateImGuiIconFont();
 	void CreateImGui();
+	void RenderImGui();
 
 	//
 	// Vulkan memory allocator
@@ -318,7 +318,10 @@ private:
 	uint32_t m_swapchainImageIndex;
 	// Current swapchain target image. Refers to m_swapchain.images[currentImageIndex]
 	VulkanRenderTexture m_swapchainTarget;
-	// Current swapchain target depth buffer.
+
+	// Current color render target
+	VulkanRenderTexture m_colorTarget;
+	// Current depth render target
 	VulkanRenderTexture m_depthTarget;
 
 	// Do we currently have a dynamic render pass instance active?
@@ -354,6 +357,21 @@ private:
 	// Immediate submit
 	//
 	RenderStatus ImmediateSubmit( std::function<RenderStatus( VkCommandBuffer commandBuffer )> func );
+
+	//
+	// Full-screen triangle for rendering stuff to
+	//
+	struct FullScreenTri
+	{
+		VertexBuffer vertexBuffer;
+		IndexBuffer indexBuffer;
+		Pipeline pipeline;
+		Descriptor descriptor;
+		uint32_t indexCount;
+		uint32_t vertexCount;
+		ImageTexture imageTexture;
+	} m_fullScreenTri;
+	void CreateFullScreenTri();
 
 protected:
 	// ----------------------------------------
@@ -428,6 +446,9 @@ public:
 	RenderStatus GetRenderSize( Size2D* outSize ) override;
 
 	/// <inheritdoc />
+	RenderStatus GetWindowSize( Size2D* outSize ) override;
+
+	/// <inheritdoc />
 	RenderStatus UpdateWindow() override;
 
 	/// <inheritdoc />
@@ -439,8 +460,6 @@ public:
 	RenderStatus BeginImGui() override;
 	/// <inheritdoc />
 	RenderStatus EndImGui() override;
-	/// <inheritdoc />
-	RenderStatus RenderImGui() override;
 
 	/// <inheritdoc />
 	RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) override;

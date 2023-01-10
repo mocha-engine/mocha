@@ -95,6 +95,11 @@ HostManager::HostManager()
 	m_lagfp = HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() );
 }
 
+void HostManager::Update()
+{
+	Invoke( "Update" );
+}
+
 void HostManager::Render()
 {
 	Invoke( "Render" );

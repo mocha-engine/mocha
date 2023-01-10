@@ -1,12 +1,8 @@
 #include <root.h>
+#include <Windows.h>
 #undef main
 
-#if _WINDOWS
-#include <Windows.h>
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
-#else
-int main()
-#endif
 {
 	auto& root = Root::GetInstance();
 

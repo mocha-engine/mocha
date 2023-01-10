@@ -44,6 +44,8 @@ extern CVarManager* g_cvarManager;
 
 extern float g_curTime;
 extern float g_frameTime;
+extern float g_tickTime;
+extern int g_curTick;
 
 extern Vector3 g_cameraPos;
 extern Quaternion g_cameraRot;
