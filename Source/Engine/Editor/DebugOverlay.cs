@@ -14,7 +14,7 @@ public static class DebugOverlay
 		{
 			this.position = position;
 			this.text = text;
-			this.time = time ?? Time.Delta;
+			this.time = time ?? Time.Delta * 2;
 		}
 	}
 
