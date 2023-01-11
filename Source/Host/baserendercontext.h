@@ -6,30 +6,19 @@
 #include <util.h>
 
 // ----------------------------------------------------------------------------------------------------
-
+// External declarations
 extern FloatCVar renderScale;
 extern float lastRenderScale;
 
 // ----------------------------------------------------------------------------------------------------
-// clang-format off
-
-enum RenderObjectStatus
-{
-	STATUS_OK,							// No error
-	STATUS_ERROR,						// Generic error
-};
-
-#define RENDEROBJECT_FUNC virtual RenderObjectStatus
-
-// clang-format on
-// ----------------------------------------------------------------------------------------------------
-
+// Forward declarations
 struct Mesh;
 class BaseRenderContext;
 class ImageTexture;
 class Descriptor;
 
 // ----------------------------------------------------------------------------------------------------
+#pragma region "Rendering enums"
 
 enum RenderTextureType
 {
@@ -91,7 +80,9 @@ enum AccelerationStructureType
 	ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL,
 };
 
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------
+#pragma region "Rendering object info structures"
 
 struct TextureInfo_t
 {
@@ -211,7 +202,9 @@ struct GPUInfo
 	const char* gpuName = "Unnamed";
 };
 
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------
+#pragma region "Rendering object classes"
 
 class RenderObject
 {
@@ -286,7 +279,9 @@ public:
 	Shader( ShaderInfo_t info );
 };
 
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------
+#pragma region "Error types"
 // clang-format off
 
 enum RenderStatus
@@ -304,7 +299,6 @@ enum RenderStatus
 	RENDER_STATUS_WINDOW_CLOSE,							// The window was closed. This shouldn't be treated as an error.
 };
 
-// ----------------------------------------------------------------------------------------------------
 
 inline std::string GetRenderContextStatusString( RenderStatus status )
 {
@@ -325,8 +319,9 @@ inline std::string GetRenderContextStatusString( RenderStatus status )
 }
 
 // clang-format on
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------
-
+#pragma region "Error checking"
 inline void ErrorIf( bool condition, RenderStatus status )
 {
 	if ( condition )
@@ -335,9 +330,9 @@ inline void ErrorIf( bool condition, RenderStatus status )
 		ErrorMessage( error );
 	}
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------
-
+#pragma region "Main Render Context class"
 // This is the base class for all rendering contexts.
 class BaseRenderContext
 {
@@ -533,3 +528,4 @@ public:
 	ImFont* m_boldFont;
 	ImFont* m_subheadingFont;
 };
+#pragma endregion
