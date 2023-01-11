@@ -49,7 +49,8 @@ enum BufferType
 {
 	BUFFER_TYPE_STAGING,
 	BUFFER_TYPE_VERTEX_INDEX_DATA,
-	BUFFER_TYPE_UNIFORM_DATA
+	BUFFER_TYPE_UNIFORM_DATA,
+	BUFFER_TYPE_ACCELERATION_STRUCTURE
 };
 
 enum DescriptorBindingType
@@ -72,8 +73,11 @@ enum BufferUsageFlags
 	BUFFER_USAGE_FLAG_INDEX_BUFFER = 1 << 2,
 	BUFFER_USAGE_FLAG_UNIFORM_BUFFER = 1 << 3,
 	BUFFER_USAGE_FLAG_TRANSFER_SRC = 1 << 4,
-	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 5
+	BUFFER_USAGE_FLAG_TRANSFER_DST = 1 << 5,
+	BUFFER_USAGE_FLAG_ACCELERATION_STRUCTURE_STORAGE = 1 << 6
 };
+
+DEFINE_FLAG_OPERATORS( BufferUsageFlags );
 
 enum ShaderType
 {
@@ -81,7 +85,11 @@ enum ShaderType
 	SHADER_TYPE_FRAGMENT
 };
 
-DEFINE_FLAG_OPERATORS( BufferUsageFlags );
+enum AccelerationStructureType
+{
+	ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL,
+	ACCELERATION_STRUCTURE_TYPE_TOP_LEVEL,
+};
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -176,6 +184,12 @@ struct PipelineInfo_t
 	std::vector<VertexAttributeInfo_t> vertexAttributes = {};
 	bool ignoreDepth = false;
 	bool renderToSwapchain = false;
+};
+
+struct AccelerationStructureInfo_t
+{
+	AccelerationStructureType type = ACCELERATION_STRUCTURE_TYPE_BOTTOM_LEVEL;
+	uint32_t size = 0;
 };
 
 struct RenderPushConstants

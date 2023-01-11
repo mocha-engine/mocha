@@ -262,6 +262,18 @@ public:
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
+class VulkanAccelerationStructure : public VulkanObject
+{
+public:
+	VkAccelerationStructureKHR accelerationStructure;
+	VulkanBuffer buffer;
+
+	VulkanAccelerationStructure() {}
+	VulkanAccelerationStructure( VulkanRenderContext* parent, AccelerationStructureInfo_t accelerationStructureInfo );
+};
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
 class VulkanRenderContext : public BaseRenderContext
 {
 private:
@@ -404,6 +416,7 @@ public:
 	friend VulkanDescriptor;
 	friend VulkanPipeline;
 	friend VulkanShader;
+	friend VulkanAccelerationStructure;
 
 	// ----------------------------------------
 

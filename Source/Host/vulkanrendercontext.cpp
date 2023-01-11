@@ -461,6 +461,9 @@ VkBufferUsageFlags VulkanBuffer::GetBufferUsageFlags( BufferInfo_t bufferInfo )
 	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_TRANSFER_DST ) != 0 )
 		outFlags |= VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
+	if ( ( bufferInfo.usage & BUFFER_USAGE_FLAG_ACCELERATION_STRUCTURE_STORAGE ) != 0 )
+		outFlags |= VK_BUFFER_USAGE_ACCELERATION_STRUCTURE_STORAGE_BIT_KHR | VK_BUFFER_USAGE_SHADER_DEVICE_ADDRESS_BIT;
+
 	if ( bufferInfo.type == BUFFER_TYPE_VERTEX_INDEX_DATA )
 		assert( ( outFlags & VK_BUFFER_USAGE_INDEX_BUFFER_BIT ) != 0 || ( outFlags & VK_BUFFER_USAGE_VERTEX_BUFFER_BIT ) != 0 );
 
@@ -1911,4 +1914,27 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	{
 		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
 	}
+}
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+VulkanAccelerationStructure::VulkanAccelerationStructure(
+    VulkanRenderContext* parent, AccelerationStructureInfo_t accelerationStructureInfo )
+{
+	SetParent( parent );
+
+	BufferInfo_t bufferInfo = {};
+	bufferInfo.size = accelerationStructureInfo.size;
+	bufferInfo.type = BUFFER_TYPE_ACCELERATION_STRUCTURE;
+	bufferInfo.usage = BUFFER_USAGE_FLAG_ACCELERATION_STRUCTURE_STORAGE;
+
+	buffer = VulkanBuffer( m_parent, bufferInfo, VMA_MEMORY_USAGE_AUTO );
+
+	VkAccelerationStructureCreateInfoKHR createInfo = {};
+	createInfo.sType = VK_STRUCTURE_TYPE_ACCELERATION_STRUCTURE_CREATE_INFO_KHR;
+	createInfo.pNext = nullptr;
+	createInfo.buffer = buffer.buffer;
+	createInfo.size = accelerationStructureInfo.size;
+
+	vkCreateAccelerationStructureKHR( m_parent->m_device, &createInfo, nullptr, &accelerationStructure );
 }
