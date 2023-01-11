@@ -332,7 +332,7 @@ inline void ErrorIf( bool condition, RenderStatus status )
 }
 #pragma endregion
 // ----------------------------------------------------------------------------------------------------
-#pragma region "Main Render Context class"
+#pragma region "Main render context class"
 // This is the base class for all rendering contexts.
 class BaseRenderContext
 {

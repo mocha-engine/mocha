@@ -14,11 +14,11 @@
 #include <window.h>
 
 // ----------------------------------------------------------------------------------------------------------------------------
-
-// Forward decls
+// Forward declarations
 class VulkanRenderContext;
 
 // ----------------------------------------------------------------------------------------------------------------------------
+#pragma region "Rendering object info structures"
 
 struct VulkanVertexInputDescription
 {
@@ -28,7 +28,9 @@ struct VulkanVertexInputDescription
 	VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
+#pragma region "Rendering object classes"
 
 struct VulkanObject
 {
@@ -272,8 +274,9 @@ public:
 	VulkanAccelerationStructure( VulkanRenderContext* parent, AccelerationStructureInfo_t accelerationStructureInfo );
 };
 
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "Main render context class"
 class VulkanRenderContext : public BaseRenderContext
 {
 private:
@@ -477,3 +480,4 @@ public:
 	/// <inheritdoc />
 	RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) override;
 };
+#pragma endregion

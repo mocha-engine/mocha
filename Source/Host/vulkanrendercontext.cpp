@@ -18,7 +18,7 @@
 #include <fontawesome.h>
 
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanSwapchain"
 void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 {
 	vkb::SwapchainBuilder swapchainBuilder( m_parent->m_chosenGPU, m_parent->m_device, m_parent->m_surface );
@@ -59,9 +59,9 @@ void VulkanSwapchain::Update( Size2D newSize )
 {
 	CreateMainSwapchain( newSize );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanRenderTexture"
 VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType type )
 {
 	switch ( type )
@@ -130,9 +130,9 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
 	VK_CHECK( vkCreateImageView( parent->m_device, &viewInfo, nullptr, &imageView ) );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanImageTexture"
 VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t textureInfo )
 {
 	SetParent( parent );
@@ -366,9 +366,9 @@ void* VulkanImageTexture::GetImGuiTextureID()
 
 	return ( void* )m_imGuiDescriptorSet;
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanCommandContext"
 VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
 {
 	SetParent( parent );
@@ -399,9 +399,9 @@ VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
 
 	VK_CHECK( vkCreateFence( parent->m_device, &fenceInfo, nullptr, &fence ) );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanSampler"
 VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
 {
 	if ( samplerType == SAMPLER_TYPE_POINT )
@@ -421,9 +421,9 @@ VulkanSampler::VulkanSampler( VulkanRenderContext* parent, SamplerType samplerTy
 	VkSamplerCreateInfo samplerInfo = GetCreateInfo( samplerType );
 	VK_CHECK( vkCreateSampler( parent->m_device, &samplerInfo, nullptr, &sampler ) );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanBuffer"
 VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VmaMemoryUsage memoryUsage )
 {
 	SetParent( parent );
@@ -511,9 +511,9 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 		return RENDER_STATUS_OK;
 	} );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanRenderContext"
 std::shared_ptr<VulkanCommandContext> VulkanRenderContext::GetUploadContext( std::thread::id thread )
 {
 	if ( m_uploadContexts.find( thread ) == m_uploadContexts.end() )
@@ -1663,9 +1663,9 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 
 	return status;
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanShader"
 RenderStatus VulkanShader::LoadShaderModule( const char* filePath, ShaderType shaderType, VkShaderModule* outShaderModule )
 {
 	VkDevice device = m_parent->m_device;
@@ -1726,9 +1726,9 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 	else
 		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanDescriptor"
 VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo )
 {
 	SetParent( parent );
@@ -1767,9 +1767,9 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 
 	__debugbreak(); // Invalid / unsupported descriptor binding type
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanPipeline"
 VkFormat VulkanPipeline::GetVulkanFormat( VertexAttributeFormat format )
 {
 	switch ( format )
@@ -1915,9 +1915,9 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
 	}
 }
-
+#pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
-
+#pragma region "VulkanAccelerationStructure"
 VulkanAccelerationStructure::VulkanAccelerationStructure(
     VulkanRenderContext* parent, AccelerationStructureInfo_t accelerationStructureInfo )
 {
@@ -1938,3 +1938,4 @@ VulkanAccelerationStructure::VulkanAccelerationStructure(
 
 	vkCreateAccelerationStructureKHR( m_parent->m_device, &createInfo, nullptr, &accelerationStructure );
 }
+#pragma endregion
