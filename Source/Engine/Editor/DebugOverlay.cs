@@ -54,6 +54,12 @@ public static class DebugOverlay
 		// Cleanup
 		//
 		ImGui.SetCursorScreenPos( System.Numerics.Vector2.Zero );
+
+		//
+		// ImGui: Submit an item to validate extent
+		// https://github.com/ocornut/imgui/releases/tag/v1.89#:~:text=Instead%2C%20please-,submit%20an%20item,-%3A%0ABegin(...)
+		//
+		ImGui.Dummy( new Vector2( 0, 0 ) );
 		ImGui.End();
 	}
 
