@@ -44,7 +44,7 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 		renderTexture.imageView = imageViews[i];
 		renderTexture.format = imageFormat;
 
-		m_swapchainTextures.push_back( renderTexture );
+		m_swapchainTextures.emplace_back( renderTexture );
 	}
 }
 
@@ -129,6 +129,13 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
 	VK_CHECK( vkCreateImageView( parent->m_device, &viewInfo, nullptr, &imageView ) );
+}
+
+void VulkanRenderTexture::Delete() const
+{
+	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
+	vkDestroyImage( m_parent->m_device, image, nullptr );
+	vmaFreeMemory( m_parent->m_allocator, allocation );
 }
 #pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -711,16 +718,32 @@ void VulkanRenderContext::CreateDescriptors()
 
 void VulkanRenderContext::CreateRenderTargets()
 {
-	// Are we re-creating render targets? If so, delete the originals
+	// Are we re-creating render targets? If so, queue the originals for deletion
 	if ( m_colorTarget.image != VK_NULL_HANDLE )
 	{
-		vkDestroyImageView( m_device, m_colorTarget.imageView, nullptr );
-		vkDestroyImage( m_device, m_colorTarget.image, nullptr );
-		vmaFreeMemory( m_allocator, m_colorTarget.allocation );
+		// Make copies of m_colorTarget and m_depthTarget
+		VulkanRenderTexture colorTarget( m_colorTarget );
+		VulkanRenderTexture depthTarget( m_depthTarget );
 
-		vkDestroyImageView( m_device, m_depthTarget.imageView, nullptr );
-		vkDestroyImage( m_device, m_depthTarget.image, nullptr );
-		vmaFreeMemory( m_allocator, m_depthTarget.allocation );
+		std::stringstream ss;
+		ss << "=== Enqueuing render target for deletion: ";
+		ss << ( void* )colorTarget.image;
+		ss << " === \n";
+
+		OutputDebugStringA( ss.str().c_str() );
+		m_frameDeletionQueue.Enqueue( [colorTarget, depthTarget]() {
+			
+			std::stringstream ss;
+			ss << "=== DELETING: ";
+			ss << ( void* )colorTarget.image;
+			ss << " === \n";
+
+			OutputDebugStringA( ss.str().c_str() );
+
+			// Delete copied render targets
+			colorTarget.Delete();
+			depthTarget.Delete();
+		} );
 	}
 
 	Size2D size = m_window->GetWindowSize();
@@ -755,6 +778,15 @@ void VulkanRenderContext::CreateRenderTargets()
 
 	renderTextureInfo.type = RENDER_TEXTURE_COLOR_OPAQUE;
 	m_colorTarget = VulkanRenderTexture( this, renderTextureInfo );
+
+	// HACK: Horrific hack to get render textures working with descriptor sets for now
+	VulkanImageTexture vkImageTexture;
+	vkImageTexture.image = m_colorTarget.image;
+	vkImageTexture.imageView = m_colorTarget.imageView;
+	vkImageTexture.format = m_colorTarget.format;
+
+	m_fullScreenTri.imageTexture = {};
+	m_fullScreenTri.imageTexture.m_handle = m_imageTextures.Add( vkImageTexture );
 }
 
 void VulkanRenderContext::CreateSamplers()
@@ -1330,6 +1362,11 @@ RenderStatus VulkanRenderContext::EndRendering()
 	}
 
 	VK_CHECK( vkQueuePresentKHR( m_graphicsQueue, &presentInfo ) );
+
+	//
+	// Delete everything in the deletion queue, because we can be 100% sure we're not using it here
+	//
+	m_frameDeletionQueue.Flush();
 
 	m_renderingActive = false;
 	return RENDER_STATUS_OK;

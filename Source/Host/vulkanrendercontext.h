@@ -28,6 +28,23 @@ struct VulkanVertexInputDescription
 	VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
+struct VulkanDeletionQueue
+{
+	std::deque<std::function<void()>> m_queue;
+
+	void Enqueue( std::function<void()>&& function ) { m_queue.push_back( function ); }
+
+	void Flush()
+	{
+		for ( auto it = m_queue.rbegin(); it != m_queue.rend(); it++ )
+		{
+			( *it )();
+		}
+
+		m_queue.clear();
+	}
+};
+
 #pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
 #pragma region "Rendering object classes"
@@ -43,6 +60,16 @@ protected:
 	{
 		assert( parent != nullptr && "Parent was nullptr" );
 		m_parent = parent;
+	}
+
+public:
+	/// <summary>
+	/// This will delete any Vulkan resources stored within this object.
+	/// </summary>
+	virtual void Delete() const
+	{
+		// TODO: If making vulkan resources, delete them here. This will be called by any context-level
+		// deletion functions (i.e. when a deletion queue is processed)
 	}
 };
 
@@ -109,6 +136,7 @@ public:
 	VulkanRenderTexture() {}
 	VulkanRenderTexture( VulkanRenderContext* parent ) { SetParent( parent ); }
 	VulkanRenderTexture( VulkanRenderContext* parent, RenderTextureInfo_t textureInfo );
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -307,6 +335,9 @@ private:
 	void FinalizeAndCreateDevice( vkb::PhysicalDevice physicalDevice );
 	vkb::PhysicalDevice CreatePhysicalDevice( vkb::Instance vkbInstance );
 
+	//
+	// Main initialization functions
+	//
 	void CreateSwapchain();
 	void CreateCommands();
 	void CreateSyncStructures();
@@ -315,7 +346,7 @@ private:
 	void CreateRenderTargets();
 
 	//
-	// ImGui
+	// ImGui initialization
 	//
 	void CreateImGuiIconFont();
 	void CreateImGui();
@@ -387,6 +418,8 @@ private:
 		ImageTexture imageTexture;
 	} m_fullScreenTri;
 	void CreateFullScreenTri();
+
+	VulkanDeletionQueue m_frameDeletionQueue = {};
 
 protected:
 	// ----------------------------------------
