@@ -90,7 +90,7 @@ public static class Assimp
 
 		string material = "internal:missing";
 
-		if ( mesh.MaterialIndex >= 0 )
+		if ( mesh.MaterialIndex >= 0 && mesh.MaterialIndex < modelInfo.Materials.Count )
 			material = modelInfo.Materials[mesh.MaterialIndex];
 
 		return new Model( vertices.ToArray(), indices.ToArray(), material );

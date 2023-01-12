@@ -24,17 +24,17 @@ public class Material : Asset
 	{
 		Path = path;
 
-		// TODO: Hook up to filesystem
-		const string DefaultShaderPath = "content/core/shaders/pbr.mshdr";
+		MochaFile<MaterialInfo> materialFormat = new();
 
-		if ( !FileSystem.Game.Exists( path ) )
+		if ( FileSystem.Game.Exists( path ) )
+		{
+			var fileBytes = FileSystem.Game.ReadAllBytes( path );
+			materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
+		}
+		else
 		{
 			Log.Warning( $"Material '{path}' does not exist" );
-			return;
 		}
-
-		var fileBytes = FileSystem.Game.ReadAllBytes( path );
-		var materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
 
 		if ( !string.IsNullOrEmpty( materialFormat.Data.DiffuseTexture ) )
 			DiffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
@@ -60,6 +60,9 @@ public class Material : Asset
 			RoughnessTexture.NativeTexture,
 			BlueNoiseTexture.NativeTexture
 		};
+
+		// TODO: Hook up to filesystem
+		const string DefaultShaderPath = "content/core/shaders/pbr.mshdr";
 
 		NativeMaterial = new(
 			DefaultShaderPath,
