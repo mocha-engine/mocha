@@ -51,7 +51,7 @@ public class BaseInspector
 		ImGui.PopStyleColor();
 	}
 
-	protected void DrawTable( (string, string)[] items )
+	protected static void DrawTable( (string, string)[] items )
 	{
 		if ( ImGui.BeginTable( $"##details", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 		{
