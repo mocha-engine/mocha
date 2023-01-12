@@ -962,6 +962,10 @@ void VulkanRenderContext::CreateImGui()
 	colors[ImGuiCol_ModalWindowDimBg] = { 0.33f, 0.67f, 0.86f, 1.00f };
 }
 
+void VulkanRenderContext::CreateRayTracingResources() {}
+void VulkanRenderContext::CreateBottomLevelAS() {}
+void VulkanRenderContext::CreateTopLevelAS() {}
+
 RenderStatus VulkanRenderContext::BeginImGui()
 {
 	ImGui_ImplVulkan_NewFrame();

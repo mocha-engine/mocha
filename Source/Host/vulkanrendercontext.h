@@ -28,6 +28,10 @@ struct VulkanVertexInputDescription
 	VkPipelineVertexInputStateCreateFlags flags = 0;
 };
 
+struct VulkanBlasInput
+{
+};
+
 struct VulkanDeletionQueue
 {
 	std::deque<std::function<void()>> m_queue;
@@ -327,6 +331,17 @@ private:
 	std::unordered_map<std::thread::id, std::shared_ptr<VulkanCommandContext>> m_uploadContexts;
 	VulkanSwapchain m_swapchain;
 	VulkanSampler m_anisoSampler, m_pointSampler;
+
+	//
+	// Ray-tracing resources ( e.g. acceleration structures )
+	//
+	VulkanAccelerationStructure m_tlas = {};
+	std::vector<VulkanAccelerationStructure> m_blas = {};
+	void CreateRayTracingResources();
+	void CreateBottomLevelAS();
+	void CreateTopLevelAS();
+	VkDeviceAddress GetBottomLevelASDeviceAddress( uint32_t entityHandle );
+	// VulkanBlasInput
 
 	std::shared_ptr<VulkanCommandContext> GetUploadContext( std::thread::id thread );
 
