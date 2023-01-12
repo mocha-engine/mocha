@@ -5,36 +5,42 @@ namespace Mocha;
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
+	[Category( "Physics" )]
 	public Vector3 Velocity
 	{
 		get => Glue.Entities.GetVelocity( NativeHandle );
 		set => Glue.Entities.SetVelocity( NativeHandle, value );
 	}
 
+	[Category( "Physics" )]
 	public float Mass
 	{
 		get => Glue.Entities.GetMass( NativeHandle );
 		set => Glue.Entities.SetMass( NativeHandle, value );
 	}
 
+	[Category( "Physics" )]
 	public float Friction
 	{
 		get => Glue.Entities.GetFriction( NativeHandle );
 		set => Glue.Entities.SetFriction( NativeHandle, value );
 	}
 
+	[Category( "Physics" )]
 	public float Restitution
 	{
 		get => Glue.Entities.GetRestitution( NativeHandle );
 		set => Glue.Entities.SetRestitution( NativeHandle, value );
 	}
 
+	[Category( "Physics" )]
 	public bool IgnoreRigidbodyRotation
 	{
 		get => Glue.Entities.GetIgnoreRigidbodyRotation( NativeHandle );
 		set => Glue.Entities.SetIgnoreRigidbodyRotation( NativeHandle, value );
 	}
 
+	[Category( "Physics" )]
 	public bool IgnoreRigidbodyPosition
 	{
 		get => Glue.Entities.GetIgnoreRigidbodyPosition( NativeHandle );

@@ -1,4 +1,6 @@
 ﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 
 namespace Mocha.Editor;
 
@@ -51,7 +53,7 @@ public class BaseInspector
 		ImGui.PopStyleColor();
 	}
 
-	protected void DrawTable( (string, string)[] items )
+	protected static void DrawTable( (string, string)[] items )
 	{
 		if ( ImGui.BeginTable( $"##details", 2, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 		{
@@ -71,5 +73,32 @@ public class BaseInspector
 
 			ImGui.EndTable();
 		}
+	}
+
+	/// <summary>
+	/// Attempts to get a suitable <see cref="BasePropertyEditor"/> for the given property type.
+	/// </summary>
+	/// <param name="propertyType">The type to search for a suitable editor with.</param>
+	/// <param name="editorType">The property editor type that was found. Null if none found.</param>
+	/// <returns>Whether or not a suitable <see cref="BasePropertyEditor"/> was found.</returns>
+	protected static bool TryGetPropertyEditorType( Type propertyType, [NotNullWhen( true )] out Type? editorType )
+	{
+		var propertyEditorAttributeType = typeof( PropertyEditorAttribute<> ).MakeGenericType( propertyType );
+		// TODO: Search all assemblies, there could be custom property editors laying around.
+		var propertyEditorTypes = Assembly.GetExecutingAssembly().GetTypes()
+			.Where( type => type.IsAssignableTo( typeof( BasePropertyEditor ) ) )
+			.ToList();
+
+		foreach ( var propertyEditorType in propertyEditorTypes )
+		{
+			if ( propertyEditorType.GetCustomAttribute( propertyEditorAttributeType ) is null )
+				continue;
+
+			editorType = propertyEditorType;
+			return true;
+		}
+
+		editorType = null;
+		return false;
 	}
 }

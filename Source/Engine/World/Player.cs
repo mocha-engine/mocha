@@ -4,23 +4,34 @@
 public class Player : ModelEntity
 {
 	// Get local player instance
+	[HideInInspector]
 	public static Player Local => BaseEntity.All.OfType<Player>().First();
 
 	private Vector3 PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
+	[Category( "Player" )]
 	public Vector3 PlayerHalfExtents => PlayerBounds / 2f;
 
+	[Category( "Player" )]
 	public Vector3 EyePosition => Position + Vector3.Up * PlayerHalfExtents.Z;
+	[Category( "Player" )]
 	public Rotation EyeRotation => Input.Rotation;
+	[HideInInspector]
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );
 
+	[Category( "Player" )]
 	public QuakeWalkController WalkController { get; private set; }
 
+	[Category( "Player" )]
 	public bool IsGrounded => WalkController.IsGrounded;
+	[Category( "Player" )]
 	public BaseEntity GroundEntity => WalkController.GroundEntity;
 
+	[Category( "Player" )]
 	public Vector3 LocalEyePosition { get; set; }
+	[Category( "Player" )]
 	public Rotation LocalEyeRotation { get; set; }
 
+	[Category( "Player" )]
 	public ViewModel ViewModel { get; set; }
 
 	protected override void Spawn()
