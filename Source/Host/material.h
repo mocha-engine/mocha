@@ -26,7 +26,6 @@ public:
 	std::string m_shaderPath;
 
 	GENERATE_BINDINGS void CreateResources();
-	GENERATE_BINDINGS void ReloadShaders();
 
 	SamplerType m_samplerType = {};
 	Descriptor m_descriptor = {};

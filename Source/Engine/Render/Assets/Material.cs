@@ -15,8 +15,6 @@ public class Material : Asset
 
 	public Glue.Material NativeMaterial { get; private set; }
 
-	private FileSystemWatcher Watcher { get; set; }
-
 	/// <summary>
 	/// Loads a material from an MMAT (compiled) file.
 	/// </summary>
@@ -71,8 +69,6 @@ public class Material : Asset
 			SamplerType.Point,
 			false
 		);
-
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ => NativeMaterial.ReloadShaders() );
 	}
 
 	/// <summary>
@@ -98,11 +94,6 @@ public class Material : Asset
 			MetalnessTexture.NativeTexture,
 			RoughnessTexture.NativeTexture
 		};
-
-		Watcher = FileSystem.Game.CreateWatcher( "core/shaders", "*.*", _ =>
-		{
-			NativeMaterial.ReloadShaders();
-		} );
 
 		NativeMaterial = new(
 			shaderPath,

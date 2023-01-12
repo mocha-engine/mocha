@@ -56,8 +56,3 @@ void Material::CreateResources()
 
 	m_pipeline = Pipeline( pipelineInfo );
 }
-
-void Material::ReloadShaders()
-{
-	CreateResources();
-}
