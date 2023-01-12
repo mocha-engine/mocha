@@ -7,6 +7,8 @@ namespace Mocha;
 public class BaseEntity : IEntity
 {
 	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
+
+	[HideInInspector]
 	public uint NativeHandle { get; protected set; }
 
 	public bool IsValid()
@@ -14,18 +16,21 @@ public class BaseEntity : IEntity
 		return true;
 	}
 
+	[Category( "Transform" )]
 	public Vector3 Scale
 	{
 		get => Glue.Entities.GetScale( NativeHandle );
 		set => Glue.Entities.SetScale( NativeHandle, value );
 	}
 
+	[Category( "Transform" )]
 	public Vector3 Position
 	{
 		get => Glue.Entities.GetPosition( NativeHandle );
 		set => Glue.Entities.SetPosition( NativeHandle, value );
 	}
 
+	[Category( "Transform" )]
 	public Rotation Rotation
 	{
 		get => Glue.Entities.GetRotation( NativeHandle );
