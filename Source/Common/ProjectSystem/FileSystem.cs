@@ -158,7 +158,7 @@ public class FileSystem
 
 	public string GetRelativePath( string filePath )
 	{
-		return Path.GetRelativePath( BasePath, filePath );
+		return Path.GetRelativePath( BasePath, filePath ).NormalizePath();
 	}
 
 	public T? Deserialize<T>( string filePath )
