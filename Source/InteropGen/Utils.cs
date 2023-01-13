@@ -47,7 +47,17 @@ static class Utils
 
 		// Check if the native type is in the lookup table
 		if ( lookupTable.ContainsKey( nativeType ) )
+		{
+			// Bonus: Emit a compiler warning if the native type is std::string
+			if ( nativeType == "std::string" )
+			{
+				// There's a better API that does this but I can't remember what it is
+				// TODO: Show position of the warning (line number, file name)
+				Console.WriteLine( "warning IG0001: std::string is not supported in managed code. Use a C string instead." );
+			}
+
 			return lookupTable[nativeType];
+		}
 
 		// Check if the native type is a pointer
 		if ( nativeType.EndsWith( "*" ) )
