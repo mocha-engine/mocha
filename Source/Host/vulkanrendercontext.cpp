@@ -998,7 +998,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		BufferInfo_t bufferInfo = {};
 		bufferInfo.size = sizeof( float ) * vertices.size();
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
-		bufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER;
+		bufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 
 		m_fullScreenTri.vertexBuffer = VertexBuffer( bufferInfo );
 
@@ -1019,7 +1019,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		BufferInfo_t bufferInfo = {};
 		bufferInfo.size = sizeof( uint32_t ) * indices.size();
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
-		bufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER;
+		bufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 
 		m_fullScreenTri.indexBuffer = IndexBuffer( bufferInfo );
 
