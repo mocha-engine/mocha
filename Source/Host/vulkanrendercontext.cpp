@@ -119,7 +119,8 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 
 	format = GetFormat( textureInfo.type ); // Depth & stencil format
 
-	VkImageCreateInfo imageInfo = VKInit::ImageCreateInfo( format, GetUsageFlagBits( textureInfo.type ), depthImageExtent, 1 );
+	VkImageCreateInfo imageInfo = VKInit::ImageCreateInfo(
+	    format, GetUsageFlagBits( textureInfo.type ) | VK_IMAGE_USAGE_SAMPLED_BIT, depthImageExtent, 1 );
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
