@@ -59,11 +59,12 @@ public class Material : Asset
 			BlueNoiseTexture.NativeTexture
 		};
 
-		// TODO: Hook up to filesystem
-		const string DefaultShaderPath = "content/core/shaders/pbr.mshdr";
+		var shaderFileBytes = FileSystem.Game.ReadAllBytes( "core/shaders/pbr.mshdr" );
+		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
 		NativeMaterial = new(
-			DefaultShaderPath,
+			shaderFormat.Data.VertexShaderData.ToInterop(),
+			shaderFormat.Data.FragmentShaderData.ToInterop(),
 			Vertex.VertexAttributes.ToInterop(),
 			textures.ToInterop(),
 			SamplerType.Point,
@@ -78,6 +79,9 @@ public class Material : Asset
 		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
 		Texture? roughnessTexture = null, SamplerType sampler = SamplerType.Point, bool ignoreDepth = false )
 	{
+		var shaderFileBytes = FileSystem.Game.ReadAllBytes( shaderPath );
+		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
+
 		Path = "Procedural Material";
 
 		DiffuseTexture = diffuseTexture ?? Texture.MissingTexture;
@@ -96,11 +100,14 @@ public class Material : Asset
 		};
 
 		NativeMaterial = new(
-			shaderPath,
+			shaderFormat.Data.VertexShaderData.ToInterop(),
+			shaderFormat.Data.FragmentShaderData.ToInterop(),
 			vertexAttributes.ToInterop(),
 			textures.ToInterop(),
 			sampler,
 			ignoreDepth
 		);
+
+		// TODO: File watcher here!
 	}
 }

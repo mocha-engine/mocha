@@ -93,6 +93,20 @@ HostManager::HostManager()
 	m_signature = signature;
 
 	m_lagfp = HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() );
+
+	m_fileSystemWatcher = std::make_unique<FileSystemWatcher>();
+
+	std::function<void( std::string path )> genericFileCallback = [=]( std::string path ) {
+		if ( !path.starts_with( ".vs" ) )
+		{
+			spdlog::info( "{} was changed", path );
+		}
+	};
+
+	m_fileSystemWatcher->RegisterModifiedCallback( genericFileCallback );
+	m_fileSystemWatcher->RegisterCreatedCallback( genericFileCallback );
+	m_fileSystemWatcher->RegisterDeletedCallback( genericFileCallback );
+	m_fileSystemWatcher->WatchDirectory( ".\\Source" );
 }
 
 void HostManager::Update()

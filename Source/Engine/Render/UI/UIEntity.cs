@@ -13,7 +13,7 @@ public partial class UIEntity : ModelEntity, IRenderer
 	{
 		IsUI = true;
 		AtlasBuilder = new();
-		Material = new( "content/core/shaders/ui/ui.mshdr",
+		Material = new( "core/shaders/ui/ui.mshdr",
 				 UIVertex.VertexAttributes,
 				 AtlasBuilder.Texture,
 				 sampler: SamplerType.Anisotropic,

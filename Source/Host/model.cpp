@@ -51,6 +51,6 @@ void Model::AddMesh( UtilArray vertices, UtilArray indices, Material* material )
 	if ( vertices.size == 0 )
 		return;
 
-	Mesh mesh( vertices, indices, *material );
+	Mesh mesh( vertices, indices, material );
 	UploadMesh( mesh );
 }

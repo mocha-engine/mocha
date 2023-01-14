@@ -1,14 +1,20 @@
 #include "material.h"
 
+#include <filesystemwatcher.h>
 #include <globalvars.h>
 #include <model.h>
 #include <rendering.h>
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Material::Material(
-    const char* shaderPath, UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth )
+Material::Material( UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes, UtilArray textures,
+    SamplerType samplerType, bool ignoreDepth )
 {
+	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();	
+	m_fragmentShaderData = fragmentShaderData.GetData<uint32_t>();
+	
+	m_isDirty.store( true );
+
 	auto texturePtrs = textures.GetData<Texture*>();
 	m_textures = std::vector<Texture>( textures.count );
 
@@ -16,8 +22,6 @@ Material::Material(
 	{
 		m_textures[i] = Texture( *texturePtrs[i] );
 	}
-
-	m_shaderPath = std::string( shaderPath );
 
 	auto vertexAttribInfo = vertexAttributes.GetData<InteropVertexAttributeInfo>();
 	for ( int i = 0; i < vertexAttributes.count; i++ )
@@ -29,12 +33,19 @@ Material::Material(
 	m_ignoreDepth = ignoreDepth;
 }
 
+void Material::Reload()
+{
+	m_isDirty.store( true );
+}
+
 void Material::CreateResources()
 {
+	spdlog::trace( "Material::CreateResources()" );
 	PipelineInfo_t pipelineInfo = {};
 
 	pipelineInfo.shaderInfo = {};
-	pipelineInfo.shaderInfo.shaderPath = m_shaderPath;
+	pipelineInfo.shaderInfo.vertexShaderData = m_vertexShaderData;
+	pipelineInfo.shaderInfo.fragmentShaderData = m_fragmentShaderData;
 	pipelineInfo.vertexAttributes = m_vertexAttribInfo;
 
 	DescriptorInfo_t descriptorInfo;
@@ -55,4 +66,6 @@ void Material::CreateResources()
 	pipelineInfo.descriptors.push_back( &m_descriptor );
 
 	m_pipeline = Pipeline( pipelineInfo );
+
+	m_isDirty.store( false );
 }

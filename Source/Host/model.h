@@ -7,7 +7,6 @@
 #include <mathtypes.h>
 #include <mesh.h>
 #include <rendering.h>
-#include <shadercompiler.h>
 #include <spdlog/spdlog.h>
 #include <texture.h>
 #include <vector>

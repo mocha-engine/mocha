@@ -12,10 +12,10 @@
 #ifdef _IMGUI
 #include <backends/imgui_impl_sdl.h>
 #include <backends/imgui_impl_vulkan.h>
+#include <fontawesome.h>
 #include <imgui.h>
 #include <implot.h>
 #endif
-#include <fontawesome.h>
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
@@ -728,15 +728,14 @@ void VulkanRenderContext::CreateRenderTargets()
 		ss << ( void* )colorTarget.image;
 		ss << " === \n";
 
-		OutputDebugStringA( ss.str().c_str() );
+		spdlog::info( ss.str() );
 		m_frameDeletionQueue.Enqueue( [colorTarget, depthTarget]() {
-			
 			std::stringstream ss;
 			ss << "=== DELETING: ";
 			ss << ( void* )colorTarget.image;
 			ss << " === \n";
 
-			OutputDebugStringA( ss.str().c_str() );
+			spdlog::info( ss.str() );
 
 			// Delete copied render targets
 			colorTarget.Delete();
@@ -1066,7 +1065,33 @@ void VulkanRenderContext::CreateFullScreenTri()
 	pipelineInfo.descriptors = std::vector<Descriptor*>{ &m_fullScreenTri.descriptor };
 	pipelineInfo.vertexAttributes = std::vector<VertexAttributeInfo_t>{ positionAttribute, uvAttribute };
 	pipelineInfo.shaderInfo = {};
-	pipelineInfo.shaderInfo.shaderPath = "Content/core/shaders/fs.mshdr";
+
+	// Compile fragment & vertex shaders
+	std::vector<unsigned int> vertexShaderBits;
+	std::vector<unsigned int> fragmentShaderBits;
+
+	// Vertex
+	{
+		if ( !ShaderCompiler::Instance().Compile( SHADER_TYPE_VERTEX, g_fullScreenTriVertexShader.c_str(), vertexShaderBits ) )
+		{
+			ErrorMessage( "Fullscreen triangle vertex shader failed to compile." );
+			abort();
+		}
+
+		pipelineInfo.shaderInfo.vertexShaderData = vertexShaderBits;
+	}
+
+	// Fragment
+	{
+		if ( !ShaderCompiler::Instance().Compile(
+		         SHADER_TYPE_FRAGMENT, g_fullScreenTriFragmentShader.c_str(), fragmentShaderBits ) )
+		{
+			ErrorMessage( "Fullscreen triangle fragment shader failed to compile." );
+			abort();
+		}
+
+		pipelineInfo.shaderInfo.fragmentShaderData = fragmentShaderBits;
+	}
 
 	m_fullScreenTri.pipeline = Pipeline( pipelineInfo );
 }
@@ -1701,44 +1726,22 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-RenderStatus VulkanShader::LoadShaderModule( const char* filePath, ShaderType shaderType, VkShaderModule* outShaderModule )
+RenderStatus VulkanShader::LoadShaderModule( std::vector<uint32_t> shaderData, ShaderType shaderType, VkShaderModule* outShaderModule )
 {
 	VkDevice device = m_parent->m_device;
-
-	std::string line, text;
-	std::ifstream in( filePath );
-
-	while ( std::getline( in, line ) )
-	{
-		text += line + "\n";
-	}
-
-	const char* buffer = text.c_str();
-
-	std::vector<unsigned int> shaderBits;
-	if ( !ShaderCompiler::Instance().Compile( shaderType, buffer, shaderBits ) )
-	{
-		std::string error = std::string( filePath ) + " failed to compile.\nCheck the console for more details.";
-		ErrorMessage( error );
-		abort();
-	}
-
-	//
-	//
-	//
 
 	VkShaderModuleCreateInfo createInfo = {};
 	createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
 	createInfo.pNext = nullptr;
 
-	createInfo.codeSize = shaderBits.size() * sizeof( uint32_t );
-	createInfo.pCode = shaderBits.data();
+	createInfo.codeSize = shaderData.size() * sizeof( uint32_t );
+	createInfo.pCode = shaderData.data();
 
 	VkShaderModule shaderModule;
 
 	if ( vkCreateShaderModule( device, &createInfo, nullptr, &shaderModule ) != VK_SUCCESS )
 	{
-		spdlog::error( "Could not compile shader {}", filePath );
+		spdlog::error( "Could not compile shader" );
 		return RENDER_STATUS_SHADER_COMPILE_FAILED;
 	}
 
@@ -1751,12 +1754,12 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 {
 	SetParent( parent );
 
-	if ( LoadShaderModule( shaderInfo.shaderPath.c_str(), SHADER_TYPE_FRAGMENT, &fragmentShader ) == RENDER_STATUS_OK )
+	if ( LoadShaderModule( shaderInfo.fragmentShaderData, SHADER_TYPE_FRAGMENT, &fragmentShader ) == RENDER_STATUS_OK )
 		spdlog::info( "VulkanShader::VulkanShader: Fragment shader compiled successfully" );
 	else
 		spdlog::error( "VulkanShader::VulkanShader: Fragment shader failed to compile" );
 
-	if ( LoadShaderModule( shaderInfo.shaderPath.c_str(), SHADER_TYPE_VERTEX, &vertexShader ) == RENDER_STATUS_OK )
+	if ( LoadShaderModule( shaderInfo.vertexShaderData, SHADER_TYPE_VERTEX, &vertexShader ) == RENDER_STATUS_OK )
 		spdlog::info( "VulkanShader::VulkanShader: Vertex shader compiled successfully" );
 	else
 		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );

@@ -189,6 +189,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="baseentity.cpp" />
     <ClCompile Include="cvarmanager.cpp" />
     <ClCompile Include="entitymanager.cpp" />
+    <ClCompile Include="filesystemwatcher.cpp" />
     <ClCompile Include="hostmanager.cpp" />
     <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
@@ -355,6 +356,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="entitymanager.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="entities.h" />
+    <ClInclude Include="filesystemwatcher.h" />
     <ClInclude Include="fontawesome.h" />
     <ClInclude Include="gamesettings.h" />
     <ClInclude Include="mathtypes.h" />
@@ -365,6 +367,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="rendering.h" />
+    <ClInclude Include="shadercompiler.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="utilarray.h" />
     <ClInclude Include="material.h" />
@@ -377,7 +380,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="rendermanager.h" />
     <ClInclude Include="baserendercontext.h" />
     <ClInclude Include="root.h" />
-    <ClInclude Include="shadercompiler.h" />
     <ClInclude Include="subsystem.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />

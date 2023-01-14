@@ -160,7 +160,8 @@ struct DescriptorUpdateInfo_t
 
 struct ShaderInfo_t
 {
-	std::string shaderPath = "";
+	std::vector<uint32_t> fragmentShaderData;
+	std::vector<uint32_t> vertexShaderData;
 };
 
 struct VertexAttributeInfo_t

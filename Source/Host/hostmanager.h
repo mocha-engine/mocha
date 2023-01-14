@@ -3,6 +3,7 @@
 #include <Windows.h>
 #include <assert.h>
 #include <coreclr_delegates.h>
+#include <filesystemwatcher.h>
 #include <generated/UnmanagedArgs.generated.h>
 #include <hostfxr.h>
 #include <iostream>
@@ -40,10 +41,12 @@ private:
 	std::wstring m_configPath;
 	std::wstring m_signature;
 
+	std::shared_ptr<FileSystemWatcher> m_fileSystemWatcher;
+
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
 
 public:
-	HostManager( );
+	HostManager();
 
 	void Startup();
 	void Shutdown();

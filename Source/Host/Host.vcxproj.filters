@@ -528,11 +528,14 @@
     <ClCompile Include="baserendercontext.cpp">
       <Filter>Rendering\Platform</Filter>
     </ClCompile>
-    <ClCompile Include="shadercompiler.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="pipeline.cpp">
       <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="filesystemwatcher.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="shadercompiler.cpp">
+      <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1424,9 +1427,6 @@
     <ClInclude Include="rendering.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="shadercompiler.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="vkmacros.h">
       <Filter>Rendering\Platform\Vulkan</Filter>
     </ClInclude>
@@ -1456,6 +1456,12 @@
     </ClInclude>
     <ClInclude Include="engine.h">
       <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="filesystemwatcher.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="shadercompiler.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,54 @@ class VulkanRenderContext;
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
+// Static shaders
+static const std::string g_fullScreenTriVertexShader = R"(
+	#version 460
+
+	struct fs_in
+	{
+		vec2 vTexCoord;
+	};
+
+	layout (location = 0) in vec3 vPosition;
+	layout (location = 1) in vec2 vTexCoord;
+
+	layout (location = 0) out fs_in vs_out;
+
+	void main()
+	{
+		vs_out.vTexCoord = vTexCoord;
+		gl_Position = vec4( vPosition, 1.0 );
+	}
+)";
+
+static const std::string g_fullScreenTriFragmentShader = R"(
+	#version 460
+
+	struct fs_in
+	{
+		vec2 vTexCoord;
+	};
+
+	layout (location = 0) in fs_in vs_out;
+	layout (location = 0) out vec4 outFragColor;
+
+	layout (set = 0, binding = 0) uniform sampler2D renderTexture;
+
+	vec3 sampleTexture( sampler2D target )
+	{
+		return texture( target, vs_out.vTexCoord.xy ).rgb;
+	}
+
+	void main()
+	{
+		vec3 fragColor = sampleTexture( renderTexture );
+		outFragColor = vec4(fragColor, 1.0f);
+	}
+)";
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
 struct VulkanVertexInputDescription
 {
 	std::vector<VkVertexInputBindingDescription> bindings;
@@ -263,7 +311,7 @@ public:
 class VulkanShader : public VulkanObject
 {
 private:
-	RenderStatus LoadShaderModule( const char* filePath, ShaderType shaderType, VkShaderModule* outShaderModule );
+	RenderStatus LoadShaderModule( std::vector<uint32_t> shaderData, ShaderType shaderType, VkShaderModule* outShaderModule );
 
 public:
 	VkShaderModule vertexShader;

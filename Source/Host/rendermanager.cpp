@@ -13,7 +13,6 @@
 #include <hostmanager.h>
 #include <modelentity.h>
 #include <physicsmanager.h>
-#include <shadercompiler.h>
 #include <vulkanrendercontext.h>
 
 //
@@ -45,25 +44,44 @@ FloatCVar maxFramerate(
 
 void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 {
-	// JIT pipeline creation
-	if ( !mesh->material.m_pipeline.IsValid() )
-	{
-		spdlog::trace( "RenderManager::RenderMesh - Handle wasn't valid, creating JIT render pipeline..." );
+	bool materialWasDirty = false;
 
-		mesh->material.CreateResources();
+	// Check if material is dirty and create any resources
+	if ( mesh->material->IsDirty() )
+	{
+		spdlog::trace( "RenderManager::RenderMesh - Material is dirty, (re-)creating render pipeline..." );
+
+		mesh->material->CreateResources();
+		materialWasDirty = true;
+
+		if ( mesh->material->m_pipeline.IsValid() )
+		{
+			spdlog::info( "Material pipeline creation was a success." );
+		}
+		else
+		{
+			spdlog::error( "Material pipeline is INVALID even though we just created a pipeline!" );
+			__debugbreak();
+		}
 	}
 
-	m_renderContext->BindPipeline( mesh->material.m_pipeline );
-	m_renderContext->BindDescriptor( mesh->material.m_descriptor );
+	if ( !mesh->material->m_pipeline.IsValid() )
+	{
+		spdlog::error( "Material pipeline was INVALID. Was material dirty? {}", materialWasDirty );
+		__debugbreak();
+	}
 
-	for ( int i = 0; i < mesh->material.m_textures.size(); ++i )
+	m_renderContext->BindPipeline( mesh->material->m_pipeline );
+	m_renderContext->BindDescriptor( mesh->material->m_descriptor );
+
+	for ( int i = 0; i < mesh->material->m_textures.size(); ++i )
 	{
 		DescriptorUpdateInfo_t updateInfo = {};
 		updateInfo.binding = i;
 		updateInfo.samplerType = SAMPLER_TYPE_POINT;
-		updateInfo.src = &mesh->material.m_textures[i].m_image;
+		updateInfo.src = &mesh->material->m_textures[i].m_image;
 
-		m_renderContext->UpdateDescriptor( mesh->material.m_descriptor, updateInfo );
+		m_renderContext->UpdateDescriptor( mesh->material->m_descriptor, updateInfo );
 	}
 
 	m_renderContext->BindConstants( constants );
@@ -188,8 +206,8 @@ void RenderManager::Run()
 			continue;
 		}
 
-		if ( frameTime > 0.25 )
-			frameTime = 0.25;
+		if ( frameTime > 1 / 30.0f )
+			frameTime = 1 / 30.0f;
 
 		currentTime = newTime;
 		accumulator += frameTime;

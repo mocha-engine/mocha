@@ -66,15 +66,8 @@ VkPipeline PipelineBuilder::Build( VkDevice device, VkFormat colorFormat, VkForm
 	pipelineInfo.subpass = 0;
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;
 	pipelineInfo.renderPass = VK_NULL_HANDLE;
-
+	
 	VkPipeline newPipeline;
-	if ( vkCreateGraphicsPipelines( device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &newPipeline ) != VK_SUCCESS )
-	{
-		spdlog::error( "Failed to create graphics pipeline" );
-		return VK_NULL_HANDLE;
-	}
-	else
-	{
-		return newPipeline;
-	}
+	VK_CHECK( vkCreateGraphicsPipelines( device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &newPipeline ) );
+	return newPipeline;
 }

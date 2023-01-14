@@ -4,7 +4,6 @@
  * 
  * Copyright (c) 2022 Alex Guthrie
  */
-
 #pragma optionNV (unroll all)
 
 #define DEBUG_VIEW_NONE 					0
