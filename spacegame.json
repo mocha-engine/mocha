@@ -4,7 +4,7 @@
     "milestone": "Prototype",
     "tickRate": 60,
     "managed": {
-        "path": ".\\build\\Engine",
-        "signature": "Mocha.Main, Engine"
+        "path": ".\\build\\Hotload",
+        "signature": "Mocha.Main, Hotload"
     }
 }

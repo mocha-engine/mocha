@@ -6,6 +6,8 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>AnyCPU;x64;x86</Platforms>
+		<RootNamespace>Mocha.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>Mocha.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>

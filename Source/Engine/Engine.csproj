@@ -9,12 +9,9 @@
 		<LangVersion>preview</LangVersion>
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
-		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>$(SolutionDir)..\build</OutputPath>
-
-		<!-- Important -->
-		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<AssemblyName>Mocha.$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -85,6 +82,7 @@
 	<PropertyGroup>
 		<PreserveCompilationReferences>true</PreserveCompilationReferences>
 		<PreserveCompilationContext>true</PreserveCompilationContext>
+		<RootNamespace>Mocha</RootNamespace>
 	</PropertyGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
