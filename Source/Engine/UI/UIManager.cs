@@ -1,8 +1,8 @@
 ﻿namespace Mocha.UI;
 
-internal partial class UIManager
+public partial class UIManager
 {
-	internal static UIManager Instance { get; private set; }
+	public static UIManager Instance { get; private set; }
 
 	private IRenderer Renderer { get; } = new UIEntity();
 	private FileSystemWatcher Watcher { get; }

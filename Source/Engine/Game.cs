@@ -1,67 +1,51 @@
-﻿using Mocha.AssetCompiler;
-using VConsoleLib;
+﻿using Mocha.UI;
 
 namespace Mocha;
 
-public class Game
+public class Game : IGame
 {
-	private World world;
-	private VConsoleServer vconsoleServer;
+	public static Game Current { get; set; }
 
-	private void InitFileSystem()
-	{
-		FileSystem.Game = new FileSystem( "content\\" );
-		FileSystem.Game.AssetCompiler = new RuntimeAssetCompiler();
-	}
-
-	private void InitVConsole()
-	{
-		vconsoleServer = new();
-		Log.OnLog += ( s ) => vconsoleServer.Log( s );
-
-		vconsoleServer.OnCommand += ( s ) =>
-		{
-			Log.Info( $"Command: {s}" );
-		};
-	}
-
-	private void InitImGui()
-	{
-		ImGuiNative.igSetCurrentContext( Glue.Editor.GetContextPointer() );
-	}
-
-	private void InitGame()
-	{
-		world = new World();
-	}
+	private UIManager ui;
 
 	public void Startup()
 	{
-		InitFileSystem();
-		InitVConsole();
-		InitImGui();
-		InitGame();
+		Current = this;
+		Event.Register( this );
+		Event.RegisterStatics();
+		Event.Run( Event.Game.LoadAttribute.Name );
+
+		ui = new UIManager();
+		ui.SetTemplate( "ui/Game.html" );
+		SetupEntities();
+	}
+
+	private void SetupEntities()
+	{
+		Log.Trace( $"Setting up entities..." );
+
+		var map = new ModelEntity( "core/models/dev/dev_map.mmdl" );
+		map.Position = new( 0.0f, 0.0f, 0.0f );
+		map.Friction = 1.0f;
+		map.Restitution = 0.0f;
+		map.Mass = 1000.0f;
+		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
+
+		var player = new Player();
 	}
 
 	public void Update()
 	{
-		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
-
-		world.Update();
+		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
 
-	public void Render()
+	public void FrameUpdate()
 	{
-		Time.UpdateFrom( Glue.Engine.GetDeltaTime() );
-		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
-		Input.Update();
-
-		world.Render();
-		world.FrameUpdate();
+		UIManager.Instance.Render();
+		BaseEntity.All.ToList().ForEach( entity => entity.FrameUpdate() );
 	}
 
-	public void DrawEditor()
+	public void Shutdown()
 	{
-		Editor.Editor.Draw();
 	}
 }

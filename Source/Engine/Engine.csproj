@@ -46,14 +46,15 @@
 
 	<ItemGroup>
 		<PackageReference Include="AssimpNet" Version="4.1.0" />
-		<PackageReference Include="ImGui.NET" Version="1.89.1" />
 		<PackageReference Include="StbImageSharp" Version="2.27.8" />
 		<PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<ProjectReference Include="..\AssetCompiler\AssetCompiler.csproj" />
-		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Common\Common.csproj">
+		  <Private></Private>
+		</ProjectReference>
 		<ProjectReference Include="..\UI\UI.csproj" />
 		<ProjectReference Include="..\VConsoleLib\VConsoleLib\VConsoleLib.csproj" />
 	</ItemGroup>

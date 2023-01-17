@@ -1,12 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Mocha;
 
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class BaseEntity : IEntity
 {
-	public static List<BaseEntity> All { get; set; } = Assembly.GetCallingAssembly().GetTypes().OfType<BaseEntity>().ToList();
+	public static List<BaseEntity> All { get; set; } = new();
 
 	[HideInInspector]
 	public uint NativeHandle { get; protected set; }

@@ -76,9 +76,6 @@ public partial class QuakeWalkController
 			WalkMove();
 		}
 
-		// stick to ground
-		CategorizePosition();
-
 		// set groundentity
 		TraceToGround();
 	}

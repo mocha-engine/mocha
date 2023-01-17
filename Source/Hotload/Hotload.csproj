@@ -12,10 +12,15 @@
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Engine\Engine.csproj" />
+	  <ProjectReference Include="..\AssetCompiler\AssetCompiler.csproj" />
+	  <ProjectReference Include="..\Common\Common.csproj">
+	    <Private>False</Private>
+	  </ProjectReference>
+	  <ProjectReference Include="..\Editor\Editor.csproj" />
 	</ItemGroup>
 
 </Project>

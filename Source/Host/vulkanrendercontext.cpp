@@ -1400,7 +1400,9 @@ RenderStatus VulkanRenderContext::BindPipeline( Pipeline p )
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	m_pipeline = m_pipelines.Get( p.m_handle );
+	std::shared_ptr<VulkanPipeline> pipeline = m_pipelines.Get( p.m_handle );
+
+	m_pipeline = pipeline;
 
 	vkCmdBindPipeline( m_mainContext.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, m_pipeline->pipeline );
 
@@ -1501,7 +1503,7 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 	}
 
 	std::shared_ptr<VulkanRenderTexture> renderTexture = m_renderTextures.Get( rt.m_handle );
-
+	
 	// Transition to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture->image );

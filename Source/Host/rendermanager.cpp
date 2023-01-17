@@ -185,8 +185,7 @@ void RenderManager::Run()
 	bool bQuit = false;
 
 	g_hostManager->FireEvent( "Event.Game.Load" );
-
-	double curTime = 0.0;
+	
 	double logicDelta = 1.0 / GameSettings::Get()->tickRate;
 
 	double currentTime = HiresTimeInSeconds();
@@ -242,7 +241,7 @@ void RenderManager::Run()
 			g_entityDictionary->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
 
-			curTime += logicDelta;
+			g_curTime += logicDelta;
 			accumulator -= logicDelta;
 			g_curTick++;
 		}

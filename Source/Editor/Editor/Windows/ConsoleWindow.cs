@@ -155,7 +155,6 @@ public class ConsoleWindow : EditorWindow
 				ImGui.TableNextRow();
 				ImGui.TableNextColumn();
 
-				DrawPerformance();
 				DrawOutliner();
 
 				ImGui.TableNextColumn();

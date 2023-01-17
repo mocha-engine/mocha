@@ -274,7 +274,8 @@ namespace JoltConversions
 	// Convert Mocha to Jolt Quaternion
 	inline JPH::Quat MochaToJoltQuat( Quaternion inQuat )
 	{
-		return JPH::Quat{ inQuat.x, inQuat.y, inQuat.z, inQuat.w };
+		JPH::Quat q = JPH::Quat{ inQuat.x, inQuat.y, inQuat.z, inQuat.w };
+		return q.Normalized();
 	}
 }; // namespace JoltConversions
 

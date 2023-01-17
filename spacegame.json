@@ -5,6 +5,6 @@
     "tickRate": 60,
     "managed": {
         "path": ".\\build\\Mocha.Hotload",
-        "signature": "Mocha.Main, Mocha.Hotload"
+        "signature": "Mocha.Hotload.Main, Mocha.Hotload"
     }
 }
