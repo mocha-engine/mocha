@@ -5,21 +5,28 @@ namespace Mocha.Editor;
 [Title( "Console" )]
 public class ConsoleWindow : EditorWindow
 {
-	private const int MAX_INPUT_LENGTH = 512;
-	private static string consoleInput = "";
-	private Vector4 graphColor = Theme.Green;
-	private bool consoleDirty = false;
+	//
+	// ImGUI input variables
+	//
+	private const int MaxInputLength = 512;
+	private static string currentInput = "";
+
+	/// <summary>
+	/// Has the console just changed? If so, set this to true and
+	/// we'll scroll to the bottom.
+	/// </summary>
+	private bool isDirty = false;
 
 	private void DrawOutput()
 	{
 		if ( !ImGui.BeginChild( "##console_output", new Vector2( -1, -32 ) ) )
 			return;
 
-		if ( consoleDirty )
+		if ( isDirty )
 		{
 			ImGui.SetScrollY( ImGui.GetScrollMaxY() );
 
-			consoleDirty = false;
+			isDirty = false;
 		}
 
 		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg ) )
@@ -59,34 +66,18 @@ public class ConsoleWindow : EditorWindow
 	private void DrawInput()
 	{
 		ImGui.SetNextItemWidth( -68 );
-		bool pressed = ImGui.InputText( "##console_input", ref consoleInput, MAX_INPUT_LENGTH, ImGuiInputTextFlags.EnterReturnsTrue );
+		bool pressed = ImGui.InputText( "##console_input", ref currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
 
 		ImGui.SameLine();
 		if ( ImGui.Button( "Submit" ) || pressed )
 		{
-			Log.Trace( $"> {consoleInput}" );
+			Log.Trace( $"> {currentInput}" );
 
-			ConsoleSystem.Run( consoleInput );
+			ConsoleSystem.Run( currentInput );
 
-			consoleDirty = true;
-			consoleInput = "";
+			isDirty = true;
+			currentInput = "";
 		}
-	}
-
-	private void DrawPerformance()
-	{
-		var targetGraphColor = Theme.Green;
-
-		if ( Time.FPS < 60 )
-			targetGraphColor = Theme.Orange;
-
-		if ( Time.FPS < 30 )
-			targetGraphColor = Theme.Red;
-
-		graphColor = Vector4.Lerp( graphColor, targetGraphColor, Time.Delta * 10f );
-
-		// TODO:
-		// Glue.Editor.DrawGraph( "##performance", graphColor.ToBackground(), Time.FPSHistory.Select( x => (float)x ).ToList().ToInterop() );
 	}
 
 	private void DrawEntityList()
