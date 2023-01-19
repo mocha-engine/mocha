@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Mocha.Common.Serialization;
+using System.Text;
 using System.Text.Json;
 
 namespace Mocha.AssetCompiler;
@@ -7,6 +8,7 @@ namespace Mocha.AssetCompiler;
 /// A compiler for .mmdl model files.
 /// </summary>
 [Handles( ".mmdl" )]
+// TODO: All the source files found in the mmdl file should be found by the compiler system.
 public class ModelCompiler : BaseCompiler
 {
 	/// <inheritdoc/>
@@ -16,7 +18,7 @@ public class ModelCompiler : BaseCompiler
 	public override string CompiledExtension => "mmdl_c";
 
 	/// <inheritdoc/>
-	public override bool SupportsMochaFile => false;
+	public override bool SupportsMochaFile => true;
 
 	private static readonly char[] magicNumber = new char[] { 'M', 'M', 'S', 'H' };
 	private static readonly char[] materialChunk = new char[] { 'M', 'T', 'R', 'L' };
@@ -104,6 +106,14 @@ public class ModelCompiler : BaseCompiler
 				binaryWriter.Write( index );
 		}
 
-		return Succeeded( stream.ToArray() );
+		var mochaFile = new MochaFile<byte[]>()
+		{
+			MajorVersion = 3,
+			MinorVersion = 0,
+			Data = stream.ToArray(),
+			AssetHash = input.DataHash
+		};
+
+		return Succeeded( Serializer.Serialize( mochaFile ) );
 	}
 }

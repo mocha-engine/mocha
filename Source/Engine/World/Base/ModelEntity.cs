@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using Mocha.Common.Serialization;
+using System.Runtime.InteropServices;
 
 namespace Mocha;
 
@@ -86,8 +87,11 @@ public partial class ModelEntity : BaseEntity
 	public void SetMeshPhysics( string path )
 	{
 		using var _ = new Stopwatch( "Mocha phys model generation" );
-		using var fileStream = FileSystem.Game.OpenRead( path );
-		using var binaryReader = new BinaryReader( fileStream );
+		var fileBytes = FileSystem.Game.ReadAllBytes( path );
+		var modelFile = Serializer.Deserialize<MochaFile<byte[]>>( fileBytes );
+
+		using var stream = new MemoryStream( modelFile.Data );
+		using var binaryReader = new BinaryReader( stream );
 
 		var vertexList = new List<Vector3>();
 
