@@ -24,7 +24,7 @@ void RenderdocManager::Startup()
 
 	RENDERDOC_API_1_5_0* rdoc_api = NULL;
 
-	auto renderdocDll = LoadLibrary( L"renderdoc.dll" );
+	auto renderdocDll = LoadLibraryA( "renderdoc.dll" );
 	if ( renderdocDll == nullptr )
 	{
 		spdlog::error( "Failed to load RenderDoc DLL - Error: %#x", GetLastError() );
