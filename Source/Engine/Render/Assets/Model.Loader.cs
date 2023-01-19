@@ -1,12 +1,17 @@
-﻿namespace Mocha.Renderer;
+﻿using Mocha.Common.Serialization;
+
+namespace Mocha.Renderer;
 
 partial class Model
 {
 	private void LoadFromPath( string path )
 	{
 		using var _ = new Stopwatch( "Mocha model generation" );
-		using var fileStream = FileSystem.Game.OpenRead( path );
-		using var binaryReader = new BinaryReader( fileStream );
+		var fileBytes = FileSystem.Game.ReadAllBytes( path );
+		var modelFile = Serializer.Deserialize<MochaFile<byte[]>>( fileBytes );
+
+		using var stream = new MemoryStream( modelFile.Data );
+		using var binaryReader = new BinaryReader( stream );
 
 		binaryReader.ReadChars( 4 ); // MMSH
 
