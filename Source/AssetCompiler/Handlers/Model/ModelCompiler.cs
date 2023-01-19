@@ -8,6 +8,7 @@ namespace Mocha.AssetCompiler;
 /// A compiler for .mmdl model files.
 /// </summary>
 [Handles( ".mmdl" )]
+// TODO: All the source files found in the mmdl file should be found by the compiler system.
 public class ModelCompiler : BaseCompiler
 {
 	/// <inheritdoc/>
