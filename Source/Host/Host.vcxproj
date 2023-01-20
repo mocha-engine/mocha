@@ -76,7 +76,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LocalDebuggerWorkingDirectory>$(OutDirFullPath)..\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -86,7 +86,7 @@
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LocalDebuggerWorkingDirectory>$(OutDirFullPath)..\</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
