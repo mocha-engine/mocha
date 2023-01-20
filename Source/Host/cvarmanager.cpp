@@ -21,8 +21,16 @@ void CVarSystem::Startup()
 		return;
 	}
 
-	// File exists so let's load it
-	cvarFile >> cvarArchive;
+	// File exists so let's try to load it
+	try
+	{
+		cvarFile >> cvarArchive;
+	}
+	catch ( nlohmann::json::parse_error& ex )
+	{
+		spdlog::error( "Couldn't parse cvars.json - skipping" );
+		return;
+	}
 
 	for ( auto& [name, value] : cvarArchive.items() )
 	{
