@@ -4,9 +4,17 @@ namespace Mocha;
 
 public class LoadedAssemblyType<T>
 {
-	private T? ManagedClass { get; }
+	private T? managedClass;
 
-	public LoadedAssemblyType( string dllPath )
+	private FileSystemWatcher watcher;
+
+	public LoadedAssemblyType( string dllPath, string sourcePath )
+	{
+		LoadManagedClass( dllPath );
+		CreateFileSystemWatcher( sourcePath );
+	}
+
+	private void LoadManagedClass( string dllPath )
 	{
 		var name = AssemblyName.GetAssemblyName( dllPath );
 		var currentAssembly = AppDomain.CurrentDomain.Load( name );
@@ -16,21 +24,33 @@ public class LoadedAssemblyType<T>
 		{
 			if ( type.GetInterface( typeof( T ).FullName! ) != null )
 			{
-				ManagedClass = (T)Activator.CreateInstance( type )!;
+				managedClass = (T)Activator.CreateInstance( type )!;
 				break;
 			}
 		}
 
-		if ( ManagedClass == null )
+		if ( managedClass == null )
 		{
 			throw new Exception( "Could not find IGame implementation" );
 		}
 	}
 
-	public T Value => ManagedClass!;
+	private void CreateFileSystemWatcher( string sourcePath )
+	{
+		watcher = new FileSystemWatcher( sourcePath, "*.*" );
+		watcher.Changed += OnFileChanged;
+		watcher.EnableRaisingEvents = true;
+	}
+
+	private void OnFileChanged( object sender, FileSystemEventArgs e )
+	{
+		Log.Trace( $"File {e.FullPath} was changed" );
+	}
+
+	public T Value => managedClass!;
 
 	public static implicit operator T( LoadedAssemblyType<T> loadedAssemblyType )
 	{
-		return loadedAssemblyType.ManagedClass!;
+		return loadedAssemblyType.managedClass!;
 	}
 }

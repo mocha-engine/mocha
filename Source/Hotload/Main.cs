@@ -1,4 +1,6 @@
-﻿using Mocha.AssetCompiler;
+﻿global using static Mocha.Common.Global;
+
+using Mocha.AssetCompiler;
 using Mocha.Common;
 using System.Runtime.InteropServices;
 
@@ -14,8 +16,8 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
 	{
-		game = new LoadedAssemblyType<IGame>( "build\\Mocha.Engine.dll" );
-		editor = new LoadedAssemblyType<IGame>( "build\\Mocha.Editor.dll" );
+		game = new LoadedAssemblyType<IGame>( "build\\Mocha.Engine.dll", "source\\Engine" );
+		editor = new LoadedAssemblyType<IGame>( "build\\Mocha.Editor.dll", "source\\Editor" );
 
 		// Convert args to structure so we can use the function pointers
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
