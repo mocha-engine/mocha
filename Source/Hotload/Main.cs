@@ -16,11 +16,27 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
 	{
-		game = new LoadedAssemblyType<IGame>( "build\\Mocha.Engine.dll", "source\\Engine" );
-		editor = new LoadedAssemblyType<IGame>( "build\\Mocha.Editor.dll", "source\\Editor" );
+		Microsoft.Build.Locator.MSBuildLocator.RegisterDefaults();
 
 		// Convert args to structure so we can use the function pointers
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
+
+		var gameAssemblyInfo = new LoadedAssemblyInfo()
+		{
+			AssemblyName = "Mocha.Engine",
+			ProjectPath = "source\\Engine\\Engine.csproj",
+			SourceRoot = "source\\Engine",
+		};
+
+		var editorAssemblyInfo = new LoadedAssemblyInfo()
+		{
+			AssemblyName = "Mocha.Editor",
+			ProjectPath = "source\\Editor\\Editor.csproj",
+			SourceRoot = "source\\Editor",
+		};
+
+		game = new LoadedAssemblyType<IGame>( gameAssemblyInfo );
+		editor = new LoadedAssemblyType<IGame>( editorAssemblyInfo );
 
 		InitFileSystem();
 
