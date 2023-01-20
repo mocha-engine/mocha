@@ -20,7 +20,6 @@
 	  <ProjectReference Include="..\Common\Common.csproj">
 	    <Private>False</Private>
 	  </ProjectReference>
-	  <ProjectReference Include="..\Editor\Editor.csproj" />
 	</ItemGroup>
 
 </Project>
