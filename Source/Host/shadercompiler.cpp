@@ -163,8 +163,8 @@ bool ShaderCompiler::Compile( const ShaderType shader_type, const char* pshader,
 
 	if ( !shader.parse( &builtInResources, 460, false, messages ) )
 	{
-		puts( shader.getInfoLog() );
-		puts( shader.getInfoDebugLog() );
+		spdlog::error( shader.getInfoLog() );
+		spdlog::error( shader.getInfoDebugLog() );
 		return false; // something didn't work
 	}
 
@@ -172,9 +172,8 @@ bool ShaderCompiler::Compile( const ShaderType shader_type, const char* pshader,
 
 	if ( !program.link( messages ) )
 	{
-		puts( shader.getInfoLog() );
-		puts( shader.getInfoDebugLog() );
-		fflush( stdout );
+		spdlog::error( shader.getInfoLog() );
+		spdlog::error( shader.getInfoDebugLog() );
 		return false;
 	}
 
