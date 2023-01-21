@@ -22,12 +22,13 @@ public class BaseInspector
 		float listBoxHeight = itemCount * lineHeight;
 		listBoxHeight += 8f; // Header spacing
 
-		ImGui.BeginListBox( "##inspector_table", new Vector2( -1, listBoxHeight ) );
+		if ( ImGui.BeginListBox( "##inspector_table", new Vector2( -1, listBoxHeight ) ) )
+		{
+			ImGuiX.TextBold( title );
+			DrawTable( items );
 
-		ImGuiX.TextBold( title );
-		DrawTable( items );
-
-		ImGui.EndListBox();
+			ImGui.EndListBox();
+		}
 	}
 
 	protected void DrawButtons( string filePath )

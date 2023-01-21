@@ -174,8 +174,8 @@ public class ConsoleWindow : EditorWindow
 
 				ImGui.EndTable();
 			}
+			
+			ImGui.End();
 		}
-
-		ImGui.End();
 	}
 }

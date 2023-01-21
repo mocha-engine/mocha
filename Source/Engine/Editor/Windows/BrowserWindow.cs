@@ -124,9 +124,9 @@ internal class BrowserWindow : EditorWindow
 		if ( ImGuiX.BeginWindow( $"Inspector", ref isVisible ) )
 		{
 			Inspector?.Draw();
-		}
 
-		ImGui.End();
+			ImGui.End();
+		}
 	}
 
 	private void CacheEverything()
@@ -620,8 +620,8 @@ internal class BrowserWindow : EditorWindow
 		{
 			DrawBrowser();
 			DrawInspector();
-		}
 
-		ImGui.End();
+			ImGui.End();
+		}
 	}
 }

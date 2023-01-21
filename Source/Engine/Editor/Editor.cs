@@ -95,8 +95,8 @@ public class Editor
 			ImGui.Text( $"FPS: {Time.FPS}" );
 			ImGui.Text( $"Current time: {Time.Now}" );
 			ImGui.Text( $"Frame time: {(Time.Delta * 1000f).CeilToInt()}ms" );
-		}
 
-		ImGui.End();
+			ImGui.End();
+		}
 	}
 }

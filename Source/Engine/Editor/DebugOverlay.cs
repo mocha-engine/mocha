@@ -33,34 +33,36 @@ public static class DebugOverlay
 		ImGui.SetNextWindowPos( ImGui.GetMainViewport().WorkPos );
 		ImGui.SetNextWindowSize( ImGui.GetMainViewport().WorkSize );
 
-		ImGui.Begin( "debugoverlay", ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoTitleBar );
-		position += (Vector2)ImGui.GetWindowPos();
+		if ( ImGui.Begin( "debugoverlay", ImGuiWindowFlags.NoBackground | ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoTitleBar ) )
+		{
+			position += (Vector2)ImGui.GetWindowPos();
 
-		//
-		// Draw shadow first (under main label)
-		//
-		ImGui.SetCursorScreenPos( position + new Vector2( 1, 1 ) );
-		ImGui.PushStyleColor( ImGuiCol.Text, new Vector4( 0, 0, 0, 1 ) );
-		ImGuiX.TextMonospace( obj?.ToString() ?? "null" );
-		ImGui.PopStyleColor();
+			//
+			// Draw shadow first (under main label)
+			//
+			ImGui.SetCursorScreenPos( position + new Vector2( 1, 1 ) );
+			ImGui.PushStyleColor( ImGuiCol.Text, new Vector4( 0, 0, 0, 1 ) );
+			ImGuiX.TextMonospace( obj?.ToString() ?? "null" );
+			ImGui.PopStyleColor();
 
-		//
-		// Draw main label
-		//
-		ImGui.SetCursorScreenPos( position );
-		ImGuiX.TextMonospace( obj?.ToString() ?? "null" );
+			//
+			// Draw main label
+			//
+			ImGui.SetCursorScreenPos( position );
+			ImGuiX.TextMonospace( obj?.ToString() ?? "null" );
 
-		//
-		// Cleanup
-		//
-		ImGui.SetCursorScreenPos( System.Numerics.Vector2.Zero );
+			//
+			// Cleanup
+			//
+			ImGui.SetCursorScreenPos( System.Numerics.Vector2.Zero );
 
-		//
-		// ImGui: Submit an item to validate extent
-		// https://github.com/ocornut/imgui/releases/tag/v1.89#:~:text=Instead%2C%20please-,submit%20an%20item,-%3A%0ABegin(...)
-		//
-		ImGui.Dummy( new Vector2( 0, 0 ) );
-		ImGui.End();
+			//
+			// ImGui: Submit an item to validate extent
+			// https://github.com/ocornut/imgui/releases/tag/v1.89#:~:text=Instead%2C%20please-,submit%20an%20item,-%3A%0ABegin(...)
+			//
+			ImGui.Dummy( new Vector2( 0, 0 ) );
+			ImGui.End();
+		}
 	}
 
 	public static void Render()
