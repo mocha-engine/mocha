@@ -15,5 +15,4 @@ public static class Theme
 		vector.W = 0.20f;
 		return vector;
 	}
-
 }
