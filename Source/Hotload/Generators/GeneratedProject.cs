@@ -15,7 +15,7 @@ namespace Mocha
     /// Class to produce the template output
     /// </summary>
     
-    #line 1 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+    #line 1 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.TextTemplating", "17.0.0.0")]
     public partial class GeneratedProject : GeneratedProjectBase
     {
@@ -44,35 +44,35 @@ namespace Mocha
 
 		<Nullable>");
             
-            #line 19 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 19 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
  if ( projectManifest.Project.Nullable ) { 
             
             #line default
             #line hidden
             this.Write("enable");
             
-            #line 19 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 19 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("disable");
             
-            #line 19 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 19 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
  } 
             
             #line default
             #line hidden
             this.Write("</Nullable>\r\n\t\t<AssemblyName>");
             
-            #line 20 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 20 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(projectManifest.Name));
             
             #line default
             #line hidden
             this.Write("</AssemblyName>\r\n\t\t<RootNamespace>");
             
-            #line 21 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 21 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(projectManifest.Project.DefaultNamespace));
             
             #line default
@@ -93,21 +93,21 @@ namespace Mocha
 	<ItemGroup>
 		<Reference Include=""");
             
-            #line 35 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 35 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default
             #line hidden
             this.Write("Mocha.Common.dll\" />\r\n\t\t<Reference Include=\"");
             
-            #line 36 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 36 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default
             #line hidden
             this.Write("Mocha.Engine.dll\" />\r\n\t\t<Reference Include=\"");
             
-            #line 37 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 37 "F:\Projects\mocha-native\source\Hotload\Generators\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default

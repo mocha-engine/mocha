@@ -43,7 +43,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="GeneratedProject.cs">
+	  <Compile Update="Generators\GeneratedProject.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
 	    <DependentUpon>GeneratedProject.tt</DependentUpon>
@@ -51,7 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="GeneratedProject.tt">
+	  <None Update="Generators\GeneratedProject.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>GeneratedProject.cs</LastGenOutput>
 	    <CustomToolNamespace>Mocha</CustomToolNamespace>
