@@ -13,7 +13,7 @@ public static class Main
 
 	private static bool hasInitialized;
 
-	private const string manifestPath = @"C:\Users\Alex\Desktop\mocha-minimal\project.json";
+	private const string manifestPath = @"Samples\mocha-minimal\project.json";
 
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )

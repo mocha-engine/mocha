@@ -1,0 +1,20 @@
+{
+    "name": "Minimal",
+    "author": "Nobody",
+    "version": "Prototype",
+    "description": "Minimal project",
+
+    "resources": {
+        "code": "code/",
+        "content": "content/"
+    },
+
+    "properties": {
+        "tickRate": 60
+    },
+
+    "project": {
+        "defaultNamespace": "Minimal",
+        "nullable": false
+    }
+}

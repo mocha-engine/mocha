@@ -4,6 +4,11 @@ namespace Mocha;
 
 partial struct ProjectManifest
 {
+	private static string GetAbsolutePath( string path, string baseDir )
+	{
+		return Path.GetFullPath( Path.Combine( baseDir, path ) );
+	}
+
 	public static ProjectManifest Load( string path )
 	{
 		if ( !File.Exists( path ) )
@@ -25,8 +30,8 @@ partial struct ProjectManifest
 		var resources = projectManifest.Resources;
 		var baseDir = Path.GetDirectoryName( path )!;
 
-		resources.Code = Path.GetFullPath( resources.Code, baseDir );
-		resources.Content = Path.GetFullPath( resources.Content, baseDir );
+		resources.Code = GetAbsolutePath( resources.Code, baseDir );
+		resources.Content = GetAbsolutePath( resources.Content, baseDir );
 		projectManifest.Resources = resources;
 
 		return projectManifest;

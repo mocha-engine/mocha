@@ -1,0 +1,35 @@
+
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>disable</ImplicitUsings>
+		<AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<Platforms>x64</Platforms>
+		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
+		<OutputPath>$(SolutionDir)..\build</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+		<PreserveCompilationReferences>true</PreserveCompilationReferences>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
+
+		<Nullable>disable</Nullable>
+		<AssemblyName>Minimal</AssemblyName>
+		<RootNamespace>Minimal</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="bin\**" />
+		<EmbeddedResource Remove="bin\**" />
+		<None Remove="bin\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include="F:\Projects\mocha-native\build\Mocha.Common.dll" />
+		<Reference Include="F:\Projects\mocha-native\build\Mocha.Engine.dll" />
+		<Reference Include="F:\Projects\mocha-native\build\Mocha.UI.dll" />
+	</ItemGroup>
+
+</Project>
