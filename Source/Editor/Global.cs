@@ -1,6 +1,10 @@
 ﻿global using Mocha.Common;
 global using Mocha.Renderer;
+global using System;
+global using System.Collections.Generic;
 global using System.ComponentModel;
+global using System.IO;
+global using System.Linq;
 global using static Mocha.Common.Global;
 global using Rotation = Mocha.Common.Rotation;
 global using Vector2 = Mocha.Common.Vector2;
