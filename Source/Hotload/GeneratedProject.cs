@@ -77,25 +77,37 @@ namespace Mocha
             
             #line default
             #line hidden
-            this.Write("</RootNamespace>\r\n\t</PropertyGroup>\r\n\r\n\t<ItemGroup>\r\n\t\t<Compile Remove=\"bin\\**\" /" +
-                    ">\r\n\t\t<EmbeddedResource Remove=\"bin\\**\" />\r\n\t\t<None Remove=\"bin\\**\" />\r\n\t</ItemGr" +
-                    "oup>\r\n\r\n\t<ItemGroup>\r\n\t\t<Reference Include=\"");
+            this.Write(@"</RootNamespace>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Using Include=""Mocha.Common.Global"" Static=""true"" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove=""bin\**"" />
+		<EmbeddedResource Remove=""bin\**"" />
+		<None Remove=""bin\**"" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Reference Include=""");
             
-            #line 31 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 35 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default
             #line hidden
             this.Write("Mocha.Common.dll\" />\r\n\t\t<Reference Include=\"");
             
-            #line 32 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 36 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default
             #line hidden
             this.Write("Mocha.Engine.dll\" />\r\n\t\t<Reference Include=\"");
             
-            #line 33 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
+            #line 37 "F:\Projects\mocha-native\source\Hotload\GeneratedProject.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(baseReferenceDir));
             
             #line default

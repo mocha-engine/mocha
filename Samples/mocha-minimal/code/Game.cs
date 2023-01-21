@@ -1,4 +1,3 @@
-global using static Mocha.Common.Global;
 using Mocha;
 using Mocha.UI;
 

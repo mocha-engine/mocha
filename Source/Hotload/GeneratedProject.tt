@@ -22,6 +22,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Using Include="Mocha.Common.Global" Static="true" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Remove="bin\**" />
 		<EmbeddedResource Remove="bin\**" />
 		<None Remove="bin\**" />
