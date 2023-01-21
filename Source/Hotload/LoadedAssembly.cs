@@ -70,6 +70,9 @@ public class LoadedAssemblyType<T>
 		// System references
 		var systemReferences = new[]
 		{
+			"mscorlib.dll",
+			"System.dll",
+
 			"System.Core.dll",
 
 			"System.ComponentModel.Primitives.dll",
@@ -81,6 +84,9 @@ public class LoadedAssemblyType<T>
 			"System.Collections.Specialized.dll",
 
 			"System.Console.dll",
+
+			"System.Data.dll",
+			"System.Diagnostics.Process.dll",
 
 			"System.IO.Compression.dll",
 			"System.IO.FileSystem.Watcher.dll",
@@ -124,21 +130,20 @@ public class LoadedAssemblyType<T>
 			"build\\Mocha.Common.dll",
 			"build\\Mocha.UI.dll",
 			"build\\VConsoleLib.dll",
+
+			// Add a reference to ImGUI too (this is for the editor project -- we should probably
+			// allow users to configure custom imports somewhere!)
+			"build\\ImGui.NET.dll",
 		} ) );
 
-		//
-		// Build usings
-		//
-		var usings = new List<string>()
+		// If this is the editor project, add a reference to Mocha.Engine
+		if ( assemblyInfo.AssemblyName == "Mocha.Editor" )
 		{
-			"Mocha",
-			"Mocha.Common",
-			"System",
-			"System.Linq",
-			"System.Collections",
-			"System.Collections.Generic",
-			"System.IO"
-		};
+			references.AddRange( CreateMetadataReferencesFromPaths( new[]
+			{
+				"build\\Mocha.Engine.dll",
+			} ) );
+		}
 
 		//
 		// Set up compiler
@@ -146,8 +151,7 @@ public class LoadedAssemblyType<T>
 		var options = new CSharpCompilationOptions( OutputKind.DynamicallyLinkedLibrary )
 			.WithAllowUnsafe( true )
 			.WithPlatform( Platform.X64 )
-			.WithConcurrentBuild( true )
-			.WithUsings( usings );
+			.WithConcurrentBuild( true );
 
 		var compilation = CSharpCompilation.Create(
 			assemblyInfo.AssemblyName,
@@ -181,8 +185,10 @@ public class LoadedAssemblyType<T>
 			}
 			else
 			{
+				Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
+
 				memoryStream.Seek( 0, SeekOrigin.Begin );
-				assembly = Assembly.Load( memoryStream.ToArray() );
+				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
 
 				LoadGameInterface();
 			}
