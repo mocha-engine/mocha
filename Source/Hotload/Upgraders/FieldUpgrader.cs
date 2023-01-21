@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 namespace Mocha.Hotload;
@@ -47,7 +48,7 @@ public class FieldUpgrader
 		foreach ( var field in fields )
 		{
 			// Check if field is a backing field and skip
-			if ( field.Name.Contains( '<' ) )
+			if ( field.GetCustomAttribute<CompilerGeneratedAttribute>() != null )
 				continue;
 
 			// Get the old value - this is what we'll copy over
