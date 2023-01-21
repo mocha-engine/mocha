@@ -187,8 +187,12 @@ public class LoadedAssemblyType<T>
 			{
 				Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
 
-				memoryStream.Seek( 0, SeekOrigin.Begin );
-				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
+				// Save result as dll file
+				var dllPath = Path.Combine( "build\\", $"{assemblyInfo.AssemblyName}.dll" );
+				File.WriteAllBytes( dllPath, memoryStream.ToArray() );
+
+				var name = AssemblyName.GetAssemblyName( dllPath );
+				assembly = AppDomain.CurrentDomain.Load( name );
 
 				LoadGameInterface();
 			}
