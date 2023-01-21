@@ -465,25 +465,27 @@ internal class BrowserWindow : EditorWindow
 				$"{FontAwesome.Cubes} AmbientCG"
 			};
 
-			ImGui.BeginListBox( "##sources", new System.Numerics.Vector2( -1, -1 ) );
+			if ( ImGui.BeginListBox( "##sources", new System.Numerics.Vector2( -1, -1 ) ) )
+			{
+				ImGuiX.TextSubheading( $"{FontAwesome.FaceGrinStars} Special" );
+				foreach ( var source in specialSources )
+					ImGuiX.TextLight( source );
 
-			ImGuiX.TextSubheading( $"{FontAwesome.FaceGrinStars} Special" );
-			foreach ( var source in specialSources )
-				ImGuiX.TextLight( source );
+				ImGuiX.Separator();
 
-			ImGuiX.Separator();
+				ImGuiX.TextSubheading( $"{FontAwesome.Folder} Local" );
+				foreach ( var source in localSources )
+					ImGuiX.TextLight( source );
 
-			ImGuiX.TextSubheading( $"{FontAwesome.Folder} Local" );
-			foreach ( var source in localSources )
-				ImGuiX.TextLight( source );
+				ImGuiX.Separator();
 
-			ImGuiX.Separator();
+				ImGuiX.TextSubheading( $"{FontAwesome.Globe} Online" );
+				foreach ( var source in onlineSources )
+					ImGuiX.TextLight( source );
 
-			ImGuiX.TextSubheading( $"{FontAwesome.Globe} Online" );
-			foreach ( var source in onlineSources )
-				ImGuiX.TextLight( source );
+				ImGui.EndListBox();
+			}
 
-			ImGui.EndListBox();
 			ImGui.EndChild();
 		}
 
