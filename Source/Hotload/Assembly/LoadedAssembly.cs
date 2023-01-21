@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Mocha.Common;
+using Mocha.Hotload;
 using System.Reflection;
 
 namespace Mocha;
@@ -185,6 +186,10 @@ public class LoadedAssemblyType<T>
 			{
 				Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
 
+				// Keep old assembly as reference. Will be destroyed once out of scope
+				var oldAssembly = assembly;
+				var oldGameInterface = managedClass;
+
 				// Unload any loaded assemblies
 				UnloadAssembly();
 
@@ -192,6 +197,13 @@ public class LoadedAssemblyType<T>
 				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
 
 				LoadGameInterface();
+
+				// Invoke upgrader to move values from oldAssembly into assembly
+				if ( oldAssembly != null && oldGameInterface != null )
+				{
+					var upgrader = new BaseUpgrader( oldAssembly, assembly );
+					upgrader.Upgrade( oldGameInterface, managedClass );
+				}
 			}
 		}
 
