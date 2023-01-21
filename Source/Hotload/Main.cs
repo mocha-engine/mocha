@@ -13,6 +13,8 @@ public static class Main
 
 	private static bool hasInitialized;
 
+	private const string manifestPath = @"C:\Users\Alex\Desktop\mocha-minimal\project.json";
+
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
 	{
@@ -21,11 +23,19 @@ public static class Main
 		// Convert args to structure so we can use the function pointers
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
 
+		var manifest = ProjectManifest.Load( manifestPath );
+		Log.Trace( $"Loading project '{manifest.Name}'" );
+
+		// Generate project
+		var projectGenerator = new ProjectGenerator();
+		var csproj = projectGenerator.GenerateProject( manifest );
+		Log.Trace( $"Generated '{csproj}'" );
+
 		var gameAssemblyInfo = new LoadedAssemblyInfo()
 		{
-			AssemblyName = "Mocha.Engine",
-			ProjectPath = "source\\Engine\\Engine.csproj",
-			SourceRoot = "source\\Engine",
+			AssemblyName = manifest.Name,
+			ProjectPath = csproj,
+			SourceRoot = manifest.Resources.Code,
 		};
 
 		var editorAssemblyInfo = new LoadedAssemblyInfo()

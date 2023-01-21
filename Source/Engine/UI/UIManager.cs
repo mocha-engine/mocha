@@ -12,7 +12,7 @@ public partial class UIManager
 
 	private string templatePath;
 
-	internal UIManager()
+	public UIManager()
 	{
 		Event.Register( this );
 		Instance = this;
@@ -58,7 +58,7 @@ public partial class UIManager
 		LoadTemplate();
 	}
 
-	internal void Render()
+	public void Render()
 	{
 		if ( !IsDirty )
 			return;

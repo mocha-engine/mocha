@@ -120,6 +120,7 @@ public class LoadedAssemblyType<T>
 		references.AddRange( CreateMetadataReferencesFromPaths( new[]
 		{
 			// TODO: Ideally shouldn't be hardcoding the paths for these here
+			"build\\Mocha.Engine.dll",
 			"build\\Mocha.Common.dll",
 			"build\\Mocha.UI.dll",
 			"build\\VConsoleLib.dll",
@@ -128,15 +129,6 @@ public class LoadedAssemblyType<T>
 			// allow users to configure custom imports somewhere!)
 			"build\\ImGui.NET.dll",
 		} ) );
-
-		// If this is the editor project, add a reference to Mocha.Engine
-		if ( assemblyInfo.AssemblyName == "Mocha.Editor" )
-		{
-			references.AddRange( CreateMetadataReferencesFromPaths( new[]
-			{
-				"build\\Mocha.Engine.dll",
-			} ) );
-		}
 
 		//
 		// Set up compiler
@@ -185,7 +177,7 @@ public class LoadedAssemblyType<T>
 				File.WriteAllBytes( dllPath, memoryStream.ToArray() );
 
 				var name = AssemblyName.GetAssemblyName( dllPath );
-				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
+				assembly = AppDomain.CurrentDomain.Load( name );
 
 				LoadGameInterface();
 			}
