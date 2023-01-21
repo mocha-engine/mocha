@@ -5,26 +5,19 @@ namespace Minimal;
 
 public class Game : BaseGame
 {
-	private UIManager ui;
+	private UIManager Hud { get; set; }
 
 	public override void Startup()
 	{
-		ui = new UIManager();
-		ui.SetTemplate( "ui/Game.html" );
-		SetupEntities();
-	}
+		// Create UI
+		Hud = new UIManager();
+		Hud.SetTemplate( "ui/Game.html" );
 
-	private void SetupEntities()
-	{
-		Log.Trace( $"Setting up entities" );
-
+		// Add level geo
 		var map = new ModelEntity( "core/models/dev/dev_map.mmdl" );
-		map.Position = new( 0.0f, 0.0f, 0.0f );
-		map.Friction = 1.0f;
-		map.Restitution = 0.0f;
-		map.Mass = 1000.0f;
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
+		// Spawn a player
 		var player = new Player();
 	}
 }
