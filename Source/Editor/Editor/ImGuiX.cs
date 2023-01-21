@@ -102,6 +102,7 @@ public static class ImGuiX
 	{
 		Glue.Editor.RenderViewDropdown();
 	}
+
 	public static string Align( string str ) => str.PadRight( 16, ' ' );
 
 	public static void DrawColoredText( string str, System.Numerics.Vector4 col, bool align = true )

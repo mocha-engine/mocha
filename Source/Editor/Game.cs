@@ -4,6 +4,7 @@ public class Game : IGame
 {
 	public void FrameUpdate()
 	{
+		DebugOverlay.Render();
 		Editor.Draw();
 	}
 

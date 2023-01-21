@@ -1,29 +1,7 @@
-﻿using Mocha.Editor;
+﻿namespace Mocha.Editor;
 
-namespace Mocha;
-
-public static class DebugOverlay
+public static partial class DebugOverlay
 {
-	struct DebugOverlayText
-	{
-		public Vector2 position;
-		public string text;
-		public float time;
-
-		public DebugOverlayText( Vector2 position, string text, float? time = null )
-		{
-			this.position = position;
-			this.text = text;
-			this.time = time ?? Time.Delta * 2;
-		}
-	}
-
-	/// <summary>
-	/// This allows us to buffer debug overlay commands in advance.
-	/// </summary>
-	private readonly static List<DebugOverlayText> screenTextList = new();
-	private static int currentLine = 0;
-
 	private static void InternalScreenText( Vector2 position, object obj )
 	{
 		//
@@ -65,6 +43,8 @@ public static class DebugOverlay
 
 	public static void Render()
 	{
+		var screenTextList = Mocha.DebugOverlay.screenTextList;
+
 		for ( int i = 0; i < screenTextList.Count; i++ )
 		{
 			var item = screenTextList[i];
@@ -74,28 +54,22 @@ public static class DebugOverlay
 			{
 				item.time -= Time.Delta;
 				screenTextList[i] = item;
-
-				if ( item.time <= 0 )
-					screenTextList.Remove( item );
 			}
 		}
 
-		currentLine = 0;
+		Mocha.DebugOverlay.currentLine = 0;
 	}
 
-	public static void ScreenText( int line, object obj )
+	public static void Clear()
 	{
-		line++;
+		var screenTextList = Mocha.DebugOverlay.screenTextList;
 
-		var lineHeight = ImGui.GetTextLineHeightWithSpacing();
-		screenTextList.Add( new( new Vector2( 32, lineHeight * line ), obj.ToString()! ) );
-	}
+		for ( int i = 0; i < screenTextList.Count; i++ )
+		{
+			var item = screenTextList[i];
 
-	public static void ScreenText( object obj )
-	{
-		currentLine++;
-
-		var lineHeight = ImGui.GetTextLineHeightWithSpacing();
-		screenTextList.Add( new( new Vector2( 32, lineHeight * currentLine ), obj.ToString()! ) );
+			if ( item.time <= 0 )
+				screenTextList.Remove( item );
+		}
 	}
 }

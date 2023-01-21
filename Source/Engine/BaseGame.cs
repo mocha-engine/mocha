@@ -22,6 +22,13 @@ public class BaseGame : IGame
 
 	public virtual void Update()
 	{
+		// HACK: Clear DebugOverlay here because doing it
+		// per-frame doesn't play nice with tick-based
+		// entries (needs fix)
+
+		DebugOverlay.screenTextList.Clear();
+		DebugOverlay.currentLine = 0;
+
 		BaseEntity.All.ToList().ForEach( entity => entity.Update() );
 	}
 
