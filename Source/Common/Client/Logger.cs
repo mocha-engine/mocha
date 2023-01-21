@@ -6,28 +6,41 @@ public class Logger
 {
 	public Action<string> OnLog;
 
-	public void Trace( object obj )
+	private string GetString( object? obj )
 	{
-		OnLog?.Invoke( obj?.ToString() );
-		Glue.LogManager.ManagedTrace( obj?.ToString() );
+		string logStr = "";
+		if ( obj != null )
+			logStr = obj.ToString()!;
+
+		return logStr;
 	}
 
-	public void Info( object obj )
+	public void Trace( object? obj )
 	{
-		OnLog?.Invoke( obj?.ToString() );
-		Glue.LogManager.ManagedInfo( obj?.ToString() );
+		string str = GetString( obj );
+		OnLog?.Invoke( str );
+		Glue.LogManager.ManagedTrace( str );
 	}
 
-	public void Warning( object obj )
+	public void Info( object? obj )
 	{
-		OnLog?.Invoke( obj?.ToString() );
-		Glue.LogManager.ManagedWarning( obj?.ToString() );
+		string str = GetString( obj );
+		OnLog?.Invoke( str );
+		Glue.LogManager.ManagedInfo( str );
 	}
 
-	public void Error( object obj )
+	public void Warning( object? obj )
 	{
-		OnLog?.Invoke( obj?.ToString() );
-		Glue.LogManager.ManagedError( obj?.ToString() );
+		string str = GetString( obj );
+		OnLog?.Invoke( str );
+		Glue.LogManager.ManagedWarning( str );
+	}
+
+	public void Error( object? obj )
+	{
+		string str = GetString( obj );
+		OnLog?.Invoke( str );
+		Glue.LogManager.ManagedError( str );
 	}
 
 	public struct LogEntry
