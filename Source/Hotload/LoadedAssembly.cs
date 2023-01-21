@@ -5,13 +5,6 @@ using System.Reflection;
 
 namespace Mocha;
 
-public struct LoadedAssemblyInfo
-{
-	public string AssemblyName;
-	public string SourceRoot;
-	public string ProjectPath;
-}
-
 public class LoadedAssemblyType<T>
 {
 	private T? managedClass;
@@ -192,7 +185,7 @@ public class LoadedAssemblyType<T>
 				File.WriteAllBytes( dllPath, memoryStream.ToArray() );
 
 				var name = AssemblyName.GetAssemblyName( dllPath );
-				assembly = AppDomain.CurrentDomain.Load( name );
+				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
 
 				LoadGameInterface();
 			}
