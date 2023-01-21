@@ -29,8 +29,10 @@ public partial class BasePropertyEditor
 	/// The Regex responsible for creating the <see ref="FormattedPropertyName"/>.
 	/// </summary>
 	/// <see href="https://stackoverflow.com/a/3216204"/>
-	[GeneratedRegex( "(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])" )]
-	protected static partial Regex FormattedPropertyNameRegex();
+	protected static Regex FormattedPropertyNameRegex()
+	{
+		return new Regex( "(?<=[A-Z])(?=[A-Z][a-z])|(?<=[^A-Z])(?=[A-Z])|(?<=[A-Za-z])(?=[^A-Za-z])" );
+	}
 
 	public BasePropertyEditor( object containingObject, PropertyInfo propertyInfo, bool readOnly )
 	{
