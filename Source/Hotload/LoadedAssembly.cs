@@ -12,11 +12,14 @@ public class LoadedAssemblyType<T>
 	private LoadedAssemblyInfo assemblyInfo;
 	private Assembly assembly;
 
+	public T? Value => managedClass;
+
 	public LoadedAssemblyType( LoadedAssemblyInfo assemblyInfo )
 	{
 		this.assemblyInfo = assemblyInfo;
 
 		CompileIntoMemory();
+		CreateFileSystemWatcher( assemblyInfo.SourceRoot );
 	}
 
 	private List<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
@@ -29,6 +32,12 @@ public class LoadedAssemblyType<T>
 		}
 
 		return references;
+	}
+
+	private void UnloadAssembly()
+	{
+		managedClass = default;
+		assembly = default;
 	}
 
 	private void CompileIntoMemory()
@@ -50,6 +59,10 @@ public class LoadedAssemblyType<T>
 			filePath = Path.Combine( assemblyInfo.SourceRoot, filePath );
 
 			var fileText = File.ReadAllText( filePath );
+
+			// Append global namespace
+			fileText = "global using static Mocha.Common.Global;\n" + fileText;
+
 			var syntaxTree = CSharpSyntaxTree.ParseText( fileText, path: filePath );
 
 			syntaxTrees.Add( syntaxTree );
@@ -172,33 +185,55 @@ public class LoadedAssemblyType<T>
 			{
 				Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
 
-				// Save result as dll file
-				var dllPath = Path.Combine( "build\\", $"{assemblyInfo.AssemblyName}.dll" );
-				File.WriteAllBytes( dllPath, memoryStream.ToArray() );
+				// Unload any loaded assemblies
+				UnloadAssembly();
 
-				var name = AssemblyName.GetAssemblyName( dllPath );
-				assembly = AppDomain.CurrentDomain.Load( name );
+				// Load from memory
+				assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
 
 				LoadGameInterface();
 			}
 		}
+
+		//
+		// Cleanup
+		//
+
+		// Unload project
+		project.ProjectCollection.UnloadProject( project );
 	}
 
 	private void LoadGameInterface()
 	{
-		// Find first type that derives from T
-		foreach ( var type in assembly.GetTypes() )
+		// Is T an interface?
+		if ( typeof( T ).IsInterface )
 		{
-			if ( type.GetInterface( typeof( T ).FullName! ) != null )
+			// Find first type that derives from interface T
+			foreach ( var type in assembly.GetTypes() )
 			{
-				managedClass = (T)Activator.CreateInstance( type )!;
-				break;
+				if ( type.GetInterface( typeof( T ).FullName! ) != null )
+				{
+					managedClass = (T)Activator.CreateInstance( type )!;
+					break;
+				}
+			}
+		}
+		else
+		{
+			// Find first type that derives from class T
+			foreach ( var type in assembly.GetTypes() )
+			{
+				if ( type.IsSubclassOf( typeof( T ) ) )
+				{
+					managedClass = (T)Activator.CreateInstance( type )!;
+					break;
+				}
 			}
 		}
 
 		if ( managedClass == null )
 		{
-			throw new Exception( "Could not find IGame implementation" );
+			throw new Exception( $"Could not find implementation of {typeof( T ).Name}" );
 		}
 	}
 
@@ -212,9 +247,8 @@ public class LoadedAssemblyType<T>
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
 		Log.Trace( $"File {e.FullPath} was changed" );
+		CompileIntoMemory();
 	}
-
-	public T Value => managedClass!;
 
 	public static implicit operator T( LoadedAssemblyType<T> loadedAssemblyType )
 	{

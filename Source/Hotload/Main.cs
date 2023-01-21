@@ -56,8 +56,8 @@ public static class Main
 
 	private static void Init()
 	{
-		editor.Value.Startup();
-		game.Value.Startup();
+		editor.Value?.Startup();
+		game.Value?.Startup();
 
 		hasInitialized = true;
 	}
@@ -70,7 +70,7 @@ public static class Main
 
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 
-		game.Value.Update();
+		game.Value?.Update();
 	}
 
 	[UnmanagedCallersOnly]
@@ -83,7 +83,7 @@ public static class Main
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
-		game.Value.FrameUpdate();
+		game.Value?.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
@@ -92,7 +92,7 @@ public static class Main
 		if ( game == null )
 			throw new Exception( "Invoke Run() first" );
 
-		editor.Value.FrameUpdate();
+		editor.Value?.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
