@@ -16,6 +16,9 @@ public class ClassUpgrader : IMemberUpgrader
 	{
 		object? oldValue = oldMember.GetValue( oldInstance );
 
+		if ( oldValue == null )
+			return;
+
 		// Create a new instance of the class WITHOUT calling the constructor
 		object newValue = FormatterServices.GetUninitializedObject( newMember.Type );
 

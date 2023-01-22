@@ -16,6 +16,9 @@ public class StructUpgrader : IMemberUpgrader
 	{
 		object? oldValue = oldMember.GetValue( oldInstance );
 
+		if ( oldValue == null )
+			return;
+
 		// Create a new instance of the struct WITHOUT calling the constructor
 		object newValue = FormatterServices.GetUninitializedObject( newMember.Type );
 
