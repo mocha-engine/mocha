@@ -485,9 +485,9 @@ internal class BrowserWindow : EditorWindow
 
 				ImGui.EndListBox();
 			}
-
-			ImGui.EndChild();
 		}
+
+		ImGui.EndChild();
 
 		ImGui.SameLine();
 
@@ -608,9 +608,9 @@ internal class BrowserWindow : EditorWindow
 
 				ImGui.EndListBox();
 			}
-
-			ImGui.EndChild();
 		}
+
+		ImGui.EndChild();
 
 		ImGui.PopStyleColor();
 

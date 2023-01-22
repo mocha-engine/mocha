@@ -90,8 +90,8 @@ public class ObjectInspector : BaseInspector
 
 				ImGuiX.Separator();
 			}
-
-			ImGui.EndChild();
 		}
+
+		ImGui.EndChild();
 	}
 }

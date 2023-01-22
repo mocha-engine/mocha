@@ -317,9 +317,9 @@ public static class ImGuiX
 
 			SetCursorPosYRelative( -8f );
 			ImGui.Text( subtext );
-
-			ImGui.EndChild();
 		}
+
+		ImGui.EndChild();
 
 		SetCursorPosXRelative( iconSize );
 	}
