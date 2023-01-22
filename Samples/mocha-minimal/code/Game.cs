@@ -89,14 +89,15 @@ public class Game : BaseGame
 		base.Update();
 
 		// These values are only set *once* but should persist between hot reloads
-		DebugOverlay.ScreenText( "Persistent values:" );
 		DebugOverlay.ScreenText( $"IntField: {IntField}" );
 		DebugOverlay.ScreenText( $"FloatField: {FloatField}" );
 		DebugOverlay.ScreenText( $"StringField: {StringField}" );
 		DebugOverlay.ScreenText( $"DateTimeField: {DateTimeField}" );
 		DebugOverlay.ScreenText( $"TimeSinceField: {TimeSinceField}" );
 		DebugOverlay.ScreenText( $"ClassField: {ClassField?.Hello}" );
-		DebugOverlay.ScreenText( $"ArrayField: {string.Join( ", ", ArrayField ?? new int[] { } )}" );
+		DebugOverlay.ScreenText( $"ArrayField: {string.Join( ", ", ArrayField ?? Array.Empty<int>() )}" );
+
+		DebugOverlay.ScreenText( "--------------------------------------------------------------------------------" );
 
 		DebugOverlay.ScreenText( $"IntProperty: {IntProperty}" );
 		DebugOverlay.ScreenText( $"FloatProperty: {FloatProperty}" );
@@ -104,6 +105,6 @@ public class Game : BaseGame
 		DebugOverlay.ScreenText( $"DateTimeProperty: {DateTimeProperty}" );
 		DebugOverlay.ScreenText( $"TimeSinceProperty: {TimeSinceProperty}" );
 		DebugOverlay.ScreenText( $"ClassProperty: {ClassProperty?.Hello}" );
-		DebugOverlay.ScreenText( $"ArrayProperty: {string.Join( ", ", ArrayProperty ?? new int[] { } )}" );
+		DebugOverlay.ScreenText( $"ArrayProperty: {string.Join( ", ", ArrayProperty ?? Array.Empty<int>() )}" );
 	}
 }
