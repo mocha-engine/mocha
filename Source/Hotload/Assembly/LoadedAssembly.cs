@@ -51,20 +51,24 @@ public class LoadedAssemblyType<T>
 		// Unload any loaded assemblies
 		UnloadAssembly();
 
-		assembly = compileResult.CompiledAssembly;
-
-		FindInterface();
+		var newAssembly = compileResult.CompiledAssembly;
+		var newInterface = CreateInterfaceFromAssembly( newAssembly );
 
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
-			Upgrader.UpgradeInstance( oldGameInterface, managedClass );
+			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 		}
+
+		// Now that everything's been upgraded, swap the new interface
+		// and assembly in
+		assembly = newAssembly;
+		managedClass = newInterface;
 
 		Common.Notify.AddNotification( $"Build successful!", $"Compiled '{assemblyInfo.AssemblyName}'!" );
 	}
 
-	private void FindInterface()
+	private T CreateInterfaceFromAssembly( Assembly assembly )
 	{
 		// Is T an interface?
 		if ( typeof( T ).IsInterface )
@@ -74,8 +78,7 @@ public class LoadedAssemblyType<T>
 			{
 				if ( type.GetInterface( typeof( T ).FullName! ) != null )
 				{
-					managedClass = (T)Activator.CreateInstance( type )!;
-					break;
+					return (T)Activator.CreateInstance( type )!;
 				}
 			}
 		}
@@ -84,6 +87,8 @@ public class LoadedAssemblyType<T>
 		{
 			throw new Exception( $"Could not find implementation of '{typeof( T ).Name}'" );
 		}
+
+		return default;
 	}
 
 	private void CreateFileSystemWatcher( string sourcePath )
