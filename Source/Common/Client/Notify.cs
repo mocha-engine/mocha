@@ -4,15 +4,17 @@ public static class Notify
 {
 	public struct Notification
 	{
-		public TimeSince Lifetime { get; set; }
+		public TimeUntil Lifetime { get; set; }
 		public string Title { get; set; }
 		public string Text { get; set; }
+
+		public const float Lifespan = 5f;
 
 		public Notification( string title, string text )
 		{
 			Title = title;
 			Text = text;
-			Lifetime = 0;
+			Lifetime = Lifespan;
 		}
 	}
 

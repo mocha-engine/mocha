@@ -30,20 +30,20 @@ public static partial class Notifications
 		for ( int i = 0; i < notifications.Length; i++ )
 		{
 			var notification = notifications[i];
-			if ( notification.Lifetime > 5 )
+			if ( notification.Lifetime < 0 )
 				continue;
 
-			float t0 = notification.Lifetime.Relative.LerpInverse( 0.5f, 0.0f );
-			float t1 = notification.Lifetime.Relative.LerpInverse( 4.5f, 5.0f );
+			float transitionTime = 0.5f;
+			float t0 = notification.Lifetime.Until.LerpInverse( Notify.Notification.Lifespan - transitionTime, Notify.Notification.Lifespan );
+			float t1 = notification.Lifetime.Until.LerpInverse( transitionTime, 0.0f );
 			float alpha = 1.0f - (t0 + t1).Clamp( 0, 1 );
 
-			t0 = EasingFunctions.InExpo( t0 );
+			t0 = EasingFunctions.InBounce( t0 );
 			float t = t0.Clamp( 0, 1 );
 
 			float xOffset = 1.0f - t;
 			var windowPivot = new System.Numerics.Vector2( xOffset, 0 );
 
-			ImGui.PushStyleColor( ImGuiCol.WindowBg, new Vector4( 0, 0, 0, 1 ) );
 			ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 1 );
 			ImGui.SetNextWindowPos( windowPos + new System.Numerics.Vector2( 0, y ), ImGuiCond.Always, windowPivot );
 			ImGui.SetNextWindowBgAlpha( 0.0f.LerpTo( 1, alpha ) );
@@ -64,7 +64,6 @@ public static partial class Notifications
 			}
 
 			ImGui.PopStyleVar();
-			ImGui.PopStyleColor();
 		}
 	}
 
