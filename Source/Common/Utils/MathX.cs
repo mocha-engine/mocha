@@ -83,4 +83,6 @@ public static class MathX
 	}
 
 	public static int CalcMipSize( int baseWidth, int mipNumber ) => (int)MathF.Max( 1, MathF.Floor( baseWidth / MathF.Pow( 2, mipNumber ) ) );
+
+	public static float Sin01( float t ) => (float)Math.Sin( t * Math.PI * 2 ) * 0.5f + 0.5f;
 }
