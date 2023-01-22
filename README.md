@@ -1,5 +1,7 @@
 <p align="center">
     <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
+    <br>
+    <a href="https://discord.gg/SDP4R6Wsza">Discord</a> • <a href="https://github.com/xezno/mocha/issues">Issues</a>
 </p>
 
 Mocha is a work-in-progress game engine that aims to (eventually) leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.

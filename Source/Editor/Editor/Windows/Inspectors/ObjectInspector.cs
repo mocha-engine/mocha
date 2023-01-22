@@ -78,17 +78,18 @@ public class ObjectInspector : BaseInspector
 		ImGuiX.Separator();
 
 		// Properties.
-		ImGui.BeginChild( "##properties", Vector2.Zero, false, ImGuiWindowFlags.AlwaysVerticalScrollbar | ImGuiWindowFlags.NoBackground );
-
-		foreach ( var (editorCategory, propertyEditors) in propertyEditors )
+		if ( ImGui.BeginChild( "##properties", Vector2.Zero, false, ImGuiWindowFlags.AlwaysVerticalScrollbar | ImGuiWindowFlags.NoBackground ) )
 		{
-			ImGuiX.TextBold( padding + editorCategory );
-			ImGuiX.Separator();
+			foreach ( var (editorCategory, propertyEditors) in propertyEditors )
+			{
+				ImGuiX.TextBold( padding + editorCategory );
+				ImGuiX.Separator();
 
-			foreach ( var propertyEditor in propertyEditors )
-				propertyEditor.Draw();
+				foreach ( var propertyEditor in propertyEditors )
+					propertyEditor.Draw();
 
-			ImGuiX.Separator();
+				ImGuiX.Separator();
+			}
 		}
 
 		ImGui.EndChild();

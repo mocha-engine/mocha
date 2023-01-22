@@ -35,9 +35,12 @@ public static class ImGuiX
 			ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar |
 			ImGuiWindowFlags.NoResize );
 
-		if ( ImGui.GetWindowViewport().ID != ImGui.GetMainViewport().ID )
+		if ( b )
 		{
-			// TODO: This window is its own thing - let's give it an icon
+			if ( ImGui.GetWindowViewport().ID != ImGui.GetMainViewport().ID )
+			{
+				// TODO: This window is its own thing - let's give it an icon
+			}
 		}
 
 		return b;
@@ -85,10 +88,13 @@ public static class ImGuiX
 
 		bool b = ImGui.Begin( name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs );
 
-		Vector2 workPos = ImGui.GetMainViewport().WorkPos;
+		if ( b )
+		{
+			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
 
-		ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
-		ImGui.SetWindowSize( new Vector2( -1, -1 ) );
+			ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
+			ImGui.SetWindowSize( new Vector2( -1, -1 ) );
+		}
 
 		return b;
 	}
@@ -312,9 +318,9 @@ public static class ImGuiX
 
 			SetCursorPosYRelative( -8f );
 			ImGui.Text( subtext );
-
-			ImGui.EndChild();
 		}
+
+		ImGui.EndChild();
 
 		SetCursorPosXRelative( iconSize );
 	}
