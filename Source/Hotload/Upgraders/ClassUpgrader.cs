@@ -5,11 +5,13 @@ namespace Mocha.Hotload;
 
 public class ClassUpgrader : IMemberUpgrader
 {
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
 		return memberInfo.IsClass();
 	}
 
+	/// <inheritdoc />
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
 		object? oldValue = oldMember.GetValue( oldInstance );

@@ -21,17 +21,30 @@ public class UpgradableMember
 		Type = type;
 	}
 
+	/// <summary>
+	/// Set the value that this member represents
+	/// </summary>
 	public void SetValue( object instance, object value )
 	{
 		Setter?.Invoke( instance, value );
 	}
 
+	/// <summary>
+	/// Get the value that this member represents
+	/// </summary>
 	public object? GetValue( object instance )
 	{
 		return Getter?.Invoke( instance );
 	}
 
 	#region "Constructors"
+
+	/// <summary>
+	/// Create an <see cref="UpgradableMember"/> given a member.
+	/// This will internally call <see cref="FromProperty(PropertyInfo)"/> or
+	/// <see cref="FromField(FieldInfo)"/> depending on the member type.
+	/// Null is returned if this cannot be made into an UpgradableMember.
+	/// </summary>
 	public static UpgradableMember? FromMember( MemberInfo memberInfo )
 	{
 		if ( memberInfo is PropertyInfo propertyInfo )
@@ -47,11 +60,17 @@ public class UpgradableMember
 		return null;
 	}
 
+	/// <summary>
+	/// Create an <see cref="UpgradableMember"/> given a field
+	/// </summary>
 	public static UpgradableMember FromField( FieldInfo fieldInfo )
 	{
 		return new( fieldInfo.GetValue, fieldInfo.SetValue, fieldInfo.FieldType );
 	}
 
+	/// <summary>
+	/// Create an <see cref="UpgradableMember"/> given a property
+	/// </summary>
 	public static UpgradableMember? FromProperty( PropertyInfo propertyInfo )
 	{
 		var getMethod = propertyInfo.GetGetMethod( true );

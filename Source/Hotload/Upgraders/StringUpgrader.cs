@@ -4,6 +4,7 @@ namespace Mocha.Hotload;
 
 public class StringUpgrader : IMemberUpgrader
 {
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
 		if ( memberInfo is PropertyInfo propertyInfo )
@@ -18,6 +19,7 @@ public class StringUpgrader : IMemberUpgrader
 		return false;
 	}
 
+	/// <inheritdoc />
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
 		object? oldValue = oldMember.GetValue( oldInstance );
