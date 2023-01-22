@@ -1,6 +1,5 @@
 #include "material.h"
 
-#include <filesystemwatcher.h>
 #include <globalvars.h>
 #include <model.h>
 #include <rendering.h>

@@ -531,9 +531,6 @@
     <ClCompile Include="pipeline.cpp">
       <Filter>Rendering\Platform\Vulkan</Filter>
     </ClCompile>
-    <ClCompile Include="filesystemwatcher.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
     <ClCompile Include="shadercompiler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -1456,9 +1453,6 @@
     </ClInclude>
     <ClInclude Include="engine.h">
       <Filter>Managed\Bindings</Filter>
-    </ClInclude>
-    <ClInclude Include="filesystemwatcher.h">
-      <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="shadercompiler.h">
       <Filter>Rendering</Filter>

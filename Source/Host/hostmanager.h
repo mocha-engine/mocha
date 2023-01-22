@@ -3,7 +3,6 @@
 #include <Windows.h>
 #include <assert.h>
 #include <coreclr_delegates.h>
-#include <filesystemwatcher.h>
 #include <generated/UnmanagedArgs.generated.h>
 #include <hostfxr.h>
 #include <iostream>
