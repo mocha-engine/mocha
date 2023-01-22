@@ -42,6 +42,9 @@ public class Game : BaseGame
 		TimeSinceField = 0f;
 		TimeSinceProperty = 0f;
 
+		ArrayField = new int[] { 1, 2, 3, 4, 5 };
+		ArrayProperty = new int[] { 1, 2, 3, 4, 5 };
+
 		ClassField = new()
 		{
 			Hello = "World"
@@ -63,11 +66,15 @@ public class Game : BaseGame
 	private DateTime DateTimeField;
 	private TimeSince TimeSinceField;
 
+	private int[] ArrayField;
+
 	private int IntProperty { get; set; }
 	private float FloatProperty { get; set; }
 	private string StringProperty { get; set; }
 	private DateTime DateTimeProperty { get; set; }
 	private TimeSince TimeSinceProperty { get; set; }
+
+	private int[] ArrayProperty { get; set; }
 
 	class TestClass
 	{
@@ -89,6 +96,7 @@ public class Game : BaseGame
 		DebugOverlay.ScreenText( $"DateTimeField: {DateTimeField}" );
 		DebugOverlay.ScreenText( $"TimeSinceField: {TimeSinceField}" );
 		DebugOverlay.ScreenText( $"ClassField: {ClassField?.Hello}" );
+		DebugOverlay.ScreenText( $"ArrayField: {string.Join( ", ", ArrayField ?? new int[] { } )}" );
 
 		DebugOverlay.ScreenText( $"IntProperty: {IntProperty}" );
 		DebugOverlay.ScreenText( $"FloatProperty: {FloatProperty}" );
@@ -96,5 +104,6 @@ public class Game : BaseGame
 		DebugOverlay.ScreenText( $"DateTimeProperty: {DateTimeProperty}" );
 		DebugOverlay.ScreenText( $"TimeSinceProperty: {TimeSinceProperty}" );
 		DebugOverlay.ScreenText( $"ClassProperty: {ClassProperty?.Hello}" );
+		DebugOverlay.ScreenText( $"ArrayProperty: {string.Join( ", ", ArrayProperty ?? new int[] { } )}" );
 	}
 }

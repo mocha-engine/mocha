@@ -20,6 +20,19 @@ public class ArrayUpgrader : IMemberUpgrader
 
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
-		// TODO
+		object? oldValue = oldMember.GetValue( oldInstance );
+
+		if ( oldValue == null )
+			return;
+
+		var oldArray = (Array)oldValue;
+		var newArray = Array.CreateInstance( newMember.Type.GetElementType()!, oldArray.Length );
+
+		for ( int i = 0; i < oldArray.Length; i++ )
+		{
+			newArray.SetValue( oldArray.GetValue( i ), i );
+		}
+
+		newMember.SetValue( newInstance, newArray );
 	}
 }
