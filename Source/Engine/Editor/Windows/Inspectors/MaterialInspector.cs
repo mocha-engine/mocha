@@ -45,26 +45,28 @@ public class MaterialInspector : BaseInspector
 		DrawButtons( material.Path );
 		ImGuiX.Separator();
 
-		ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) );
-		ImGuiX.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
-
-		if ( ImGui.BeginTable( $"##material_slots", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
+		if ( ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) ) )
 		{
-			ImGui.TableSetupColumn( "Preview", ImGuiTableColumnFlags.WidthFixed, 32f );
-			ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthFixed, 100f );
-			ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 1f );
+			ImGuiX.TextBold( $"{FontAwesome.FaceGrinStars} Material" );
 
-			foreach ( var property in material.GetType().GetProperties().Where( x => x.PropertyType == typeof( Texture ) ) )
+			if ( ImGui.BeginTable( $"##material_slots", 3, ImGuiTableFlags.PadOuterX | ImGuiTableFlags.SizingStretchProp ) )
 			{
-				var texture = property.GetValue( material ) as Texture;
+				ImGui.TableSetupColumn( "Preview", ImGuiTableColumnFlags.WidthFixed, 32f );
+				ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthFixed, 100f );
+				ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-				TextureSlot( ImGuiX.GetDisplayName( property.Name ), texture );
+				foreach ( var property in material.GetType().GetProperties().Where( x => x.PropertyType == typeof( Texture ) ) )
+				{
+					var texture = property.GetValue( material ) as Texture;
+
+					TextureSlot( ImGuiX.GetDisplayName( property.Name ), texture );
+				}
+
+				ImGui.EndTable();
 			}
 
-			ImGui.EndTable();
+			ImGui.EndListBox();
 		}
-
-		ImGui.EndListBox();
 
 		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
 		ImGuiX.Image( material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
