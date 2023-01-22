@@ -1,4 +1,5 @@
 ﻿using Mocha.Common.Serialization;
+using System.Collections.Concurrent;
 
 namespace Mocha.UI;
 
@@ -10,7 +11,7 @@ partial class Graphics
 		public Font.Data Data { get; set; }
 	}
 
-	private static Dictionary<string, CachedFont> CachedFonts { get; } = new();
+	private static ConcurrentDictionary<string, CachedFont> CachedFonts { get; } = new();
 
 	private static string GetKeyForText( string text, string fontName )
 	{
