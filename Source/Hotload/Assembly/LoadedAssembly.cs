@@ -58,8 +58,7 @@ public class LoadedAssemblyType<T>
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
-			var upgrader = new FieldUpgrader( oldAssembly, assembly );
-			upgrader.Upgrade( oldGameInterface, managedClass );
+			Upgrader.UpgradeInstance( oldGameInterface, managedClass );
 		}
 
 		Common.Notify.AddNotification( $"Build successful!", $"Compiled '{assemblyInfo.AssemblyName}'!" );

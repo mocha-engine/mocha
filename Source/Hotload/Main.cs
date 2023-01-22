@@ -18,10 +18,16 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
 	{
+		// This MUST be done before everything
 		Microsoft.Build.Locator.MSBuildLocator.RegisterDefaults();
 
-		// Convert args to structure so we can use the function pointers
+		// Convert args to structure so we can use the function pointers.
+		// This MUST be done before calling any native functions
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
+
+		// Initialize upgrader, we do this as early as possible to prevent
+		// slowdowns while the engine is running.
+		Upgrader.Init();
 
 		var manifest = ProjectManifest.Load( manifestPath );
 		Log.Trace( $"Loading project '{manifest.Name}'" );
