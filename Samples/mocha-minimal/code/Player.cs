@@ -16,7 +16,7 @@ public class Player : Mocha.Player
 
 	private void UpdateEyeTransform()
 	{
-		EyePosition = Position + Vector3.Up * PlayerHalfExtents.Z * 2f;
+		EyePosition = Position + Vector3.Up * PlayerHalfExtents.Z;
 		EyeRotation = Input.Rotation;
 	}
 

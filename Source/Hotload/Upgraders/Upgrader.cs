@@ -27,7 +27,11 @@ public static class Upgrader
 			new PrimitiveUpgrader(),
 			new StringUpgrader(),
 
-			new ClassUpgrader()
+			new ClassUpgrader(),
+
+			// We call this last because things like strings are ValueTypes, which
+			// means they are also structures, but we upgrade them differently.
+			new StructUpgrader()
 		};
 	}
 

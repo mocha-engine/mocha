@@ -25,4 +25,24 @@ internal static class MemberInfoExtensions
 
 		return false;
 	}
+
+	internal static bool IsStruct( this MemberInfo memberInfo )
+	{
+		if ( memberInfo is PropertyInfo propertyInfo )
+		{
+			return propertyInfo.PropertyType.IsValueType
+				&& !propertyInfo.PropertyType.IsSubclassOf( typeof( Delegate ) )
+				&& !propertyInfo.PropertyType.IsArray
+				&& !propertyInfo.PropertyType.IsSubclassOf( typeof( ICollection<> ) );
+		}
+		else if ( memberInfo is FieldInfo fieldInfo )
+		{
+			return fieldInfo.FieldType.IsValueType
+				&& !fieldInfo.FieldType.IsSubclassOf( typeof( Delegate ) )
+				&& !fieldInfo.FieldType.IsArray
+				&& !fieldInfo.FieldType.IsSubclassOf( typeof( ICollection<> ) );
+		}
+
+		return false;
+	}
 }

@@ -82,6 +82,11 @@ public class UpgradableMember
 		if ( setMethod == null )
 			return null;
 
+		// Some get methods (array indexers) have parameters which we don't support
+		// yet. We can't upgrade these.
+		if ( getMethod.GetParameters().Length != 0 )
+			return null;
+
 		var invokeGet = ( object instance ) => getMethod.Invoke( instance, null );
 		var invokeSet = ( object instance, object value ) =>
 		{
