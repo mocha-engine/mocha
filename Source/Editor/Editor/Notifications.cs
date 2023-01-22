@@ -60,8 +60,9 @@ public static partial class Notifications
 				ImGui.PopStyleColor();
 
 				y += ImGui.GetWindowSize().Y + 8;
-				ImGui.End();
 			}
+
+			ImGui.End();
 
 			ImGui.PopStyleVar();
 		}
