@@ -26,6 +26,7 @@ public static class Upgrader
 			new ArrayUpgrader(),
 			new PrimitiveUpgrader(),
 			new StringUpgrader(),
+			new CollectionUpgrader(),
 
 			new ClassUpgrader(),
 

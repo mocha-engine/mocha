@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections;
+using System.Reflection;
 
 namespace Mocha.Hotload;
 
@@ -41,6 +42,20 @@ internal static class MemberInfoExtensions
 				&& !fieldInfo.FieldType.IsSubclassOf( typeof( Delegate ) )
 				&& !fieldInfo.FieldType.IsArray
 				&& !fieldInfo.FieldType.IsSubclassOf( typeof( ICollection<> ) );
+		}
+
+		return false;
+	}
+
+	internal static bool IsCollection( this MemberInfo memberInfo )
+	{
+		if ( memberInfo is PropertyInfo propertyInfo )
+		{
+			return propertyInfo.PropertyType.GetInterface( nameof( ICollection ) ) != null;
+		}
+		else if ( memberInfo is FieldInfo fieldInfo )
+		{
+			return fieldInfo.FieldType.GetInterface( nameof( ICollection ) ) != null;
 		}
 
 		return false;
