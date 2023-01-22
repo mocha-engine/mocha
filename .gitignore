@@ -386,6 +386,7 @@ vcpkg_installed/
 # Auto-generated content
 [Ss]ource/Host/gitdefs.h
 cvars.json
+Samples/mocha-minimal/code/code.csproj
 
 # Content meta files
 ![Cc]ontent/**/*.meta
