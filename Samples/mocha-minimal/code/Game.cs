@@ -1,11 +1,17 @@
-using Mocha;
-using Mocha.UI;
+global using Mocha;
+global using Mocha.Common;
+global using Mocha.UI;
+global using System;
+global using System.ComponentModel;
 
 namespace Minimal;
 
 public class Game : BaseGame
 {
+	[HotloadSkip]
 	private UIManager Hud { get; set; }
+
+	private Player Player;
 
 	public override void Startup()
 	{
@@ -18,6 +24,77 @@ public class Game : BaseGame
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
 		// Spawn a player
-		var player = new Player();
+		Player = new Player();
+
+		// Set testing values
+		IntField = 0x0D06F00D;
+		IntProperty = 0x0D06F00D;
+
+		FloatField = 0.69420f;
+		FloatProperty = 0.69420f;
+
+		StringField = "Hello World!";
+		StringProperty = "Hello World!";
+
+		DateTimeField = DateTime.Now;
+		DateTimeProperty = DateTime.Now;
+
+		TimeSinceField = 0f;
+		TimeSinceProperty = 0f;
+
+		ClassField = new()
+		{
+			Hello = "World"
+		};
+
+		ClassProperty = new()
+		{
+			Hello = "World"
+		};
+	}
+
+	//
+	// These are assigned to in Startup(), which is only called when the
+	// game starts
+	//
+	private int IntField;
+	private float FloatField;
+	private string StringField;
+	private DateTime DateTimeField;
+	private TimeSince TimeSinceField;
+
+	private int IntProperty { get; set; }
+	private float FloatProperty { get; set; }
+	private string StringProperty { get; set; }
+	private DateTime DateTimeProperty { get; set; }
+	private TimeSince TimeSinceProperty { get; set; }
+
+	class TestClass
+	{
+		public string Hello;
+	}
+
+	private TestClass ClassField;
+	private TestClass ClassProperty { get; set; }
+
+	public override void Update()
+	{
+		base.Update();
+
+		// These values are only set *once* but should persist between hot reloads
+		DebugOverlay.ScreenText( "Persistent values:" );
+		DebugOverlay.ScreenText( $"IntField: {IntField}" );
+		DebugOverlay.ScreenText( $"FloatField: {FloatField}" );
+		DebugOverlay.ScreenText( $"StringField: {StringField}" );
+		DebugOverlay.ScreenText( $"DateTimeField: {DateTimeField}" );
+		DebugOverlay.ScreenText( $"TimeSinceField: {TimeSinceField}" );
+		DebugOverlay.ScreenText( $"ClassField: {ClassField?.Hello}" );
+
+		DebugOverlay.ScreenText( $"IntProperty: {IntProperty}" );
+		DebugOverlay.ScreenText( $"FloatProperty: {FloatProperty}" );
+		DebugOverlay.ScreenText( $"StringProperty: {StringProperty}" );
+		DebugOverlay.ScreenText( $"DateTimeProperty: {DateTimeProperty}" );
+		DebugOverlay.ScreenText( $"TimeSinceProperty: {TimeSinceProperty}" );
+		DebugOverlay.ScreenText( $"ClassProperty: {ClassProperty?.Hello}" );
 	}
 }

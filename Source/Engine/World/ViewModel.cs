@@ -85,8 +85,8 @@ public class ViewModel : ModelEntity
 		var speed = player.Velocity.WithZ( 0 ).Length;
 		float t = speed.LerpInverse( 0, 4.0f );
 
-		if ( player.GroundEntity != null )
-			WalkBob += Time.Delta * 20.0f * t;
+		//if ( player.GroundEntity != null )
+		//	WalkBob += Time.Delta * 20.0f * t;
 
 		float factor = 0.025f;
 		TargetPosition += Bobbing.CalculateOffset( WalkBob, t, factor ) * Camera.Rotation;
@@ -97,12 +97,12 @@ public class ViewModel : ModelEntity
 	{
 		var player = Player.Local;
 
-		if ( player.WalkController.Sprinting )
-		{
-			TargetRotation *= Offsets["Sprint"].Rotation;
-			TargetPosition += Offsets["Sprint"].Position;
-			return true;
-		}
+		//if ( player.WalkController.Sprinting )
+		//{
+		//	TargetRotation *= Offsets["Sprint"].Rotation;
+		//	TargetPosition += Offsets["Sprint"].Position;
+		//	return true;
+		//}
 
 		return false;
 	}
