@@ -108,14 +108,13 @@ public static class Upgrader
 
 				upgrader.UpgradeMember( oldInstance, oldUpgradable, newInstance, newUpgradable );
 				wasUpgraded = true;
-				Log.Trace( $"Copied {newMember.MemberType.ToString().ToLower()} '{newMember.Name}' in '{newType.Name}'" );
 
 				break;
 			}
 
 			if ( !wasUpgraded )
 			{
-				Log.Trace( $"Don't know how to upgrade {oldMember.MemberType.ToString().ToLower()} '{oldMember.Name}' in '{oldType.Name}'" );
+				Log.Warning( $"Don't know how to upgrade {oldMember.MemberType.ToString().ToLower()} '{oldMember.Name}' in '{oldType.Name}'" );
 			}
 		}
 	}

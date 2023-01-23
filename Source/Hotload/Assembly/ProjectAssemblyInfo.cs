@@ -1,6 +1,6 @@
 ﻿namespace Mocha;
 
-public struct LoadedAssemblyInfo
+public struct ProjectAssemblyInfo
 {
 	public string AssemblyName;
 	public string SourceRoot;

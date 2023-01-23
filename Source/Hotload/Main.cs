@@ -8,8 +8,8 @@ namespace Mocha.Hotload;
 
 public static class Main
 {
-	private static LoadedAssemblyType<IGame> game;
-	private static LoadedAssemblyType<IGame> editor;
+	private static ProjectAssembly<IGame> game;
+	private static ProjectAssembly<IGame> editor;
 
 	private static bool hasInitialized;
 
@@ -37,22 +37,22 @@ public static class Main
 		var csproj = projectGenerator.GenerateProject( manifest );
 		Log.Trace( $"Generated '{csproj}'" );
 
-		var gameAssemblyInfo = new LoadedAssemblyInfo()
+		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = manifest.Name,
 			ProjectPath = csproj,
 			SourceRoot = manifest.Resources.Code,
 		};
 
-		var editorAssemblyInfo = new LoadedAssemblyInfo()
+		var editorAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = "Mocha.Editor",
 			ProjectPath = "source\\Editor\\Editor.csproj",
 			SourceRoot = "source\\Editor",
 		};
 
-		game = new LoadedAssemblyType<IGame>( gameAssemblyInfo );
-		editor = new LoadedAssemblyType<IGame>( editorAssemblyInfo );
+		game = new ProjectAssembly<IGame>( gameAssemblyInfo );
+		editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
 		InitFileSystem();
 

@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Mocha.Common;
-using System.Reflection;
 
 namespace Mocha.Hotload;
 
@@ -9,7 +8,7 @@ public struct CompileResult
 {
 	public bool WasSuccessful;
 
-	public Assembly CompiledAssembly;
+	public byte[] CompiledAssembly;
 	public string[] Errors;
 
 	public static CompileResult Failed( string[] errors )
@@ -21,12 +20,12 @@ public struct CompileResult
 		};
 	}
 
-	public static CompileResult Successful( Assembly assembly )
+	public static CompileResult Successful( byte[] compiledAssembly )
 	{
 		return new CompileResult
 		{
 			WasSuccessful = true,
-			CompiledAssembly = assembly
+			CompiledAssembly = compiledAssembly
 		};
 	}
 }
@@ -55,7 +54,7 @@ public class Compiler
 		return references;
 	}
 
-	public CompileResult Compile( LoadedAssemblyInfo assemblyInfo )
+	public CompileResult Compile( ProjectAssemblyInfo assemblyInfo )
 	{
 		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
 
@@ -200,9 +199,6 @@ public class Compiler
 		}
 
 		Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
-
-		// Load from memory
-		var assembly = AppDomain.CurrentDomain.Load( memoryStream.ToArray() );
-		return CompileResult.Successful( assembly );
+		return CompileResult.Successful( memoryStream.ToArray() );
 	}
 }

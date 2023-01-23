@@ -22,6 +22,8 @@ public class ClassUpgrader : IMemberUpgrader
 		// Create a new instance of the class WITHOUT calling the constructor
 		object newValue = FormatterServices.GetUninitializedObject( newMember.Type );
 
+		Log.Trace( $"Upgrading class '{oldMember.Type.Name}' (assembly hash {oldMember.Type.Assembly.GetHashCode()}) to '{newMember.Type.Name}' (assembly hash {newMember.Type.Assembly.GetHashCode()})" );
+
 		Upgrader.UpgradeInstance( oldValue!, newValue! );
 
 		newMember.SetValue( newInstance, newValue );

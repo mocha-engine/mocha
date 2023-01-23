@@ -5,7 +5,7 @@ namespace Mocha;
 [Title( "Entity" ), Icon( FontAwesome.VectorSquare )]
 public class BaseEntity : IEntity
 {
-	public static List<BaseEntity> All { get; set; } = new();
+	public static List<BaseEntity> All => EntityRegistry.Instance.OfType<BaseEntity>().ToList();
 
 	[HideInInspector]
 	public uint NativeHandle { get; protected set; }
@@ -55,7 +55,7 @@ public class BaseEntity : IEntity
 
 	public BaseEntity()
 	{
-		All.Add( this );
+		EntityRegistry.Instance.RegisterEntity( this );
 
 		CreateNativeEntity();
 
