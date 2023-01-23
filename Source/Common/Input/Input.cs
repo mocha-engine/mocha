@@ -17,8 +17,6 @@ public static partial class Input
 
 	public static Rotation Rotation { get; private set; } = Rotation.Identity;
 
-	private static float DegreesPerPixel = 12.0f;
-
 	public static Vector3 Direction { get; private set; }
 
 	private static bool IsKeyDown( InputButton key ) => Glue.Input.IsKeyDown( (int)key );
@@ -33,8 +31,8 @@ public static partial class Input
 		// Rotation
 		//
 		var euler = Rotation.ToEulerAngles();
-		euler.X += MouseDelta.Y * MouseSensitivity * Time.Delta * DegreesPerPixel; // Pitch
-		euler.Y += MouseDelta.X * MouseSensitivity * Time.Delta * DegreesPerPixel; // Yaw
+		euler.X += MouseDelta.Y * MouseSensitivity * Time.Delta; // Pitch
+		euler.Y += MouseDelta.X * MouseSensitivity * Time.Delta; // Yaw
 		Rotation = Rotation.From( euler.X.Clamp( -89, 89 ), euler.Y, 0 );
 
 		//
