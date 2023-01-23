@@ -106,5 +106,30 @@ public class Game : BaseGame
 		DebugOverlay.ScreenText( $"TimeSinceProperty: {TimeSinceProperty}" );
 		DebugOverlay.ScreenText( $"ClassProperty: {ClassProperty?.Hello}" );
 		DebugOverlay.ScreenText( $"ArrayProperty: {string.Join( ", ", ArrayProperty ?? Array.Empty<int>() )}" );
+
+		DebugOverlay.ScreenText( "--------------------------------------------------------------------------------" );
+
+		DebugOverlay.ScreenText( "Loaded Assemblies:" );
+
+		foreach ( var assembly in AppDomain.CurrentDomain.GetAssemblies() )
+		{
+			if ( !assembly.FullName.Contains( "Mocha" ) && !assembly.FullName.Contains( "Minimal" ) )
+				continue;
+
+			DebugOverlay.ScreenText( $"- {assembly.FullName}, hash {assembly.GetHashCode()}" );
+		}
+
+		DebugOverlay.ScreenText( "--------------------------------------------------------------------------------" );
+
+		DebugOverlay.ScreenText( "Entities:" );
+
+		foreach ( var entity in BaseEntity.All )
+		{
+			DebugOverlay.ScreenText( $"- {entity.Name} from assembly {entity.GetType().Assembly.GetHashCode()}" );
+		}
+
+		DebugOverlay.ScreenText( "--------------------------------------------------------------------------------" );
+
+		DebugOverlay.ScreenText( $"Minimal assembly hash: {ClassProperty.GetType().Assembly.GetHashCode()}" );
 	}
 }
