@@ -174,7 +174,10 @@ bool Window::Update()
 			inputState.mousePosition = { ( float )mme.x, ( float )mme.y };
 
 			if ( m_captureMouse )
-				inputState.mouseDelta = { ( float )mme.xrel, ( float )mme.yrel };
+			{
+				inputState.mouseDelta.x += ( float )mme.xrel;
+				inputState.mouseDelta.y += ( float )mme.yrel;
+			}
 		}
 
 #ifdef _IMGUI
