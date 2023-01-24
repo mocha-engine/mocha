@@ -537,7 +537,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 	vkb::InstanceBuilder builder;
 	vkb::Instance vkbInstance;
 
-	auto ret = builder.set_app_name( GameSettings::Get()->name.c_str() )
+	auto ret = builder.set_app_name( g_projectManager->GetProject().name.c_str() )
 	               .set_engine_name( ENGINE_NAME )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
@@ -1500,7 +1500,7 @@ RenderStatus VulkanRenderContext::BindRenderTarget( RenderTexture rt )
 	}
 
 	std::shared_ptr<VulkanRenderTexture> renderTexture = m_renderTextures.Get( rt.m_handle );
-	
+
 	// Transition to VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL
 	VkImageMemoryBarrier startRenderImageMemoryBarrier = VKInit::ImageMemoryBarrier( VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
 	    VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL, renderTexture->image );
@@ -1725,7 +1725,8 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
-RenderStatus VulkanShader::LoadShaderModule( std::vector<uint32_t> shaderData, ShaderType shaderType, VkShaderModule* outShaderModule )
+RenderStatus VulkanShader::LoadShaderModule(
+    std::vector<uint32_t> shaderData, ShaderType shaderType, VkShaderModule* outShaderModule )
 {
 	VkDevice device = m_parent->m_device;
 

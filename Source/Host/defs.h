@@ -1,6 +1,5 @@
 #pragma once
 #include <cvarmanager.h>
-#include <gamesettings.h>
 #include <gitdefs.h>
 
 // clang-format off
@@ -55,6 +54,7 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 //
 namespace EngineProperties
 {
+	extern StringCVar LoadedProject;
 	extern BoolCVar Raytracing;
 	extern BoolCVar Renderdoc;
 };
@@ -64,7 +64,7 @@ namespace EngineProperties
 //
 #define ENGINE_NAME						"Mocha"
 #define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define WINDOW_TITLE					std::string( GameSettings::Get()->name + " [" + GameSettings::Get()->milestone + "] - " GAME_VERSION ).c_str()
+#define WINDOW_TITLE					std::string( g_projectManager->GetProject().name + " [" + g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
 
 //
 // Types

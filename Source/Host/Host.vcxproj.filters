@@ -528,6 +528,7 @@
     <ClCompile Include="shadercompiler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="ProjectManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modelentity.h">
@@ -1397,9 +1398,6 @@
     <ClInclude Include="thirdparty\volk\volk.h">
       <Filter>Thirdparty\Volk</Filter>
     </ClInclude>
-    <ClInclude Include="gamesettings.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="vulkanrendercontext.h">
       <Filter>Rendering\Platform\Vulkan</Filter>
     </ClInclude>
@@ -1448,6 +1446,8 @@
     <ClInclude Include="shadercompiler.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="projectmanifest.h" />
+    <ClInclude Include="ProjectManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

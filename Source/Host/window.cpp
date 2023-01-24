@@ -2,9 +2,9 @@
 
 #include <SDL2/SDL_image.h>
 #include <defs.h>
-#include <gamesettings.h>
 #include <globalvars.h>
 #include <inputmanager.h>
+#include <projectmanager.h>
 
 #ifdef _IMGUI
 #include <backends/imgui_impl_sdl.h>
@@ -32,17 +32,6 @@ Window::Window( uint32_t width, uint32_t height )
 		const char* error = SDL_GetError();
 		ErrorMessage( std::string( error ) );
 		abort();
-	}
-
-	if ( !GameSettings::Get()->icon.empty() )
-	{
-		SDL_Surface* icon;
-		icon = IMG_Load( GameSettings::Get()->icon.c_str() );
-		SDL_SetWindowIcon( m_window, icon );
-	}
-	else
-	{
-		spdlog::warn( "No icon provided, so not using one. Make sure GameSettings has been filled correctly." );
 	}
 }
 

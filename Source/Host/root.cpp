@@ -5,12 +5,12 @@
 #include <crtdbg.h>
 #include <defs.h>
 #include <entitymanager.h>
-#include <gamesettings.h>
 #include <globalvars.h>
 #include <hostmanager.h>
 #include <inputmanager.h>
 #include <logmanager.h>
 #include <physicsmanager.h>
+#include <projectmanager.h>
 #include <renderdocmanager.h>
 #include <rendermanager.h>
 #include <stdlib.h>
@@ -27,6 +27,7 @@ PhysicsManager* g_physicsManager;
 InputManager* g_inputManager;
 BaseRenderContext* g_renderContext; // TODO: Remove
 CVarManager* g_cvarManager;
+ProjectManager* g_projectManager;
 
 float g_curTime;
 float g_frameTime;
@@ -41,7 +42,8 @@ RenderDebugViews g_debugView;
 
 namespace EngineProperties
 {
-	StringCVar GameConfig( "game.config", "spacegame.json", CVarFlags::Archive, "Which game config should we use?" );
+	StringCVar LoadedProject(
+	    "project.current", "Samples\\mocha-minimal\\project.json", CVarFlags::Archive, "Which project should we load?" );
 	BoolCVar Raytracing( "render.raytracing", true, CVarFlags::Archive, "Enable raytracing" );
 	BoolCVar Renderdoc( "render.renderdoc", false, CVarFlags::Archive, "Enable renderdoc" );
 } // namespace EngineProperties
@@ -50,9 +52,12 @@ void Root::Startup()
 {
 	g_logManager = new LogManager();
 	g_logManager->Startup();
-	
+
 	g_cvarManager = new CVarManager();
 	g_cvarManager->Startup();
+
+	g_projectManager = new ProjectManager();
+	g_projectManager->Startup();
 
 	g_renderdocManager = new RenderdocManager();
 	g_renderdocManager->Startup();
@@ -81,6 +86,7 @@ void Root::Shutdown()
 	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
 	g_renderdocManager->Shutdown();
+	g_projectManager->Shutdown();
 	g_cvarManager->Shutdown();
 	g_logManager->Shutdown();
 

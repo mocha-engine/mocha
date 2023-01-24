@@ -22,8 +22,8 @@ class EntityManager;
 class PhysicsManager;
 class InputManager;
 class BaseRenderContext;
-class GameSettings;
 class CVarManager;
+class ProjectManager;
 
 struct Vector3;
 struct Quaternion;
@@ -31,7 +31,6 @@ struct Quaternion;
 //
 // Global vars
 //
-extern GameSettings* g_gameSettings;
 extern RenderManager* g_renderManager;
 extern LogManager* g_logManager;
 extern HostManager* g_hostManager;
@@ -41,6 +40,7 @@ extern PhysicsManager* g_physicsManager;
 extern InputManager* g_inputManager;
 extern BaseRenderContext* g_renderContext;
 extern CVarManager* g_cvarManager;
+extern ProjectManager* g_projectManager;
 
 extern float g_curTime;
 extern float g_frameTime;

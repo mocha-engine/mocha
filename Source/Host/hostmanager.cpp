@@ -1,7 +1,5 @@
 #include "hostmanager.h"
 
-#include <gamesettings.h>
-
 void* HostGlobals::load_library( const char_t* path )
 {
 	HMODULE h = ::LoadLibraryW( path );
@@ -82,11 +80,9 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 
 HostManager::HostManager()
 {
-	// Convert from std::string to std::wstring
-	std::wstring basePath = std::wstring( GameSettings::Get()->managed.path.begin(), GameSettings::Get()->managed.path.end() );
-
-	std::wstring signature =
-	    std::wstring( GameSettings::Get()->managed.signature.begin(), GameSettings::Get()->managed.signature.end() );
+	// TODO: Hardcoding these might be a bad idea?
+	std::wstring basePath = L".\\build\\Mocha.Hotload";
+	std::wstring signature = L"Mocha.Hotload.Main, Mocha.Hotload";
 
 	m_dllPath = basePath + L".dll";
 	m_configPath = basePath + L".runtimeconfig.json";

@@ -8,11 +8,11 @@
 #include <defs.h>
 #include <entitymanager.h>
 #include <fontawesome.h>
-#include <gamesettings.h>
 #include <globalvars.h>
 #include <hostmanager.h>
 #include <modelentity.h>
 #include <physicsmanager.h>
+#include <projectmanager.h>
 #include <vulkanrendercontext.h>
 
 //
@@ -185,8 +185,8 @@ void RenderManager::Run()
 	bool bQuit = false;
 
 	g_hostManager->FireEvent( "Event.Game.Load" );
-	
-	double logicDelta = 1.0 / GameSettings::Get()->tickRate;
+
+	double logicDelta = 1.0 / g_projectManager->GetProject().properties.tickRate;
 
 	double currentTime = HiresTimeInSeconds();
 	double accumulator = 0.0;
