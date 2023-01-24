@@ -65,6 +65,9 @@ public class ProjectAssembly<T>
 		{
 			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 			UpgradeEntities( oldAssembly, newAssembly );
+
+			// Unregister events for old interface
+			Event.Unregister( oldGameInterface );
 		}
 
 		// Now that everything's been upgraded, swap the new interface
