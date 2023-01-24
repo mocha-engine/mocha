@@ -219,8 +219,9 @@ void RenderManager::Run()
 		while ( accumulator >= logicDelta )
 		{
 			// Assign previous transforms to all entities
-			g_entityDictionary->ForEach(
-			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
+			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+				entity->m_transformLastFrame = entity->m_transformCurrentFrame;
+			} );
 
 			g_tickTime = ( float )logicDelta;
 
@@ -238,8 +239,9 @@ void RenderManager::Run()
 			}
 
 			// Assign current transforms to all entities
-			g_entityDictionary->ForEach(
-			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
+			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+				entity->m_transformCurrentFrame = entity->m_transform;
+			} );
 
 			g_curTime += logicDelta;
 			accumulator -= logicDelta;
@@ -254,6 +256,10 @@ void RenderManager::Run()
 
 			// Assign interpolated transforms to all entities
 			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+				// If this entity was spawned in just now, don't interpolate
+				if ( entity->m_spawnTime == g_curTime )
+					return;
+
 				entity->m_transform =
 				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
 			} );

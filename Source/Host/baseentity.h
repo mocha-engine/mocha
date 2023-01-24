@@ -20,8 +20,11 @@ class Camera;
 class BaseEntity
 {
 public:
-	BaseEntity(){};
+	BaseEntity()
+	    : m_spawnTime( g_curTime ){};
 	virtual ~BaseEntity() {}
+
+	int m_spawnTime;
 
 	EntityFlags m_flags = ENTITY_NONE;
 
