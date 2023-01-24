@@ -11,8 +11,6 @@ public class Game : BaseGame
 	[HotloadSkip]
 	private UIManager Hud { get; set; }
 
-	private Player Player;
-
 	public override void Startup()
 	{
 		// Set up UI
@@ -24,7 +22,7 @@ public class Game : BaseGame
 		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
 
 		// Spawn a player
-		Player = new Player();
+		var player = new Player();
 
 		// Set testing values
 		IntField = 0x0D06F00D;

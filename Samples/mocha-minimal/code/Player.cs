@@ -35,7 +35,6 @@ public class Player : Mocha.Player
 	{
 		UpdateEyeTransform();
 
-		WalkController.Player = this;
 		WalkController.Update();
 	}
 
@@ -52,6 +51,7 @@ public class Player : Mocha.Player
 
 	private void UpdateCamera()
 	{
+
 		//
 		// Rotation
 		//
