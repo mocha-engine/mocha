@@ -132,7 +132,7 @@
 		File.WriteAllText( $"{baseDir}/Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
 	}
 
-	private static void WriteNativeIncludes( string baseDir, ref List<(string Name, Method method)> methods )
+	private static void WriteNativeIncludes( string baseDir )
 	{
 		var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
 
@@ -189,7 +189,7 @@
 		//
 		WriteManagedStruct( baseDir, ref methods );
 		WriteNativeStruct( baseDir, ref methods );
-		WriteNativeIncludes( baseDir, ref methods );
+		WriteNativeIncludes( baseDir );
 
 		// Track time & output total duration
 		var end = DateTime.Now;

@@ -125,7 +125,6 @@ public partial class ModelEntity : BaseEntity
 
 				Vector3 ReadVector3()
 				{
-					// binaryReader.ReadInt32();
 					float x = binaryReader.ReadSingle();
 					float y = binaryReader.ReadSingle();
 					float z = binaryReader.ReadSingle();
@@ -134,8 +133,6 @@ public partial class ModelEntity : BaseEntity
 
 				Vector2 ReadVector2()
 				{
-					// binaryReader.ReadInt32();
-					// binaryReader.ReadInt32();
 					float x = binaryReader.ReadSingle();
 					float y = binaryReader.ReadSingle();
 					return new Vector2( x, y );
@@ -144,11 +141,8 @@ public partial class ModelEntity : BaseEntity
 				vertex.Position = ReadVector3();
 				vertex.Normal = ReadVector3();
 				vertex.UV = ReadVector2();
-				// vertex.Tangent = ReadVector3();
-				// vertex.Bitangent = ReadVector3();
-
-				ReadVector3();
-				ReadVector3();
+				vertex.Tangent = ReadVector3();
+				vertex.Bitangent = ReadVector3();
 
 				vertices.Add( vertex );
 			}

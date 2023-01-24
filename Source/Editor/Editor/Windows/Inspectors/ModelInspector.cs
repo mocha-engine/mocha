@@ -3,7 +3,7 @@
 [Inspector<Model>]
 public class ModelInspector : BaseInspector
 {
-	private Model model;
+	private readonly Model model;
 
 	public ModelInspector( Model model )
 	{

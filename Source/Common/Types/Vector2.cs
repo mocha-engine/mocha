@@ -44,7 +44,7 @@ public struct Vector2 : IEquatable<Vector2>
 
 	}
 
-	public Vector2( float all = 0.0f ) : this( all, all )
+	public Vector2( float all ) : this( all, all )
 	{
 
 	}
@@ -112,16 +112,16 @@ public struct Vector2 : IEquatable<Vector2>
 
 	public static Vector2 Reflect( Vector2 direction, Vector2 normal ) => direction - 2f * Dot( direction, normal ) * normal;
 
-	public readonly Vector2 WithX( float x_ ) => new Vector2( x_, Y );
-	public readonly Vector2 WithY( float y_ ) => new Vector2( X, y_ );
+	public readonly Vector2 WithX( float x ) => new Vector2( x, Y );
+	public readonly Vector2 WithY( float y ) => new Vector2( X, y );
 
 	public override int GetHashCode() => HashCode.Combine( internalVector );
 
 	public override string ToString() => internalVector.ToString();
 
-	public void Deconstruct( out float X_, out float Y_ )
+	public void Deconstruct( out float x, out float y )
 	{
-		X_ = X;
-		Y_ = Y;
+		x = X;
+		y = Y;
 	}
 }

@@ -145,7 +145,7 @@ public class ConsoleWindow : EditorWindow
 
 	public override void Draw()
 	{
-		if ( ImGuiX.BeginWindow( "Console", ref isVisible ) )
+		if ( ImGuiX.BeginWindow( "Console", ref IsVisible ) )
 		{
 			if ( ImGui.BeginTable( "##console_output", 2, ImGuiTableFlags.Resizable ) )
 			{

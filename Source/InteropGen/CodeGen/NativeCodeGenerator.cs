@@ -28,20 +28,10 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 					GenerateClassCode( ref writer, c );
 			}
 
-			if ( unit is Structure s )
-			{
-				GenerateStructCode( ref writer, s );
-			}
-
 			writer.WriteLine();
 		}
 
 		return baseTextWriter.ToString();
-	}
-
-	private void GenerateStructCode( ref IndentedTextWriter writer, Structure s )
-	{
-
 	}
 
 	private void GenerateNamespaceCode( ref IndentedTextWriter writer, Class c )

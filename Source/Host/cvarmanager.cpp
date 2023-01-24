@@ -34,7 +34,9 @@ void CVarSystem::Startup()
 
 	for ( auto& [name, value] : cvarArchive.items() )
 	{
-		assert( Exists( name ) ); // Doesn't exist! Register it first
+		// If this cvar wasn't registered, we'll skip over the entry gracefully.
+		if ( !Exists( name ) )
+			continue;
 
 		size_t hash = GetHash( name );
 		CVarEntry& entry = m_cvarEntries[hash];

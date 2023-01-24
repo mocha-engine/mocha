@@ -30,7 +30,7 @@ partial class UIEntity
 		public Vector2 PanelSize { get; set; }
 		public int Flags { get; set; }
 
-		public static VertexAttribute[] VertexAttributes = new[]
+		public static readonly VertexAttribute[] VertexAttributes = new[]
 		{
 			new VertexAttribute( "position", VertexAttributeFormat.Float3 ),
 			new VertexAttribute( "texCoords", VertexAttributeFormat.Float2 ),

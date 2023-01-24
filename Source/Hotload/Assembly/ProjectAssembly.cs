@@ -8,9 +8,10 @@ namespace Mocha;
 
 public class ProjectAssembly<T>
 {
+	private readonly ProjectAssemblyInfo projectAssemblyInfo;
+
 	private T? managedClass;
 	private FileSystemWatcher watcher;
-	private ProjectAssemblyInfo projectAssemblyInfo;
 	private Assembly assembly;
 	private AssemblyLoadContext loadContext;
 

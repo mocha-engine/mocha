@@ -115,11 +115,9 @@ public class LayoutTree
 
 			void ApplyLayout( LayoutNode applyNode )
 			{
-				Rectangle initialPosition = new();
-
 				if ( applyNode.Parent != null )
 				{
-					initialPosition = applyNode.Parent.Bounds;
+					var initialPosition = applyNode.Parent.Bounds;
 
 					applyNode.Bounds = new Rectangle(
 						initialPosition.X + applyNode.YogaNode.LayoutGetLeft(),

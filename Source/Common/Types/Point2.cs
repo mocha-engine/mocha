@@ -25,7 +25,7 @@ public struct Point2
 
 	}
 
-	public Point2( int all = 0 ) : this( all, all )
+	public Point2( int all ) : this( all, all )
 	{
 
 	}

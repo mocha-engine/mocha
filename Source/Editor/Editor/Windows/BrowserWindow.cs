@@ -121,7 +121,7 @@ internal class BrowserWindow : EditorWindow
 
 	public void DrawInspector()
 	{
-		if ( ImGuiX.BeginWindow( $"Inspector", ref isVisible ) )
+		if ( ImGuiX.BeginWindow( $"Inspector", ref IsVisible ) )
 		{
 			Inspector?.Draw();
 
@@ -618,7 +618,7 @@ internal class BrowserWindow : EditorWindow
 
 	public override void Draw()
 	{
-		if ( ImGuiX.BeginWindow( "Browser", ref isVisible ) )
+		if ( ImGuiX.BeginWindow( "Browser", ref IsVisible ) )
 		{
 			DrawBrowser();
 			DrawInspector();

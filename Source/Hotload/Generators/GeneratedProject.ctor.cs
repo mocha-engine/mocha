@@ -1,8 +1,8 @@
 ﻿namespace Mocha;
 partial class GeneratedProject
 {
-	private string baseReferenceDir;
-	private ProjectManifest projectManifest;
+	private readonly string baseReferenceDir;
+	private readonly ProjectManifest projectManifest;
 
 	public GeneratedProject( string baseReferenceDir, ProjectManifest projectManifest )
 	{

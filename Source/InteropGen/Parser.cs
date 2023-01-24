@@ -149,6 +149,9 @@ public static class Parser
 						s.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) );
 						break;
 					}
+
+				default:
+					break;
 			}
 
 			return CXChildVisitResult.CXChildVisit_Recurse;

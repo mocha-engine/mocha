@@ -5,12 +5,10 @@ public class AtlasBuilder
 	private List<(Point2 Position, Texture Texture)> TextureCache { get; } = new();
 
 	public Texture Texture { get; private set; }
-
-	public Action OnBuild;
+	public Action OnBuild { get; set; }
 
 	private uint RowHeight = 0;
 	private Vector2 Cursor = new();
-
 	private const uint Size = 4096;
 
 	public AtlasBuilder()

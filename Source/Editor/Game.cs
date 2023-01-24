@@ -11,6 +11,7 @@ public class Game : IGame
 
 	public void Shutdown()
 	{
+		// Stub
 	}
 
 	public void Startup()
@@ -20,5 +21,6 @@ public class Game : IGame
 
 	public void Update()
 	{
+		// Stub
 	}
 }

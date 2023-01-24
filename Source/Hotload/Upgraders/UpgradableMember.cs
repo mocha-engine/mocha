@@ -6,13 +6,13 @@ public class UpgradableMember
 {
 	// In object: instance
 	// Out object: value
-	private Func<object, object?> Getter;
+	private readonly Func<object, object?> Getter;
 
 	// In object: instance
 	// In object: value
-	private Action<object, object> Setter;
+	private readonly Action<object, object> Setter;
 
-	public Type Type { get; private set; }
+	public Type Type { get; }
 
 	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type )
 	{

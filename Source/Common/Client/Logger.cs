@@ -4,7 +4,7 @@ namespace Mocha.Common;
 
 public class Logger
 {
-	public Action<string> OnLog;
+	public Action<string> OnLog { get; set; }
 
 	private string GetString( object? obj )
 	{

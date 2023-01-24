@@ -383,10 +383,8 @@ public static class ImGuiX
 
 		SetCursorPosXRelative( padding.X * 0.5f );
 
-		//ImGui.PushFont( Editor.Subheading );
 		ImGui.Text( icon );
 		ImGui.SameLine();
-		//ImGui.PopFont();
 
 		SetCursorPosYRelative( 4 );
 		ImGui.Text( text );

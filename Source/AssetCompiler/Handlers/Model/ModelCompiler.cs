@@ -74,7 +74,6 @@ public class ModelCompiler : BaseCompiler
 			{
 				void WriteVector3( Vector3 a )
 				{
-					// binaryWriter.Write( 0 );
 					binaryWriter.Write( a.X );
 					binaryWriter.Write( a.Y );
 					binaryWriter.Write( a.Z );
@@ -82,8 +81,6 @@ public class ModelCompiler : BaseCompiler
 
 				void WriteVector2( Vector2 a )
 				{
-					// binaryWriter.Write( 0 );
-					// binaryWriter.Write( 0 );
 					binaryWriter.Write( a.X );
 					binaryWriter.Write( a.Y );
 				}

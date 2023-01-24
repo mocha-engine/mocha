@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Common;
 
-public class Time
+public static class Time
 {
 	public static float Delta { get; internal set; }
 	public static float Now { get; internal set; }

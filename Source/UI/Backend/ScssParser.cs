@@ -87,7 +87,7 @@ class ScssParser : BaseParser
 			if ( styleAttribute.CssName == name )
 			{
 				var parseMethod = property.PropertyType.GetMethod( "ParseFrom" );
-				var parsedValue = parseMethod?.Invoke( null, new[] { value } );
+				var parsedValue = parseMethod?.Invoke( null, new string[] { value } );
 
 				property.SetValue( styleValues, parsedValue );
 				break;
