@@ -18,7 +18,7 @@ public class Float3PropertyEditor : SimplePropertyEditor
 	protected override void DrawInput()
 	{
 		var float3 = GetVector();
-		
+
 		switch ( DisplayMode )
 		{
 			case DisplayMode.Text:
