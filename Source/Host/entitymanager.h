@@ -2,8 +2,8 @@
 
 #include <baseentity.h>
 #include <functional>
-#include <mathtypes.h>
 #include <handlemap.h>
+#include <mathtypes.h>
 #include <memory>
 #include <subsystem.h>
 #include <unordered_map>
@@ -21,12 +21,12 @@ public:
 
 	template <typename T>
 	void ForEachSpecific( std::function<void( std::shared_ptr<T> entity )> func );
-	
+
 	void For( std::function<void( Handle handle, std::shared_ptr<BaseEntity> entity )> func );
 
-	void Startup() override;
+	void Startup() override{};
 
-	void Shutdown() override;
+	void Shutdown() override{};
 };
 
 template <typename T>

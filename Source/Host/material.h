@@ -4,8 +4,6 @@
 #include <texture.h>
 #include <vector>
 
-class FileSystemWatcher;
-
 struct InteropVertexAttributeInfo
 {
 	const char* name;

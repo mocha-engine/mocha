@@ -40,8 +40,6 @@ private:
 	std::wstring m_configPath;
 	std::wstring m_signature;
 
-	std::shared_ptr<FileSystemWatcher> m_fileSystemWatcher;
-
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
 
 public:

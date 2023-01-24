@@ -4,9 +4,6 @@
 
 #include <iostream>
 
-LogManager::LogManager() {}
-
-
 void LogManager::Startup()
 {
 	// Setup spdlog
@@ -25,8 +22,6 @@ void LogManager::Startup()
 	// Set pattern "time logger,8 type,8 message"
 	spdlog::set_pattern( "%H:%M:%S %-8n %^%-8l%$ %v" );
 }
-
-void LogManager::Shutdown() {}
 
 void LogManager::ManagedInfo( std::string str )
 {

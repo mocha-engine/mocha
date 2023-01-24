@@ -11,10 +11,6 @@
 
 #endif
 
-void InputManager::Startup() {}
-
-void InputManager::Shutdown() {}
-
 InputState InputManager::GetState()
 {
 	return m_inputState;

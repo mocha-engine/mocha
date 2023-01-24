@@ -21,8 +21,8 @@ private:
 	InputState m_inputState;
 
 public:
-	void Startup() override;
-	void Shutdown() override;
+	void Startup() override{};
+	void Shutdown() override{};
 
 	InputState GetState();
 	void SetState( InputState newState );

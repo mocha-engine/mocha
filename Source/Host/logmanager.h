@@ -29,10 +29,8 @@ struct LogHistory
 class LogManager : ISubSystem
 {
 public:
-	LogManager();
-
 	void Startup();
-	void Shutdown();
+	void Shutdown(){};
 
 	std::vector<LogEntryInterop> m_logHistory;
 

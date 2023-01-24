@@ -60,12 +60,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="baseentity.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="entitymanager.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
     <ClCompile Include="modelentity.cpp">
       <Filter>Entities</Filter>
     </ClCompile>
@@ -1432,9 +1426,6 @@
     </ClInclude>
     <ClInclude Include="mesh.h">
       <Filter>Rendering\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="defer.h">
-      <Filter>Misc</Filter>
     </ClInclude>
     <ClInclude Include="consolesystem.h">
       <Filter>Managed\Bindings</Filter>

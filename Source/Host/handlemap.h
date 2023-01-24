@@ -1,5 +1,4 @@
 #pragma once
-// #define DO_EMPTY_CHECKING
 
 #include <defs.h>
 #include <functional>
@@ -75,14 +74,6 @@ inline std::shared_ptr<T> HandleMap<T>::Get( Handle handle )
 	
 	std::shared_ptr<T> object = m_objects[handle];
 
-#ifdef DO_EMPTY_CHECKING
-	// Check whether the target object is valid - i.e. not empty
-	if ( object.get() == nullptr )
-	{
-		__debugbreak();
-	}
-#endif
-
 	return object;
 }
 
@@ -95,14 +86,6 @@ inline std::shared_ptr<T1> HandleMap<T>::GetSpecific( Handle handle )
 
 	std::shared_ptr<T> object = Get( handle );
 	
-#ifdef DO_EMPTY_CHECKING
-	// Check whether the target object is valid - i.e. not empty
-	if ( object.get() == nullptr )
-	{
-		__debugbreak();
-	}
-#endif
-
 	return std::dynamic_pointer_cast<T1>( object );
 }
 
