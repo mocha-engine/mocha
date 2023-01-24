@@ -1168,9 +1168,6 @@ inline bool VulkanRenderContext::CanRender()
 
 void VulkanRenderContext::RenderImGui()
 {
-	if ( m_window->GetCaptureMouse() )
-		return; // Window has mouse capture, so don't render
-
 	VkCommandBuffer cmd = m_mainContext.commandBuffer;
 
 	if ( m_isRenderPassActive )
