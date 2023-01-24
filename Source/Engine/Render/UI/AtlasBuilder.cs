@@ -1,4 +1,4 @@
-﻿namespace Mocha.UI;
+﻿namespace Mocha;
 
 public class AtlasBuilder
 {

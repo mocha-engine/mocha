@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Mocha.Renderer;
+namespace Mocha;
 
 [StructLayout( LayoutKind.Sequential )]
 public struct Vertex

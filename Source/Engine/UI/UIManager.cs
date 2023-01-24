@@ -1,4 +1,6 @@
-﻿namespace Mocha.UI;
+﻿using Mocha.UI;
+
+namespace Mocha;
 
 public partial class UIManager
 {

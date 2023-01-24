@@ -1,4 +1,5 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Hotload;
+
 partial class GeneratedProject
 {
 	private readonly string baseReferenceDir;

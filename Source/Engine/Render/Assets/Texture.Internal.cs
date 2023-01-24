@@ -1,4 +1,4 @@
-﻿namespace Mocha.Renderer;
+﻿namespace Mocha;
 
 /*
  * Generators for internal textures (missing texture etc.)

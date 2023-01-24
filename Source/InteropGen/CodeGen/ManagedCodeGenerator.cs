@@ -1,5 +1,7 @@
 ﻿using System.CodeDom.Compiler;
 
+namespace MochaTool.InteropGen;
+
 sealed class ManagedCodeGenerator : BaseCodeGenerator
 {
 	public ManagedCodeGenerator( List<IUnit> units ) : base( units )
@@ -8,7 +10,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 	private List<string> GetUsings()
 	{
-		return new() { "System.Runtime.InteropServices" };
+		return new() { "System.Runtime.InteropServices", "Mocha.Common" };
 	}
 
 	private string GetNamespace()

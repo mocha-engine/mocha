@@ -7,7 +7,7 @@
 //     the code is regenerated.
 // </auto-generated>
 // ------------------------------------------------------------------------------
-namespace Mocha
+namespace Mocha.Hotload
 {
     using System;
     

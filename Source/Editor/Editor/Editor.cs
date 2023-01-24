@@ -22,7 +22,7 @@ public class Editor
 
 		foreach ( var window in EditorWindows.ToArray() )
 		{
-			if ( window.IsVisible )
+			if ( window.isVisible )
 				window.Draw();
 		}
 	}
@@ -44,7 +44,7 @@ public class Editor
 				{
 					var displayInfo = DisplayInfo.For( window );
 					if ( ImGui.MenuItem( displayInfo.Name ) )
-						window.IsVisible = !window.IsVisible;
+						window.isVisible = !window.isVisible;
 				}
 
 				if ( ImGui.MenuItem( "Performance Overlay" ) )

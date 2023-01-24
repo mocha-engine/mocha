@@ -1,4 +1,4 @@
-﻿namespace Mocha.Renderer;
+﻿namespace Mocha;
 
 public class Asset
 {

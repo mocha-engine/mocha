@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace Mocha;
+namespace Mocha.Hotload;
 
 partial struct ProjectManifest
 {

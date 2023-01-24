@@ -1,4 +1,4 @@
-﻿namespace Mocha.AssetCompiler;
+﻿namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// Marks a <see cref="BaseCompiler"/> to handle specified file extensions.
@@ -10,7 +10,7 @@ public class HandlesAttribute : Attribute
 	/// The file extensions the compiler can handle.
 	/// </summary>
 	public string[] Extensions { get; }
-	
+
 	public HandlesAttribute( params string[] extensions )
 	{
 		Extensions = extensions;

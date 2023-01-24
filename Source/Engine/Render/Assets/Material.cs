@@ -1,6 +1,4 @@
-﻿using Mocha.Common.Serialization;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha;
 
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset

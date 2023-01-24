@@ -2,7 +2,7 @@
 
 public abstract class EditorWindow
 {
-	public bool IsVisible { get; set; } = false;
+	public bool isVisible = false;
 
 	public abstract void Draw();
 }

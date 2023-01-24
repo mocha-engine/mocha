@@ -1,6 +1,6 @@
 ﻿using Assimp;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 public static class Assimp
 {

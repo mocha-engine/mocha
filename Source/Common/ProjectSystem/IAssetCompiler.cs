@@ -1,4 +1,4 @@
-﻿namespace Mocha.AssetCompiler;
+﻿namespace Mocha.Common;
 
 public interface IAssetCompiler
 {

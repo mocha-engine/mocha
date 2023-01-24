@@ -1,7 +1,6 @@
-﻿using Mocha.Common.Serialization;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 
-namespace Mocha.UI;
+namespace Mocha;
 
 partial class Graphics
 {

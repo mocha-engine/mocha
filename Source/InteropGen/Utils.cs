@@ -1,5 +1,7 @@
 ﻿using System.CodeDom.Compiler;
 
+namespace MochaTool.InteropGen;
+
 static class Utils
 {
 	public static string GetManagedType( string nativeType )

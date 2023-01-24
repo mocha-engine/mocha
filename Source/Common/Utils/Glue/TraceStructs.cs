@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Mocha.Glue;
+namespace Mocha.Common;
 
 [StructLayout( LayoutKind.Sequential )]
 public struct TraceResult

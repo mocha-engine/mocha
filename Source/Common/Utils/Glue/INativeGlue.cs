@@ -1,4 +1,4 @@
-﻿namespace Mocha.Glue;
+﻿namespace Mocha.Common;
 
 public interface INativeGlue
 {

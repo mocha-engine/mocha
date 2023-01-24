@@ -1,7 +1,6 @@
-﻿using Mocha.Common.Serialization;
-using System.Text.Json;
+﻿using System.Text.Json;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// A compiler for .mmat material files.

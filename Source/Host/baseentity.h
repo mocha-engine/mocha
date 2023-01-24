@@ -20,7 +20,7 @@ class Camera;
 class BaseEntity
 {
 public:
-	BaseEntity();
+	BaseEntity(){};
 	virtual ~BaseEntity() {}
 
 	EntityFlags m_flags = ENTITY_NONE;

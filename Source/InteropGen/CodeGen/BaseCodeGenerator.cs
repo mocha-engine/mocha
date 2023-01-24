@@ -1,4 +1,6 @@
-﻿internal class BaseCodeGenerator
+﻿namespace MochaTool.InteropGen;
+
+internal class BaseCodeGenerator
 {
 	protected List<IUnit> Units { get; } = new();
 

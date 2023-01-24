@@ -1,8 +1,7 @@
-﻿using Mocha.Common.Serialization;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// A compiler for .mmdl model files.

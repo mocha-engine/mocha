@@ -1,4 +1,6 @@
-﻿public struct Structure : IUnit
+﻿namespace MochaTool.InteropGen;
+
+public struct Structure : IUnit
 {
 	public Structure( string name ) : this()
 	{

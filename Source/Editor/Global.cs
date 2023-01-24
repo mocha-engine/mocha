@@ -1,5 +1,4 @@
 ﻿global using Mocha.Common;
-global using Mocha.Renderer;
 global using System;
 global using System.Collections.Generic;
 global using System.ComponentModel;

@@ -1,9 +1,8 @@
-﻿using Mocha.Common.Serialization;
-using System.Text;
+﻿using System.Text;
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 [Handles( ".mshdr" )]
 public partial class ShaderCompiler : BaseCompiler

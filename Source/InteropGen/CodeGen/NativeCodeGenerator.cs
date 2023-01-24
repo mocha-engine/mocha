@@ -1,5 +1,7 @@
 ﻿using System.CodeDom.Compiler;
 
+namespace MochaTool.InteropGen;
+
 sealed class NativeCodeGenerator : BaseCodeGenerator
 {
 	public NativeCodeGenerator( List<IUnit> units ) : base( units )

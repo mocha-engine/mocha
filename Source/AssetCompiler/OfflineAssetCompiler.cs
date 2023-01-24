@@ -1,6 +1,6 @@
 ﻿global using Mocha.Common;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 public class OfflineAssetCompiler : AssetCompilerBase
 {

@@ -1,6 +1,6 @@
 ﻿using Mocha.Glue;
 
-namespace Mocha;
+namespace Mocha.Common;
 
 public static class InteropExtensions
 {

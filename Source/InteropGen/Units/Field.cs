@@ -1,4 +1,6 @@
-﻿public struct Variable
+﻿namespace MochaTool.InteropGen;
+
+public struct Variable
 {
 	public Variable( string name, string type ) : this()
 	{

@@ -1,4 +1,4 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Hotload;
 
 public struct ProjectAssemblyInfo
 {

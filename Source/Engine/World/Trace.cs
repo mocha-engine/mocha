@@ -2,8 +2,8 @@
 
 public class Cast
 {
-	readonly List<BaseEntity> IgnoredEntities = new();
-	Glue.TraceInfo info;
+	private readonly List<BaseEntity> IgnoredEntities = new();
+	private Common.TraceInfo info;
 
 	public static Cast Ray( Ray ray, float distance )
 	{

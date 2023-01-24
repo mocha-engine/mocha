@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Mocha.UI;
+namespace Mocha;
 
 partial class UIEntity
 {

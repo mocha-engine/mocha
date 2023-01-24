@@ -1,4 +1,4 @@
-﻿namespace Mocha.Common.World;
+﻿namespace Mocha.Common;
 
 public struct Transform
 {

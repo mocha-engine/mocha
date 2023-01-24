@@ -1,4 +1,4 @@
-﻿namespace Mocha;
+﻿namespace Mocha.Hotload;
 
 /// <summary>
 /// Generates a .csproj based on a given ProjectManfiest

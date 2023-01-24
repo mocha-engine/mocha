@@ -1,10 +1,9 @@
 ﻿using Mocha.Common;
-using Mocha.Hotload;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Runtime.Serialization;
 
-namespace Mocha;
+namespace Mocha.Hotload;
 
 public class ProjectAssembly<T>
 {

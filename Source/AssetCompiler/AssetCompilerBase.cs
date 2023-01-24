@@ -1,10 +1,9 @@
-﻿using Mocha.Common.Serialization;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 public class AssetCompilerBase : IAssetCompiler
 {
@@ -81,7 +80,7 @@ public class AssetCompilerBase : IAssetCompiler
 
 			if ( !File.Exists( filePath ) )
 				continue;
-			
+
 			// Add associated file and apply it to the MD5 hash.
 			var data = await File.ReadAllBytesAsync( filePath );
 			files.Add( filePathPattern, data );
@@ -122,7 +121,7 @@ public class AssetCompilerBase : IAssetCompiler
 		{
 			result = compiler.Compile( ref input );
 		}
-		catch( Exception e )
+		catch ( Exception e )
 		{
 			result = new CompileResult()
 			{

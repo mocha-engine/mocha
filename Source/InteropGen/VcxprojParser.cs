@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace InteropGen;
+namespace MochaTool.InteropGen;
 
 internal static class VcxprojParser
 {

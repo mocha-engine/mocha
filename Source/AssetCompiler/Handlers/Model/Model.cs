@@ -1,4 +1,4 @@
-﻿namespace Mocha.AssetCompiler;
+﻿namespace MochaTool.AssetCompiler;
 
 public class Model
 {

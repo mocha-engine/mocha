@@ -1,11 +1,10 @@
 ﻿using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
-using Mocha.Common.Serialization;
 using StbImageSharp;
 using System.Diagnostics;
 using System.Text.Json;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// A compiler for .png, .jpg, and .jpeg image files.

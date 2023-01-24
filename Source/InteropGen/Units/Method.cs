@@ -1,4 +1,6 @@
-﻿public struct Method
+﻿namespace MochaTool.InteropGen;
+
+public struct Method
 {
 	public Method( string name, string returnType )
 	{

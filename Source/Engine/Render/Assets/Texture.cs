@@ -1,6 +1,4 @@
-﻿using Mocha.Common.Serialization;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha;
 
 [Icon( FontAwesome.Image ), Title( "Texture" )]
 public partial class Texture : Asset

@@ -1,4 +1,6 @@
-﻿namespace Mocha.UI;
+﻿using Mocha.UI;
+
+namespace Mocha;
 
 [Icon( FontAwesome.Square ), Title( "UI" )]
 public partial class UIEntity : ModelEntity, IRenderer

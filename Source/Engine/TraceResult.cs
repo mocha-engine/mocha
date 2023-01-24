@@ -12,7 +12,7 @@ public struct TraceResult
 	public bool StartedSolid;
 	public bool EndedSolid;
 
-	public static TraceResult From( Glue.TraceResult orig )
+	public static TraceResult From( Common.TraceResult orig )
 	{
 		return new TraceResult()
 		{

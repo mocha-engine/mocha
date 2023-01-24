@@ -1,5 +1,5 @@
 ﻿using ClangSharp.Interop;
-using InteropGen;
+namespace MochaTool.InteropGen;
 
 public static class Parser
 {

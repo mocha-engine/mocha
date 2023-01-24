@@ -1,6 +1,6 @@
 ﻿using CommandLine;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 public class Options
 {
 	[Option( 'v', "verbose", Required = false, HelpText = "Set output to verbose messages." )]

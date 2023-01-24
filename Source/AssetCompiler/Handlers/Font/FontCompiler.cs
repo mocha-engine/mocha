@@ -1,8 +1,7 @@
-﻿using Mocha.Common.Serialization;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Text.Json;
 
-namespace Mocha.AssetCompiler;
+namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// A compiler for .ttf font files.

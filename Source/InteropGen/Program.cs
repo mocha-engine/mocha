@@ -1,4 +1,6 @@
-﻿public static class Program
+﻿namespace MochaTool.InteropGen;
+
+public static class Program
 {
 	internal static List<string> GeneratedPaths { get; set; } = new();
 	internal static List<IUnit> Units { get; set; } = new();
@@ -57,7 +59,7 @@
 		List<string> queue = new();
 		QueueDirectory( ref queue, baseDir );
 
-		var dispatcher = new Mocha.Common.ThreadDispatcher<string>( ( files ) =>
+		var dispatcher = new ThreadDispatcher<string>( ( files ) =>
 		{
 			foreach ( var path in files )
 			{

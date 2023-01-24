@@ -1,6 +1,6 @@
-﻿using static Mocha.UI.UIEntity;
+﻿using static Mocha.UIEntity;
 
-namespace Mocha.UI;
+namespace Mocha;
 
 public partial class UIModel : Model<UIVertex>
 {

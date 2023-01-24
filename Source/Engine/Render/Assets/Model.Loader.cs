@@ -1,6 +1,4 @@
-﻿using Mocha.Common.Serialization;
-
-namespace Mocha.Renderer;
+﻿namespace Mocha;
 
 partial class Model
 {

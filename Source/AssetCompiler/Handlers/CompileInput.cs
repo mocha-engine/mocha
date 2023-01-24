@@ -1,4 +1,4 @@
-﻿namespace Mocha.AssetCompiler;
+﻿namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// Represents an input to a asset compiler.

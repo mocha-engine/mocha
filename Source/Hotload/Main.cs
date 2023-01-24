@@ -1,7 +1,6 @@
 ﻿global using static Mocha.Common.Global;
-
-using Mocha.AssetCompiler;
 using Mocha.Common;
+using MochaTool.AssetCompiler;
 using System.Runtime.InteropServices;
 
 namespace Mocha.Hotload;

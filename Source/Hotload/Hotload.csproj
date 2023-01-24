@@ -54,7 +54,7 @@
 	  <None Update="Generators\GeneratedProject.tt">
 	    <Generator>TextTemplatingFilePreprocessor</Generator>
 	    <LastGenOutput>GeneratedProject.cs</LastGenOutput>
-	    <CustomToolNamespace>Mocha</CustomToolNamespace>
+	    <CustomToolNamespace>Mocha.Hotload</CustomToolNamespace>
 	  </None>
 	</ItemGroup>
 

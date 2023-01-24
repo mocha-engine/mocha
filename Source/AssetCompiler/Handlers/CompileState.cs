@@ -1,4 +1,4 @@
-﻿namespace Mocha.AssetCompiler;
+﻿namespace MochaTool.AssetCompiler;
 
 /// <summary>
 /// Represents an ending state of an assets compilation.
