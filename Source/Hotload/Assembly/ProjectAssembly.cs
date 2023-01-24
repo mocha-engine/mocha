@@ -36,7 +36,7 @@ public class ProjectAssembly<T>
 
 	private void CompileIntoMemory()
 	{
-		Common.Notify.AddNotification( $"Building...", $"Compiling '{projectAssemblyInfo.AssemblyName}'" );
+		Notify.AddNotification( $"Building...", $"Compiling '{projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
 		var compileResult = Compiler.Instance.Compile( projectAssemblyInfo );
 
 		if ( !compileResult.WasSuccessful )
@@ -48,7 +48,7 @@ public class ProjectAssembly<T>
 				Log.Error( error );
 			}
 
-			Common.Notify.AddNotification( $"Build failed", $"Failed to compile '{projectAssemblyInfo.AssemblyName}'\n{errorStr}" );
+			Notify.AddError( $"Build failed", $"Failed to compile '{projectAssemblyInfo.AssemblyName}'\n{errorStr}", FontAwesome.FaceSadTear );
 			return;
 		}
 
@@ -71,7 +71,8 @@ public class ProjectAssembly<T>
 		// and assembly in
 		Swap( newAssembly, newInterface );
 
-		Common.Notify.AddNotification( $"Build successful!", $"Compiled '{projectAssemblyInfo.AssemblyName}'!" );
+		Notify.AddNotification( $"Build successful!", $"Compiled '{projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
+		Event.Run( Event.Game.HotloadAttribute.Name );
 	}
 
 	private void UpgradeEntities( Assembly oldAssembly, Assembly newAssembly )
