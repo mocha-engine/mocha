@@ -10,9 +10,9 @@ public static class Theme
 	public static readonly Vector4 Gray = MathX.GetColor( "#272929" );
 	public static readonly Vector4 Transparent = MathX.GetColor( "#00000000" );
 
-	public static Vector4 ToBackground( this Vector4 vector )
+	public static Vector4 ToBackground( this Vector4 vector, float opacity = 0.2f )
 	{
-		vector.W = 0.20f;
+		vector.W = opacity;
 		return vector;
 	}
 }
