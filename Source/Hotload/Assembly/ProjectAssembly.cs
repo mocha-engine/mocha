@@ -1,4 +1,5 @@
-﻿using Mocha.Hotload;
+﻿using Mocha.Common;
+using Mocha.Hotload;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Runtime.Serialization;
@@ -141,14 +142,43 @@ public class ProjectAssembly<T>
 
 	private void CreateFileSystemWatcher( string sourcePath )
 	{
-		watcher = new FileSystemWatcher( sourcePath, "*.*" );
-		watcher.Changed += OnFileChanged;
+		watcher = new FileSystemWatcher( sourcePath, "*.cs" );
+		watcher.NotifyFilter = NotifyFilters.Attributes
+							 | NotifyFilters.CreationTime
+							 | NotifyFilters.DirectoryName
+							 | NotifyFilters.FileName
+							 | NotifyFilters.LastAccess
+							 | NotifyFilters.LastWrite
+							 | NotifyFilters.Security
+							 | NotifyFilters.Size;
+
+		// Visual Studio will create a new temporary file, write to it,
+		// delete the cs file and then rename the temporary file to
+		// match the deleted file
+		// The Renamed event will catch this nicely for us, because renaming
+		// is the last thing that happens in the order of operations
+
+		// This will typically happen twice, so we'll gate it with a TimeSince too
+		watcher.Renamed += OnFileChanged;
+		watcher.IncludeSubdirectories = true;
 		watcher.EnableRaisingEvents = true;
 	}
 
+	private TimeSince timeSinceLastChange;
+
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
-		Log.Trace( $"File {e.FullPath} was changed" );
+		Log.Trace( $"File {e.FullPath} was changed ({timeSinceLastChange})" );
+
+		// This will typically fire twice, so gate it with a TimeSince
+		if ( timeSinceLastChange < 1f )
+			return;
+
+		// This might be a directory - if it is then skip
+		if ( string.IsNullOrEmpty( Path.GetExtension( e.FullPath ) ) )
+			return;
+
+		timeSinceLastChange = 0f;
 		CompileIntoMemory();
 	}
 }
