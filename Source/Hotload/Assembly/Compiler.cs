@@ -53,7 +53,7 @@ public struct CompileResult
 
 public class Compiler
 {
-	private static string[] s_SystemReferences = new[]
+	private static string[] systemReferences = new[]
 		{
 			"mscorlib.dll",
 			"System.dll",
@@ -102,17 +102,17 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
-	private static string s_Globals = """
+	private static string globals = """
 		global using static Mocha.Common.Global;
 		""";
 
-	private static Compiler s_Instance;
+	private static Compiler instance;
 	public static Compiler Instance
 	{
 		get
 		{
-			s_Instance ??= new();
-			return s_Instance;
+			instance ??= new();
+			return instance;
 		}
 	}
 
@@ -152,7 +152,7 @@ public class Compiler
 		// For each source file, create a syntax tree we can use to compile it
 
 		// Global namespaces, etc.
-		syntaxTrees.Add( CSharpSyntaxTree.ParseText( s_Globals ) );
+		syntaxTrees.Add( CSharpSyntaxTree.ParseText( globals ) );
 
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
@@ -185,7 +185,7 @@ public class Compiler
 
 		// System references
 		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location );
-		foreach ( var systemReference in s_SystemReferences )
+		foreach ( var systemReference in systemReferences )
 		{
 			references.Add( MetadataReference.CreateFromFile( Path.Combine( dotnetBaseDir, systemReference ) ) );
 		}
