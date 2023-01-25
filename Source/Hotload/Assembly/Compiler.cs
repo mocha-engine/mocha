@@ -102,6 +102,10 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
+	private static string s_Globals = """
+		global using static Mocha.Common.Global;
+		""";
+
 	private static Compiler s_Instance;
 	public static Compiler Instance
 	{
@@ -145,6 +149,9 @@ public class Compiler
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
 
+		// Global namespaces, etc.
+		syntaxTrees.Add( CSharpSyntaxTree.ParseText( s_Globals ) );
+
 		// For each source file, create a syntax tree we can use to compile it
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
@@ -156,10 +163,6 @@ public class Compiler
 			var encoding = System.Text.Encoding.Default;
 
 			var fileText = File.ReadAllText( filePath );
-
-			// Append global namespace
-			fileText = "global using static Mocha.Common.Global;\n" + fileText;
-
 			var sourceText = SourceText.From( fileText, encoding );
 
 			var syntaxTree = CSharpSyntaxTree.ParseText( sourceText, path: filePath );
