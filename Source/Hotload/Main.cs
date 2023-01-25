@@ -7,10 +7,10 @@ namespace Mocha.Hotload;
 
 public static class Main
 {
-	private static ProjectAssembly<IGame> game;
-	private static ProjectAssembly<IGame> editor;
+	private static ProjectAssembly<IGame> s_game;
+	private static ProjectAssembly<IGame> s_editor;
 
-	private static bool hasInitialized;
+	private static bool s_hasInitialized;
 
 	private const string manifestPath = @"Samples\mocha-minimal\project.json";
 
@@ -50,54 +50,54 @@ public static class Main
 			SourceRoot = "source\\Editor",
 		};
 
-		game = new ProjectAssembly<IGame>( gameAssemblyInfo );
-		editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
+		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
+		s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
 		InitFileSystem();
 
-		if ( !hasInitialized )
+		if ( !s_hasInitialized )
 			Init();
 	}
 
 	private static void Init()
 	{
-		editor.Value?.Startup();
-		game.Value?.Startup();
+		s_editor.Value?.Startup();
+		s_game.Value?.Startup();
 
-		hasInitialized = true;
+		s_hasInitialized = true;
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Update()
 	{
-		if ( game == null )
+		if ( s_game == null )
 			throw new Exception( "Invoke Run() first" );
 
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 
-		game.Value?.Update();
+		s_game.Value?.Update();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		if ( game == null )
+		if ( s_game == null )
 			throw new Exception( "Invoke Run() first" );
 
 		Time.UpdateFrom( Glue.Engine.GetDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
-		game.Value?.FrameUpdate();
+		s_game.Value?.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		if ( game == null )
+		if ( s_game == null )
 			throw new Exception( "Invoke Run() first" );
 
-		editor.Value?.FrameUpdate();
+		s_editor.Value?.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]

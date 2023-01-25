@@ -3,7 +3,7 @@
 partial class Graphics
 {
 	internal static Texture UITexture { get; set; }
-	private static List<(Texture Texture, Vector2 Position)> TextureCache { get; } = new();
+	private static List<(Texture Texture, Vector2 Position)> s_textureCache { get; } = new();
 
 	public static void Init()
 	{

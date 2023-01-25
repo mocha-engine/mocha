@@ -117,16 +117,16 @@ public partial class Texture : Asset
 	//
 	// Texture caching
 	// TODO: This should really be handled by the C++ side, but this will do for now
-	private static Dictionary<string, Texture> CachedTextures { get; } = new();
+	private static Dictionary<string, Texture> s_cachedTextures { get; } = new();
 
 	public static Texture FromCache( string fontName )
 	{
-		if ( CachedTextures.TryGetValue( fontName, out var cachedTexture ) )
+		if ( s_cachedTextures.TryGetValue( fontName, out var cachedTexture ) )
 		{
 			return cachedTexture;
 		}
 
 		var loadedTexture = new Texture( fontName, false );
-		return CachedTextures[fontName] = loadedTexture;
+		return s_cachedTextures[fontName] = loadedTexture;
 	}
 }

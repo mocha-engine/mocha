@@ -19,17 +19,17 @@ public enum RoundingFlags
 public static partial class Graphics
 {
 	internal static UIEntity PanelRenderer { get; set; }
-	private static Dictionary<string, Texture> CachedTextures { get; } = new();
+	private static Dictionary<string, Texture> s_cachedTextures { get; } = new();
 
 	private static Texture GetTexture( string path )
 	{
-		if ( CachedTextures.TryGetValue( path, out var cachedTexture ) )
+		if ( s_cachedTextures.TryGetValue( path, out var cachedTexture ) )
 		{
 			return cachedTexture;
 		}
 
 		var texture = new Texture( path, false );
-		CachedTextures.Add( path, texture );
+		s_cachedTextures.Add( path, texture );
 
 		return texture;
 	}

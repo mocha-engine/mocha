@@ -24,7 +24,7 @@ public class ObjectInspector : BaseInspector
 	private readonly Dictionary<string, List<BasePropertyEditor>> propertyEditors;
 
 	private const int paddingSize = 4;
-	private static readonly string padding = new( ' ', paddingSize );
+	private static readonly string s_padding = new( ' ', paddingSize );
 
 	public ObjectInspector( object obj )
 	{
@@ -82,7 +82,7 @@ public class ObjectInspector : BaseInspector
 		{
 			foreach ( var (editorCategory, propertyEditors) in propertyEditors )
 			{
-				ImGuiX.TextBold( padding + editorCategory );
+				ImGuiX.TextBold( s_padding + editorCategory );
 				ImGuiX.Separator();
 
 				foreach ( var propertyEditor in propertyEditors )

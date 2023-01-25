@@ -6,7 +6,7 @@ public static class Parser
 	/// <summary>
 	/// Cached launch arguments so that we don't have to regenerate them every time
 	/// </summary>
-	private static string[] LaunchArgs = GetLaunchArgs();
+	private static string[] s_launchArgs = GetLaunchArgs();
 	private static string[] GetLaunchArgs()
 	{
 		// Generate includes from vcxproj
@@ -33,7 +33,7 @@ public static class Parser
 		List<IUnit> units = new();
 
 		using var index = CXIndex.Create();
-		using var unit = CXTranslationUnit.Parse( index, path, LaunchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
 
 		for ( int i = 0; i < unit.NumDiagnostics; ++i )
 		{

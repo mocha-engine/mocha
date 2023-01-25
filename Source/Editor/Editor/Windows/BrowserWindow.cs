@@ -35,7 +35,7 @@ internal class BrowserWindow : EditorWindow
 
 	private BaseInspector Inspector { get; set; }
 
-	private static Dictionary<Type, Type> inspectorTypeCache = new();
+	private static Dictionary<Type, Type> s_inspectorTypeCache = new();
 
 	/// <summary>
 	/// Attempts to get a suitable inspector for <see ref="objType"/>.
@@ -45,7 +45,7 @@ internal class BrowserWindow : EditorWindow
 	/// <returns>Whether or not a suitable inspector was found.</returns>
 	private static bool TryGetInspector( Type objType, [NotNullWhen( true )] out Type? type )
 	{
-		if ( inspectorTypeCache.TryGetValue( objType, out var cachedType ) )
+		if ( s_inspectorTypeCache.TryGetValue( objType, out var cachedType ) )
 		{
 			type = cachedType;
 			return true;
@@ -62,7 +62,7 @@ internal class BrowserWindow : EditorWindow
 			if ( inspector.GetCustomAttribute( inspectorType ) is null )
 				continue;
 
-			inspectorTypeCache.Add( objType, inspector );
+			s_inspectorTypeCache.Add( objType, inspector );
 
 			type = inspector;
 			return true;
@@ -72,7 +72,7 @@ internal class BrowserWindow : EditorWindow
 		{
 			var result = TryGetInspector( objType.BaseType, out var nestedInspectorType );
 			if ( result )
-				inspectorTypeCache.Add( objType, nestedInspectorType! );
+				s_inspectorTypeCache.Add( objType, nestedInspectorType! );
 
 			type = nestedInspectorType;
 			return result;

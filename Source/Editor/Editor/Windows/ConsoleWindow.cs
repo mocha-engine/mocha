@@ -9,7 +9,7 @@ public class ConsoleWindow : EditorWindow
 	// ImGUI input variables
 	//
 	private const int MaxInputLength = 512;
-	private static string currentInput = "";
+	private static string s_currentInput = "";
 
 	/// <summary>
 	/// Has the console just changed? If so, set this to true and
@@ -66,17 +66,17 @@ public class ConsoleWindow : EditorWindow
 	private void DrawInput()
 	{
 		ImGui.SetNextItemWidth( -68 );
-		bool pressed = ImGui.InputText( "##console_input", ref currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
+		bool pressed = ImGui.InputText( "##console_input", ref s_currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
 
 		ImGui.SameLine();
 		if ( ImGui.Button( "Submit" ) || pressed )
 		{
-			Log.Trace( $"> {currentInput}" );
+			Log.Trace( $"> {s_currentInput}" );
 
-			ConsoleSystem.Run( currentInput );
+			ConsoleSystem.Run( s_currentInput );
 
 			isDirty = true;
-			currentInput = "";
+			s_currentInput = "";
 		}
 	}
 

@@ -18,7 +18,7 @@ public static partial class Event
 		}
 	}
 
-	private static List<EventRef> events = new();
+	private static List<EventRef> s_events = new();
 
 	public static void Register( object obj )
 	{
@@ -26,12 +26,12 @@ public static partial class Event
 			.Where( m => m.GetCustomAttribute<EventAttribute>() != null )
 			.Select( m => new EventRef( m.GetCustomAttribute<EventAttribute>().EventName, m, obj ) );
 
-		events.AddRange( attributes );
+		s_events.AddRange( attributes );
 	}
 
 	public static void Unregister( object obj )
 	{
-		events.RemoveAll( x => x.Object == obj );
+		s_events.RemoveAll( x => x.Object == obj );
 	}
 
 	public static void RegisterStatics()
@@ -46,7 +46,7 @@ public static partial class Event
 
 	public static void Run( string name, params object[] parameters )
 	{
-		events.ForEach( e =>
+		s_events.ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, parameters );
@@ -55,7 +55,7 @@ public static partial class Event
 
 	public static void Run( string name )
 	{
-		events.ForEach( e =>
+		s_events.ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, null );

@@ -4,13 +4,13 @@ namespace Mocha.Common;
 
 public sealed class EntityRegistry : IEnumerable<IEntity>
 {
-	private static EntityRegistry? instance;
+	private static EntityRegistry? s_instance;
 	public static EntityRegistry Instance
 	{
 		get
 		{
-			instance ??= new();
-			return instance;
+			s_instance ??= new();
+			return s_instance;
 		}
 	}
 
