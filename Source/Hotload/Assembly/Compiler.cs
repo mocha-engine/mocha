@@ -1,94 +1,59 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.Emit;
+using Microsoft.CodeAnalysis.Text;
 using Mocha.Common;
 
 namespace Mocha.Hotload;
 
+public class CompileOptions
+{
+	public OptimizationLevel OptimizationLevel { get; set; }
+
+	// Does nothing with a Release optimization level
+	public bool GenerateSymbols { get; set; }
+}
+
 public struct CompileResult
 {
-	public bool WasSuccessful;
+	public readonly bool WasSuccessful;
 
-	public byte[] CompiledAssembly;
-	public string[] Errors;
+	public readonly byte[]? CompiledAssembly;
+	public readonly byte[]? CompiledAssemblySymbols;
+	public readonly string[]? Errors;
+
+	public bool HasSymbols => CompiledAssemblySymbols is not null;
+
+	private CompileResult( bool wasSuccessful, byte[]? compiledAssembly = null, byte[]? compiledAssemblySymbols = null, string[]? errors = null )
+	{
+		WasSuccessful = wasSuccessful;
+
+		CompiledAssembly = compiledAssembly;
+		CompiledAssemblySymbols = compiledAssemblySymbols;
+		Errors = errors;
+	}
 
 	public static CompileResult Failed( string[] errors )
 	{
-		return new CompileResult
-		{
-			WasSuccessful = false,
-			Errors = errors
-		};
+		return new CompileResult(
+			wasSuccessful: false,
+			errors: errors
+		);
 	}
 
-	public static CompileResult Successful( byte[] compiledAssembly )
+	public static CompileResult Successful( byte[] compiledAssembly, byte[]? compiledAssemblySymbols )
 	{
-		return new CompileResult
-		{
-			WasSuccessful = true,
-			CompiledAssembly = compiledAssembly
-		};
+		return new CompileResult(
+			wasSuccessful: true,
+			compiledAssembly: compiledAssembly,
+			compiledAssemblySymbols: compiledAssemblySymbols
+		);
 	}
 }
 
 public class Compiler
 {
-	private static Compiler instance;
-	public static Compiler Instance
-	{
-		get
-		{
-			instance ??= new();
-			return instance;
-		}
-	}
-
-	private List<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
-	{
-		var references = new List<PortableExecutableReference>();
-
-		foreach ( var path in assemblyPaths )
-		{
-			references.Add( MetadataReference.CreateFromFile( path ) );
-		}
-
-		return references;
-	}
-
-	public CompileResult Compile( ProjectAssemblyInfo assemblyInfo )
-	{
-		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
-
-		//
-		// Fetch the project and all source files
-		//
-		var project = new Microsoft.Build.Evaluation.Project( assemblyInfo.ProjectPath );
-		var syntaxTrees = new List<SyntaxTree>();
-
-		// For each source file, create a syntax tree we can use to compile it
-		foreach ( var item in project.GetItems( "Compile" ) )
-		{
-			var filePath = item.EvaluatedInclude;
-
-			// Get path based on project root
-			filePath = Path.Combine( assemblyInfo.SourceRoot, filePath );
-
-			var fileText = File.ReadAllText( filePath );
-
-			// Append global namespace
-			fileText = "global using static Mocha.Common.Global;\n" + fileText;
-
-			var syntaxTree = CSharpSyntaxTree.ParseText( fileText, path: filePath );
-
-			syntaxTrees.Add( syntaxTree );
-		}
-
-		//
-		// Build up references
-		//
-		var references = new List<PortableExecutableReference>();
-
-		// System references
-		var systemReferences = new[]
+	private static string[] systemReferences = new[]
 		{
 			"mscorlib.dll",
 			"System.dll",
@@ -137,6 +102,88 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
+	private static string globals = """
+		global using static Mocha.Common.Global;
+		""";
+
+	private static Compiler instance;
+	public static Compiler Instance
+	{
+		get
+		{
+			instance ??= new();
+			return instance;
+		}
+	}
+
+	private List<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
+	{
+		var references = new List<PortableExecutableReference>();
+
+		foreach ( var path in assemblyPaths )
+		{
+			references.Add( MetadataReference.CreateFromFile( path ) );
+		}
+
+		return references;
+	}
+
+	public CompileResult Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
+	{
+		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
+
+		if ( compileOptions is null )
+		{
+			compileOptions = new CompileOptions
+			{
+				OptimizationLevel = OptimizationLevel.Debug,
+				GenerateSymbols = true,
+			};
+		}
+
+		//
+		// Fetch the project and all source files
+		//
+		var project = new Microsoft.Build.Evaluation.Project( assemblyInfo.ProjectPath );
+
+		var syntaxTrees = new List<SyntaxTree>();
+		var embeddedTexts = new List<EmbeddedText>();
+
+		// For each source file, create a syntax tree we can use to compile it
+
+		// Global namespaces, etc.
+		syntaxTrees.Add( CSharpSyntaxTree.ParseText( globals ) );
+
+		foreach ( var item in project.GetItems( "Compile" ) )
+		{
+			var filePath = item.EvaluatedInclude;
+
+			// Get path based on project root
+			filePath = Path.Combine( assemblyInfo.SourceRoot, filePath );
+
+			var encoding = System.Text.Encoding.Default;
+
+			var fileText = File.ReadAllText( filePath );
+			var sourceText = SourceText.From( fileText, encoding );
+
+			var syntaxTree = CSharpSyntaxTree.ParseText( sourceText, path: filePath );
+
+			syntaxTrees.Add( syntaxTree );
+
+			if ( compileOptions.GenerateSymbols )
+			{
+				var embeddedText = EmbeddedText.FromSource( filePath, sourceText );
+				
+				embeddedTexts.Add( embeddedText );
+			}
+		}
+
+		//
+		// Build up references
+		//
+		var references = new List<PortableExecutableReference>();
+
+		// System references
 		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location );
 		foreach ( var systemReference in systemReferences )
 		{
@@ -160,9 +207,11 @@ public class Compiler
 		//
 		// Set up compiler
 		//
+
 		var options = new CSharpCompilationOptions( OutputKind.DynamicallyLinkedLibrary )
 			.WithAllowUnsafe( true )
 			.WithPlatform( Platform.X64 )
+			.WithOptimizationLevel( compileOptions.OptimizationLevel )
 			.WithConcurrentBuild( true );
 
 		var compilation = CSharpCompilation.Create(
@@ -178,8 +227,23 @@ public class Compiler
 		//
 		// Compile assembly into memory
 		//
-		using var memoryStream = new MemoryStream();
-		var result = compilation.Emit( memoryStream );
+		using var assemblyStream = new MemoryStream();
+		using var symbolsStream = compileOptions.GenerateSymbols ? new MemoryStream() : null;
+
+		EmitOptions? emitOptions = null;
+
+		if ( compileOptions.GenerateSymbols )
+		{
+			emitOptions = new EmitOptions(
+						debugInformationFormat: DebugInformationFormat.PortablePdb,
+						pdbFilePath: $"{assemblyInfo.AssemblyName}.pdb" );
+		}
+
+		EmitResult result = compilation.Emit(
+			assemblyStream,
+			symbolsStream,
+			options: emitOptions
+		);
 
 		if ( !result.Success )
 		{
@@ -199,6 +263,7 @@ public class Compiler
 		}
 
 		Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
-		return CompileResult.Successful( memoryStream.ToArray() );
+
+		return CompileResult.Successful( assemblyStream.ToArray(), symbolsStream?.ToArray() );
 	}
 }

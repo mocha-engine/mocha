@@ -42,9 +42,9 @@ public class ProjectAssembly<T>
 
 		if ( !compileResult.WasSuccessful )
 		{
-			var errorStr = string.Join( '\n', compileResult.Errors );
+			var errorStr = string.Join( '\n', compileResult.Errors! );
 
-			foreach ( var error in compileResult.Errors )
+			foreach ( var error in compileResult.Errors! )
 			{
 				Log.Error( error );
 			}
@@ -58,7 +58,10 @@ public class ProjectAssembly<T>
 		var oldGameInterface = managedClass;
 
 		// Load new assembly
-		var newAssembly = loadContext.LoadFromStream( new MemoryStream( compileResult.CompiledAssembly ) );
+		var assemblyStream = new MemoryStream( compileResult.CompiledAssembly! );
+		var symbolsStream = compileResult.HasSymbols ? new MemoryStream( compileResult.CompiledAssemblySymbols! ) : null;
+
+		var newAssembly = loadContext.LoadFromStream( assemblyStream, symbolsStream );
 		var newInterface = CreateInterfaceFromAssembly( newAssembly );
 
 		// Invoke upgrader to move values from oldAssembly into assembly
