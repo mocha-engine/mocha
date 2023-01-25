@@ -16,31 +16,38 @@ public class CompileOptions
 
 public struct CompileResult
 {
-	public bool WasSuccessful;
+	public readonly bool WasSuccessful;
 
-	public byte[] CompiledAssembly;
-	public byte[]? CompiledAssemblySymbols;
-	public string[] Errors;
+	public readonly byte[]? CompiledAssembly;
+	public readonly byte[]? CompiledAssemblySymbols;
+	public readonly string[]? Errors;
 
 	public bool HasSymbols => CompiledAssemblySymbols is not null;
 
+	private CompileResult( bool wasSuccessful, byte[]? compiledAssembly = null, byte[]? compiledAssemblySymbols = null, string[]? errors = null )
+	{
+		WasSuccessful = wasSuccessful;
+
+		CompiledAssembly = compiledAssembly;
+		CompiledAssemblySymbols = compiledAssemblySymbols;
+		Errors = errors;
+	}
+
 	public static CompileResult Failed( string[] errors )
 	{
-		return new CompileResult
-		{
-			WasSuccessful = false,
-			Errors = errors
-		};
+		return new CompileResult(
+			wasSuccessful: false,
+			errors: errors
+		);
 	}
 
 	public static CompileResult Successful( byte[] compiledAssembly, byte[]? compiledAssemblySymbols )
 	{
-		return new CompileResult
-		{
-			WasSuccessful = true,
-			CompiledAssembly = compiledAssembly,
-			CompiledAssemblySymbols = compiledAssemblySymbols
-		};
+		return new CompileResult(
+			wasSuccessful: true,
+			compiledAssembly: compiledAssembly,
+			compiledAssemblySymbols: compiledAssemblySymbols
+		);
 	}
 }
 
