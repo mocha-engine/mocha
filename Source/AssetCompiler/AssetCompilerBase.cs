@@ -12,7 +12,7 @@ public class AssetCompilerBase : IAssetCompiler
 	/// </summary>
 	protected List<BaseCompiler> Compilers = new();
 
-	private readonly Dictionary<string, BaseCompiler> ExtensionToCompilerCache = new();
+	private readonly Dictionary<string, BaseCompiler> _extensionToCompilerCache = new();
 
 	public AssetCompilerBase()
 	{
@@ -30,7 +30,7 @@ public class AssetCompilerBase : IAssetCompiler
 				continue;
 
 			foreach ( var extension in handleAttribute.Extensions )
-				ExtensionToCompilerCache.Add( extension, instance );
+				_extensionToCompilerCache.Add( extension, instance );
 		}
 	}
 
@@ -42,7 +42,7 @@ public class AssetCompilerBase : IAssetCompiler
 	/// <returns>Whether or not a compiler was found.</returns>
 	protected bool TryGetCompiler( string fileExtension, [NotNullWhen( true )] out BaseCompiler? foundCompiler )
 	{
-		return ExtensionToCompilerCache.TryGetValue( fileExtension, out foundCompiler );
+		return _extensionToCompilerCache.TryGetValue( fileExtension, out foundCompiler );
 	}
 
 	/// <summary>

@@ -5,17 +5,17 @@
  */
 public partial class Texture
 {
-	private static Texture? zero;
-	public static Texture Zero => zero ?? CreateZeroTexture();
+	private static Texture? s_zero;
+	public static Texture Zero => s_zero ?? CreateZeroTexture();
 
-	private static Texture? one;
-	public static Texture One => one ?? CreateOneTexture();
+	private static Texture? s_one;
+	public static Texture One => s_one ?? CreateOneTexture();
 
-	private static Texture? missingTexture;
-	public static Texture MissingTexture => missingTexture ?? CreateMissingTexture();
+	private static Texture? s_missingTexture;
+	public static Texture MissingTexture => s_missingTexture ?? CreateMissingTexture();
 
-	private static Texture? normal;
-	public static Texture Normal => normal ?? CreateNormalTexture();
+	private static Texture? s_normal;
+	public static Texture Normal => s_normal ?? CreateNormalTexture();
 
 	public static Texture CreateOneTexture()
 	{
@@ -24,8 +24,8 @@ public partial class Texture
 			255, 255, 255, 255,
 		};
 
-		one = new Texture( 1, 1, missingTextureData );
-		return one;
+		s_one = new Texture( 1, 1, missingTextureData );
+		return s_one;
 	}
 
 	public static Texture CreateZeroTexture()
@@ -35,8 +35,8 @@ public partial class Texture
 			0, 0, 0, 255,
 		};
 
-		zero = new Texture( 1, 1, missingTextureData );
-		return zero;
+		s_zero = new Texture( 1, 1, missingTextureData );
+		return s_zero;
 	}
 
 	// TODO: Change this so that the alpha is zero, and then use the vertex normal
@@ -48,8 +48,8 @@ public partial class Texture
 			0, 0, 255, 255
 		};
 
-		normal = new Texture( 1, 1, normalTextureData );
-		return normal;
+		s_normal = new Texture( 1, 1, normalTextureData );
+		return s_normal;
 	}
 
 	public static Texture CreateMissingTexture()
@@ -64,7 +64,7 @@ public partial class Texture
 		missingTextureData.AddRange( colorB );
 		missingTextureData.AddRange( colorA );
 
-		missingTexture = new Texture( 2, 2, missingTextureData.ToArray() );
-		return missingTexture;
+		s_missingTexture = new Texture( 2, 2, missingTextureData.ToArray() );
+		return s_missingTexture;
 	}
 }

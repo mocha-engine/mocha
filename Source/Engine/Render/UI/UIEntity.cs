@@ -24,8 +24,8 @@ public partial class UIEntity : ModelEntity, IRenderer
 
 	public void NewFrame()
 	{
-		Vertices.Clear();
-		RectCount = 0;
+		_vertices.Clear();
+		_rectCount = 0;
 	}
 
 	public void AddRectangle( Common.Rectangle rect,
@@ -79,8 +79,8 @@ public partial class UIEntity : ModelEntity, IRenderer
 			return tx;
 		} ).ToArray();
 
-		Vertices.AddRange( vertices );
-		RectCount++;
+		_vertices.AddRange( vertices );
+		_rectCount++;
 
 		IsDirty = true;
 	}

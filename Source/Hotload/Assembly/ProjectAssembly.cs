@@ -7,20 +7,20 @@ namespace Mocha.Hotload;
 
 public class ProjectAssembly<T>
 {
-	private readonly ProjectAssemblyInfo projectAssemblyInfo;
+	private readonly ProjectAssemblyInfo _projectAssemblyInfo;
 
-	private T? managedClass;
-	private FileSystemWatcher watcher;
-	private Assembly assembly;
-	private AssemblyLoadContext loadContext;
+	private T? _managedClass;
+	private FileSystemWatcher _watcher;
+	private Assembly _assembly;
+	private AssemblyLoadContext _loadContext;
 
-	public T? Value => managedClass;
-	public Assembly Assembly => assembly;
+	public T? Value => _managedClass;
+	public Assembly Assembly => _assembly;
 
 	public ProjectAssembly( ProjectAssemblyInfo assemblyInfo )
 	{
-		projectAssemblyInfo = assemblyInfo;
-		loadContext = new AssemblyLoadContext( null, isCollectible: true );
+		_projectAssemblyInfo = assemblyInfo;
+		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
 		CompileIntoMemory();
 		CreateFileSystemWatcher( assemblyInfo.SourceRoot );
@@ -28,17 +28,17 @@ public class ProjectAssembly<T>
 
 	private void Swap( Assembly newAssembly, T newInterface )
 	{
-		loadContext?.Unload();
-		loadContext = new AssemblyLoadContext( null, isCollectible: true );
+		_loadContext?.Unload();
+		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
-		assembly = newAssembly;
-		managedClass = newInterface;
+		_assembly = newAssembly;
+		_managedClass = newInterface;
 	}
 
 	private void CompileIntoMemory()
 	{
-		Notify.AddNotification( $"Building...", $"Compiling '{projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
-		var compileResult = Compiler.Instance.Compile( projectAssemblyInfo );
+		Notify.AddNotification( $"Building...", $"Compiling '{_projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
+		var compileResult = Compiler.Instance.Compile( _projectAssemblyInfo );
 
 		if ( !compileResult.WasSuccessful )
 		{
@@ -49,19 +49,19 @@ public class ProjectAssembly<T>
 				Log.Error( error );
 			}
 
-			Notify.AddError( $"Build failed", $"Failed to compile '{projectAssemblyInfo.AssemblyName}'\n{errorStr}", FontAwesome.FaceSadTear );
+			Notify.AddError( $"Build failed", $"Failed to compile '{_projectAssemblyInfo.AssemblyName}'\n{errorStr}", FontAwesome.FaceSadTear );
 			return;
 		}
 
 		// Keep old assembly as reference. Should be destroyed once out of scope
-		var oldAssembly = assembly;
-		var oldGameInterface = managedClass;
+		var oldAssembly = _assembly;
+		var oldGameInterface = _managedClass;
 
 		// Load new assembly
 		var assemblyStream = new MemoryStream( compileResult.CompiledAssembly! );
 		var symbolsStream = compileResult.HasSymbols ? new MemoryStream( compileResult.CompiledAssemblySymbols! ) : null;
 
-		var newAssembly = loadContext.LoadFromStream( assemblyStream, symbolsStream );
+		var newAssembly = _loadContext.LoadFromStream( assemblyStream, symbolsStream );
 		var newInterface = CreateInterfaceFromAssembly( newAssembly );
 
 		// Invoke upgrader to move values from oldAssembly into assembly
@@ -78,7 +78,7 @@ public class ProjectAssembly<T>
 		// and assembly in
 		Swap( newAssembly, newInterface );
 
-		Notify.AddNotification( $"Build successful!", $"Compiled '{projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
+		Notify.AddNotification( $"Build successful!", $"Compiled '{_projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
 		Event.Run( Event.Game.HotloadAttribute.Name );
 	}
 
@@ -145,8 +145,8 @@ public class ProjectAssembly<T>
 
 	private void CreateFileSystemWatcher( string sourcePath )
 	{
-		watcher = new FileSystemWatcher( sourcePath, "*.cs" );
-		watcher.NotifyFilter = NotifyFilters.Attributes
+		_watcher = new FileSystemWatcher( sourcePath, "*.cs" );
+		_watcher.NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
 							 | NotifyFilters.DirectoryName
 							 | NotifyFilters.FileName
@@ -162,26 +162,26 @@ public class ProjectAssembly<T>
 		// is the last thing that happens in the order of operations
 
 		// This will typically happen twice, so we'll gate it with a TimeSince too
-		watcher.Renamed += OnFileChanged;
-		watcher.IncludeSubdirectories = true;
-		watcher.EnableRaisingEvents = true;
+		_watcher.Renamed += OnFileChanged;
+		_watcher.IncludeSubdirectories = true;
+		_watcher.EnableRaisingEvents = true;
 	}
 
-	private TimeSince timeSinceLastChange;
+	private TimeSince _timeSinceLastChange;
 
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
-		Log.Trace( $"File {e.FullPath} was changed ({timeSinceLastChange})" );
+		Log.Trace( $"File {e.FullPath} was changed ({_timeSinceLastChange})" );
 
 		// This will typically fire twice, so gate it with a TimeSince
-		if ( timeSinceLastChange < 1f )
+		if ( _timeSinceLastChange < 1f )
 			return;
 
 		// This might be a directory - if it is then skip
 		if ( string.IsNullOrEmpty( Path.GetExtension( e.FullPath ) ) )
 			return;
 
-		timeSinceLastChange = 0f;
+		_timeSinceLastChange = 0f;
 		CompileIntoMemory();
 	}
 }

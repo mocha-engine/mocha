@@ -9,24 +9,24 @@ public class ConsoleWindow : EditorWindow
 	// ImGUI input variables
 	//
 	private const int MaxInputLength = 512;
-	private static string currentInput = "";
+	private static string s_currentInput = "";
 
 	/// <summary>
 	/// Has the console just changed? If so, set this to true and
 	/// we'll scroll to the bottom.
 	/// </summary>
-	private bool isDirty = false;
+	private bool _isDirty = false;
 
 	private void DrawOutput()
 	{
 		if ( !ImGui.BeginChild( "##console_output", new Vector2( -1, -32 ) ) )
 			return;
 
-		if ( isDirty )
+		if ( _isDirty )
 		{
 			ImGui.SetScrollY( ImGui.GetScrollMaxY() );
 
-			isDirty = false;
+			_isDirty = false;
 		}
 
 		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg ) )
@@ -66,17 +66,17 @@ public class ConsoleWindow : EditorWindow
 	private void DrawInput()
 	{
 		ImGui.SetNextItemWidth( -68 );
-		bool pressed = ImGui.InputText( "##console_input", ref currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
+		bool pressed = ImGui.InputText( "##console_input", ref s_currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
 
 		ImGui.SameLine();
 		if ( ImGui.Button( "Submit" ) || pressed )
 		{
-			Log.Trace( $"> {currentInput}" );
+			Log.Trace( $"> {s_currentInput}" );
 
-			ConsoleSystem.Run( currentInput );
+			ConsoleSystem.Run( s_currentInput );
 
-			isDirty = true;
-			currentInput = "";
+			_isDirty = true;
+			s_currentInput = "";
 		}
 	}
 

@@ -7,15 +7,14 @@ namespace Mocha.Editor;
 internal class BrowserWindow : EditorWindow
 {
 	public static BrowserWindow Instance { get; set; }
-	public List<string> fileSystemCache = new();
+	public List<string> FileSystemCache = new();
 
-	private int selectedIndex;
-	private string assetSearchText = "";
+	private int _selectedIndex;
+	private string _assetSearchText = "";
+	private Vector2 _iconSize;
+	private List<ResourceType> _assetFilter = new();
 
-	private Vector2 baseIconSize => new( 100f, 150f );
-	private Vector2 iconSize;
-
-	private List<ResourceType> assetFilter = new();
+	private Vector2 BaseIconSize => new( 100f, 150f );
 
 	private enum SortModes
 	{
@@ -24,7 +23,7 @@ internal class BrowserWindow : EditorWindow
 		Alphabetical
 	};
 
-	private SortModes sortMode = SortModes.DateAscending;
+	private SortModes _sortMode = SortModes.DateAscending;
 
 	public BrowserWindow()
 	{
@@ -35,7 +34,7 @@ internal class BrowserWindow : EditorWindow
 
 	private BaseInspector Inspector { get; set; }
 
-	private static Dictionary<Type, Type> inspectorTypeCache = new();
+	private static Dictionary<Type, Type> s_inspectorTypeCache = new();
 
 	/// <summary>
 	/// Attempts to get a suitable inspector for <see ref="objType"/>.
@@ -45,7 +44,7 @@ internal class BrowserWindow : EditorWindow
 	/// <returns>Whether or not a suitable inspector was found.</returns>
 	private static bool TryGetInspector( Type objType, [NotNullWhen( true )] out Type? type )
 	{
-		if ( inspectorTypeCache.TryGetValue( objType, out var cachedType ) )
+		if ( s_inspectorTypeCache.TryGetValue( objType, out var cachedType ) )
 		{
 			type = cachedType;
 			return true;
@@ -62,7 +61,7 @@ internal class BrowserWindow : EditorWindow
 			if ( inspector.GetCustomAttribute( inspectorType ) is null )
 				continue;
 
-			inspectorTypeCache.Add( objType, inspector );
+			s_inspectorTypeCache.Add( objType, inspector );
 
 			type = inspector;
 			return true;
@@ -72,7 +71,7 @@ internal class BrowserWindow : EditorWindow
 		{
 			var result = TryGetInspector( objType.BaseType, out var nestedInspectorType );
 			if ( result )
-				inspectorTypeCache.Add( objType, nestedInspectorType! );
+				s_inspectorTypeCache.Add( objType, nestedInspectorType! );
 
 			type = nestedInspectorType;
 			return result;
@@ -131,7 +130,7 @@ internal class BrowserWindow : EditorWindow
 
 	private void CacheEverything()
 	{
-		fileSystemCache.Clear();
+		FileSystemCache.Clear();
 
 		void CacheDirectory( string directory )
 		{
@@ -156,7 +155,7 @@ internal class BrowserWindow : EditorWindow
 				if ( !sourceFileName.Split( "." )[1].StartsWith( "m" ) )
 					continue;
 
-				fileSystemCache.Add( relativePath );
+				FileSystemCache.Add( relativePath );
 			}
 
 			foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
@@ -172,16 +171,16 @@ internal class BrowserWindow : EditorWindow
 
 	private void Sort()
 	{
-		switch ( sortMode )
+		switch ( _sortMode )
 		{
 			case SortModes.DateAscending:
-				fileSystemCache = fileSystemCache.OrderBy( x => File.GetLastWriteTime( x ) ).Reverse().ToList();
+				FileSystemCache = FileSystemCache.OrderBy( x => File.GetLastWriteTime( x ) ).Reverse().ToList();
 				break;
 			case SortModes.DateDescending:
-				fileSystemCache = fileSystemCache.OrderBy( x => File.GetLastWriteTime( x ) ).ToList();
+				FileSystemCache = FileSystemCache.OrderBy( x => File.GetLastWriteTime( x ) ).ToList();
 				break;
 			case SortModes.Alphabetical:
-				fileSystemCache.Sort( ( x, y ) => string.Compare( x, y ) );
+				FileSystemCache.Sort( ( x, y ) => string.Compare( x, y ) );
 				break;
 		}
 	}
@@ -204,7 +203,7 @@ internal class BrowserWindow : EditorWindow
 		{
 			drawList.AddRectFilledMultiColor(
 				windowPos + startPos - new System.Numerics.Vector2( 8, 8 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( _iconSize.X + 8, _iconSize.Y + 8 ) - scrollPos,
 				ImGui.GetColorU32( resourceType.Color * 0.6f ),
 				ImGui.GetColorU32( resourceType.Color * 0.6f ),
 				ImGui.GetColorU32( resourceType.Color * 0.4f ),
@@ -213,7 +212,7 @@ internal class BrowserWindow : EditorWindow
 
 			drawList.AddRect(
 				windowPos + startPos - new System.Numerics.Vector2( 10, 10 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 10, iconSize.Y + 10 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( _iconSize.X + 10, _iconSize.Y + 10 ) - scrollPos,
 				ImGui.GetColorU32( ImGuiCol.FrameBg ),
 				4,
 				ImDrawFlags.None,
@@ -221,14 +220,14 @@ internal class BrowserWindow : EditorWindow
 			);
 
 			drawList.AddRectFilled(
-				windowPos + startPos + new System.Numerics.Vector2( -8, iconSize.Y + 4 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 8, iconSize.Y + 8 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( -8, _iconSize.Y + 4 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( _iconSize.X + 8, _iconSize.Y + 8 ) - scrollPos,
 				ImGui.GetColorU32( resourceType.Color * 0.75f ),
 				4f,
 				ImDrawFlags.RoundCornersBottom );
 		}
 
-		Vector2 center = (iconSize - 96f) / 2.0f;
+		Vector2 center = (_iconSize - 96f) / 2.0f;
 
 		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( center.X, 24 + 2 ) );
 		ImGuiX.Image( icon, new Vector2( 96f ), new System.Numerics.Vector4( 0, 0, 0, 0.1f ) );
@@ -240,7 +239,7 @@ internal class BrowserWindow : EditorWindow
 		{
 			drawList.AddRect(
 				windowPos + startPos - new System.Numerics.Vector2( 12, 12 ) - scrollPos,
-				windowPos + startPos + new System.Numerics.Vector2( iconSize.X + 12, iconSize.Y + 12 ) - scrollPos,
+				windowPos + startPos + new System.Numerics.Vector2( _iconSize.X + 12, _iconSize.Y + 12 ) - scrollPos,
 				ImGui.GetColorU32( Theme.Blue ),
 				4f,
 				ImDrawFlags.None,
@@ -248,22 +247,22 @@ internal class BrowserWindow : EditorWindow
 		}
 
 		ImGui.SetCursorPos( startPos );
-		if ( ImGui.InvisibleButton( $"##{name}", iconSize ) )
+		if ( ImGui.InvisibleButton( $"##{name}", _iconSize ) )
 		{
 			return true;
 		}
 
-		var textSize = ImGui.CalcTextSize( fileName, iconSize.X );
+		var textSize = ImGui.CalcTextSize( fileName, _iconSize.X );
 
-		var textPos = (iconSize.X - textSize.X) / 2.0f;
+		var textPos = (_iconSize.X - textSize.X) / 2.0f;
 		if ( textSize.Y > 16 )
 			textPos = 0.0f;
 
-		var textStartPos = startPos + new System.Numerics.Vector2( textPos, iconSize.Y - textSize.Y - 4 );
+		var textStartPos = startPos + new System.Numerics.Vector2( textPos, _iconSize.Y - textSize.Y - 4 );
 		ImGui.SetCursorPos( textStartPos );
 
 		ImGui.SetCursorPos( textStartPos );
-		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + iconSize.X );
+		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + _iconSize.X );
 		ImGui.TextWrapped( fileName );
 		ImGui.PopTextWrapPos();
 
@@ -276,7 +275,7 @@ internal class BrowserWindow : EditorWindow
 			float xOff = 16;
 
 			ImGui.PushStyleColor( ImGuiCol.Text, Theme.Green );
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( _iconSize.X - xOff, 0 ) );
 			ImGui.Text( FontAwesome.Check );
 			ImGui.PopStyleColor();
 
@@ -288,7 +287,7 @@ internal class BrowserWindow : EditorWindow
 			if ( name.Contains( "subaru" ) )
 			{
 				ImGui.PushStyleColor( ImGuiCol.Text, Theme.Orange );
-				ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
+				ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( _iconSize.X - xOff, 0 ) );
 				ImGui.Text( FontAwesome.Star );
 				ImGui.PopStyleColor();
 				xOff += 16;
@@ -297,7 +296,7 @@ internal class BrowserWindow : EditorWindow
 					ImGui.SetTooltip( "Favourited" );
 			}
 
-			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( iconSize.X - xOff, 0 ) );
+			ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( _iconSize.X - xOff, 0 ) );
 			ImGui.Text( FontAwesome.HardDrive );
 
 			if ( ImGui.IsItemHovered() )
@@ -324,15 +323,15 @@ internal class BrowserWindow : EditorWindow
 
 				if ( ImGui.Button( "All", new System.Numerics.Vector2( -1, 0 ) ) )
 				{
-					assetFilter.Clear();
-					assetFilter.AddRange( ResourceType.All );
+					_assetFilter.Clear();
+					_assetFilter.AddRange( ResourceType.All );
 				}
 
 				ImGui.TableNextColumn();
 
 				if ( ImGui.Button( "None", new System.Numerics.Vector2( -1, 0 ) ) )
 				{
-					assetFilter.Clear();
+					_assetFilter.Clear();
 				}
 
 				ImGui.EndTable();
@@ -349,13 +348,13 @@ internal class BrowserWindow : EditorWindow
 					ImGui.TableNextRow();
 					ImGui.TableNextColumn();
 
-					bool selected = assetFilter.Contains( resourceType );
+					bool selected = _assetFilter.Contains( resourceType );
 					if ( ImGui.Checkbox( $"##{resourceType.Name}_selected", ref selected ) )
 					{
 						if ( selected )
-							assetFilter.Add( resourceType );
+							_assetFilter.Add( resourceType );
 						else
-							assetFilter.Remove( resourceType );
+							_assetFilter.Remove( resourceType );
 					}
 
 					ImGui.TableNextColumn();
@@ -367,8 +366,8 @@ internal class BrowserWindow : EditorWindow
 
 					if ( ImGui.Button( $"Solo##{resourceType.Name}_solo", new System.Numerics.Vector2( -1, 0 ) ) )
 					{
-						assetFilter.Clear();
-						assetFilter.Add( resourceType );
+						_assetFilter.Clear();
+						_assetFilter.Add( resourceType );
 					}
 				}
 
@@ -494,7 +493,7 @@ internal class BrowserWindow : EditorWindow
 		if ( ImGui.BeginChild( "main", new System.Numerics.Vector2( -1, -1 ) ) )
 		{
 			{
-				var sortString = sortMode switch
+				var sortString = _sortMode switch
 				{
 					SortModes.DateAscending => $"{FontAwesome.CalendarPlus}",
 					SortModes.DateDescending => $"{FontAwesome.CalendarMinus}",
@@ -504,8 +503,8 @@ internal class BrowserWindow : EditorWindow
 
 				if ( ImGuiX.GradientButton( $"{sortString}" ) )
 				{
-					sortMode++;
-					sortMode = (SortModes)((int)sortMode % 3);
+					_sortMode++;
+					_sortMode = (SortModes)((int)_sortMode % 3);
 
 					Sort();
 				}
@@ -513,11 +512,11 @@ internal class BrowserWindow : EditorWindow
 				ImGui.SameLine();
 
 				ImGui.SetNextItemWidth( -243 );
-				ImGui.InputText( "##asset_search", ref assetSearchText, 128 );
+				ImGui.InputText( "##asset_search", ref _assetSearchText, 128 );
 
 				ImGui.SameLine();
 
-				string suffix = (assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
+				string suffix = (_assetFilter.Count > 0) ? FontAwesome.Asterisk : "";
 				if ( ImGuiX.GradientButton( $"{FontAwesome.File} Asset{suffix}" ) )
 				{
 					ImGui.OpenPopup( "asset_popup" );
@@ -556,24 +555,24 @@ internal class BrowserWindow : EditorWindow
 				float startPos = 16;
 
 				var availableSpace = windowSize.X - startPos - 4f;
-				var remainingSpace = availableSpace % (baseIconSize.X + margin.X);
+				var remainingSpace = availableSpace % (BaseIconSize.X + margin.X);
 
-				int count = (int)windowSize.X / (int)(baseIconSize.X + margin.X);
+				int count = (int)windowSize.X / (int)(BaseIconSize.X + margin.X);
 
-				iconSize = baseIconSize;
-				iconSize.X += (remainingSpace / count);
+				_iconSize = BaseIconSize;
+				_iconSize.X += (remainingSpace / count);
 
 				float x = startPos;
 				float y = startPos;
 
-				for ( int i = 0; i < fileSystemCache.Count; i++ )
+				for ( int i = 0; i < FileSystemCache.Count; i++ )
 				{
-					var name = fileSystemCache[i];
+					var name = FileSystemCache[i];
 
-					if ( !string.IsNullOrEmpty( assetSearchText ) )
+					if ( !string.IsNullOrEmpty( _assetSearchText ) )
 					{
 						bool foundAll = true;
-						var inputs = assetSearchText.Split( " " );
+						var inputs = _assetSearchText.Split( " " );
 
 						foreach ( var input in inputs )
 							if ( !name.Contains( input, StringComparison.CurrentCultureIgnoreCase ) )
@@ -583,27 +582,27 @@ internal class BrowserWindow : EditorWindow
 							continue;
 					}
 
-					if ( assetFilter.Count > 0 )
+					if ( _assetFilter.Count > 0 )
 					{
 						var resourceType = ResourceType.GetResourceForExtension( Path.GetExtension( name ) ) ?? ResourceType.Default;
-						if ( !assetFilter.Contains( resourceType ) )
+						if ( !_assetFilter.Contains( resourceType ) )
 							continue;
 					}
 
-					if ( DrawIcon( x, y, name, i == selectedIndex ) )
+					if ( DrawIcon( x, y, name, i == _selectedIndex ) )
 					{
 						SelectItem( name );
-						selectedIndex = i;
+						_selectedIndex = i;
 					}
 
-					x += iconSize.X + margin.X;
-					if ( x + iconSize.X > windowSize.X )
+					x += _iconSize.X + margin.X;
+					if ( x + _iconSize.X > windowSize.X )
 					{
 						x = startPos;
-						y += iconSize.Y + margin.Y + 24;
+						y += _iconSize.Y + margin.Y + 24;
 					}
 
-					ImGui.Dummy( new System.Numerics.Vector2( -1, iconSize.Y ) );
+					ImGui.Dummy( new System.Numerics.Vector2( -1, _iconSize.Y ) );
 				}
 
 				ImGui.EndListBox();

@@ -2,9 +2,9 @@
 
 public static class Program
 {
-	internal static List<string> GeneratedPaths { get; set; } = new();
-	internal static List<IUnit> Units { get; set; } = new();
-	internal static List<string> Files { get; set; } = new();
+	internal static List<string> s_generatedPaths { get; set; } = new();
+	internal static List<IUnit> s_units { get; set; } = new();
+	internal static List<string> s_files { get; set; } = new();
 
 	private static void ProcessHeader( string baseDir, string path )
 	{
@@ -24,8 +24,8 @@ public static class Program
 		Console.WriteLine( $"{baseDir}/Host/generated/{fileName}.generated.h" );
 		File.WriteAllText( $"{baseDir}/Host/generated/{fileName}.generated.h", nativeCode );
 
-		Files.Add( fileName );
-		Units.AddRange( units );
+		s_files.Add( fileName );
+		s_units.AddRange( units );
 	}
 
 	private static void QueueDirectory( ref List<string> queue, string directory )
@@ -143,7 +143,7 @@ public static class Program
 		nativeListWriter.WriteLine();
 		nativeListWriter.Indent++;
 
-		var nativeListBody = string.Join( "\r\n\t", Files.Select( x => $"#include \"{x}.generated.h\"" ) );
+		var nativeListBody = string.Join( "\r\n\t", s_files.Select( x => $"#include \"{x}.generated.h\"" ) );
 		nativeListWriter.Write( nativeListBody );
 		nativeListWriter.WriteLine();
 
@@ -184,7 +184,7 @@ public static class Program
 		//
 		// Expand methods out into list of (method name, method)
 		//
-		var methods = Units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
+		var methods = s_units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
 		//
 		// Write files

@@ -22,8 +22,8 @@ public partial class TextureCompiler : BaseCompiler
 	public override bool SupportsMochaFile => true;
 
 	/// <inheritdoc/>
-	public override string[] AssociatedFiles => associatedFiles;
-	private static readonly string[] associatedFiles = new string[]
+	public override string[] AssociatedFiles => s_associatedFiles;
+	private static readonly string[] s_associatedFiles = new string[]
 	{
 		"{SourcePathWithoutExt}.meta"
 	};

@@ -19,10 +19,10 @@ public class ModelCompiler : BaseCompiler
 	/// <inheritdoc/>
 	public override bool SupportsMochaFile => true;
 
-	private static readonly char[] magicNumber = new char[] { 'M', 'M', 'S', 'H' };
-	private static readonly char[] materialChunk = new char[] { 'M', 'T', 'R', 'L' };
-	private static readonly char[] vertexChunk = new char[] { 'V', 'R', 'T', 'X' };
-	private static readonly char[] indexChunk = new char[] { 'I', 'N', 'D', 'X' };
+	private static readonly char[] s_magicNumber = new char[] { 'M', 'M', 'S', 'H' };
+	private static readonly char[] s_materialChunk = new char[] { 'M', 'T', 'R', 'L' };
+	private static readonly char[] s_vertexChunk = new char[] { 'V', 'R', 'T', 'X' };
+	private static readonly char[] s_indexChunk = new char[] { 'I', 'N', 'D', 'X' };
 
 	/// <inheritdoc/>
 	public override CompileResult Compile( ref CompileInput input )
@@ -34,7 +34,7 @@ public class ModelCompiler : BaseCompiler
 		using var stream = new MemoryStream();
 		using var binaryWriter = new BinaryWriter( stream );
 
-		binaryWriter.Write( magicNumber ); // Magic number
+		binaryWriter.Write( s_magicNumber ); // Magic number
 
 		//
 		// File header
@@ -58,14 +58,14 @@ public class ModelCompiler : BaseCompiler
 			//
 			// Material chunk
 			//
-			binaryWriter.Write( materialChunk );
+			binaryWriter.Write( s_materialChunk );
 
 			binaryWriter.Write( mesh.Material );
 
 			//
 			// Vertex chunk
 			//
-			binaryWriter.Write( vertexChunk );
+			binaryWriter.Write( s_vertexChunk );
 
 			binaryWriter.Write( mesh.Vertices.Length );
 
@@ -94,7 +94,7 @@ public class ModelCompiler : BaseCompiler
 			//
 			// Index chunk
 			//
-			binaryWriter.Write( indexChunk );
+			binaryWriter.Write( s_indexChunk );
 
 			binaryWriter.Write( mesh.Indices.Length );
 

@@ -6,7 +6,7 @@ namespace Mocha.Editor;
 
 public class BaseInspector
 {
-	private TimeSince timeSinceCopied = 1000;
+	private TimeSince _timeSinceCopied = 1000;
 
 	public virtual void Draw()
 	{
@@ -43,12 +43,12 @@ public class BaseInspector
 
 		ImGui.SameLine();
 
-		var copyPathButtonText = (timeSinceCopied < 3) ? $"{FontAwesome.ClipboardCheck}" : $"{FontAwesome.Clipboard}";
+		var copyPathButtonText = (_timeSinceCopied < 3) ? $"{FontAwesome.ClipboardCheck}" : $"{FontAwesome.Clipboard}";
 
 		if ( ImGui.SmallButton( copyPathButtonText ) )
 		{
 			ImGui.SetClipboardText( filePath.NormalizePath() );
-			timeSinceCopied = 0;
+			_timeSinceCopied = 0;
 		}
 
 		ImGui.PopStyleColor();

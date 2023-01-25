@@ -4,24 +4,24 @@ namespace Mocha.Common;
 
 public struct Vector3 : IEquatable<Vector3>
 {
-	private System.Numerics.Vector3 internalVector;
+	private System.Numerics.Vector3 _internalVector;
 
 	public float X
 	{
-		readonly get => internalVector.X;
-		set => internalVector.X = value;
+		readonly get => _internalVector.X;
+		set => _internalVector.X = value;
 	}
 
 	public float Y
 	{
-		readonly get => internalVector.Y;
-		set => internalVector.Y = value;
+		readonly get => _internalVector.Y;
+		set => _internalVector.Y = value;
 	}
 
 	public float Z
 	{
-		readonly get => internalVector.Z;
-		set => internalVector.Z = value;
+		readonly get => _internalVector.Z;
+		set => _internalVector.Z = value;
 	}
 
 	public static readonly Vector3 One = new( 1f );
@@ -46,8 +46,8 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public static readonly Vector3 OneZ = new( 0f, 0f, 1f );
 
-	public readonly float Length => internalVector.Length();
-	public readonly float LengthSquared => internalVector.LengthSquared();
+	public readonly float Length => _internalVector.Length();
+	public readonly float LengthSquared => _internalVector.LengthSquared();
 
 	public readonly Vector3 Normal => (Length == 0) ? new( 0 ) : (this / Length);
 	public void Normalize()
@@ -57,7 +57,7 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public Vector3( float x, float y, float z )
 	{
-		internalVector = new System.Numerics.Vector3( x, y, z );
+		_internalVector = new System.Numerics.Vector3( x, y, z );
 	}
 
 	public Vector3( Vector3 other ) : this( other.X, other.Y, other.Z )
@@ -113,13 +113,13 @@ public struct Vector3 : IEquatable<Vector3>
 		return false;
 	}
 
-	public bool Equals( Vector3 other ) => internalVector.Equals( other.internalVector );
+	public bool Equals( Vector3 other ) => _internalVector.Equals( other._internalVector );
 
 	public static Vector3 Cross( Vector3 a, Vector3 b ) => new Vector3( a.Y * b.Z - a.Z * b.Y, a.Z * b.X - a.X * b.Z, a.X * b.Y - a.Y * b.X );
 
 	public readonly Vector3 Cross( Vector3 b ) => new Vector3( Y * b.Z - Z * b.Y, Z * b.X - X * b.Z, X * b.Y - Y * b.X );
 
-	public static float Dot( Vector3 a, Vector3 b ) => System.Numerics.Vector3.Dot( a.internalVector, b.internalVector );
+	public static float Dot( Vector3 a, Vector3 b ) => System.Numerics.Vector3.Dot( a._internalVector, b._internalVector );
 
 	public readonly float Dot( Vector3 b ) => Dot( this, b );
 
@@ -144,9 +144,9 @@ public struct Vector3 : IEquatable<Vector3>
 		return angle;
 	}
 
-	public override int GetHashCode() => HashCode.Combine( internalVector );
+	public override int GetHashCode() => HashCode.Combine( _internalVector );
 
-	public System.Numerics.Vector3 GetSystemVector3() => internalVector;
+	public System.Numerics.Vector3 GetSystemVector3() => _internalVector;
 
 	public static Vector3 OrthoNormalize( Vector3 normal, Vector3 tangent )
 	{

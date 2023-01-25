@@ -4,7 +4,7 @@ partial class ProceduralMeshes
 {
 	public static class Cube
 	{
-		private static float[] cubeVertices = new[] {
+		private static float[] s_vertices = new[] {
             // Top
             -.5f,.5f,-.5f,     0,1,0,     0, 0,
 			.5f,.5f,-.5f,      0,1,0,     1, 0,
@@ -43,7 +43,7 @@ partial class ProceduralMeshes
 		};
 
 
-		private static uint[] indices =
+		private static uint[] s_indices =
 		{
 			0,1,2, 0,2,3,
 			4,5,6, 4,6,7,
@@ -59,18 +59,18 @@ partial class ProceduralMeshes
 			{
 				List<Vertex> tmp = new List<Vertex>();
 
-				for ( int i = 0; i < cubeVertices.Length; i += 8 )
+				for ( int i = 0; i < s_vertices.Length; i += 8 )
 				{
-					var x = cubeVertices[i];
-					var y = cubeVertices[i + 1];
-					var z = cubeVertices[i + 2];
+					var x = s_vertices[i];
+					var y = s_vertices[i + 1];
+					var z = s_vertices[i + 2];
 
-					var nX = cubeVertices[i + 3];
-					var nY = cubeVertices[i + 4];
-					var nZ = cubeVertices[i + 5];
+					var nX = s_vertices[i + 3];
+					var nY = s_vertices[i + 4];
+					var nZ = s_vertices[i + 5];
 
-					var u = cubeVertices[i + 6];
-					var v = cubeVertices[i + 7];
+					var u = s_vertices[i + 6];
+					var v = s_vertices[i + 7];
 
 					tmp.Add( new Vertex()
 					{
@@ -87,7 +87,7 @@ partial class ProceduralMeshes
 
 		public static Model GenerateModel( Material material )
 		{
-			return new Model( Vertices.ToArray(), indices, material );
+			return new Model( Vertices.ToArray(), s_indices, material );
 		}
 	}
 }

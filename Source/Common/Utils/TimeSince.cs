@@ -2,20 +2,20 @@
 
 public struct TimeSince : IEquatable<TimeSince>
 {
-	private float time;
+	private float _time;
 
-	public float Absolute => time;
+	public float Absolute => _time;
 	public float Relative => this;
 
 	public static implicit operator float( TimeSince other )
 	{
-		return Time.Now - other.time;
+		return Time.Now - other._time;
 	}
 
 	public static implicit operator TimeSince( float other )
 	{
 		TimeSince result = new();
-		result.time = Time.Now - other;
+		result._time = Time.Now - other;
 
 		return result;
 	}
@@ -28,7 +28,7 @@ public struct TimeSince : IEquatable<TimeSince>
 		return false;
 	}
 
-	public bool Equals( TimeSince o ) => time == o.time;
+	public bool Equals( TimeSince o ) => _time == o._time;
 
 	public static bool operator ==( TimeSince a, TimeSince b ) => a.Equals( b );
 	public static bool operator !=( TimeSince a, TimeSince b ) => !a.Equals( b );

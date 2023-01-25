@@ -10,7 +10,7 @@ partial class Graphics
 		public Font.Data Data { get; set; }
 	}
 
-	private static ConcurrentDictionary<string, CachedFont> CachedFonts { get; } = new();
+	private static ConcurrentDictionary<string, CachedFont> s_cachedFonts { get; } = new();
 
 	private static string GetKeyForText( string text, string fontName )
 	{
@@ -19,7 +19,7 @@ partial class Graphics
 
 	private static CachedFont LoadOrGetFont( string fontName )
 	{
-		if ( CachedFonts.TryGetValue( fontName, out var cachedFont ) )
+		if ( s_cachedFonts.TryGetValue( fontName, out var cachedFont ) )
 		{
 			return cachedFont;
 		}
@@ -30,7 +30,7 @@ partial class Graphics
 		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/{fontName}.mfnt" );
 		loadedFont.Data = Serializer.Deserialize<MochaFile<Font.Data>>( fileBytes ).Data;
 
-		return CachedFonts[fontName] = loadedFont;
+		return s_cachedFonts[fontName] = loadedFont;
 	}
 
 	private static Rectangle FontBoundsToAtlasRect( Font.Glyph glyph )
@@ -56,7 +56,7 @@ partial class Graphics
 		var font = LoadOrGetFont( fontFamily );
 		var scale = (fontSize / font.Data.Atlas.Size);
 
-		if ( CachedTextures.TryGetValue( key, out var cachedTexture ) )
+		if ( s_cachedTextures.TryGetValue( key, out var cachedTexture ) )
 		{
 			return cachedTexture.Size * scale;
 		}
