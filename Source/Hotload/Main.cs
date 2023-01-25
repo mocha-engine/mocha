@@ -28,6 +28,8 @@ public static class Main
 		// slowdowns while the engine is running.
 		Upgrader.Init();
 
+		// Get the current loaded project from native
+		var manifestPath = Glue.Engine.GetProjectPath();
 		var manifest = ProjectManifest.Load( manifestPath );
 		Log.Trace( $"Loading project '{manifest.Name}'" );
 

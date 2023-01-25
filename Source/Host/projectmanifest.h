@@ -152,4 +152,28 @@ namespace ProjectManifest
 		from_json( get_untyped( j, "properties" ), x.properties );
 		from_json( get_untyped( j, "project" ), x.project );
 	}
+
+	inline void normalize( const std::string path, Project& x )
+	{
+		// Convert paths to absolute paths based on the project file location
+		// ( Combine with path )
+		std::filesystem::path code = x.resources.code;
+		std::filesystem::path content = x.resources.content;
+
+		if ( !code.is_absolute() )
+		{
+			code = std::filesystem::path( path ) / code;
+		}
+
+		if ( !content.is_absolute() )
+		{
+			content = std::filesystem::path( path ) / content;
+		}
+
+		// weakly_canonical will convert to a canonical absolute path with the least amount of
+		// ..'s and .'s
+		// make_preferred will convert to the preferred path format for the current platform
+		x.resources.code = std::filesystem::weakly_canonical( code ).make_preferred().string();
+		x.resources.content = std::filesystem::weakly_canonical( content ).make_preferred().string();
+	}
 } // namespace ProjectManifest

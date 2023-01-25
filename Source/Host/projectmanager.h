@@ -13,5 +13,5 @@ public:
 	virtual void Startup() override;
 	virtual void Shutdown() override;
 
-	GENERATE_BINDINGS Project GetProject() { return m_project; }
+	Project GetProject() { return m_project; }
 };
