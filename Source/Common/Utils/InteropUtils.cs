@@ -36,7 +36,6 @@ public class MemoryContext : IDisposable
 	}
 
 	private List<(Type Type, IntPtr Pointer)> Values { get; } = new();
-
 	private string Name { get; }
 
 	public MemoryContext( string name )
@@ -147,7 +146,7 @@ public interface IInteropArray
 
 public class InteropArray<T> : IInteropArray
 {
-	private Glue.UtilArray NativeStruct;
+	private Glue.UtilArray _nativeStruct;
 	private InteropArray() { }
 
 	public static InteropArray<T> FromArray( T[] array )
@@ -156,8 +155,8 @@ public class InteropArray<T> : IInteropArray
 
 		int stride, size;
 
-		var s = new InteropArray<T>();
-		s.NativeStruct = new();
+		var interopArray = new InteropArray<T>();
+		interopArray._nativeStruct = new();
 
 		if ( isNativeGlue )
 			stride = Marshal.SizeOf( typeof( IntPtr ) );
@@ -166,24 +165,24 @@ public class InteropArray<T> : IInteropArray
 
 		size = stride * array.Length;
 
-		s.NativeStruct.count = array.Length;
-		s.NativeStruct.size = size;
+		interopArray._nativeStruct.count = array.Length;
+		interopArray._nativeStruct.size = size;
 
 		unsafe
 		{
 			if ( isNativeGlue )
 			{
 				fixed ( void* data = array.Select( x => (x as INativeGlue).NativePtr ).ToArray() )
-					s.NativeStruct.data = (IntPtr)data;
+					interopArray._nativeStruct.data = (IntPtr)data;
 			}
 			else
 			{
 				fixed ( void* data = array )
-					s.NativeStruct.data = (IntPtr)data;
+					interopArray._nativeStruct.data = (IntPtr)data;
 			}
 		}
 
-		return s;
+		return interopArray;
 	}
 
 	public static InteropArray<T> FromList( List<T> list )
@@ -193,7 +192,7 @@ public class InteropArray<T> : IInteropArray
 
 	public Glue.UtilArray GetNative()
 	{
-		return NativeStruct;
+		return _nativeStruct;
 	}
 
 	//

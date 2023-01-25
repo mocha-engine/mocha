@@ -17,8 +17,8 @@ partial class UIEntity
 		1, 2, 3
 	};
 
-	private int RectCount = 0;
-	private List<UIVertex> Vertices = new();
+	private int _rectCount = 0;
+	private List<UIVertex> _vertices = new();
 
 	[StructLayout( LayoutKind.Sequential )]
 	public struct UIVertex

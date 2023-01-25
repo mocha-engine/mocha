@@ -9,10 +9,9 @@ public partial class UIManager
 	private IRenderer Renderer { get; } = new UIEntity();
 	private FileSystemWatcher Watcher { get; }
 	private bool IsDirty { get; set; }
-
 	public LayoutNode RootPanel { get; private set; }
 
-	private string templatePath;
+	private string _templatePath;
 
 	public UIManager()
 	{
@@ -35,22 +34,22 @@ public partial class UIManager
 		{
 			var relativePath = FileSystem.Game.GetRelativePath( file );
 
-			var templatePath = this.templatePath.NormalizePath();
-			var stylePath = System.IO.Path.ChangeExtension( this.templatePath.NormalizePath(), "scss" );
+			var templatePath = this._templatePath.NormalizePath();
+			var stylePath = System.IO.Path.ChangeExtension( this._templatePath.NormalizePath(), "scss" );
 			shouldLoad = (relativePath == templatePath || relativePath == stylePath);
 		}
 
 		if ( shouldLoad )
 		{
 			Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
-			RootPanel = Template.FromFile( Renderer, templatePath );
+			RootPanel = Template.FromFile( Renderer, _templatePath );
 			IsDirty = true;
 		}
 	}
 
 	public void SetTemplate( string path )
 	{
-		this.templatePath = path;
+		this._templatePath = path;
 		LoadTemplate();
 	}
 

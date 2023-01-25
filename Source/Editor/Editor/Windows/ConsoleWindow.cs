@@ -15,18 +15,18 @@ public class ConsoleWindow : EditorWindow
 	/// Has the console just changed? If so, set this to true and
 	/// we'll scroll to the bottom.
 	/// </summary>
-	private bool isDirty = false;
+	private bool _isDirty = false;
 
 	private void DrawOutput()
 	{
 		if ( !ImGui.BeginChild( "##console_output", new Vector2( -1, -32 ) ) )
 			return;
 
-		if ( isDirty )
+		if ( _isDirty )
 		{
 			ImGui.SetScrollY( ImGui.GetScrollMaxY() );
 
-			isDirty = false;
+			_isDirty = false;
 		}
 
 		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg ) )
@@ -75,7 +75,7 @@ public class ConsoleWindow : EditorWindow
 
 			ConsoleSystem.Run( s_currentInput );
 
-			isDirty = true;
+			_isDirty = true;
 			s_currentInput = "";
 		}
 	}

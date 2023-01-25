@@ -6,10 +6,11 @@ namespace Mocha.Common;
 public class FileSystem
 {
 	public static FileSystem Game { get; set; }
-	private List<FileSystemWatcher> Watchers { get; } = new();
 
-	private string BasePath { get; }
 	public IAssetCompiler AssetCompiler { get; set; }
+
+	private List<FileSystemWatcher> Watchers { get; } = new();
+	private string BasePath { get; }
 
 	public FileSystem( string relativePath )
 	{

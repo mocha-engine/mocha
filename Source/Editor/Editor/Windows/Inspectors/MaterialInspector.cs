@@ -3,11 +3,11 @@
 [Inspector<Material>]
 public class MaterialInspector : BaseInspector
 {
-	private Material material;
+	private Material _material;
 
 	public MaterialInspector( Material material )
 	{
-		this.material = material;
+		this._material = material;
 	}
 
 	private void TextureSlot( string name, Texture texture )
@@ -37,12 +37,12 @@ public class MaterialInspector : BaseInspector
 		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
 		ImGuiX.InspectorTitle(
-			$"{Path.GetFileName( material.Path )}",
+			$"{Path.GetFileName( _material.Path )}",
 			"This is a material.",
 			ResourceType.Material
 		);
 
-		DrawButtons( material.Path );
+		DrawButtons( _material.Path );
 		ImGuiX.Separator();
 
 		if ( ImGui.BeginListBox( "##inspector_table", new( -1, 210 ) ) )
@@ -55,9 +55,9 @@ public class MaterialInspector : BaseInspector
 				ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthFixed, 100f );
 				ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 1f );
 
-				foreach ( var property in material.GetType().GetProperties().Where( x => x.PropertyType == typeof( Texture ) ) )
+				foreach ( var property in _material.GetType().GetProperties().Where( x => x.PropertyType == typeof( Texture ) ) )
 				{
-					var texture = property.GetValue( material ) as Texture;
+					var texture = property.GetValue( _material ) as Texture;
 
 					TextureSlot( ImGuiX.GetDisplayName( property.Name ), texture );
 				}
@@ -69,6 +69,6 @@ public class MaterialInspector : BaseInspector
 		}
 
 		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
-		ImGuiX.Image( material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		ImGuiX.Image( _material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

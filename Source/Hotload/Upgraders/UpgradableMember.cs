@@ -6,18 +6,18 @@ public class UpgradableMember
 {
 	// In object: instance
 	// Out object: value
-	private readonly Func<object, object?> Getter;
+	private readonly Func<object, object?> _getter;
 
 	// In object: instance
 	// In object: value
-	private readonly Action<object, object> Setter;
+	private readonly Action<object, object> _setter;
 
 	public Type Type { get; }
 
 	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type )
 	{
-		Getter = getter;
-		Setter = setter;
+		_getter = getter;
+		_setter = setter;
 		Type = type;
 	}
 
@@ -26,7 +26,7 @@ public class UpgradableMember
 	/// </summary>
 	public void SetValue( object instance, object value )
 	{
-		Setter?.Invoke( instance, value );
+		_setter?.Invoke( instance, value );
 	}
 
 	/// <summary>
@@ -34,7 +34,7 @@ public class UpgradableMember
 	/// </summary>
 	public object? GetValue( object instance )
 	{
-		return Getter?.Invoke( instance );
+		return _getter?.Invoke( instance );
 	}
 
 	#region "Constructors"

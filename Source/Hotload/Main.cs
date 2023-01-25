@@ -12,7 +12,7 @@ public static class Main
 
 	private static bool s_hasInitialized;
 
-	private const string manifestPath = @"Samples\mocha-minimal\project.json";
+	private const string ManifestPath = @"Samples\mocha-minimal\project.json";
 
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
@@ -28,7 +28,7 @@ public static class Main
 		// slowdowns while the engine is running.
 		Upgrader.Init();
 
-		var manifest = ProjectManifest.Load( manifestPath );
+		var manifest = ProjectManifest.Load( ManifestPath );
 		Log.Trace( $"Loading project '{manifest.Name}'" );
 
 		// Generate project

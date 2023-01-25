@@ -14,28 +14,28 @@ public sealed class EntityRegistry : IEnumerable<IEntity>
 		}
 	}
 
-	private readonly List<IEntity> Entities = new();
+	private readonly List<IEntity> _entities = new();
 
 	public void RegisterEntity( IEntity entity )
 	{
 		// Don't add duplicates
-		if ( Entities.Contains( entity ) )
+		if ( _entities.Contains( entity ) )
 			return;
 
-		Entities.Add( entity );
+		_entities.Add( entity );
 	}
 
 	public void UnregisterEntity( IEntity entity )
 	{
-		Entities.Remove( entity );
+		_entities.Remove( entity );
 	}
 
-	public IEnumerator<IEntity> GetEnumerator() => Entities.GetEnumerator();
-	IEnumerator IEnumerable.GetEnumerator() => Entities.GetEnumerator();
+	public IEnumerator<IEntity> GetEnumerator() => _entities.GetEnumerator();
+	IEnumerator IEnumerable.GetEnumerator() => _entities.GetEnumerator();
 
 	public IEntity this[int index]
 	{
-		get => Entities.ElementAt( index );
-		set => Entities[index] = value;
+		get => _entities.ElementAt( index );
+		set => _entities[index] = value;
 	}
 }
