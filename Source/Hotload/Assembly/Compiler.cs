@@ -9,6 +9,8 @@ namespace Mocha.Hotload;
 public class CompileOptions
 {
 	public OptimizationLevel OptimizationLevel { get; set; }
+
+	// Does nothing with a Release optimization level
 	public bool GenerateSymbols { get; set; }
 }
 
@@ -72,7 +74,7 @@ public class Compiler
 
 		if ( compileOptions is null )
 		{
-			compileOptions = new CompileOptions()
+			compileOptions = new CompileOptions
 			{
 				OptimizationLevel = OptimizationLevel.Debug,
 				GenerateSymbols = true,
