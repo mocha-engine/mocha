@@ -53,6 +53,55 @@ public struct CompileResult
 
 public class Compiler
 {
+	private static string[] s_SystemReferences = new[]
+		{
+			"mscorlib.dll",
+			"System.dll",
+
+			"System.Core.dll",
+
+			"System.ComponentModel.Primitives.dll",
+			"System.ComponentModel.Annotations.dll",
+
+			"System.Collections.dll",
+			"System.Collections.Concurrent.dll",
+			"System.Collections.Immutable.dll",
+			"System.Collections.Specialized.dll",
+
+			"System.Console.dll",
+
+			"System.Data.dll",
+			"System.Diagnostics.Process.dll",
+
+			"System.IO.Compression.dll",
+			"System.IO.FileSystem.Watcher.dll",
+
+			"System.Linq.dll",
+			"System.Linq.Expressions.dll",
+
+			"System.Numerics.Vectors.dll",
+
+			"System.ObjectModel.dll",
+
+			"System.Private.CoreLib.dll",
+			"System.Private.Xml.dll",
+			"System.Private.Uri.dll",
+
+			"System.Runtime.Extensions.dll",
+			"System.Runtime.dll",
+
+			"System.Text.RegularExpressions.dll",
+			"System.Text.Json.dll",
+
+			"System.Security.Cryptography.dll",
+
+			"System.Threading.Channels.dll",
+
+			"System.Web.HttpUtility.dll",
+
+			"System.Xml.ReaderWriter.dll",
+		};
+
 	private static Compiler s_Instance;
 	public static Compiler Instance
 	{
@@ -131,57 +180,8 @@ public class Compiler
 		var references = new List<PortableExecutableReference>();
 
 		// System references
-		var systemReferences = new[]
-		{
-			"mscorlib.dll",
-			"System.dll",
-
-			"System.Core.dll",
-
-			"System.ComponentModel.Primitives.dll",
-			"System.ComponentModel.Annotations.dll",
-
-			"System.Collections.dll",
-			"System.Collections.Concurrent.dll",
-			"System.Collections.Immutable.dll",
-			"System.Collections.Specialized.dll",
-
-			"System.Console.dll",
-
-			"System.Data.dll",
-			"System.Diagnostics.Process.dll",
-
-			"System.IO.Compression.dll",
-			"System.IO.FileSystem.Watcher.dll",
-
-			"System.Linq.dll",
-			"System.Linq.Expressions.dll",
-
-			"System.Numerics.Vectors.dll",
-
-			"System.ObjectModel.dll",
-
-			"System.Private.CoreLib.dll",
-			"System.Private.Xml.dll",
-			"System.Private.Uri.dll",
-
-			"System.Runtime.Extensions.dll",
-			"System.Runtime.dll",
-
-			"System.Text.RegularExpressions.dll",
-			"System.Text.Json.dll",
-
-			"System.Security.Cryptography.dll",
-
-			"System.Threading.Channels.dll",
-
-			"System.Web.HttpUtility.dll",
-
-			"System.Xml.ReaderWriter.dll",
-		};
-
 		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location );
-		foreach ( var systemReference in systemReferences )
+		foreach ( var systemReference in s_SystemReferences )
 		{
 			references.Add( MetadataReference.CreateFromFile( Path.Combine( dotnetBaseDir, systemReference ) ) );
 		}
