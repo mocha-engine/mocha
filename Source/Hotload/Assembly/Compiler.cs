@@ -149,10 +149,11 @@ public class Compiler
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
 
+		// For each source file, create a syntax tree we can use to compile it
+
 		// Global namespaces, etc.
 		syntaxTrees.Add( CSharpSyntaxTree.ParseText( s_Globals ) );
 
-		// For each source file, create a syntax tree we can use to compile it
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
 			var filePath = item.EvaluatedInclude;
