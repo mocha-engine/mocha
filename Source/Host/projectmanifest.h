@@ -119,41 +119,41 @@ struct Project
 
 namespace ProjectManifest
 {
-	void from_json( const json& j, ProjectClass& x );
-	void from_json( const json& j, Properties& x );
-	void from_json( const json& j, Resources& x );
-	void from_json( const json& j, Project& x );
+	void FromJson( const json& j, ProjectClass& x );
+	void FromJson( const json& j, Properties& x );
+	void FromJson( const json& j, Resources& x );
+	void FromJson( const json& j, Project& x );
 
-	inline void from_json( const json& j, ProjectClass& x )
+	inline void FromJson( const json& j, ProjectClass& x )
 	{
 		x.defaultNamespace = get_stack_optional<std::string>( j, "defaultNamespace" ).value_or( "" );
 		x.nullable = get_stack_optional<bool>( j, "nullable" ).value_or( false );
 	}
 
-	inline void from_json( const json& j, Properties& x )
+	inline void FromJson( const json& j, Properties& x )
 	{
 		x.tickRate = get_stack_optional<int64_t>( j, "tickRate" ).value_or( 60 );
 	}
 
-	inline void from_json( const json& j, Resources& x )
+	inline void FromJson( const json& j, Resources& x )
 	{
 		x.code = get_stack_optional<std::string>( j, "code" ).value_or( "" );
 		x.content = get_stack_optional<std::string>( j, "content" ).value_or( "" );
 	}
 
-	inline void from_json( const json& j, Project& x )
+	inline void FromJson( const json& j, Project& x )
 	{
 		x.name = get_stack_optional<std::string>( j, "name" ).value_or( "Unnamed" );
 		x.author = get_stack_optional<std::string>( j, "author" ).value_or( "Unknown" );
 		x.version = get_stack_optional<std::string>( j, "version" ).value_or( "1.0.0" );
 		x.description = get_stack_optional<std::string>( j, "description" ).value_or( "" );
 
-		from_json( get_untyped( j, "resources" ), x.resources );
-		from_json( get_untyped( j, "properties" ), x.properties );
-		from_json( get_untyped( j, "project" ), x.project );
+		FromJson( get_untyped( j, "resources" ), x.resources );
+		FromJson( get_untyped( j, "properties" ), x.properties );
+		FromJson( get_untyped( j, "project" ), x.project );
 	}
 
-	inline void normalize( const std::string path, Project& x )
+	inline void NormalizePaths( const std::string path, Project& x )
 	{
 		// Convert paths to absolute paths based on the project file location
 		// ( Combine with path )

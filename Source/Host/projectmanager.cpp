@@ -21,14 +21,14 @@ void ProjectManager::Startup()
 	try
 	{
 		projectFile >> projectManifest;
-		ProjectManifest::from_json( projectManifest, m_project );
+		ProjectManifest::FromJson( projectManifest, m_project );
 
 		// Get the directory for EngineProperties::LoadedProject so that we
 		// can use it to get absolute paths for resources
 		std::filesystem::path projectPath = EngineProperties::LoadedProject.GetValue();
 		std::string parentDirectory = projectPath.parent_path().string();
 
-		ProjectManifest::normalize( parentDirectory, m_project );
+		ProjectManifest::NormalizePaths( parentDirectory, m_project );
 	}
 	catch ( nlohmann::json::parse_error& ex )
 	{

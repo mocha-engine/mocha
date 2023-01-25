@@ -528,7 +528,9 @@
     <ClCompile Include="shadercompiler.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
-    <ClCompile Include="ProjectManager.cpp" />
+    <ClCompile Include="projectmanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modelentity.h">
@@ -1446,8 +1448,12 @@
     <ClInclude Include="shadercompiler.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="projectmanifest.h" />
-    <ClInclude Include="ProjectManager.h" />
+    <ClInclude Include="projectmanifest.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="projectmanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

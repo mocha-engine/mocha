@@ -195,7 +195,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="modelentity.cpp" />
     <ClCompile Include="physicsmanager.cpp" />
     <ClCompile Include="pipeline.cpp" />
-    <ClCompile Include="ProjectManager.cpp" />
+    <ClCompile Include="projectmanager.cpp" />
     <ClCompile Include="renderdocmanager.cpp" />
     <ClCompile Include="rendermanager.cpp" />
     <ClCompile Include="baserendercontext.cpp" />
@@ -360,7 +360,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="mesh.h" />
-    <ClInclude Include="ProjectManager.h" />
+    <ClInclude Include="projectmanager.h" />
     <ClInclude Include="projectmanifest.h" />
     <ClInclude Include="rendering.h" />
     <ClInclude Include="shadercompiler.h" />
