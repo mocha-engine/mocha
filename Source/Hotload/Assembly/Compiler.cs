@@ -3,7 +3,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Mocha.Common;
-using MochaTool.AssetCompiler;
 
 namespace Mocha.Hotload;
 
