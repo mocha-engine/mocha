@@ -21,7 +21,7 @@ class BaseEntity
 {
 public:
 	BaseEntity()
-	    : m_spawnTime( g_curTime ){};
+	    : m_spawnTime( g_curTick ){};
 	virtual ~BaseEntity() {}
 
 	int m_spawnTime;

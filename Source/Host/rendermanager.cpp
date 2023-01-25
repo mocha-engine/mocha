@@ -257,7 +257,7 @@ void RenderManager::Run()
 			// Assign interpolated transforms to all entities
 			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 				// If this entity was spawned in just now, don't interpolate
-				if ( entity->m_spawnTime == g_curTime )
+				if ( entity->m_spawnTime == g_curTick )
 					return;
 
 				entity->m_transform =
