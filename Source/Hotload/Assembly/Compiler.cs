@@ -102,10 +102,6 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
-	private static string globals = """
-		global using static Mocha.Common.Global;
-		""";
-
 	private static Compiler instance;
 	public static Compiler Instance
 	{
@@ -149,10 +145,18 @@ public class Compiler
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
 
-		// For each source file, create a syntax tree we can use to compile it
-
 		// Global namespaces, etc.
-		syntaxTrees.Add( CSharpSyntaxTree.ParseText( globals ) );
+		var globalUsings = string.Empty;
+		foreach ( var usingEntry in project.GetItems( "Using" ) )
+		{
+			var isStatic = bool.Parse( usingEntry.GetMetadataValue( "Static" ) );
+			globalUsings += $"global using{(isStatic ? " static " : " ")}{usingEntry.EvaluatedInclude};{Environment.NewLine}";
+		}
+
+		if ( globalUsings != string.Empty )
+			syntaxTrees.Add( CSharpSyntaxTree.ParseText( globalUsings ) );
+
+		// For each source file, create a syntax tree we can use to compile it
 
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
