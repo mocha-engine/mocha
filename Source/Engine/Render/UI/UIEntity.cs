@@ -15,7 +15,7 @@ public partial class UIEntity : ModelEntity, IRenderer
 	{
 		IsUI = true;
 		AtlasBuilder = new();
-		Material = new( "core/shaders/ui/ui.mshdr",
+		Material = new( "shaders/ui/ui.mshdr",
 				 UIVertex.VertexAttributes,
 				 AtlasBuilder.Texture,
 				 sampler: SamplerType.Anisotropic,
@@ -99,10 +99,10 @@ public partial class UIEntity : ModelEntity, IRenderer
 			_ => $"{fontFamily}-Regular",
 		};
 
-		if ( FileSystem.Game.Exists( $"core/fonts/{fontName}.mfnt" ) )
+		if ( FileSystem.Mounted.Exists( $"fonts/{fontName}.mfnt" ) )
 			return fontName;
 
-		if ( FileSystem.Game.Exists( $"core/fonts/{fontFamily}.mfnt" ) )
+		if ( FileSystem.Mounted.Exists( $"fonts/{fontFamily}.mfnt" ) )
 			return fontFamily;
 
 		return "Inter-Regular";

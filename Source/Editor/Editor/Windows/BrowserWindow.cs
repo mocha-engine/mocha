@@ -134,7 +134,7 @@ internal class BrowserWindow : EditorWindow
 
 		void CacheDirectory( string directory )
 		{
-			foreach ( var fileName in FileSystem.Game.GetFiles( directory ) )
+			foreach ( var fileName in FileSystem.Mounted.GetFiles( directory ) )
 			{
 				var sourceFileName = fileName;
 				var isCompiled = false;
@@ -145,7 +145,7 @@ internal class BrowserWindow : EditorWindow
 					sourceFileName = fileName[..^2];
 				}
 
-				var relativePath = FileSystem.Game.GetRelativePath( fileName );
+				var relativePath = FileSystem.Mounted.GetRelativePath( fileName );
 
 				// Is this a compiled file with a source file present?
 				if ( isCompiled && File.Exists( sourceFileName ) )
@@ -158,7 +158,7 @@ internal class BrowserWindow : EditorWindow
 				FileSystemCache.Add( relativePath );
 			}
 
-			foreach ( var subDir in FileSystem.Game.GetDirectories( directory ) )
+			foreach ( var subDir in FileSystem.Mounted.GetDirectories( directory ) )
 			{
 				CacheDirectory( subDir );
 			}

@@ -9,7 +9,7 @@ public class Material : Asset
 	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
 	public Texture? RoughnessTexture { get; set; } = Texture.One;
 
-	public static Texture BlueNoiseTexture { get; } = new Texture( "core/textures/bluenoise.mtex", false );
+	public static Texture BlueNoiseTexture { get; } = new Texture( "textures/bluenoise.mtex", false );
 
 	public Glue.Material NativeMaterial { get; private set; }
 
@@ -22,9 +22,9 @@ public class Material : Asset
 
 		MochaFile<MaterialInfo> materialFormat = new();
 
-		if ( FileSystem.Game.Exists( path ) )
+		if ( FileSystem.Mounted.Exists( path ) )
 		{
-			var fileBytes = FileSystem.Game.ReadAllBytes( path );
+			var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
 			materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
 		}
 		else
@@ -57,7 +57,7 @@ public class Material : Asset
 			BlueNoiseTexture.NativeTexture
 		};
 
-		var shaderFileBytes = FileSystem.Game.ReadAllBytes( "core/shaders/pbr.mshdr" );
+		var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
 		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
 		NativeMaterial = new(
@@ -77,7 +77,7 @@ public class Material : Asset
 		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
 		Texture? roughnessTexture = null, SamplerType sampler = SamplerType.Point, bool ignoreDepth = false )
 	{
-		var shaderFileBytes = FileSystem.Game.ReadAllBytes( shaderPath );
+		var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( shaderPath );
 		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
 		Path = "Procedural Material";

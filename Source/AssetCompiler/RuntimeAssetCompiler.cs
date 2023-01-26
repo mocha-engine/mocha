@@ -2,14 +2,14 @@
 
 public class RuntimeAssetCompiler : AssetCompilerBase
 {
-	private FileSystemWatcher _watcher { get; set; }
+	private List<FileSystemWatcher> _watchers { get; set; }
 
 	public RuntimeAssetCompiler()
 	{
 		// Only notify on file created
 		var filters = NotifyFilters.CreationTime;
 
-		_watcher = FileSystem.Game.CreateWatcher( "", "*.*", path =>
+		_watchers = FileSystem.Mounted.CreateMountedFileSystemWatchers( "*.*", path =>
 		{
 			// Prevent an infinite loop -- don't recompile assets that we just compiled!
 			if ( path.EndsWith( "_c" ) )
@@ -23,7 +23,7 @@ public class RuntimeAssetCompiler : AssetCompilerBase
 
 				for ( int i = 0; i < RetryCount; ++i )
 				{
-					if ( FileSystem.Game.IsFileReady( path ) )
+					if ( FileSystem.Mounted.IsFileReady( path ) )
 						break;
 
 					Thread.Sleep( 500 );

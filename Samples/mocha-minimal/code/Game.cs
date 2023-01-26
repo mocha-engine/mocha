@@ -1,6 +1,5 @@
 global using Mocha;
 global using Mocha.Common;
-global using Mocha.UI;
 global using System;
 global using System.ComponentModel;
 
@@ -18,8 +17,8 @@ public class Game : BaseGame
 		Hud.SetTemplate( "ui/Game.html" );
 
 		// Spawn a model to walk around in
-		var map = new ModelEntity( "core/models/dev/dev_map.mmdl" );
-		map.SetMeshPhysics( "core/models/dev/dev_map.mmdl" );
+		var map = new ModelEntity( "models/dev/dev_map.mmdl" );
+		map.SetMeshPhysics( "models/dev/dev_map.mmdl" );
 
 		// Spawn a player
 		var player = new Player();

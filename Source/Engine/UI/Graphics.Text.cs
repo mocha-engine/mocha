@@ -25,9 +25,9 @@ partial class Graphics
 		}
 
 		var loadedFont = new CachedFont();
-		loadedFont.Texture = new Texture( $"core/fonts/{fontName}.mtex" );
+		loadedFont.Texture = new Texture( $"fonts/{fontName}.mtex" );
 
-		var fileBytes = FileSystem.Game.ReadAllBytes( $"core/fonts/{fontName}.mfnt" );
+		var fileBytes = FileSystem.Mounted.ReadAllBytes( $"fonts/{fontName}.mfnt" );
 		loadedFont.Data = Serializer.Deserialize<MochaFile<Font.Data>>( fileBytes ).Data;
 
 		return s_cachedFonts[fontName] = loadedFont;

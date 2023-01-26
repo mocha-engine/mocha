@@ -11,8 +11,7 @@ public static class Main
 	private static ProjectAssembly<IGame> s_editor;
 
 	private static bool s_hasInitialized;
-
-	private const string ManifestPath = @"Samples\mocha-minimal\project.json";
+	private static ProjectManifest s_manifest;
 
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
@@ -28,22 +27,21 @@ public static class Main
 		// slowdowns while the engine is running.
 		Upgrader.Init();
 
-		var manifest = ProjectManifest.Load( ManifestPath );
 		// Get the current loaded project from native
 		var manifestPath = Glue.Engine.GetProjectPath();
-		var manifest = ProjectManifest.Load( manifestPath );
-		Log.Trace( $"Loading project '{manifest.Name}'" );
+		s_manifest = ProjectManifest.Load( manifestPath );
+		Log.Trace( $"Loading project '{s_manifest.Name}'" );
 
 		// Generate project
 		var projectGenerator = new ProjectGenerator();
-		var csproj = projectGenerator.GenerateProject( manifest );
+		var csproj = projectGenerator.GenerateProject( s_manifest );
 		Log.Trace( $"Generated '{csproj}'" );
 
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
-			AssemblyName = manifest.Name,
+			AssemblyName = s_manifest.Name,
 			ProjectPath = csproj,
-			SourceRoot = manifest.Resources.Code,
+			SourceRoot = s_manifest.Resources.Code,
 		};
 
 		var editorAssemblyInfo = new ProjectAssemblyInfo()
@@ -60,6 +58,15 @@ public static class Main
 
 		if ( !s_hasInitialized )
 			Init();
+	}
+
+	private static void InitFileSystem()
+	{
+		FileSystem.Mounted = new FileSystem(
+			"content\\core",
+			s_manifest.Resources.Content );
+
+		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 	}
 
 	private static void Init()
@@ -112,11 +119,5 @@ public static class Main
 			return;
 
 		Event.Run( eventName );
-	}
-
-	private static void InitFileSystem()
-	{
-		FileSystem.Game = new FileSystem( "content\\" );
-		FileSystem.Game.AssetCompiler = new RuntimeAssetCompiler();
 	}
 }

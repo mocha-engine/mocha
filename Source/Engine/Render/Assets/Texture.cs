@@ -20,7 +20,7 @@ public partial class Texture : Asset
 		Path = path;
 		All.Add( this );
 
-		var fileBytes = FileSystem.Game.ReadAllBytes( path );
+		var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
 
 		var textureFormat = Serializer.Deserialize<MochaFile<TextureInfo>>( fileBytes );
 		Width = textureFormat.Data.Width;

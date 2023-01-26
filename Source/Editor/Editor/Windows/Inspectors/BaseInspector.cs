@@ -37,7 +37,7 @@ public class BaseInspector
 
 		if ( ImGui.SmallButton( $"{FontAwesome.Folder}" ) )
 		{
-			var args = $"/select,\"{FileSystem.Game.GetFullPath( filePath )}\"";
+			var args = $"/select,\"{FileSystem.Mounted.GetFullPath( filePath )}\"";
 			Process.Start( "explorer.exe", args );
 		}
 

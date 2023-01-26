@@ -9,11 +9,11 @@ public static class Template
 		var templatePath = Path.ChangeExtension( path, ".html" );
 		var stylePath = Path.ChangeExtension( path, ".scss" );
 
-		while ( !FileSystem.Game.IsFileReady( templatePath ) ) ;
-		while ( !FileSystem.Game.IsFileReady( stylePath ) ) ;
+		while ( !FileSystem.Mounted.IsFileReady( templatePath ) ) ;
+		while ( !FileSystem.Mounted.IsFileReady( stylePath ) ) ;
 
-		var rootTemplateNode = HtmlParser.Parse( FileSystem.Game.ReadAllText( templatePath ) );
-		var stylesheet = ScssParser.Parse( FileSystem.Game.ReadAllText( stylePath ) );
+		var rootTemplateNode = HtmlParser.Parse( FileSystem.Mounted.ReadAllText( templatePath ) );
+		var stylesheet = ScssParser.Parse( FileSystem.Mounted.ReadAllText( stylePath ) );
 		var rootStyledNode = StyleTree.BuildTree( rootTemplateNode, stylesheet );
 
 		var rootLayoutNode = LayoutTree.BuildTree( renderer, rootStyledNode );
