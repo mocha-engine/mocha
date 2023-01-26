@@ -12,7 +12,7 @@ public class AssetCompilerBase : IAssetCompiler
 	/// </summary>
 	protected List<BaseCompiler> Compilers = new();
 
-	private readonly Dictionary<string, BaseCompiler> ExtensionToCompilerCache = new();
+	private readonly Dictionary<string, BaseCompiler> _extensionToCompilerCache = new();
 
 	public AssetCompilerBase()
 	{
@@ -30,7 +30,7 @@ public class AssetCompilerBase : IAssetCompiler
 				continue;
 
 			foreach ( var extension in handleAttribute.Extensions )
-				ExtensionToCompilerCache.Add( extension, instance );
+				_extensionToCompilerCache.Add( extension, instance );
 		}
 	}
 
@@ -42,7 +42,7 @@ public class AssetCompilerBase : IAssetCompiler
 	/// <returns>Whether or not a compiler was found.</returns>
 	protected bool TryGetCompiler( string fileExtension, [NotNullWhen( true )] out BaseCompiler? foundCompiler )
 	{
-		return ExtensionToCompilerCache.TryGetValue( fileExtension, out foundCompiler );
+		return _extensionToCompilerCache.TryGetValue( fileExtension, out foundCompiler );
 	}
 
 	/// <summary>
@@ -63,10 +63,10 @@ public class AssetCompilerBase : IAssetCompiler
 	public void CompileFile( string path ) => CompileFileAsync( path ).Wait();
 
 	/// <inheritdoc/>
-	public async Task CompileFileAsync( string path )
+	public async Task CompileFileAsync( string relativePath )
 	{
 		// Check if we have a compiler for the file.
-		var fileExtension = Path.GetExtension( path );
+		var fileExtension = Path.GetExtension( relativePath );
 		if ( !TryGetCompiler( fileExtension, out var compiler ) )
 			return;
 
@@ -75,42 +75,42 @@ public class AssetCompilerBase : IAssetCompiler
 
 		foreach ( var filePathPattern in compiler.AssociatedFiles )
 		{
-			var filePath = CompilePathPattern( path, filePathPattern );
+			var filePath = CompilePathPattern( relativePath, filePathPattern );
 			// TODO: Support wildcard (*)
 
-			if ( !File.Exists( filePath ) )
+			if ( !FileSystem.Mounted.Exists( filePath, FileSystemOptions.AssetCompiler ) )
 				continue;
 
 			// Add associated file and apply it to the MD5 hash.
-			var data = await File.ReadAllBytesAsync( filePath );
+			var data = await FileSystem.Mounted.ReadAllBytesAsync( filePath, FileSystemOptions.AssetCompiler );
 			files.Add( filePathPattern, data );
 			md5.TransformBlock( data, 0, data.Length, data, 0 );
 		}
 
 		// Finish MD5 with the source file.
-		var sourceData = await File.ReadAllBytesAsync( path );
+		var sourceData = await FileSystem.Mounted.ReadAllBytesAsync( relativePath, FileSystemOptions.AssetCompiler );
 		md5.TransformFinalBlock( sourceData, 0, sourceData.Length );
 
 		var hash = md5.Hash!;
-		var compiledPath = Path.ChangeExtension( path, compiler.CompiledExtension );
+		var compiledPath = Path.ChangeExtension( relativePath, compiler.CompiledExtension );
 
 		// Check if we need to recompile.
-		if ( compiler.SupportsMochaFile && File.Exists( compiledPath ) )
+		if ( compiler.SupportsMochaFile && FileSystem.Mounted.Exists( compiledPath, FileSystemOptions.AssetCompiler ) )
 		{
-			MochaFile<object> compiledFile = Serializer.Deserialize<MochaFile<object>>( await File.ReadAllBytesAsync( compiledPath ) );
+			MochaFile<object> compiledFile = Serializer.Deserialize<MochaFile<object>>( await FileSystem.Mounted.ReadAllBytesAsync( compiledPath, FileSystemOptions.AssetCompiler ) );
 			if ( Enumerable.SequenceEqual( hash, compiledFile.AssetHash ) )
 			{
-				Log.UpToDate( path );
+				ResultLog.UpToDate( relativePath );
 				return;
 			}
 		}
 
-		Log.Processing( compiler.AssetName, path );
+		ResultLog.Processing( compiler.AssetName, relativePath );
 
 		// Compile.
 		var input = new CompileInput()
 		{
-			SourcePath = path,
+			SourcePath = relativePath,
 			SourceData = sourceData,
 			AssociatedData = files,
 			DataHash = md5.Hash!
@@ -134,20 +134,20 @@ public class AssetCompilerBase : IAssetCompiler
 		{
 			case CompileState.Succeeded:
 				// Write compiled data.
-				using ( var compiledFile = File.OpenWrite( compiledPath ) )
+				using ( var compiledFile = FileSystem.Mounted.OpenWrite( compiledPath, FileSystemOptions.AssetCompiler ) )
 					await compiledFile.WriteAsync( result.Data );
 
 				foreach ( var (compiledAssociatedPathPattern, associatedData) in result.AssociatedData )
 				{
-					var compiledAssociatedPath = CompilePathPattern( path, compiledAssociatedPathPattern );
-					using var compiledAssociatedFile = File.OpenWrite( compiledAssociatedPath );
+					var compiledAssociatedPath = CompilePathPattern( relativePath, compiledAssociatedPathPattern );
+					using var compiledAssociatedFile = FileSystem.Mounted.OpenWrite( compiledAssociatedPath, FileSystemOptions.AssetCompiler );
 					await compiledAssociatedFile.WriteAsync( associatedData );
 				}
 
-				Log.Compiled( compiledPath );
+				ResultLog.Compiled( compiledPath );
 				break;
 			case CompileState.Failed:
-				Log.Fail( path, result.Exception );
+				ResultLog.Fail( relativePath, result.Exception );
 				break;
 			default:
 				throw new UnreachableException();

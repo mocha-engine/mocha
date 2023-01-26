@@ -3,11 +3,11 @@
 [Inspector<Texture>]
 public class TextureInspector : BaseInspector
 {
-	private Texture texture;
+	private Texture _texture;
 
 	public TextureInspector( Texture texture )
 	{
-		this.texture = texture;
+		this._texture = texture;
 	}
 
 	public override void Draw()
@@ -15,22 +15,22 @@ public class TextureInspector : BaseInspector
 		var (windowWidth, windowHeight) = (ImGui.GetWindowWidth(), ImGui.GetWindowHeight());
 
 		ImGuiX.InspectorTitle(
-			$"{Path.GetFileName( texture.Path.NormalizePath() )}",
+			$"{Path.GetFileName( _texture.Path.NormalizePath() )}",
 			"This is a texture.",
 			ResourceType.Texture
 		);
 
 		var items = new (string, string)[]
 		{
-			( "Full Path", $"{texture.Path.NormalizePath()}" ),
-			( "Size", $"{texture.Width}x{texture.Height}" )
+			( "Full Path", $"{_texture.Path.NormalizePath()}" ),
+			( "Size", $"{_texture.Width}x{_texture.Height}" )
 		};
 
-		DrawProperties( $"{FontAwesome.Image} Texture", items, texture.Path );
+		DrawProperties( $"{FontAwesome.Image} Texture", items, _texture.Path );
 
 		ImGuiX.Separator();
 
 		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
-		ImGuiX.Image( texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		ImGuiX.Image( _texture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

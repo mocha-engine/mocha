@@ -2,20 +2,20 @@
 
 public struct TimeUntil : IEquatable<TimeUntil>
 {
-	private float time;
+	private float _time;
 
-	public float Absolute => time;
-	public float Until => time - Time.Now;
+	public float Absolute => _time;
+	public float Until => _time - Time.Now;
 
 	public static implicit operator float( TimeUntil other )
 	{
-		return other.time - Time.Now;
+		return other._time - Time.Now;
 	}
 
 	public static implicit operator TimeUntil( float other )
 	{
 		TimeUntil result = new();
-		result.time = Time.Now + other;
+		result._time = Time.Now + other;
 
 		return result;
 	}
@@ -28,7 +28,7 @@ public struct TimeUntil : IEquatable<TimeUntil>
 		return false;
 	}
 
-	public bool Equals( TimeUntil o ) => time == o.time;
+	public bool Equals( TimeUntil o ) => _time == o._time;
 
 	public static bool operator ==( TimeUntil a, TimeUntil b ) => a.Equals( b );
 	public static bool operator !=( TimeUntil a, TimeUntil b ) => !a.Equals( b );

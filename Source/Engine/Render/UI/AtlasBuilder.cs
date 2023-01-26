@@ -7,8 +7,9 @@ public class AtlasBuilder
 	public Texture Texture { get; private set; }
 	public Action OnBuild { get; set; }
 
-	private uint RowHeight = 0;
-	private Vector2 Cursor = new();
+	private uint _rowHeight = 0;
+	private Vector2 _cursor = new();
+
 	private const uint Size = 4096;
 
 	public AtlasBuilder()
@@ -23,25 +24,25 @@ public class AtlasBuilder
 			return TextureCache.First( x => x.Texture == texture ).Position;
 		}
 
-		if ( RowHeight < texture.Height )
-			RowHeight = texture.Height;
+		if ( _rowHeight < texture.Height )
+			_rowHeight = texture.Height;
 
-		if ( Cursor.X + texture.Width > Size )
+		if ( _cursor.X + texture.Width > Size )
 		{
-			Cursor.X = 0;
-			Cursor.Y += RowHeight;
-			RowHeight = 0;
+			_cursor.X = 0;
+			_cursor.Y += _rowHeight;
+			_rowHeight = 0;
 		}
 
 		//
 		// Copy the texture into the atlas
 		//
-		Point2 pos = new Point2( (int)Cursor.X, (int)Cursor.Y );
+		Point2 pos = new Point2( (int)_cursor.X, (int)_cursor.Y );
 
 		Texture.Copy( 0, 0, (uint)pos.X, (uint)pos.Y, texture.Width, texture.Height, texture );
 
 		TextureCache.Add( (pos, texture) );
-		Cursor.X += texture.Width;
+		_cursor.X += texture.Width;
 
 		OnBuild?.Invoke();
 		return pos;

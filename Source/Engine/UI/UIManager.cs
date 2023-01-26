@@ -5,22 +5,21 @@ namespace Mocha;
 public partial class UIManager
 {
 	public static UIManager Instance { get; private set; }
-
-	private IRenderer Renderer { get; } = new UIEntity();
-	private FileSystemWatcher Watcher { get; }
-	private bool IsDirty { get; set; }
-
 	public LayoutNode RootPanel { get; private set; }
 
-	private string templatePath;
+	private string _templatePath;
+	private bool _isDirty;
+	private readonly List<FileSystemWatcher> _watchers;
+	private readonly IRenderer _renderer = new UIEntity();
 
 	public UIManager()
 	{
-		Event.Register( this );
 		Instance = this;
+
+		Event.Register( this );
 		Graphics.Init();
 
-		Watcher = FileSystem.Game.CreateWatcher( "", "*.*", LoadTemplate );
+		_watchers = FileSystem.Mounted.CreateMountedFileSystemWatchers( "*.*", LoadTemplate );
 	}
 
 	public void LoadTemplate( string? file = null )
@@ -33,24 +32,24 @@ public partial class UIManager
 		}
 		else
 		{
-			var relativePath = FileSystem.Game.GetRelativePath( file );
+			var relativePath = FileSystem.Mounted.GetRelativePath( file );
 
-			var templatePath = this.templatePath.NormalizePath();
-			var stylePath = System.IO.Path.ChangeExtension( this.templatePath.NormalizePath(), "scss" );
+			var templatePath = _templatePath.NormalizePath();
+			var stylePath = Path.ChangeExtension( _templatePath.NormalizePath(), "scss" );
 			shouldLoad = (relativePath == templatePath || relativePath == stylePath);
 		}
 
 		if ( shouldLoad )
 		{
 			Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
-			RootPanel = Template.FromFile( Renderer, templatePath );
-			IsDirty = true;
+			RootPanel = Template.FromFile( _renderer, _templatePath );
+			_isDirty = true;
 		}
 	}
 
 	public void SetTemplate( string path )
 	{
-		this.templatePath = path;
+		this._templatePath = path;
 		LoadTemplate();
 	}
 
@@ -62,13 +61,13 @@ public partial class UIManager
 
 	public void Render()
 	{
-		if ( !IsDirty )
+		if ( !_isDirty )
 			return;
 
 		Graphics.PanelRenderer.NewFrame();
 
 		DrawNode( RootPanel );
-		IsDirty = false;
+		_isDirty = false;
 	}
 
 	internal void DrawNode( LayoutNode layoutNode )
@@ -79,12 +78,12 @@ public partial class UIManager
 			var rounding = layoutNode.StyledNode.StyleValues.BorderRadius?.Value ?? 0;
 			var bounds = layoutNode.Bounds;
 
-			Renderer.DrawRectangle( bounds, backgroundColor, rounding );
+			_renderer.DrawRectangle( bounds, backgroundColor, rounding );
 
 			var backgroundImage = layoutNode.StyledNode.StyleValues.BackgroundImage?.Value;
 			if ( backgroundImage != null )
 			{
-				Renderer.DrawImage( bounds, backgroundImage );
+				_renderer.DrawImage( bounds, backgroundImage );
 			}
 		}
 		else if ( layoutNode.StyledNode.Node is TextNode textNode )
@@ -96,7 +95,7 @@ public partial class UIManager
 
 			var bounds = layoutNode.Bounds;
 
-			Renderer.DrawText( bounds, textNode.Text, font, (int)weight, fontSize, color );
+			_renderer.DrawText( bounds, textNode.Text, font, (int)weight, fontSize, color );
 		}
 
 		foreach ( var childNode in layoutNode.Children )

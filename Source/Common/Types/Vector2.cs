@@ -2,18 +2,18 @@
 
 public struct Vector2 : IEquatable<Vector2>
 {
-	private System.Numerics.Vector2 internalVector;
+	private System.Numerics.Vector2 _internalVector;
 
 	public float X
 	{
-		readonly get => internalVector.X;
-		set => internalVector.X = value;
+		readonly get => _internalVector.X;
+		set => _internalVector.X = value;
 	}
 
 	public float Y
 	{
-		readonly get => internalVector.Y;
-		set => internalVector.Y = value;
+		readonly get => _internalVector.Y;
+		set => _internalVector.Y = value;
 	}
 
 	public static readonly Vector2 One = new( 1f );
@@ -24,19 +24,19 @@ public struct Vector2 : IEquatable<Vector2>
 
 	public static readonly Vector2 OneY = new( 0f, 1f );
 
-	public readonly float Length => internalVector.Length();
-	public readonly float LengthSquared => internalVector.LengthSquared();
+	public readonly float Length => _internalVector.Length();
+	public readonly float LengthSquared => _internalVector.LengthSquared();
 
 	public readonly Vector2 Normal => this / Length;
 
 	public void Normalize()
 	{
-		internalVector = new System.Numerics.Vector2( X, Y ) / Length;
+		_internalVector = new System.Numerics.Vector2( X, Y ) / Length;
 	}
 
 	public Vector2( float x, float y )
 	{
-		internalVector = new System.Numerics.Vector2( x, y );
+		_internalVector = new System.Numerics.Vector2( x, y );
 	}
 
 	public Vector2( Vector2 other ) : this( other.X, other.Y )
@@ -102,7 +102,7 @@ public struct Vector2 : IEquatable<Vector2>
 
 	public bool Equals( Vector2 other ) => Equals( (object)other );
 
-	public static float Dot( Vector2 a, Vector2 b ) => System.Numerics.Vector2.Dot( a.internalVector, b.internalVector );
+	public static float Dot( Vector2 a, Vector2 b ) => System.Numerics.Vector2.Dot( a._internalVector, b._internalVector );
 
 	public readonly float Dot( Vector2 b ) => Dot( this, b );
 
@@ -115,9 +115,9 @@ public struct Vector2 : IEquatable<Vector2>
 	public readonly Vector2 WithX( float x ) => new Vector2( x, Y );
 	public readonly Vector2 WithY( float y ) => new Vector2( X, y );
 
-	public override int GetHashCode() => HashCode.Combine( internalVector );
+	public override int GetHashCode() => HashCode.Combine( _internalVector );
 
-	public override string ToString() => internalVector.ToString();
+	public override string ToString() => _internalVector.ToString();
 
 	public void Deconstruct( out float x, out float y )
 	{

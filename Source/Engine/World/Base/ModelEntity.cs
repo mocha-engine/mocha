@@ -86,7 +86,7 @@ public partial class ModelEntity : BaseEntity
 	public void SetMeshPhysics( string path )
 	{
 		using var _ = new Stopwatch( "Mocha phys model generation" );
-		var fileBytes = FileSystem.Game.ReadAllBytes( path );
+		var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
 		var modelFile = Serializer.Deserialize<MochaFile<byte[]>>( fileBytes );
 
 		using var stream = new MemoryStream( modelFile.Data );

@@ -7,7 +7,7 @@ partial struct ResourceType
 		Name = "Shader",
 		Extension = "mshdr",
 		SourceExtensions = new[] { "mshdr" },
-		IconLg = "core/ui/icons/shader.mtex",
+		IconLg = "ui/icons/shader.mtex",
 		IconSm = FontAwesome.Glasses,
 		Color = MathX.GetColor( "#ffc710" )
 	};
@@ -17,7 +17,7 @@ partial struct ResourceType
 		Name = "Material",
 		Extension = "mmat",
 		SourceExtensions = new[] { "mmat" },
-		IconLg = "core/ui/icons/material.mtex",
+		IconLg = "ui/icons/material.mtex",
 		IconSm = FontAwesome.Circle,
 		Color = MathX.GetColor( "#f7b239" )
 	};
@@ -27,7 +27,7 @@ partial struct ResourceType
 		Name = "Texture",
 		Extension = "mtex",
 		SourceExtensions = new[] { "png", "jpg" },
-		IconLg = "core/ui/icons/image.mtex",
+		IconLg = "ui/icons/image.mtex",
 		IconSm = FontAwesome.Image,
 		Color = MathX.GetColor( "#5292fa" )
 	};
@@ -37,7 +37,7 @@ partial struct ResourceType
 		Name = "Model",
 		Extension = "mmdl",
 		SourceExtensions = new[] { "mmdl" },
-		IconLg = "core/ui/icons/model.mtex",
+		IconLg = "ui/icons/model.mtex",
 		IconSm = FontAwesome.Cube,
 		Color = MathX.GetColor( "#1ee3a5" )
 	};
@@ -47,7 +47,7 @@ partial struct ResourceType
 		Name = "Sound",
 		Extension = "msnd",
 		SourceExtensions = { },
-		IconLg = "core/ui/icons/sound.mtex",
+		IconLg = "ui/icons/sound.mtex",
 		IconSm = FontAwesome.VolumeHigh,
 		Color = MathX.GetColor( "#fe646f" )
 	};
@@ -57,7 +57,7 @@ partial struct ResourceType
 		Name = "Font",
 		Extension = "mfnt",
 		SourceExtensions = new[] { "ttf" },
-		IconLg = "core/ui/icons/font.mtex",
+		IconLg = "ui/icons/font.mtex",
 		IconSm = FontAwesome.Font,
 		Color = MathX.GetColor( "#acb4bc" )
 	};
@@ -66,7 +66,7 @@ partial struct ResourceType
 	{
 		Name = "Unknown",
 		Extension = "*",
-		IconLg = "core/ui/icons/document.mtex",
+		IconLg = "ui/icons/document.mtex",
 		IconSm = FontAwesome.File,
 		Color = MathX.GetColor( "#ffffff" )
 	};

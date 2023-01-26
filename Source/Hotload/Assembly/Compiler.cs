@@ -54,7 +54,7 @@ public struct CompileResult
 
 public class Compiler
 {
-	private static string[] systemReferences = new[]
+	private static string[] s_systemReferences = new[]
 		{
 			"mscorlib.dll",
 			"System.dll",
@@ -103,13 +103,14 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
-	private static Compiler instance;
+	private static Compiler s_instance;
+  
 	public static Compiler Instance
 	{
 		get
 		{
-			instance ??= new();
-			return instance;
+			s_instance ??= new();
+			return s_instance;
 		}
 	}
 
@@ -158,7 +159,6 @@ public class Compiler
 			syntaxTrees.Add( CSharpSyntaxTree.ParseText( globalUsings ) );
 
 		// For each source file, create a syntax tree we can use to compile it
-
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
 			var filePath = item.EvaluatedInclude;
@@ -178,7 +178,7 @@ public class Compiler
 			if ( compileOptions.GenerateSymbols )
 			{
 				var embeddedText = EmbeddedText.FromSource( filePath, sourceText );
-				
+
 				embeddedTexts.Add( embeddedText );
 			}
 		}
@@ -190,7 +190,7 @@ public class Compiler
 
 		// System references
 		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location );
-		foreach ( var systemReference in systemReferences )
+		foreach ( var systemReference in s_systemReferences )
 		{
 			references.Add( MetadataReference.CreateFromFile( Path.Combine( dotnetBaseDir, systemReference ) ) );
 		}

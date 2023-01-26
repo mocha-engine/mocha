@@ -3,14 +3,14 @@
 public class ThreadDispatcher<T>
 {
 	public delegate void ThreadCallback( List<T> threadQueue );
-	private int threadCount = 16;
 
-	private int threadsCompleted = 0;
-	public bool IsComplete => threadsCompleted == threadCount;
+	private int _threadCount = 16;
+	private int _threadsCompleted = 0;
+	public bool IsComplete => _threadsCompleted == _threadCount;
 
 	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
 	{
-		var batchSize = queue.Count / threadCount - 1;
+		var batchSize = queue.Count / _threadCount - 1;
 
 		if ( batchSize == 0 )
 			return; // Bail to avoid division by zero
@@ -21,8 +21,8 @@ public class ThreadDispatcher<T>
 			.Select( g => g.Select( p => p.Value ).ToList() )
 			.ToList();
 
-		if ( batched.Count < threadCount )
-			threadCount = batched.Count; // Min. 1 per thread
+		if ( batched.Count < _threadCount )
+			_threadCount = batched.Count; // Min. 1 per thread
 
 		for ( int i = 0; i < batched.Count; i++ )
 		{
@@ -31,7 +31,7 @@ public class ThreadDispatcher<T>
 			{
 				threadStart( threadQueue );
 
-				threadsCompleted++;
+				_threadsCompleted++;
 			} );
 
 			thread.Start();

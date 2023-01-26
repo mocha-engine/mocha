@@ -10,12 +10,12 @@ partial class UIEntity
 			return;
 
 		var indices = new List<uint>();
-		for ( int i = 0; i < RectCount; ++i )
+		for ( int i = 0; i < _rectCount; ++i )
 		{
 			indices.AddRange( RectIndices.Select( x => (uint)(x + i * 4) ).ToArray() );
 		}
 
-		Model = new( Vertices.ToArray(), indices.ToArray(), Material );
+		Model = new( _vertices.ToArray(), indices.ToArray(), Material );
 		SetModel( Model );
 
 		IsDirty = false;

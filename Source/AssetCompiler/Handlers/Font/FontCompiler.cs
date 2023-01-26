@@ -19,8 +19,8 @@ public class FontCompiler : BaseCompiler
 	public override bool SupportsMochaFile => true;
 
 	/// <inheritdoc/>
-	public override string[] AssociatedFiles => associatedFiles;
-	private static readonly string[] associatedFiles = new string[]
+	public override string[] AssociatedFiles => s_associatedFiles;
+	private static readonly string[] s_associatedFiles = new string[]
 	{
 		"{SourcePathWithoutExt}.txt"
 	};
@@ -59,8 +59,8 @@ public class FontCompiler : BaseCompiler
 		if ( process.ExitCode != 0 )
 		{
 			// Delete temporary files.
-			File.Delete( destJsonFileName );
-			File.Delete( destAtlasFileName );
+			FileSystem.Mounted.Delete( destJsonFileName, FileSystemOptions.AssetCompiler );
+			FileSystem.Mounted.Delete( destAtlasFileName, FileSystemOptions.AssetCompiler );
 
 			throw new Exception( $"There was an error generating the atlas: {process.ExitCode}" );
 		}
@@ -70,15 +70,15 @@ public class FontCompiler : BaseCompiler
 		{
 			Format = TextureFormat.RGBA
 		};
-		File.WriteAllText( Path.ChangeExtension( input.SourcePath, "meta" )!, JsonSerializer.Serialize( textureMeta ) );
+		FileSystem.Mounted.WriteAllText( Path.ChangeExtension( input.SourcePath, "meta" )!, JsonSerializer.Serialize( textureMeta ), FileSystemOptions.AssetCompiler );
 
 		// Compile atlas
 		IAssetCompiler.Current!.CompileFile( destAtlasFileName );
 
 		// Load json
-		var fileData = File.ReadAllText( destJsonFileName );
+		var fileData = FileSystem.Mounted.ReadAllText( destJsonFileName, FileSystemOptions.AssetCompiler );
 		var fontData = JsonSerializer.Deserialize<Font.Data>( fileData );
-		fontData!.ModifiedDate = File.GetLastWriteTime( input.SourcePath ).ToString();
+		fontData!.ModifiedDate = FileSystem.Mounted.GetLastWriteTime( input.SourcePath, FileSystemOptions.AssetCompiler ).ToString();
 
 		// Wrapper for file
 		var mochaFile = new MochaFile<Font.Data>()
@@ -90,8 +90,8 @@ public class FontCompiler : BaseCompiler
 		};
 
 		// Delete temporary files.
-		File.Delete( destJsonFileName );
-		File.Delete( destAtlasFileName );
+		FileSystem.Mounted.Delete( destJsonFileName, FileSystemOptions.AssetCompiler );
+		FileSystem.Mounted.Delete( destAtlasFileName, FileSystemOptions.AssetCompiler );
 
 		return Succeeded( Serializer.Serialize( mochaFile ) );
 	}

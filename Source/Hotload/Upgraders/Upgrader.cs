@@ -6,7 +6,7 @@ namespace Mocha.Hotload;
 
 public static class Upgrader
 {
-	private static List<IMemberUpgrader> Upgraders { get; set; }
+	private static List<IMemberUpgrader> s_upgraders { get; set; }
 
 	/// <summary>
 	/// This must be called before invoking any other functions. Ideally, this should be
@@ -21,7 +21,7 @@ public static class Upgrader
 
 		// These actually have a specific hierarchy / order, so we don't use reflection here
 		// at the moment
-		Upgraders = new List<IMemberUpgrader>()
+		s_upgraders = new List<IMemberUpgrader>()
 		{
 			new ArrayUpgrader(),
 			new PrimitiveUpgrader(),
@@ -101,7 +101,7 @@ public static class Upgrader
 			//
 			bool wasUpgraded = false;
 
-			foreach ( var upgrader in Upgraders )
+			foreach ( var upgrader in s_upgraders )
 			{
 				if ( !upgrader.CanUpgrade( oldMember ) )
 					continue;

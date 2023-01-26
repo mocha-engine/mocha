@@ -5,7 +5,7 @@ partial class Model
 	private void LoadFromPath( string path )
 	{
 		using var _ = new Stopwatch( "Mocha model generation" );
-		var fileBytes = FileSystem.Game.ReadAllBytes( path );
+		var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
 		var modelFile = Serializer.Deserialize<MochaFile<byte[]>>( fileBytes );
 
 		using var stream = new MemoryStream( modelFile.Data );
@@ -88,7 +88,7 @@ partial class Model
 			path = path + $"_{typeName}.mtex";
 		}
 
-		if ( !FileSystem.Game.Exists( path ) )
+		if ( !FileSystem.Mounted.Exists( path ) )
 		{
 			Log.Warning( $"No texture '{path}'" );
 			return Texture.MissingTexture;

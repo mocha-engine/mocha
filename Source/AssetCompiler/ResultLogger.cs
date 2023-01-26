@@ -1,11 +1,11 @@
 ﻿namespace AssetCompiler;
 
-public class Logger
+public class ResultLogger
 {
-	private int SuccessCount = 0;
-	private int SkipCount = 0;
-	private int FailCount = 0;
-	private int UpToDateCount = 0;
+	private int _successCount = 0;
+	private int _skipCount = 0;
+	private int _failCount = 0;
+	private int _upToDateCount = 0;
 
 	private void Log( string prefix, string message )
 	{
@@ -14,25 +14,25 @@ public class Logger
 
 	public void UpToDate( string path )
 	{
-		UpToDateCount++;
+		_upToDateCount++;
 		Log( "Up-to-date", $"'{path}' is up to date, skipping" );
 	}
 
 	public void UnknownType( string path )
 	{
-		SkipCount++;
+		_skipCount++;
 		Log( "Skip", $"'{path}' has an unknown resource type" );
 	}
 
 	public void Compiled( string path )
 	{
-		SuccessCount++;
+		_successCount++;
 		Log( "Success", $"'{path}' compiled" );
 	}
 
 	public void Fail( string path, Exception? e = null )
 	{
-		FailCount++;
+		_failCount++;
 		Log( "Fail", $"{path} failed to compile. Error was: {e?.Message ?? "Unknown."}" );
 		if ( e.StackTrace is not null )
 			Log( "StackTrace", e.StackTrace );
@@ -46,10 +46,10 @@ public class Logger
 	public void Results( TimeSpan totalTime )
 	{
 		Log( "Results", $"========== Build: " +
-			$"{SuccessCount} succeeded, " +
-			$"{FailCount} failed, " +
-			$"{UpToDateCount} up-to-date, " +
-			$"{SkipCount} skipped " +
+			$"{_successCount} succeeded, " +
+			$"{_failCount} failed, " +
+			$"{_upToDateCount} up-to-date, " +
+			$"{_skipCount} skipped " +
 			$"==========\n" +
 			$"Build took {totalTime.TotalSeconds} seconds." );
 	}
