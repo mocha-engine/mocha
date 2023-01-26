@@ -23,7 +23,7 @@ public class RuntimeAssetCompiler : AssetCompilerBase
 
 				for ( int i = 0; i < RetryCount; ++i )
 				{
-					if ( FileSystem.Mounted.IsFileReady( path ) )
+					if ( FileSystem.Mounted.IsFileReady( path, FileSystemOptions.AssetCompiler ) )
 						break;
 
 					Thread.Sleep( 500 );

@@ -8,60 +8,47 @@ public class OfflineAssetCompiler : AssetCompilerBase
 	{
 		var start = DateTime.Now;
 
-		if ( !Path.Exists( options.Target ) )
-		{
-			Console.WriteLine( $"'{options.Target}' is not a valid target." );
-			return;
-		}
+		Log = new ConsoleLogger();
 
-		var attr = File.GetAttributes( options.Target );
-
+		FileSystem.Mounted = new( options.MountPoints.ToArray() );
 		List<string> queue = new();
 
-		if ( attr.HasFlag( FileAttributes.Directory ) )
-		{
-			// Target is directory
-			QueueDirectory( ref queue, options.Target );
+		// Target is directory
+		QueueDirectory( ref queue, "." );
 
-			var dispatcher = new ThreadDispatcher<string>( async ( threadQueue ) =>
+		var dispatcher = new ThreadDispatcher<string>( async ( threadQueue ) =>
+		{
+			var tasks = new List<Task>();
+
+			foreach ( var relativePath in threadQueue )
 			{
-				var tasks = new List<Task>();
-
-				foreach ( var item in threadQueue )
+				try
 				{
-					try
-					{
-						tasks.Add( CompileFileAsync( item ) );
-					}
-					catch ( Exception e )
-					{
-						Log.Fail( item, e );
-					}
+					tasks.Add( CompileFileAsync( relativePath ) );
 				}
+				catch ( Exception e )
+				{
+					ResultLog.Fail( relativePath, e );
+				}
+			}
 
-				await Task.WhenAll( tasks );
-			}, queue );
+			await Task.WhenAll( tasks );
+		}, queue );
 
-			while ( !dispatcher.IsComplete )
-				Thread.Sleep( 5 );
-		}
-		else
-		{
-			// Target is single file
-			CompileFile( options.Target );
-		}
+		while ( !dispatcher.IsComplete )
+			Thread.Sleep( 5 );
 
-		Log.Results( (DateTime.Now - start) );
+		ResultLog.Results( (DateTime.Now - start) );
 	}
 
 	private void QueueDirectory( ref List<string> queue, string directory )
 	{
-		foreach ( var file in Directory.GetFiles( directory ) )
+		foreach ( var file in FileSystem.Mounted.GetFilesAbsolute( directory, FileSystemOptions.AssetCompiler ) )
 		{
 			QueueFile( ref queue, file );
 		}
 
-		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
+		foreach ( var subDirectory in FileSystem.Mounted.GetDirectoriesAbsolute( directory, FileSystemOptions.AssetCompiler ) )
 		{
 			QueueDirectory( ref queue, subDirectory );
 		}
@@ -77,7 +64,7 @@ public class OfflineAssetCompiler : AssetCompilerBase
 		}
 		else
 		{
-			Log.UnknownType( path );
+			ResultLog.UnknownType( path );
 		}
 	}
 }

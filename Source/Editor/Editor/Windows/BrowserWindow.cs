@@ -164,7 +164,7 @@ internal class BrowserWindow : EditorWindow
 			}
 		}
 
-		CacheDirectory( "" );
+		CacheDirectory( "." );
 
 		Sort();
 	}

@@ -10,13 +10,10 @@ public static class Assimp
 		var context = new AssimpContext();
 		var logStream = new LogStream( ( msg, _ ) => Console.WriteLine( msg ) );
 
-		// HACK: Specify content dir specifically for now.
-		// This is done so that we can match the directory structure for models
-		// with everything else - this is a temporary solution.
-		var sourcePath = ("content\\" + modelInfo.Model).NormalizePath();
-		var directory = Path.GetDirectoryName( sourcePath );
+		var sourceData = FileSystem.Mounted.ReadAllBytes( modelInfo.Model, FileSystemOptions.AssetCompiler );
+		using var memoryStream = new MemoryStream( sourceData );
 
-		var scene = context.ImportFile( sourcePath,
+		var scene = context.ImportFileFromStream( memoryStream,
 			PostProcessSteps.Triangulate
 			| PostProcessSteps.RemoveRedundantMaterials
 			| PostProcessSteps.CalculateTangentSpace

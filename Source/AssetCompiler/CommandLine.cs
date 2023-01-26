@@ -9,8 +9,8 @@ public class Options
 	[Option( 'f', "force-recompile", Required = false, HelpText = "Force re-compile all assets (slow!)" )]
 	public bool ForceRecompile { get; set; }
 
-	[Option( "target", Required = true, HelpText = "Which file or folder should we compile?" )]
-	public string Target { get; set; }
+	[Option( "mountpoints", Required = true, HelpText = "Which file or folder should we compile?" )]
+	public IEnumerable<string> MountPoints { get; set; }
 }
 
 public static class CommandLine

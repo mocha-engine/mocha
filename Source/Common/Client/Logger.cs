@@ -2,7 +2,7 @@
 
 namespace Mocha.Common;
 
-public class Logger
+public class NativeLogger : ILogger
 {
 	public Action<string> OnLog { get; set; }
 

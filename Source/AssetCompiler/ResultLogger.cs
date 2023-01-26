@@ -1,6 +1,6 @@
 ﻿namespace AssetCompiler;
 
-public class Logger
+public class ResultLogger
 {
 	private int _successCount = 0;
 	private int _skipCount = 0;

@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using System.Text.Json;
 
 namespace Mocha.Common;
 
@@ -9,13 +8,34 @@ internal class MountedFileSystem
 
 	public MountedFileSystem( string mountPoint )
 	{
-		MountPoint = mountPoint;
+		MountPoint = Path.GetFullPath( mountPoint );
 	}
 
 	public string GetAbsolutePath( string relativePath )
 	{
-		return Path.Combine( MountPoint, relativePath ).NormalizePath();
+		var combinedPath = Path.Combine( MountPoint, relativePath );
+		return Path.GetFullPath( combinedPath ).NormalizePath();
 	}
+
+	public string GetRelativePath( string absolutePath )
+	{
+		return Path.GetRelativePath( MountPoint, absolutePath ).NormalizePath();
+	}
+}
+
+public struct FileSystemOptions
+{
+	public bool DisableAutoCompile { get; set; }
+
+	public static FileSystemOptions Default = new()
+	{
+		DisableAutoCompile = false
+	};
+
+	public static FileSystemOptions AssetCompiler = new()
+	{
+		DisableAutoCompile = true
+	};
 }
 
 public class FileSystem
@@ -35,34 +55,48 @@ public class FileSystem
 		}
 	}
 
-	private bool TryFindFile( string relativePath, out string? outPath )
+	private bool TryFindFile( string relativePath, out string? outPath, FileSystemOptions? options = null )
 	{
-		Log.Trace( $"Trying to find file '{relativePath}' across mounted file systems..." );
-
 		foreach ( var mountedFs in _mountedFileSystems )
 		{
 			var path = mountedFs.GetAbsolutePath( relativePath );
 
-			if ( File.Exists( path ) )
+			if ( Path.Exists( path ) )
 			{
-				Log.Trace( $"\t- Present at '{path}'" );
 				outPath = path;
 				return true;
 			}
-
-			Log.Trace( $"\t- Does not exist at '{path}'" );
 		}
 
 		outPath = null;
 		return false;
 	}
 
-	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, bool ignoreCompiledFiles = false )
+	public bool TryGetRelativePath( string absolutePath, out string? outPath, FileSystemOptions? options = null )
 	{
+		foreach ( var mountedFs in _mountedFileSystems )
+		{
+			var path = mountedFs.GetRelativePath( absolutePath );
+
+			if ( Path.Exists( path ) )
+			{
+				outPath = path;
+				return true;
+			}
+		}
+
+		outPath = null;
+		return false;
+	}
+
+	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, FileSystemOptions? options = null )
+	{
+		options ??= FileSystemOptions.Default;
+
 		bool isResource = false;
 		ResourceType resourceType = ResourceType.Default;
 
-		if ( !ignoreCompiledFiles )
+		if ( !options.Value.DisableAutoCompile )
 		{
 			var extension = Path.GetExtension( relativePath );
 			var matchingType = ResourceType.GetResourceForExtension( extension );
@@ -84,6 +118,8 @@ public class FileSystem
 		{
 			// Try to find either the path provided OR the compiled file
 			// if this is a resource type
+
+			return path;
 		}
 		else if ( isResource )
 		{
@@ -107,30 +143,26 @@ public class FileSystem
 				}
 			}
 		}
-		else
-		{
-			// We couldn't find the source file AND this wasn't a resource
-			// We'll handle that in the next step
-		}
 
-		// Check if path exists (we do this after compiling the asset in case
-		// asset compilation creates the file)
-		if ( !File.Exists( path ) && !Directory.Exists( path ) && !ignorePathNotFound )
-		{
-			Log.Warning( $"Path not found: '{relativePath}'. Continuing anyway." );
-		}
-
-		return path;
+		// If we got this far it means we couldn't find the path at all, so we're going to use
+		// the first available filesystem to generate an absolute path 
+		return _mountedFileSystems[0].GetAbsolutePath( relativePath );
 	}
 
-	public FileStream OpenRead( string relativePath )
+	public FileStream OpenRead( string relativePath, FileSystemOptions? options = null )
 	{
-		return new FileStream( GetAbsolutePath( relativePath ), FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
+		var absolutePath = GetAbsolutePath( relativePath, options: options );
+		return new FileStream( absolutePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
 	}
 
-	public byte[] ReadAllBytes( string relativePath )
+	public FileStream OpenWrite( string relativePath, FileSystemOptions? options = null )
 	{
-		using ( var fileStream = OpenRead( relativePath ) )
+		return new FileStream( GetAbsolutePath( relativePath, ignorePathNotFound: true, options: options ), FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite );
+	}
+
+	public byte[] ReadAllBytes( string relativePath, FileSystemOptions? options = null )
+	{
+		using ( var fileStream = OpenRead( relativePath, options ) )
 		{
 			var buffer = new byte[fileStream.Length];
 			fileStream.Read( buffer, 0, buffer.Length );
@@ -138,15 +170,55 @@ public class FileSystem
 		}
 	}
 
-	public string ReadAllText( string relativePath )
+	public string ReadAllText( string relativePath, FileSystemOptions? options = null )
 	{
-		var bytes = ReadAllBytes( relativePath );
+		var bytes = ReadAllBytes( relativePath, options );
 		return Encoding.Default.GetString( bytes );
 	}
 
-	public bool Exists( string relativePath )
+	public Task<byte[]> ReadAllBytesAsync( string relativePath, FileSystemOptions? options = null )
 	{
-		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true ) );
+		return Task.Run( () => ReadAllBytes( relativePath, options ) );
+	}
+
+	public Task<string> ReadAllTextAsync( string relativePath, FileSystemOptions? options = null )
+	{
+		return Task.Run( () => ReadAllText( relativePath, options ) );
+	}
+
+	public void WriteAllBytes( string relativePath, byte[] data, FileSystemOptions? options = null )
+	{
+		using ( var fileStream = OpenWrite( relativePath, options ) )
+		{
+			fileStream.Write( data, 0, data.Length );
+		}
+	}
+
+	public void WriteAllText( string relativePath, string data, FileSystemOptions? options = null )
+	{
+		var bytes = Encoding.Default.GetBytes( data );
+		WriteAllBytes( relativePath, bytes, options );
+	}
+
+	public void WriteAllText( string relativePath, string data, Encoding encoding, FileSystemOptions? options = null )
+	{
+		var bytes = encoding.GetBytes( data );
+		WriteAllBytes( relativePath, bytes, options );
+	}
+
+	public bool Exists( string relativePath, FileSystemOptions? options = null )
+	{
+		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true, options ) );
+	}
+
+	public DateTime GetLastWriteTime( string relativePath, FileSystemOptions? options = null )
+	{
+		return File.GetLastWriteTime( GetAbsolutePath( relativePath, options: options ) );
+	}
+
+	public void Delete( string relativePath, FileSystemOptions? options = null )
+	{
+		File.Delete( GetAbsolutePath( relativePath, options: options ) );
 	}
 
 	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange, NotifyFilters? filters = null )
@@ -207,9 +279,9 @@ public class FileSystem
 		return watchers;
 	}
 
-	public bool IsFileReady( string relativePath )
+	public bool IsFileReady( string relativePath, FileSystemOptions? options = null )
 	{
-		var path = GetAbsolutePath( relativePath );
+		var path = GetAbsolutePath( relativePath, options: options );
 
 		if ( !Path.Exists( path ) )
 		{
@@ -227,31 +299,61 @@ public class FileSystem
 		}
 	}
 
-	public string GetFullPath( string filePath )
+	public string GetFullPath( string filePath, FileSystemOptions? options = null )
 	{
-		TryFindFile( filePath, out var path );
+		TryFindFile( filePath, out var path, options );
 		return path;
 	}
 
-	public IEnumerable<string> GetFiles( string directory )
+	private IEnumerable<(FileAttributes Attributes, string AbsolutePath)> GetEntries( string directory, FileSystemOptions? options = null )
 	{
-		return Directory.GetFiles( GetAbsolutePath( directory ) );
+		List<(FileAttributes Attributes, string AbsolutePath)> entries = new();
+
+		foreach ( var mountedFs in _mountedFileSystems )
+		{
+			var mountedDirectory = mountedFs.GetAbsolutePath( directory );
+
+			if ( !Directory.Exists( mountedDirectory ) )
+				continue;
+
+			var fsEntries = Directory.GetFileSystemEntries( mountedDirectory );
+
+			// Select relative paths
+			entries.AddRange( fsEntries.Select( x => (File.GetAttributes( x ), x.NormalizePath()) ) );
+		}
+
+		// Return paths without duplicates
+		return entries.Distinct();
 	}
 
-	public IEnumerable<string> GetDirectories( string directory )
+	public IEnumerable<string> GetFilesAbsolute( string directory, FileSystemOptions? options = null )
 	{
-		return Directory.GetDirectories( GetAbsolutePath( directory ) );
+		return GetEntries( directory, options )
+			.Where( x => !x.Attributes.HasFlag( FileAttributes.Directory ) )
+			.Select( x => x.AbsolutePath );
 	}
 
-	public string GetRelativePath( string filePath )
+	public IEnumerable<string> GetFiles( string directory, FileSystemOptions? options = null )
 	{
-		TryFindFile( filePath, out var path );
+		return GetFilesAbsolute( directory, options )
+			.Select( x => GetRelativePath( x ) );
+	}
+
+	public IEnumerable<string> GetDirectoriesAbsolute( string directory, FileSystemOptions? options = null )
+	{
+		return GetEntries( directory, options )
+			.Where( x => x.Attributes.HasFlag( FileAttributes.Directory ) )
+			.Select( x => x.AbsolutePath );
+	}
+
+	public IEnumerable<string> GetDirectories( string directory, FileSystemOptions? options = null )
+	{
+		return GetDirectoriesAbsolute( directory, options ).Select( x => GetRelativePath( x ) );
+	}
+
+	public string GetRelativePath( string filePath, FileSystemOptions? options = null )
+	{
+		TryFindFile( filePath, out var path, options );
 		return path;
-	}
-
-	public T? Deserialize<T>( string filePath )
-	{
-		var text = ReadAllText( filePath );
-		return JsonSerializer.Deserialize<T>( text );
 	}
 }

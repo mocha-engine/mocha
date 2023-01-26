@@ -23,6 +23,9 @@ public static class Main
 		// This MUST be done before calling any native functions
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
 
+		// Initialize the logger
+		Log = new NativeLogger();
+
 		// Initialize upgrader, we do this as early as possible to prevent
 		// slowdowns while the engine is running.
 		Upgrader.Init();
@@ -63,8 +66,9 @@ public static class Main
 	private static void InitFileSystem()
 	{
 		FileSystem.Mounted = new FileSystem(
-			"content\\core",
-			s_manifest.Resources.Content );
+			s_manifest.Resources.Content,
+			"content\\core"
+		);
 
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 	}
