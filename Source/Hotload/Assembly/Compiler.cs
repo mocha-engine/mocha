@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
@@ -102,11 +103,8 @@ public class Compiler
 			"System.Xml.ReaderWriter.dll",
 		};
 
-	private static string s_globals = """
-		global using static Mocha.Common.Global;
-		""";
-
 	private static Compiler s_instance;
+  
 	public static Compiler Instance
 	{
 		get
@@ -149,11 +147,18 @@ public class Compiler
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
 
-		// For each source file, create a syntax tree we can use to compile it
-
 		// Global namespaces, etc.
-		syntaxTrees.Add( CSharpSyntaxTree.ParseText( s_globals ) );
+		var globalUsings = string.Empty;
+		foreach ( var usingEntry in project.GetItems( "Using" ) )
+		{
+			var isStatic = bool.Parse( usingEntry.GetMetadataValue( "Static" ) );
+			globalUsings += $"global using{(isStatic ? " static " : " ")}{usingEntry.EvaluatedInclude};{Environment.NewLine}";
+		}
 
+		if ( globalUsings != string.Empty )
+			syntaxTrees.Add( CSharpSyntaxTree.ParseText( globalUsings ) );
+
+		// For each source file, create a syntax tree we can use to compile it
 		foreach ( var item in project.GetItems( "Compile" ) )
 		{
 			var filePath = item.EvaluatedInclude;
@@ -209,10 +214,15 @@ public class Compiler
 		//
 
 		var options = new CSharpCompilationOptions( OutputKind.DynamicallyLinkedLibrary )
-			.WithAllowUnsafe( true )
 			.WithPlatform( Platform.X64 )
 			.WithOptimizationLevel( compileOptions.OptimizationLevel )
 			.WithConcurrentBuild( true );
+
+		var unsafeBlocksAllowed = project.GetPropertyValue( "AllowUnsafeBlocks" );
+		if ( unsafeBlocksAllowed != string.Empty )
+			options = options.WithAllowUnsafe( bool.Parse( unsafeBlocksAllowed ) );
+		else
+			options = options.WithAllowUnsafe( false );
 
 		var compilation = CSharpCompilation.Create(
 			assemblyInfo.AssemblyName,

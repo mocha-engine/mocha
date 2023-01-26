@@ -39,11 +39,74 @@ public partial struct ProjectManifest
 
 	public struct ProjectInfo
 	{
+		[JsonPropertyName( "languageVersion" )]
+		public string? LanguageVersion { get; set; }
+
 		[JsonPropertyName( "defaultNamespace" )]
-		public string DefaultNamespace { get; set; }
+		public string? DefaultNamespace { get; set; }
 
 		[JsonPropertyName( "nullable" )]
 		public bool Nullable { get; set; }
+
+		[JsonPropertyName( "implicitUsings" )]
+		public bool ImplicitUsings { get; set; }
+
+		[JsonPropertyName( "allowUnsafeBlocks" )]
+		public bool AllowUnsafeBlocks { get; set; }
+
+		[JsonPropertyName( "useMochaGlobal" )]
+		public bool? UseMochaGlobal { get; set; }
+
+		[JsonPropertyName( "usings" )]
+		public Using[]? Usings { get; set; }
+
+		[JsonPropertyName( "packageReferences" )]
+		public PackageReference[]? PackageReferences { get; set; }
+
+		[JsonPropertyName( "projectReferences" )]
+		public ProjectReference[]? ProjectReferences { get; set; }
+
+		[JsonPropertyName( "rawEntry" )]
+		public string? RawEntry { get; set; }
+
+		public struct Using
+		{
+			[JsonPropertyName( "namespace" )]
+			public string Namespace { get; set; }
+
+			[JsonPropertyName( "static" )]
+			public bool Static { get; set; }
+		}
+
+		public struct PackageReference
+		{
+			[JsonPropertyName( "name" )]
+			public string Name { get; set; }
+
+			[JsonPropertyName( "version" )]
+			public string Version { get; set; }
+
+			[JsonPropertyName( "privateAssets" )]
+			public string? PrivateAssets { get; set; }
+
+			[JsonPropertyName( "includeAssets" )]
+			public string? IncludeAssets { get; set; }
+		}
+
+		public struct ProjectReference
+		{
+			[JsonPropertyName( "path" )]
+			public string Path { get; set; }
+
+			[JsonPropertyName( "privateAssets" )]
+			public string? PrivateAssets { get; set; }
+
+			[JsonPropertyName( "referenceOutputAssembly" )]
+			public bool? ReferenceOutputAssembly { get; set; }
+
+			[JsonPropertyName( "outputItemType" )]
+			public string? OutputItemType { get; set; }
+		}
 	}
 
 	[JsonPropertyName( "project" )]

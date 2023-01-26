@@ -5,9 +5,9 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>disable</ImplicitUsings>
-		<AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
+		<ImplicitUsings><# if ( projectManifest.Project.ImplicitUsings ) { #>enable<# } else { #>disable<# } #></ImplicitUsings>
+		<AllowUnsafeBlocks><# if ( projectManifest.Project.AllowUnsafeBlocks ) { #>True<# } else { #>False<# } #></AllowUnsafeBlocks>
+		<LangVersion><#= projectManifest.Project.LanguageVersion ?? "latest" #></LangVersion>
 		<Platforms>x64</Platforms>
 		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
 		<OutputPath>$(SolutionDir)..\build</OutputPath>
@@ -18,11 +18,12 @@
 
 		<Nullable><# if ( projectManifest.Project.Nullable ) { #>enable<# } else { #>disable<# } #></Nullable>
 		<AssemblyName><#= projectManifest.Name #></AssemblyName>
-		<RootNamespace><#= projectManifest.Project.DefaultNamespace #></RootNamespace>
+		<RootNamespace><#= projectManifest.Project.DefaultNamespace ?? "Mocha" #></RootNamespace>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Using Include="Mocha.Common.Global" Static="true" />
+		<# if ( projectManifest.Project.UseMochaGlobal is null || projectManifest.Project.UseMochaGlobal.Value ) { #><Using Include="Mocha.Common.Global" Static="true" /><#= "\n" #><# } #>
+		<# if ( projectManifest.Project.Usings is not null ) { #><# foreach ( var usingEntry in projectManifest.Project.Usings ) { #><Using Include="<#= usingEntry.Namespace #>" Static="<#= usingEntry.Static.ToString().ToLower() #>" /><# } } #><#= Environment.NewLine #>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -36,5 +37,24 @@
 		<Reference Include="<#= baseReferenceDir #>Mocha.Engine.dll" />
 		<Reference Include="<#= baseReferenceDir #>Mocha.UI.dll" />
 	</ItemGroup>
+	<# if ( projectManifest.Project.PackageReferences is not null ) { #>
+
+	<ItemGroup>
+	<# foreach ( var packageReference in projectManifest.Project.PackageReferences ) { #>
+	<PackageReference Include="<#= packageReference.Name #>" Version="<#= packageReference.Version #>"<# if ( packageReference.PrivateAssets is not null ) { #> PrivateAssets="<#= packageReference.PrivateAssets #>"<# } #><# if ( packageReference.IncludeAssets is not null ) { #> IncludeAssets="<#= packageReference.IncludeAssets #>"<# } #> />
+	<# } #>
+</ItemGroup>
+	<# } #>
+	<# if ( projectManifest.Project.ProjectReferences is not null ) { #>
+
+	<ItemGroup>
+	<# foreach ( var projectReference in projectManifest.Project.ProjectReferences ) { #>
+	<ProjectReference Include="<#= baseReferenceDir #><#= projectReference.Path #>"<# if ( projectReference.PrivateAssets is not null ) { #> PrivateAssets="<#= projectReference.PrivateAssets #>"<# } #><# if ( projectReference.ReferenceOutputAssembly is not null ) { #> ReferenceOutputAssembly="<#= projectReference.ReferenceOutputAssembly.ToString().ToLower() #>"<# } #><# if ( projectReference.OutputItemType is not null ) { #> OutputItemType="<#= projectReference.OutputItemType #>"<# } #> />
+	<# } #>
+</ItemGroup>
+	<# } #>
+	<# if ( projectManifest.Project.RawEntry is not null ) { #>
+	<#= projectManifest.Project.RawEntry #>
+	<# } #>
 
 </Project>

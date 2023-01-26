@@ -387,6 +387,7 @@ vcpkg_installed/
 [Ss]ource/Host/gitdefs.h
 cvars.json
 Samples/mocha-minimal/code/code.csproj
+Source/Hotload/Generators/GeneratedProject.cs
 
 # Content meta files
 ![Cc]ontent/**/*.meta
