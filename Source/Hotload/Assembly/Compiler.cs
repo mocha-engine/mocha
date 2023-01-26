@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis;
+﻿using Microsoft.Build.Evaluation;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
@@ -213,10 +214,15 @@ public class Compiler
 		//
 
 		var options = new CSharpCompilationOptions( OutputKind.DynamicallyLinkedLibrary )
-			.WithAllowUnsafe( true )
 			.WithPlatform( Platform.X64 )
 			.WithOptimizationLevel( compileOptions.OptimizationLevel )
 			.WithConcurrentBuild( true );
+
+		var unsafeBlocksAllowed = project.GetPropertyValue( "AllowUnsafeBlocks" );
+		if ( unsafeBlocksAllowed != string.Empty )
+			options = options.WithAllowUnsafe( bool.Parse( unsafeBlocksAllowed ) );
+		else
+			options = options.WithAllowUnsafe( false );
 
 		var compilation = CSharpCompilation.Create(
 			assemblyInfo.AssemblyName,
