@@ -5,9 +5,9 @@
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
 		<TargetFramework>net7.0</TargetFramework>
-		<ImplicitUsings>disable</ImplicitUsings>
 		<AllowUnsafeBlocks>False</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
+		<ImplicitUsings><# if ( projectManifest.Project.ImplicitUsings ) { #>enable<# } else { #>disable<# } #></ImplicitUsings>
 		<Platforms>x64</Platforms>
 		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
 		<OutputPath>$(SolutionDir)..\build</OutputPath>

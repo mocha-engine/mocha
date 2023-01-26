@@ -44,6 +44,9 @@ public partial struct ProjectManifest
 
 		[JsonPropertyName( "nullable" )]
 		public bool Nullable { get; set; }
+
+		[JsonPropertyName( "implicitUsings" )]
+		public bool ImplicitUsings { get; set; }
 	}
 
 	[JsonPropertyName( "project" )]
