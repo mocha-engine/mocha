@@ -8,10 +8,7 @@ add_compile_definitions(NOMINMAX)
 set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_GENERATOR_PLATFORM x64)
-add_compile_definitions(_DEBUG;_IMGUI;VK_NO_PROTOTYPES)
-
-# Threaded build
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+add_compile_definitions(_IMGUI;VK_NO_PROTOTYPES)
 
 find_package(Vulkan)
 
@@ -54,6 +51,12 @@ include_directories("Host/thirdparty/renderdoc")
 include_directories("Host/thirdparty/vk-bootstrap/src")
 include_directories("Host/thirdparty/volk")
 include_directories("Host/thirdparty/implot")
+
+# Threaded build
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
 
 add_executable(Host 
 	${HOST_SOURCES}
