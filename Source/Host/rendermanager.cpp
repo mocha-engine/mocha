@@ -38,7 +38,6 @@
 #include <imgui.h>
 #include <implot.h>
 
-FloatCVar timescale( "game.timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
 FloatCVar maxFramerate(
     "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
@@ -139,7 +138,19 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 	}
 }
 
-void RenderManager::Render()
+void RenderManager::DrawOverlaysAndEditor()
+{
+	m_renderContext->BeginImGui();
+	ImGui::NewFrame();
+	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
+
+	g_hostManager->Render();
+	g_hostManager->DrawEditor();
+
+	m_renderContext->EndImGui();
+}
+
+void RenderManager::DrawGame()
 {
 	RenderStatus res = m_renderContext->BeginRendering();
 
@@ -171,115 +182,6 @@ void RenderManager::Render()
 	} );
 
 	m_renderContext->EndRendering();
-}
-
-double HiresTimeInSeconds()
-{
-	return std::chrono::duration_cast<std::chrono::duration<double>>(
-	    std::chrono::high_resolution_clock::now().time_since_epoch() )
-	    .count();
-}
-
-void RenderManager::Run()
-{
-	bool bQuit = false;
-
-	g_hostManager->FireEvent( "Event.Game.Load" );
-
-	double logicDelta = 1.0 / g_projectManager->GetProject().properties.tickRate;
-
-	double currentTime = HiresTimeInSeconds();
-	double accumulator = 0.0;
-
-	while ( !bQuit )
-	{
-		double newTime = HiresTimeInSeconds();
-		double frameTime = newTime - currentTime;
-
-		// How quick did we do last frame? Let's limit ourselves if (1.0f / g_frameTime) is more than maxFramerate
-		float fps = 1.0f / frameTime;
-		float maxFps = maxFramerate.GetValue();
-
-		if ( maxFps > 0 && fps > maxFps )
-		{
-			continue;
-		}
-
-		if ( frameTime > 1 / 30.0f )
-			frameTime = 1 / 30.0f;
-
-		currentTime = newTime;
-		accumulator += frameTime;
-
-		//
-		// How long has it been since we last updated the game logic?
-		// We want to update as many times as we can in this frame in
-		// order to match the desired tick rate.
-		//
-		while ( accumulator >= logicDelta )
-		{
-			// Assign previous transforms to all entities
-			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
-				entity->m_transformLastFrame = entity->m_transformCurrentFrame;
-			} );
-
-			g_tickTime = ( float )logicDelta;
-
-			// Update physics
-			g_physicsManager->Update();
-
-			// Update game
-			g_hostManager->Update();
-
-			// Update window
-			if ( m_renderContext->UpdateWindow() == RENDER_STATUS_WINDOW_CLOSE )
-			{
-				bQuit = true;
-				break;
-			}
-
-			// Assign current transforms to all entities
-			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
-				entity->m_transformCurrentFrame = entity->m_transform;
-			} );
-
-			g_curTime += logicDelta;
-			accumulator -= logicDelta;
-			g_curTick++;
-		}
-
-		g_frameTime = ( float )frameTime;
-
-		// Render
-		{
-			const double alpha = accumulator / logicDelta;
-
-			// Assign interpolated transforms to all entities
-			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
-				// If this entity was spawned in just now, don't interpolate
-				if ( entity->m_spawnTime == g_curTick )
-					return;
-
-				entity->m_transform =
-				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
-			} );
-
-			// Draw editor
-			{
-				m_renderContext->BeginImGui();
-				ImGui::NewFrame();
-				ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
-
-				g_hostManager->Render();
-				g_hostManager->DrawEditor();
-
-				m_renderContext->EndImGui();
-			}
-
-			// Draw game
-			Render();
-		}
-	}
 }
 
 glm::mat4 RenderManager::CalculateViewmodelViewProjMatrix()

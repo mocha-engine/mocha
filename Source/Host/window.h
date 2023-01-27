@@ -10,6 +10,7 @@ class Window
 private:
 	struct SDL_Window* m_window{ nullptr };
 	bool m_visible = false;
+	bool m_closeRequested = false;
 	bool m_captureMouse = true;
 
 public:
@@ -19,8 +20,9 @@ public:
 
 	VkSurfaceKHR CreateSurface( VkInstance instance );
 	bool GetCaptureMouse() { return m_captureMouse; }
+	bool GetCloseRequested() { return m_closeRequested; }
 	void Cleanup();
-	bool Update();
+	void Update();
 	void Show();
 
 	inline SDL_Window* GetSDLWindow() { return m_window; }

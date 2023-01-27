@@ -531,7 +531,10 @@ public:
 	RenderStatus GetWindowSize( Size2D* outSize ) override;
 
 	/// <inheritdoc />
-	RenderStatus UpdateWindow() override;
+	void UpdateWindow() override { m_window->Update(); }
+
+	/// <inheritdoc />
+	bool GetWindowCloseRequested() override { return m_window->GetCloseRequested(); }
 
 	/// <inheritdoc />
 	RenderStatus GetGPUInfo( GPUInfo* outInfo ) override;

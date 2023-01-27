@@ -3,6 +3,11 @@
 
 class Root : ISubSystem
 {
+private:
+	bool m_shouldQuit = false;
+
+	bool GetQuitRequested();
+
 public:
 	inline static Root& GetInstance()
 	{
@@ -13,4 +18,6 @@ public:
 	void Startup();
 	void Run();
 	void Shutdown();
+
+	void Quit() { m_shouldQuit = true; }
 };

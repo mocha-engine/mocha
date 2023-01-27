@@ -1540,16 +1540,6 @@ RenderStatus VulkanRenderContext::GetWindowSize( Size2D* outSize )
 	return RENDER_STATUS_OK;
 }
 
-RenderStatus VulkanRenderContext::UpdateWindow()
-{
-	if ( m_window->Update() )
-	{
-		return RENDER_STATUS_WINDOW_CLOSE;
-	}
-
-	return RENDER_STATUS_OK;
-}
-
 RenderStatus VulkanRenderContext::CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle )
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
