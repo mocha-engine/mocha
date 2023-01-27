@@ -47,29 +47,24 @@ public partial class ModelEntity : BaseEntity
 		set => Glue.Entities.SetIgnoreRigidbodyPosition( NativeHandle, value );
 	}
 
+	[Category( "Rendering" )]
+	public IModel Model
+	{
+		set => Glue.Entities.SetModel( NativeHandle, value.NativeModel );
+	}
+
 	public ModelEntity()
 	{
 	}
 
 	public ModelEntity( string path )
 	{
-		SetModel( path );
+		Model = new Model( path );
 	}
 
 	protected override void CreateNativeEntity()
 	{
 		NativeHandle = Glue.Entities.CreateModelEntity();
-	}
-
-	public void SetModel( IModel model )
-	{
-		Glue.Entities.SetModel( NativeHandle, model.NativeModel );
-	}
-
-	public void SetModel( string modelPath )
-	{
-		var model = new Model( modelPath );
-		SetModel( model );
 	}
 
 	public void SetCubePhysics( Vector3 bounds, bool isStatic )

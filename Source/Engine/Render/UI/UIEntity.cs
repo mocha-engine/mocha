@@ -7,7 +7,7 @@ public partial class UIEntity : ModelEntity, IRenderer
 {
 	public AtlasBuilder AtlasBuilder { get; set; }
 	private Material Material { get; set; }
-	private UIModel Model { get; set; }
+	private UIModel UIModel { get; set; }
 
 	private bool IsDirty { get; set; }
 

@@ -38,7 +38,7 @@ public class ViewModel : ModelEntity
 
 	protected override void Spawn()
 	{
-		SetModel( "models/m4a1.mmdl" );
+		Model = new Model( "models/m4a1.mmdl" );
 		Name = "ViewModel";
 		Scale = new Vector3( 0.1f );
 		IsViewModel = true;

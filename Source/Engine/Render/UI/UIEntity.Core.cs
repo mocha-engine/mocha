@@ -15,8 +15,8 @@ partial class UIEntity
 			indices.AddRange( RectIndices.Select( x => (uint)(x + i * 4) ).ToArray() );
 		}
 
-		Model = new( _vertices.ToArray(), indices.ToArray(), Material );
-		SetModel( Model );
+		UIModel = new( _vertices.ToArray(), indices.ToArray(), Material );
+		Model = UIModel;
 
 		IsDirty = false;
 	}
