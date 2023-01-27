@@ -29,12 +29,12 @@ public struct ViewModelOffset
 
 public class ViewModel : ModelEntity
 {
-	private float WalkBob;
-	private float OffsetLerpRate = 10f;
-	private float FovLerpRate = 25f;
+	private readonly float _walkBob;
+	private readonly float _offsetLerpRate = 10f;
+	private readonly float _fovLerpRate = 25f;
 
-	private Vector3 TargetPosition;
-	private Rotation TargetRotation;
+	private Vector3 _targetPosition;
+	private Rotation _targetRotation;
 
 	protected override void Spawn()
 	{
@@ -53,8 +53,8 @@ public class ViewModel : ModelEntity
 
 	public override void Update()
 	{
-		TargetPosition = Vector3.Zero;
-		TargetRotation = Rotation.Identity;
+		_targetPosition = Vector3.Zero;
+		_targetRotation = Rotation.Identity;
 
 		BuildSprintEffects();
 		BuildWalkEffects();
@@ -66,7 +66,7 @@ public class ViewModel : ModelEntity
 	private void BuildSwayEffects()
 	{
 		var delta = new Vector3( -Input.MouseDelta.Y, -Input.MouseDelta.X, 0 ) * 0.25f;
-		TargetRotation *= Rotation.From( delta );
+		_targetRotation *= Rotation.From( delta );
 	}
 
 	private void BuildAvoidanceEffects()
@@ -74,8 +74,8 @@ public class ViewModel : ModelEntity
 		var player = Player.Local;
 		var ray = Cast.Ray( player.EyeRay, 2.0f ).Ignore( player ).Run();
 
-		TargetRotation = TargetRotation.LerpTo( Offsets["Avoid"].Rotation, 1.0f - ray.Fraction );
-		TargetPosition = TargetPosition.LerpTo( Offsets["Avoid"].Position, 1.0f - ray.Fraction );
+		_targetRotation = _targetRotation.LerpTo( Offsets["Avoid"].Rotation, 1.0f - ray.Fraction );
+		_targetPosition = _targetPosition.LerpTo( Offsets["Avoid"].Position, 1.0f - ray.Fraction );
 	}
 
 	private void BuildWalkEffects()
@@ -89,8 +89,8 @@ public class ViewModel : ModelEntity
 		//	WalkBob += Time.Delta * 20.0f * t;
 
 		float factor = 0.025f;
-		TargetPosition += Bobbing.CalculateOffset( WalkBob, t, factor ) * Camera.Rotation;
-		TargetPosition += new Vector3( 0, 0, t ) * factor * 0.1f;
+		_targetPosition += Bobbing.CalculateOffset( _walkBob, t, factor ) * Camera.Rotation;
+		_targetPosition += new Vector3( 0, 0, t ) * factor * 0.1f;
 	}
 
 	private bool BuildSprintEffects()
@@ -115,8 +115,8 @@ public class ViewModel : ModelEntity
 		//
 		// Interpolation
 		//
-		OffsetPosition = OffsetPosition.LerpTo( TargetPosition, 10f * Time.Delta );
-		OffsetRotation = OffsetRotation.LerpTo( TargetRotation, 10f * Time.Delta );
+		OffsetPosition = OffsetPosition.LerpTo( _targetPosition, 10f * Time.Delta );
+		OffsetRotation = OffsetRotation.LerpTo( _targetRotation, 10f * Time.Delta );
 
 		//
 		// Set values
