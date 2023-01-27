@@ -8,7 +8,7 @@ add_compile_definitions(NOMINMAX)
 set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_GENERATOR_PLATFORM x64)
-add_compile_definitions(_DEBUG;_IMGUI)
+add_compile_definitions(_DEBUG;_IMGUI;VK_NO_PROTOTYPES)
 
 # Threaded build
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
