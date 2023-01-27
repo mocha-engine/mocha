@@ -4,7 +4,7 @@
 public class Player : ModelEntity
 {
 	[HideInInspector]
-	public static Player Local => BaseEntity.All.OfType<Player>().First();
+	public static Player? Local => BaseEntity.All.OfType<Player>().FirstOrDefault();
 
 	[HideInInspector]
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );

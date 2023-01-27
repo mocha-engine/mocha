@@ -67,8 +67,9 @@ public class ProjectAssembly<T>
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
-			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 			UpgradeEntities( oldAssembly, newAssembly );
+
+			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 
 			// Unregister events for old interface
 			Event.Unregister( oldGameInterface );
@@ -114,7 +115,19 @@ public class ProjectAssembly<T>
 			Log.Trace( $"\tNew type is from assembly hash {newType.Assembly.GetHashCode()}" );
 
 			Log.Trace( $"\tUpgrading new entity instance" );
-			Upgrader.UpgradeInstance( entity, newEntity );
+
+
+			// Have we already upgraded this? If so, use a reference so that we're not 
+			// duplicating the object.
+			if ( ClassUpgrader.UpgradedReferences.TryGetValue( entity.GetHashCode(), out var upgradedValue ) )
+			{
+				newEntity = (IEntity)upgradedValue;
+			}
+			else
+			{
+				ClassUpgrader.UpgradedReferences[entity.GetHashCode()] = newEntity;
+				Upgrader.UpgradeInstance( entity, newEntity );
+			}
 
 			// If we created a new entity successfully, register it
 			if ( newEntity != null )
