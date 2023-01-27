@@ -2,42 +2,6 @@
 
 namespace Mocha.Common;
 
-internal class MountedFileSystem
-{
-	public string MountPoint { get; private set; }
-
-	public MountedFileSystem( string mountPoint )
-	{
-		MountPoint = Path.GetFullPath( mountPoint );
-	}
-
-	public string GetAbsolutePath( string relativePath )
-	{
-		var combinedPath = Path.Combine( MountPoint, relativePath );
-		return Path.GetFullPath( combinedPath ).NormalizePath();
-	}
-
-	public string GetRelativePath( string absolutePath )
-	{
-		return Path.GetRelativePath( MountPoint, absolutePath ).NormalizePath();
-	}
-}
-
-public struct FileSystemOptions
-{
-	public bool DisableAutoCompile { get; set; }
-
-	public static FileSystemOptions Default = new()
-	{
-		DisableAutoCompile = false
-	};
-
-	public static FileSystemOptions AssetCompiler = new()
-	{
-		DisableAutoCompile = true
-	};
-}
-
 public class FileSystem
 {
 	public static FileSystem Mounted { get; set; }
@@ -89,7 +53,7 @@ public class FileSystem
 		return false;
 	}
 
-	public string GetAbsolutePath( string relativePath, bool ignorePathNotFound = false, FileSystemOptions? options = null )
+	public string GetAbsolutePath( string relativePath, FileSystemOptions? options = null )
 	{
 		options ??= FileSystemOptions.Default;
 
@@ -149,13 +113,13 @@ public class FileSystem
 
 	public FileStream OpenRead( string relativePath, FileSystemOptions? options = null )
 	{
-		var absolutePath = GetAbsolutePath( relativePath, options: options );
+		var absolutePath = GetAbsolutePath( relativePath, options );
 		return new FileStream( absolutePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite );
 	}
 
 	public FileStream OpenWrite( string relativePath, FileSystemOptions? options = null )
 	{
-		return new FileStream( GetAbsolutePath( relativePath, ignorePathNotFound: true, options: options ), FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite );
+		return new FileStream( GetAbsolutePath( relativePath, options ), FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite );
 	}
 
 	public byte[] ReadAllBytes( string relativePath, FileSystemOptions? options = null )
@@ -206,17 +170,17 @@ public class FileSystem
 
 	public bool Exists( string relativePath, FileSystemOptions? options = null )
 	{
-		return File.Exists( GetAbsolutePath( relativePath, ignorePathNotFound: true, options ) );
+		return File.Exists( GetAbsolutePath( relativePath, options ) );
 	}
 
 	public DateTime GetLastWriteTime( string relativePath, FileSystemOptions? options = null )
 	{
-		return File.GetLastWriteTime( GetAbsolutePath( relativePath, options: options ) );
+		return File.GetLastWriteTime( GetAbsolutePath( relativePath, options ) );
 	}
 
 	public void Delete( string relativePath, FileSystemOptions? options = null )
 	{
-		File.Delete( GetAbsolutePath( relativePath, options: options ) );
+		File.Delete( GetAbsolutePath( relativePath, options ) );
 	}
 
 	public FileSystemWatcher CreateWatcher( string relativeDir, string filter, Action<string?> onChange, NotifyFilters? filters = null )
@@ -279,7 +243,7 @@ public class FileSystem
 
 	public bool IsFileReady( string relativePath, FileSystemOptions? options = null )
 	{
-		var path = GetAbsolutePath( relativePath, options: options );
+		var path = GetAbsolutePath( relativePath, options );
 
 		if ( !Path.Exists( path ) )
 		{
