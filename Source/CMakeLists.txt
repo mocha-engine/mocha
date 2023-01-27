@@ -6,9 +6,12 @@ project(Mocha)
 add_compile_definitions(NOMINMAX)
 
 set(VCPKG_TARGET_TRIPLET "x64-windows" CACHE STRING "")
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_GENERATOR_PLATFORM x64)
 add_compile_definitions(_DEBUG;_IMGUI)
+
+# Threaded build
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
 
 find_package(Vulkan)
 
@@ -26,26 +29,31 @@ find_package(unofficial-vulkan-memory-allocator CONFIG REQUIRED)
 include_directories(${VULKAN_PATH}/Include ${GLM_INCLUDE_DIRS} ${VULKAN_MEMORY_ALLOCATOR_INCLUDE_DIRS} ${SDL_INCLUDE_DIRS})
 link_directories( ${VULKAN_PATH}/Bin;${VULKAN_PATH}/Lib; )
 
-file(GLOB HOST_SOURCES "source/Host/*.cpp")
-file(GLOB HOST_HEADERS "source/Host/*.h")
-file(GLOB_RECURSE JOLT_SOURCES "source/Host/thirdparty/JoltPhysics/Jolt/*.cpp")
-file(GLOB_RECURSE VKB_SOURCES "source/Host/thirdparty/vk-bootstrap/src/*.cpp")
+file(GLOB HOST_SOURCES "Host/*.cpp")
+file(GLOB HOST_HEADERS "Host/*.h")
+file(GLOB_RECURSE JOLT_SOURCES "Host/thirdparty/JoltPhysics/Jolt/*.cpp")
+file(GLOB_RECURSE VKB_SOURCES "Host/thirdparty/vk-bootstrap/src/*.cpp")
 
 set(IMGUI_SOURCES
-	"source/Host/thirdparty/imgui/imgui.cpp"
-	"source/Host/thirdparty/imgui/imgui_demo.cpp"
-	"source/Host/thirdparty/imgui/imgui_draw.cpp"
-	"source/Host/thirdparty/imgui/imgui_tables.cpp"
-	"source/Host/thirdparty/imgui/imgui_widgets.cpp"
-	"source/Host/thirdparty/imgui/backends/imgui_impl_sdl.cpp"
-	"source/Host/thirdparty/imgui/backends/imgui_impl_vulkan.cpp"
+	"Host/thirdparty/imgui/imgui.cpp"
+	"Host/thirdparty/imgui/imgui_demo.cpp"
+	"Host/thirdparty/imgui/imgui_draw.cpp"
+	"Host/thirdparty/imgui/imgui_tables.cpp"
+	"Host/thirdparty/imgui/imgui_widgets.cpp"
+	"Host/thirdparty/imgui/backends/imgui_impl_sdl.cpp"
+	"Host/thirdparty/imgui/backends/imgui_impl_vulkan.cpp"
 )
 
-include_directories("source/Host/")
-include_directories("source/Host/thirdparty/JoltPhysics")
-include_directories("source/Host/thirdparty/imgui")
-include_directories("source/Host/thirdparty/renderdoc")
-include_directories("source/Host/thirdparty/vk-bootstrap/src")
+set(VOLK_SOURCES "Host/thirdparty/volk/volk.c")
+set(IMPLOT_SOURCES "Host/thirdparty/implot/implot.cpp" "Host/thirdparty/implot/implot_demo.cpp" "Host/thirdparty/implot/implot_items.cpp")
+
+include_directories("Host/")
+include_directories("Host/thirdparty/JoltPhysics")
+include_directories("Host/thirdparty/imgui")
+include_directories("Host/thirdparty/renderdoc")
+include_directories("Host/thirdparty/vk-bootstrap/src")
+include_directories("Host/thirdparty/volk")
+include_directories("Host/thirdparty/implot")
 
 add_executable(Host 
 	${HOST_SOURCES}
@@ -54,6 +62,9 @@ add_executable(Host
 	${JOLT_SOURCES}
 	${IMGUI_SOURCES}
 	${VKB_SOURCES}
+
+	${VOLK_SOURCES}
+	${IMPLOT_SOURCES}
 )
 
 target_link_libraries(Host PRIVATE
