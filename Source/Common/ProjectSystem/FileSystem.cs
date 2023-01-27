@@ -114,12 +114,12 @@ public class FileSystem
 			}
 		}
 
-		if ( TryFindFile( relativePath, out var path ) )
+		if ( TryFindFile( relativePath, out var locatedPath ) )
 		{
 			// Try to find either the path provided OR the compiled file
 			// if this is a resource type
 
-			return path;
+			return locatedPath!;
 		}
 		else if ( isResource )
 		{
@@ -134,19 +134,17 @@ public class FileSystem
 				if ( TryFindFile( searchPath, out var sourcePath ) )
 				{
 					// We found a source file, let's compile that and use it
-					AssetCompiler?.CompileFile( sourcePath );
+					AssetCompiler?.CompileFile( sourcePath! );
 
-					// Compile complete so let's find the compiled file...
-					TryFindFile( relativePath, out path );
-
-					break;
+					// Compile complete so let's return the compiled file
+					if ( TryFindFile( relativePath, out var compiledResultPath ) )
+						return compiledResultPath!;
 				}
 			}
 		}
 
-		// If we got this far it means we couldn't find the path at all, so we're going to use
-		// the first available filesystem to generate an absolute path 
-		return _mountedFileSystems[0].GetAbsolutePath( relativePath );
+		// Default to using the first mounted file system
+		return _mountedFileSystems[0].GetAbsolutePath( relativePath ); ;
 	}
 
 	public FileStream OpenRead( string relativePath, FileSystemOptions? options = null )
