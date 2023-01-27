@@ -60,4 +60,18 @@ internal static class MemberInfoExtensions
 
 		return false;
 	}
+
+	internal static bool IsInterface( this MemberInfo memberInfo )
+	{
+		if ( memberInfo is PropertyInfo propertyInfo )
+		{
+			return propertyInfo.PropertyType.IsInterface;
+		}
+		else if ( memberInfo is FieldInfo fieldInfo )
+		{
+			return fieldInfo.FieldType.IsInterface;
+		}
+
+		return false;
+	}
 }

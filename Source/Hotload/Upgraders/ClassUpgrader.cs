@@ -8,7 +8,7 @@ public class ClassUpgrader : IMemberUpgrader
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
-		return memberInfo.IsClass();
+		return memberInfo.IsClass() || memberInfo.IsInterface();
 	}
 
 	/// <inheritdoc />
@@ -21,11 +21,17 @@ public class ClassUpgrader : IMemberUpgrader
 
 		Type type = newMember.Type;
 
-		if ( type.IsAbstract )
+		// Check for a derived type if any
 		{
 			var oldDerivedType = oldValue.GetType();
+			var derivedType = newMember.Type.Assembly.GetTypes().FirstOrDefault( x => x.FullName == oldDerivedType.FullName );
 
-			type = newMember.Type.Assembly.GetTypes().First( x => x.FullName == oldDerivedType.FullName );
+			if ( derivedType != null && type != derivedType )
+			{
+				Log.Trace( $"!!! '{oldMember.Name}' --> '{newMember.Name}': Type '{type.FullName}' upgrading to derived '{derivedType}' since it matches better" );
+
+				type = derivedType;
+			}
 		}
 
 		// Create a new instance of the class WITHOUT calling the constructor

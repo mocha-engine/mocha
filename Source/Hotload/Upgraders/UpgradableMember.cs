@@ -14,11 +14,15 @@ public class UpgradableMember
 
 	public Type Type { get; }
 
-	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type )
+	public string Name { get; }
+
+	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type, string name )
 	{
 		_getter = getter;
 		_setter = setter;
+
 		Type = type;
+		Name = name;
 	}
 
 	/// <summary>
@@ -65,7 +69,7 @@ public class UpgradableMember
 	/// </summary>
 	public static UpgradableMember FromField( FieldInfo fieldInfo )
 	{
-		return new( fieldInfo.GetValue, fieldInfo.SetValue, fieldInfo.FieldType );
+		return new( fieldInfo.GetValue, fieldInfo.SetValue, fieldInfo.FieldType, fieldInfo.Name );
 	}
 
 	/// <summary>
@@ -93,7 +97,7 @@ public class UpgradableMember
 			setMethod.Invoke( instance, new[] { value } );
 		};
 
-		return new( invokeGet, invokeSet, propertyInfo.PropertyType );
+		return new( invokeGet, invokeSet, propertyInfo.PropertyType, propertyInfo.Name );
 	}
 	#endregion
 }
