@@ -67,6 +67,8 @@ public class ProjectAssembly<T>
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
+			Upgrader.UpgradedReferences.Clear();
+
 			UpgradeEntities( oldAssembly, newAssembly );
 
 			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
@@ -85,54 +87,40 @@ public class ProjectAssembly<T>
 
 	private void UpgradeEntities( Assembly oldAssembly, Assembly newAssembly )
 	{
-		Log.Trace( $"Uprading {EntityRegistry.Instance.Count()} entities..." );
-
 		var entityRegistryCopy = EntityRegistry.Instance.ToList();
 
 		for ( int i = 0; i < entityRegistryCopy.Count; i++ )
 		{
 			var entity = entityRegistryCopy[i];
 
-			Log.Trace( $"Entity {entity.Name}" );
-
 			// Do we actually want to upgrade this?
 			if ( entity.GetType().Assembly != oldAssembly )
 			{
-				Log.Trace( $"\tNot part of hotloaded assembly - skipping" );
+				// Not part of hotloaded assembly - skip
 				continue;
 			}
 
 			// Unregister the old entity
-			Log.Trace( $"\tUnregistering old entity {entity.Name}" );
 			EntityRegistry.Instance.UnregisterEntity( entity );
 
 			// Find new type for entity in new assembly
-			Log.Trace( $"\tCreating new entity instance" );
 			var newType = newAssembly.GetType( entity.GetType().FullName )!;
 			var newEntity = (IEntity)FormatterServices.GetUninitializedObject( newType )!;
 
-			Log.Trace( $"\tOld type is from assembly hash {entity.GetType().Assembly.GetHashCode()}" );
-			Log.Trace( $"\tNew type is from assembly hash {newType.Assembly.GetHashCode()}" );
-
-			Log.Trace( $"\tUpgrading new entity instance" );
-
-
-			// Have we already upgraded this? If so, use a reference so that we're not 
-			// duplicating the object.
-			if ( ClassUpgrader.UpgradedReferences.TryGetValue( entity.GetHashCode(), out var upgradedValue ) )
+			// Have we already upgraded this?
+			if ( Upgrader.UpgradedReferences.TryGetValue( entity.GetHashCode(), out var upgradedValue ) )
 			{
 				newEntity = (IEntity)upgradedValue;
 			}
 			else
 			{
-				ClassUpgrader.UpgradedReferences[entity.GetHashCode()] = newEntity;
+				Upgrader.UpgradedReferences[entity.GetHashCode()] = newEntity;
 				Upgrader.UpgradeInstance( entity, newEntity );
 			}
 
 			// If we created a new entity successfully, register it
 			if ( newEntity != null )
 			{
-				Log.Trace( $"\tRegistering new entity {newEntity.Name}" );
 				EntityRegistry.Instance.RegisterEntity( newEntity );
 			}
 		}
@@ -184,8 +172,6 @@ public class ProjectAssembly<T>
 
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
-		Log.Trace( $"File {e.FullPath} was changed ({_timeSinceLastChange})" );
-
 		// This will typically fire twice, so gate it with a TimeSince
 		if ( _timeSinceLastChange < 1f )
 			return;

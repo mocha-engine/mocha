@@ -33,7 +33,7 @@ public class UpgradableMember
 	{
 		if ( !Type.IsAssignableFrom( value.GetType() ) )
 		{
-			Log.Trace( $"{Type.FullName} isn't assignable from {value.GetType().FullName}, bailing SetValue" );
+			// Bail
 			return;
 		}
 

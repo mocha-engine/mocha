@@ -6,6 +6,12 @@ namespace Mocha.Hotload;
 
 public static class Upgrader
 {
+	/// <summary>
+	/// Dictionary of old hash codes and upgraded objects used
+	/// for reference types
+	/// </summary>
+	public static Dictionary<int, object> UpgradedReferences { get; } = new();
+
 	private static List<IMemberUpgrader> s_upgraders { get; set; }
 
 	/// <summary>
@@ -40,13 +46,13 @@ public static class Upgrader
 	{
 		if ( oldInstance == null )
 		{
-			Log.Warning( "UpgradeInstance bailing because oldInstance was null!" );
+			// Bail
 			return;
 		}
 
 		if ( newInstance == null )
 		{
-			Log.Warning( "UpgradeInstance bailing because newInstance was null!" );
+			// Bail
 			return;
 		}
 

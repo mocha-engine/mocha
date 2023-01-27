@@ -33,12 +33,10 @@ public static class Main
 		// Get the current loaded project from native
 		var manifestPath = Glue.Engine.GetProjectPath();
 		s_manifest = ProjectManifest.Load( manifestPath );
-		Log.Trace( $"Loading project '{s_manifest.Name}'" );
 
 		// Generate project
 		var projectGenerator = new ProjectGenerator();
 		var csproj = projectGenerator.GenerateProject( s_manifest );
-		Log.Trace( $"Generated '{csproj}'" );
 
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
