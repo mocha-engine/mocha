@@ -53,7 +53,6 @@ public class Player : Mocha.Player
 
 	private void UpdateCamera()
 	{
-
 		//
 		// Rotation
 		//
