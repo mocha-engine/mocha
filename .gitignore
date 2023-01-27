@@ -391,3 +391,4 @@ Source/Hotload/Generators/GeneratedProject.cs
 
 # Content meta files
 ![Cc]ontent/**/*.meta
+Compile/
