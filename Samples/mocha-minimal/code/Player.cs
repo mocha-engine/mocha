@@ -1,4 +1,6 @@
-﻿namespace Minimal;
+﻿using System.ComponentModel;
+
+namespace Minimal;
 
 public class Player : Mocha.Player
 {

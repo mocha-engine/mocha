@@ -215,6 +215,10 @@ public partial class QuakeWalkController
 		Vector3 forward = Player.EyeRotation.Forward.WithZ( 0 );
 		Vector3 right = Player.EyeRotation.Right.WithZ( 0 );
 
+		DebugOverlay.ScreenText( Player.EyeRotation );
+		DebugOverlay.ScreenText( $"WalkController.Player: {Player.GetType().FullName} ({Player.GetType().Assembly.GetHashCode()})" );
+		DebugOverlay.ScreenText( $"WalkController.Player.GetHashCode(): {Player.GetHashCode()}" );
+
 		forward = forward.Normal;
 		right = right.Normal;
 
