@@ -1,38 +1,22 @@
-﻿using System.IO.Compression;
-using System.Text.Json;
+﻿using BinaryPack;
+using System.IO.Compression;
 
 namespace Mocha.Common;
 
 public static class Serializer
 {
-	private static JsonSerializerOptions CreateSerializerOptions()
+	public static byte[] Serialize<T>( T obj ) where T : new()
 	{
-		var serializeOptions = new JsonSerializerOptions
-		{
-			WriteIndented = false
-		};
-
-		return serializeOptions;
-	}
-
-	public static byte[] Serialize<T>( T obj )
-	{
-		var serialized = JsonSerializer.SerializeToUtf8Bytes( obj, CreateSerializerOptions() );
+		var serialized = BinaryConverter.Serialize( obj );
 
 		return Compress( serialized );
 	}
 
-	public static T? Deserialize<T>( byte[] serialized )
+	public static T? Deserialize<T>( byte[] data ) where T : new()
 	{
-		using var outputStream = new MemoryStream();
+		var serialized = Decompress( data );
 
-		using ( var compressStream = new MemoryStream( serialized ) )
-		{
-			using var deflateStream = new DeflateStream( compressStream, CompressionMode.Decompress );
-			deflateStream.CopyTo( outputStream );
-		}
-
-		return JsonSerializer.Deserialize<T>( outputStream.ToArray(), CreateSerializerOptions() );
+		return BinaryConverter.Deserialize<T>( serialized );
 	}
 
 	public static byte[] Compress( byte[] uncompressedData )

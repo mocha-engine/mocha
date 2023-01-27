@@ -66,8 +66,8 @@ public partial class ShaderCompiler : BaseCompiler
 		// Wrapper for file.
 		var mochaFile = new MochaFile<ShaderInfo>
 		{
-			MajorVersion = 3,
-			MinorVersion = 1,
+			MajorVersion = 4,
+			MinorVersion = 0,
 			Data = shaderFormat,
 			AssetHash = input.DataHash
 		};

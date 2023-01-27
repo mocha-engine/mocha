@@ -104,7 +104,7 @@ public class ModelCompiler : BaseCompiler
 
 		var mochaFile = new MochaFile<byte[]>()
 		{
-			MajorVersion = 3,
+			MajorVersion = 4,
 			MinorVersion = 0,
 			Data = stream.ToArray(),
 			AssetHash = input.DataHash

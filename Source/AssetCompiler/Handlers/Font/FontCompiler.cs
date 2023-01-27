@@ -83,8 +83,8 @@ public class FontCompiler : BaseCompiler
 		// Wrapper for file
 		var mochaFile = new MochaFile<Font.Data>()
 		{
-			MajorVersion = 3,
-			MinorVersion = 1,
+			MajorVersion = 4,
+			MinorVersion = 0,
 			Data = fontData,
 			AssetHash = input.DataHash
 		};

@@ -96,8 +96,8 @@ public partial class TextureCompiler : BaseCompiler
 		// Wrapper for file.
 		var mochaFile = new MochaFile<TextureInfo>
 		{
-			MajorVersion = 3,
-			MinorVersion = 1,
+			MajorVersion = 4,
+			MinorVersion = 0,
 			Data = textureFormat,
 			AssetHash = input.DataHash
 		};
