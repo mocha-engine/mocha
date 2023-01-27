@@ -1,11 +1,18 @@
 #pragma once
 #include <defs.h>
 #include <globalvars.h>
+#include <root.h>
 #include <projectmanager.h>
 #include <projectmanifest.h>
 
 namespace Engine
 {
+	GENERATE_BINDINGS inline void Quit()
+	{
+		auto& root = Root::GetInstance();
+		root.Quit();
+	}
+
 	GENERATE_BINDINGS inline int GetCurrentTick()
 	{
 		return g_curTick;
