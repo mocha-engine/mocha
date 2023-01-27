@@ -56,10 +56,9 @@ void Window::Show()
 	m_visible = true;
 }
 
-bool Window::Update()
+void Window::Update()
 {
 	SDL_Event e;
-	bool bQuit = false;
 
 	InputState inputState = g_inputManager->GetState();
 
@@ -72,7 +71,8 @@ bool Window::Update()
 	{
 		if ( e.type == SDL_QUIT )
 		{
-			return true;
+			m_closeRequested = true;
+			return;
 		}
 		else if ( e.type == SDL_WINDOWEVENT )
 		{
@@ -125,8 +125,7 @@ bool Window::Update()
 				// We don't want to quit if an editor window is closed
 				if ( we.windowID == SDL_GetWindowID( m_window ) )
 				{
-					// Main window was closed, so quit
-					bQuit = true;
+					m_closeRequested = true;
 				}
 			}
 		}
@@ -176,6 +175,4 @@ bool Window::Update()
 	}
 
 	g_inputManager->SetState( inputState );
-
-	return bQuit;
 }

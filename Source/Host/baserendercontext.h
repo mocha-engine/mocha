@@ -288,7 +288,6 @@ enum RenderStatus
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
 	RENDER_STATUS_SHADER_COMPILE_FAILED,				// The shader failed to compile
 	RENDER_STATUS_WINDOW_SIZE_INVALID,					// The window size is invalid. It might be minimized. This shouldn't be treated as an error.
-	RENDER_STATUS_WINDOW_CLOSE,							// The window was closed. This shouldn't be treated as an error.
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -508,8 +507,16 @@ public:
 
 	virtual RenderStatus GetWindowSize( Size2D* outSize ) = 0;
 
-	// Update window, fetch inputs etc..
-	virtual RenderStatus UpdateWindow() = 0;
+	/// <summary>
+	/// Update window, fetch inputs etc..
+	/// </summary>
+	virtual void UpdateWindow() = 0;
+
+	/// <summary>
+	/// Did the user try to close the game window?
+	/// </summary>
+	virtual bool GetWindowCloseRequested() = 0;
+
 
 	// ----------------------------------------
 	// ImGui
