@@ -26,15 +26,22 @@ public class UpgradableMember
 	}
 
 	/// <summary>
-	/// Set the value that this member represents
+	/// Set the value that this member represents.
+	/// This will bail if <see cref="Type"/> is not assignable from <paramref name="value"/>.
 	/// </summary>
 	public void SetValue( object instance, object value )
 	{
+		if ( !Type.IsAssignableFrom( value.GetType() ) )
+		{
+			Log.Trace( $"{Type.FullName} isn't assignable from {value.GetType().FullName}, bailing SetValue" );
+			return;
+		}
+
 		_setter?.Invoke( instance, value );
 	}
 
 	/// <summary>
-	/// Get the value that this member represents
+	/// Get the value that this member represents.
 	/// </summary>
 	public object? GetValue( object instance )
 	{
