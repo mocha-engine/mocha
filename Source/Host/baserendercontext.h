@@ -344,9 +344,11 @@ protected:
 	// The current vertex buffer
 	VertexBuffer* m_currentVertexBuffer;
 
+
 	// ----------------------------------------
 	// Objects
 	// ----------------------------------------
+
 	virtual RenderStatus CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle ) = 0;
 	virtual RenderStatus CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle ) = 0;
 	virtual RenderStatus SetImageTextureData( Handle handle, TextureData_t pipelineInfo ) = 0;
@@ -380,14 +382,14 @@ public:
 	virtual RenderStatus Startup() = 0;
 	virtual RenderStatus Shutdown() = 0;
 
+
 	// ----------------------------------------
 	// Rendering commands
 	// ----------------------------------------
 
-	// Call this before invoking any render functions.
-
 	/// <summary>
-	/// Begins rendering. This should be matched with a call to EndRendering.
+	/// Begins rendering. Call this before invoking any render functions.
+	/// This should be matched with a call to EndRendering.
 	/// </summary>
 	/// <returns>
 	/// <para>
@@ -401,7 +403,8 @@ public:
 	virtual RenderStatus BeginRendering() = 0;
 
 	/// <summary>
-	/// Ends rendering. This should be matched with a call to BeginRendering.
+	/// Ends rendering.
+	/// This should be matched with a call to BeginRendering.
 	/// </summary>
 	/// <returns>
 	/// <para>
@@ -413,10 +416,11 @@ public:
 	/// </returns>
 	virtual RenderStatus EndRendering() = 0;
 
+
 	// ----------------------------------------
-	//
 	// Low-level rendering
-	//
+	// ----------------------------------------
+
 	/// <summary>
 	/// Binds a pipeline
 	/// </summary>
@@ -466,15 +470,21 @@ public:
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
 	/// <summary>
+	/// This will return the size for the current render target.
+	/// </summary>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
+	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+
+	/// <summary>
 	/// Get information about the GPU.
 	/// </summary>
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
+
 	// ----------------------------------------
-	//
 	// High-level rendering
-	//
+	// ----------------------------------------
 
 	/// <summary>
 	/// Begin the ImGUI drawing pass.
@@ -498,13 +508,14 @@ public:
 	virtual RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) = 0;
 
 	// ----------------------------------------
-	//
 	// Windowing
-	//
-	// TODO: Move this elsewhere
-	// This will return the size for the current render target.
-	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+	// ----------------------------------------
 
+	// TODO: Move these elsewhere
+
+	/// <summary>
+	/// Get the current window size
+	/// </summary>
 	virtual RenderStatus GetWindowSize( Size2D* outSize ) = 0;
 
 	/// <summary>
@@ -520,6 +531,7 @@ public:
 
 	// ----------------------------------------
 	// ImGui
+	// ----------------------------------------
 
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;
