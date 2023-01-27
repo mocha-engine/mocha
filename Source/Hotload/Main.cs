@@ -96,7 +96,7 @@ public static class Main
 		if ( s_game == null )
 			throw new Exception( "Invoke Run() first" );
 
-		Time.UpdateFrom( Glue.Engine.GetDeltaTime() );
+		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 

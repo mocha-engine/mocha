@@ -288,7 +288,6 @@ enum RenderStatus
 	RENDER_STATUS_INVALID_HANDLE,						// You passed an invalid handle to a render function
 	RENDER_STATUS_SHADER_COMPILE_FAILED,				// The shader failed to compile
 	RENDER_STATUS_WINDOW_SIZE_INVALID,					// The window size is invalid. It might be minimized. This shouldn't be treated as an error.
-	RENDER_STATUS_WINDOW_CLOSE,							// The window was closed. This shouldn't be treated as an error.
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -345,9 +344,11 @@ protected:
 	// The current vertex buffer
 	VertexBuffer* m_currentVertexBuffer;
 
+
 	// ----------------------------------------
 	// Objects
 	// ----------------------------------------
+
 	virtual RenderStatus CreateImageTexture( ImageTextureInfo_t textureInfo, Handle* outHandle ) = 0;
 	virtual RenderStatus CreateRenderTexture( RenderTextureInfo_t textureInfo, Handle* outHandle ) = 0;
 	virtual RenderStatus SetImageTextureData( Handle handle, TextureData_t pipelineInfo ) = 0;
@@ -381,14 +382,14 @@ public:
 	virtual RenderStatus Startup() = 0;
 	virtual RenderStatus Shutdown() = 0;
 
+
 	// ----------------------------------------
 	// Rendering commands
 	// ----------------------------------------
 
-	// Call this before invoking any render functions.
-
 	/// <summary>
-	/// Begins rendering. This should be matched with a call to EndRendering.
+	/// Begins rendering. Call this before invoking any render functions.
+	/// This should be matched with a call to EndRendering.
 	/// </summary>
 	/// <returns>
 	/// <para>
@@ -402,7 +403,8 @@ public:
 	virtual RenderStatus BeginRendering() = 0;
 
 	/// <summary>
-	/// Ends rendering. This should be matched with a call to BeginRendering.
+	/// Ends rendering.
+	/// This should be matched with a call to BeginRendering.
 	/// </summary>
 	/// <returns>
 	/// <para>
@@ -414,10 +416,11 @@ public:
 	/// </returns>
 	virtual RenderStatus EndRendering() = 0;
 
+
 	// ----------------------------------------
-	//
 	// Low-level rendering
-	//
+	// ----------------------------------------
+
 	/// <summary>
 	/// Binds a pipeline
 	/// </summary>
@@ -467,15 +470,21 @@ public:
 	virtual RenderStatus BindRenderTarget( RenderTexture rt ) = 0;
 
 	/// <summary>
+	/// This will return the size for the current render target.
+	/// </summary>
+	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
+	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+
+	/// <summary>
 	/// Get information about the GPU.
 	/// </summary>
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
+
 	// ----------------------------------------
-	//
 	// High-level rendering
-	//
+	// ----------------------------------------
 
 	/// <summary>
 	/// Begin the ImGUI drawing pass.
@@ -499,20 +508,30 @@ public:
 	virtual RenderStatus GetImGuiTextureID( ImageTexture* texture, void** outTextureId ) = 0;
 
 	// ----------------------------------------
-	//
 	// Windowing
-	//
-	// TODO: Move this elsewhere
-	// This will return the size for the current render target.
-	virtual RenderStatus GetRenderSize( Size2D* outSize ) = 0;
+	// ----------------------------------------
 
+	// TODO: Move these elsewhere
+
+	/// <summary>
+	/// Get the current window size
+	/// </summary>
 	virtual RenderStatus GetWindowSize( Size2D* outSize ) = 0;
 
-	// Update window, fetch inputs etc..
-	virtual RenderStatus UpdateWindow() = 0;
+	/// <summary>
+	/// Update window, fetch inputs etc..
+	/// </summary>
+	virtual void UpdateWindow() = 0;
+
+	/// <summary>
+	/// Did the user try to close the game window?
+	/// </summary>
+	virtual bool GetWindowCloseRequested() = 0;
+
 
 	// ----------------------------------------
 	// ImGui
+	// ----------------------------------------
 
 	ImFont* m_mainFont;
 	ImFont* m_monospaceFont;

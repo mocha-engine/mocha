@@ -1,29 +1,36 @@
 #pragma once
 #include <defs.h>
 #include <globalvars.h>
+#include <root.h>
 #include <projectmanager.h>
 #include <projectmanifest.h>
 
 namespace Engine
 {
+	GENERATE_BINDINGS inline void Quit()
+	{
+		auto& root = Root::GetInstance();
+		root.Quit();
+	}
+
 	GENERATE_BINDINGS inline int GetCurrentTick()
 	{
 		return g_curTick;
 	}
 
-	GENERATE_BINDINGS inline float GetDeltaTime()
+	GENERATE_BINDINGS inline float GetFrameDeltaTime()
 	{
-		return g_frameTime;
+		return g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTickDeltaTime()
 	{
-		return g_tickTime;
+		return g_tickDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetFramesPerSecond()
 	{
-		return 1.0f / g_frameTime;
+		return 1.0f / g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTime()

@@ -30,8 +30,8 @@ public:
 	void Startup();
 	void Shutdown();
 
-	void Render();
-	void Run();
+	void DrawOverlaysAndEditor();
+	void DrawGame();
 
 	const char* GetGPUName()
 	{

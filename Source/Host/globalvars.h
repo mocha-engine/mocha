@@ -43,8 +43,8 @@ extern CVarManager* g_cvarManager;
 extern ProjectManager* g_projectManager;
 
 extern float g_curTime;
-extern float g_frameTime;
-extern float g_tickTime;
+extern float g_frameDeltaTime;
+extern float g_tickDeltaTime;
 extern int g_curTick;
 
 extern Vector3 g_cameraPos;

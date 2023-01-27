@@ -8,9 +8,9 @@ public static class Time
 
 	public static List<int> FPSHistory { get; } = new();
 
-	public static void UpdateFrom( float deltaTime )
+	public static void UpdateFrom( float tickDeltaTime )
 	{
-		Delta = deltaTime;
+		Delta = tickDeltaTime;
 		Now = Glue.Engine.GetTime();
 
 		FPS = Glue.Engine.GetFramesPerSecond().CeilToInt();
