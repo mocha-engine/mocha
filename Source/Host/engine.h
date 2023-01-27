@@ -18,19 +18,19 @@ namespace Engine
 		return g_curTick;
 	}
 
-	GENERATE_BINDINGS inline float GetDeltaTime()
+	GENERATE_BINDINGS inline float GetFrameDeltaTime()
 	{
-		return g_frameTime;
+		return g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTickDeltaTime()
 	{
-		return g_tickTime;
+		return g_tickDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetFramesPerSecond()
 	{
-		return 1.0f / g_frameTime;
+		return 1.0f / g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTime()

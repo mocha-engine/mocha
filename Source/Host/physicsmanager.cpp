@@ -98,7 +98,7 @@ void PhysicsManager::Update()
 
 	// Step the world
 	m_physicsInstance->m_physicsSystem.Update(
-	    g_tickTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
+	    g_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
 	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?

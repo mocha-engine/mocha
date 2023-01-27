@@ -30,8 +30,8 @@ CVarManager* g_cvarManager;
 ProjectManager* g_projectManager;
 
 float g_curTime;
-float g_frameTime;
-float g_tickTime;
+float g_frameDeltaTime;
+float g_tickDeltaTime;
 int g_curTick;
 Vector3 g_cameraPos;
 Quaternion g_cameraRot;
@@ -117,12 +117,12 @@ void Root::Run()
 	while ( !m_shouldQuit )
 	{
 		double newTime = HiresTimeInSeconds();
-		double frameTime = newTime - currentTime;
+		double loopDeltaTime = newTime - currentTime;
 
-		// How quick did we do last frame? Let's limit ourselves if (1.0f / g_frameTime) is more than maxLoopHz
-		float loopHz = 1.0f / frameTime;
+		// How quick did we do last frame? Let's limit ourselves if (1.0f / loopDeltaTime) is more than maxLoopHz
+		float loopHz = 1.0f / loopDeltaTime;
 
-		// TODO: Server / client. Perhaps abstract this and set it the tickrate on dedicated servers?
+		// TODO: Server / client. Perhaps abstract this and set it to the tickrate if we're a dedicated server?
 		float maxLoopHz = maxFramerate.GetValue();
 
 		if ( maxLoopHz > 0 && loopHz > maxLoopHz )
@@ -130,11 +130,11 @@ void Root::Run()
 			continue;
 		}
 
-		if ( frameTime > 1 / 30.0f )
-			frameTime = 1 / 30.0f;
+		if ( loopDeltaTime > 1 / 30.0f )
+			loopDeltaTime = 1 / 30.0f;
 
 		currentTime = newTime;
-		accumulator += frameTime;
+		accumulator += loopDeltaTime;
 
 		//
 		// How long has it been since we last updated the game logic?
@@ -147,7 +147,7 @@ void Root::Run()
 			g_entityDictionary->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
 
-			g_tickTime = ( float )logicDelta;
+			g_tickDeltaTime = ( float )logicDelta;
 
 			// Update physics
 			g_physicsManager->Update();
@@ -155,8 +155,7 @@ void Root::Run()
 			// Update game
 			g_hostManager->Update();
 
-			// TODO: Server / client
-			// 
+// TODO: Server / client
 // #ifndef DEDICATED_SERVER
 			// Update window
 			g_renderContext->UpdateWindow();
@@ -177,8 +176,9 @@ void Root::Run()
 			g_curTick++;
 		}
 
-		g_frameTime = ( float )frameTime;
-
+		g_frameDeltaTime = ( float )loopDeltaTime;
+		
+// TODO: Server / client
 // #ifndef DEDICATED_SERVER
 		// Render
 		{
