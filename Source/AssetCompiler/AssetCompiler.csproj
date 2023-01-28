@@ -17,6 +17,7 @@
 		<PackageReference Include="shaderc.net" Version="0.1.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="2.1.3" />
 		<PackageReference Include="StbImageSharp" Version="2.27.13" />
+		<PackageReference Include="TinyEXR.NET" Version="0.2.3" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.15" />
 	</ItemGroup>
 
