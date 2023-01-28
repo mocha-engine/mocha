@@ -1,10 +1,11 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.Collections.Concurrent;
+using System.Runtime.InteropServices;
 
 namespace Mocha.Common;
 
 public static class MemoryLogger
 {
-	public static Dictionary<string, (int Allocations, int Frees)> Entries = new();
+	public static ConcurrentDictionary<string, (int Allocations, int Frees)> Entries = new();
 
 	public static void AllocatedBytes( string name, int count )
 	{
