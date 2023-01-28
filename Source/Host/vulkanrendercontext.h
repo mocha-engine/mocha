@@ -7,6 +7,7 @@
 #include <globalvars.h>
 #include <handlemap.h>
 #include <mathtypes.h>
+#include <shared_mutex>
 #include <unordered_map>
 #include <vk_mem_alloc.h>
 #include <vkinit.h>
@@ -358,7 +359,10 @@ private:
 
 	std::unique_ptr<Window> m_window;
 	VulkanCommandContext m_mainContext;
+
+	std::shared_mutex m_uploadContextMutex;
 	std::unordered_map<std::thread::id, std::shared_ptr<VulkanCommandContext>> m_uploadContexts;
+
 	VulkanSwapchain m_swapchain;
 	VulkanSampler m_anisoSampler, m_pointSampler;
 

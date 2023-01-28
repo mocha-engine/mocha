@@ -516,6 +516,8 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 std::shared_ptr<VulkanCommandContext> VulkanRenderContext::GetUploadContext( std::thread::id thread )
 {
+	std::shared_lock lock( m_uploadContextMutex );
+
 	if ( m_uploadContexts.find( thread ) == m_uploadContexts.end() )
 	{
 		m_uploadContexts[thread] = std::make_shared<VulkanCommandContext>( this );
@@ -1687,7 +1689,8 @@ RenderStatus VulkanRenderContext::ImmediateSubmit( std::function<RenderStatus( V
 	RenderStatus status;
 
 	// Get a command context for this thread, prevents threading issues
-	std::shared_ptr<VulkanCommandContext> currentContext = GetUploadContext( std::this_thread::get_id() );
+	std::thread::id threadId = std::this_thread::get_id();
+	std::shared_ptr<VulkanCommandContext> currentContext = GetUploadContext( threadId );
 
 	VkCommandBuffer cmd = currentContext->commandBuffer;
 	VkCommandBufferBeginInfo cmdBeginInfo = VKInit::CommandBufferBeginInfo( VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT );
