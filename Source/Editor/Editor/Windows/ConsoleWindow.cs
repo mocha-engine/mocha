@@ -51,28 +51,23 @@ public class ConsoleWindow : EditorWindow
 				ImGui.TableNextRow();
 				ImGui.TableNextColumn();
 
-				ImGui.PushStyleColor( ImGuiCol.Text, Theme.Green );
-				ImGui.TableSetBgColor( ImGuiTableBgTarget.CellBg, ImGui.GetColorU32( Theme.Green.ToBackground() ), -1 );
-				ImGuiX.TextMonospace( item.time.ToString() );
-				ImGui.PopStyleColor();
+				static void ColoredText( string text, Vector4 color )
+				{
+					ImGui.PushStyleColor( ImGuiCol.Text, color );
+					ImGui.TableSetBgColor( ImGuiTableBgTarget.CellBg, ImGui.GetColorU32( color.ToBackground() ), -1 );
+					ImGuiX.TextMonospace( text );
+					ImGui.PopStyleColor();
+				}
 
+				ColoredText( item.time, Theme.Green );
 				ImGui.TableNextColumn();
 
-				ImGui.PushStyleColor( ImGuiCol.Text, Theme.Blue );
-				ImGui.TableSetBgColor( ImGuiTableBgTarget.CellBg, ImGui.GetColorU32( Theme.Blue.ToBackground() ), -1 );
-				ImGuiX.TextMonospace( item.logger.ToString() );
-				ImGui.PopStyleColor();
-
+				ColoredText( item.logger, Theme.Blue );
 				ImGui.TableNextColumn();
 
 				var level = Enum.Parse<LogLevel>( item.level );
 				var color = LogLevelToColor( level );
-
-				ImGui.PushStyleColor( ImGuiCol.Text, color );
-				ImGui.TableSetBgColor( ImGuiTableBgTarget.CellBg, ImGui.GetColorU32( color.ToBackground() ), -1 );
-				ImGuiX.TextMonospace( item.message );
-				ImGui.PopStyleColor();
-
+				ColoredText( item.message, color );
 			}
 
 			ImGui.EndTable();
