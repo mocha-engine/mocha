@@ -42,16 +42,6 @@ public partial class Texture : Asset
 			textureData.AddRange( mipData[i] );
 		}
 
-		Log.Trace( $"""
-			
-			Loading texture {path}
-				- Width: {Width} (Data: {DataWidth})
-				- Height: {Height} (Data: {DataHeight})
-				- Format: {format}
-				- Mip count: {mipCount}
-				
-			""" );
-
 		NativeTexture.SetData( DataWidth, DataHeight, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}
 

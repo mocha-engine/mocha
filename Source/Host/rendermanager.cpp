@@ -48,8 +48,6 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 	// Check if material is dirty and create any resources
 	if ( mesh->material->IsDirty() )
 	{
-		spdlog::trace( "RenderManager::RenderMesh - Material is dirty, (re-)creating render pipeline..." );
-
 		mesh->material->CreateResources();
 		materialWasDirty = true;
 

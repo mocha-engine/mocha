@@ -214,9 +214,6 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 				bufferOffset += CalcMipSize( textureData.width, textureData.height, i, imageFormat );
 			}
 
-			spdlog::trace(
-			    "Offset for mip {} on texture size {}x{} is {}", mip, textureData.width, textureData.height, bufferOffset );
-
 			VkExtent3D mipExtent;
 			GetMipDimensions( textureData.width, textureData.height, mip, &mipExtent.width, &mipExtent.height );
 			mipExtent.depth = 1;
@@ -252,8 +249,6 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 	VkImageViewCreateInfo imageViewInfo =
 	    VKInit::ImageViewCreateInfo( ( VkFormat )imageFormat, image, VK_IMAGE_ASPECT_COLOR_BIT, textureData.mipCount );
 	vkCreateImageView( m_parent->m_device, &imageViewInfo, nullptr, &imageView );
-
-	spdlog::info( "Created texture with size {}x{}", textureData.width, textureData.height );
 }
 
 inline void VulkanImageTexture::TransitionLayout(

@@ -39,7 +39,6 @@ void Material::Reload()
 
 void Material::CreateResources()
 {
-	spdlog::trace( "Material::CreateResources()" );
 	PipelineInfo_t pipelineInfo = {};
 
 	pipelineInfo.shaderInfo = {};

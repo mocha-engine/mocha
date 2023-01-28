@@ -1,6 +1,4 @@
-﻿using Mocha.UI;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 public class BaseGame : IGame
 {
@@ -79,6 +77,5 @@ public class BaseGame : IGame
 	public void OnHotload()
 	{
 		FailedMethods.Clear();
-		Log.Trace( "=== GAME HOTLOADED ===" );
 	}
 }

@@ -71,7 +71,7 @@ public class ConsoleWindow : EditorWindow
 		ImGui.SameLine();
 		if ( ImGui.Button( "Submit" ) || pressed )
 		{
-			Log.Trace( $"> {s_currentInput}" );
+			Log.Info( $"] {s_currentInput}" );
 
 			ConsoleSystem.Run( s_currentInput );
 

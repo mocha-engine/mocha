@@ -13,8 +13,6 @@ namespace Entities
 		baseEntity.AddFlag( ENTITY_MANAGED );
 		baseEntity.m_type = "BaseEntity";
 
-		spdlog::trace( "Created base entity" );
-
 		return g_entityDictionary->AddEntity<BaseEntity>( baseEntity );
 	}
 
@@ -24,8 +22,6 @@ namespace Entities
 		modelEntity.AddFlag( ENTITY_MANAGED );
 		modelEntity.AddFlag( ENTITY_RENDERABLE );
 		modelEntity.m_type = "ModelEntity";
-
-		spdlog::trace( "Created model entity" );
 
 		return g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
 	}

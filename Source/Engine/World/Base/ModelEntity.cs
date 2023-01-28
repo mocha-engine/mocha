@@ -94,13 +94,9 @@ public partial class ModelEntity : BaseEntity
 		var verMajor = binaryReader.ReadInt32();
 		var verMinor = binaryReader.ReadInt32();
 
-		Log.Trace( $"Mocha model {verMajor}.{verMinor}" );
-
 		binaryReader.ReadInt32(); // Pad
 
 		var meshCount = binaryReader.ReadInt32();
-
-		Log.Trace( $"{meshCount} meshes" );
 
 		for ( int i = 0; i < meshCount; i++ )
 		{
