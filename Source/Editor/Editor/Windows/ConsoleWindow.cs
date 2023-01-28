@@ -17,6 +17,17 @@ public class ConsoleWindow : EditorWindow
 	/// </summary>
 	private bool _isDirty = false;
 
+	private static Vector4 LogLevelToColor( LogLevel level ) => level switch
+	{
+		LogLevel.Trace => Theme.Blue,
+		LogLevel.Debug => Theme.Blue,
+		LogLevel.Info => Theme.LightGray,
+		LogLevel.Warning => Theme.Orange,
+		LogLevel.Error => Theme.Red,
+		LogLevel.Critical => Theme.Red,
+		_ => Theme.LightGray,
+	};
+
 	private void DrawOutput()
 	{
 		if ( !ImGui.BeginChild( "##console_output", new Vector2( -1, -32 ) ) )
@@ -29,13 +40,13 @@ public class ConsoleWindow : EditorWindow
 			_isDirty = false;
 		}
 
-		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.Resizable | ImGuiTableFlags.RowBg ) )
+		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.RowBg ) )
 		{
 			ImGui.TableSetupColumn( "Time", ImGuiTableColumnFlags.WidthFixed, 64.0f );
 			ImGui.TableSetupColumn( "Logger", ImGuiTableColumnFlags.WidthFixed, 64.0f );
 			ImGui.TableSetupColumn( "Text", ImGuiTableColumnFlags.WidthStretch, 1.0f );
 
-			foreach ( var item in Log.GetHistory() )
+			foreach ( NativeLogger.LogEntry item in Log.GetHistory() )
 			{
 				ImGui.TableNextRow();
 				ImGui.TableNextColumn();
@@ -54,7 +65,14 @@ public class ConsoleWindow : EditorWindow
 
 				ImGui.TableNextColumn();
 
+				var level = Enum.Parse<LogLevel>( item.level );
+				var color = LogLevelToColor( level );
+
+				ImGui.PushStyleColor( ImGuiCol.Text, color );
+				ImGui.TableSetBgColor( ImGuiTableBgTarget.CellBg, ImGui.GetColorU32( color.ToBackground() ), -1 );
 				ImGuiX.TextMonospace( item.message );
+				ImGui.PopStyleColor();
+
 			}
 
 			ImGui.EndTable();
