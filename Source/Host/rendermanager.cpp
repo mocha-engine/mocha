@@ -51,11 +51,7 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 		mesh->material->CreateResources();
 		materialWasDirty = true;
 
-		if ( mesh->material->m_pipeline.IsValid() )
-		{
-			spdlog::info( "Material pipeline creation was a success." );
-		}
-		else
+		if ( !mesh->material->m_pipeline.IsValid() )
 		{
 			spdlog::error( "Material pipeline is INVALID even though we just created a pipeline!" );
 			__debugbreak();

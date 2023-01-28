@@ -111,8 +111,6 @@ void Window::Update()
 					auto width = we.data1;
 					auto height = we.data2;
 
-					spdlog::info( "Window was resized to {}x{}", width, height );
-
 					// Push event so that renderer etc. knows we've resized the window
 					Size2D windowExtents = { ( uint32_t )width, ( uint32_t )height };
 

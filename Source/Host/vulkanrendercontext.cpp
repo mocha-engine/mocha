@@ -720,20 +720,7 @@ void VulkanRenderContext::CreateRenderTargets()
 		VulkanRenderTexture colorTarget( m_colorTarget );
 		VulkanRenderTexture depthTarget( m_depthTarget );
 
-		std::stringstream ss;
-		ss << "=== Enqueuing render target for deletion: ";
-		ss << ( void* )colorTarget.image;
-		ss << " === \n";
-
-		spdlog::info( ss.str() );
 		m_frameDeletionQueue.Enqueue( [colorTarget, depthTarget]() {
-			std::stringstream ss;
-			ss << "=== DELETING: ";
-			ss << ( void* )colorTarget.image;
-			ss << " === \n";
-
-			spdlog::info( ss.str() );
-
 			// Delete copied render targets
 			colorTarget.Delete();
 			depthTarget.Delete();
@@ -1742,14 +1729,10 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 {
 	SetParent( parent );
 
-	if ( LoadShaderModule( shaderInfo.fragmentShaderData, SHADER_TYPE_FRAGMENT, &fragmentShader ) == RENDER_STATUS_OK )
-		spdlog::info( "VulkanShader::VulkanShader: Fragment shader compiled successfully" );
-	else
+	if ( LoadShaderModule( shaderInfo.fragmentShaderData, SHADER_TYPE_FRAGMENT, &fragmentShader ) != RENDER_STATUS_OK )
 		spdlog::error( "VulkanShader::VulkanShader: Fragment shader failed to compile" );
 
-	if ( LoadShaderModule( shaderInfo.vertexShaderData, SHADER_TYPE_VERTEX, &vertexShader ) == RENDER_STATUS_OK )
-		spdlog::info( "VulkanShader::VulkanShader: Vertex shader compiled successfully" );
-	else
+	if ( LoadShaderModule( shaderInfo.vertexShaderData, SHADER_TYPE_VERTEX, &vertexShader ) != RENDER_STATUS_OK )
 		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );
 }
 
