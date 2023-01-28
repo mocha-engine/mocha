@@ -1,7 +1,7 @@
 <p align="center">
     <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
     <br>
-    <a href="https://discord.gg/SDP4R6Wsza">Discord</a> • <a href="https://github.com/xezno/mocha/issues">Issues</a>
+    <a href="https://discord.gg/SDP4R6Wsza">Discord</a> • <a href="https://github.com/xezno/mocha/issues">Issues</a> • <a href="https://wiki.gu3.me/index.php/Main_Page">Wiki</a>
 </p>
 
 Mocha is a work-in-progress game engine that aims to (eventually) leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.
@@ -42,7 +42,7 @@ Contributions to this project are greatly appreciated; please follow these steps
 2. Create a branch under the name `YourName/FeatureName`
 3. Once you've made all the changes you need to make, go ahead and submit a Pull Request.
 
-Throughout this project, the standard [C# coding conventions](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/inside-a-program/coding-conventions) should be observed and used within any pull requests / any other direct contributions.
+Style conventions are detailed on [the Mocha wiki](https://wiki.gu3.me/index.php/Style_Guidelines). In your pull requests, you should take care to ensure these style guidelines are followed closely.
 
 ## Issues and Support
 
@@ -56,7 +56,8 @@ Mocha is an open source game engine distributed under the AGPL-3.0 license. This
 
 ```
 Mocha Game Engine
-Copyright (C) 2023  Alex Guthrie
+Copyright (C) 2023 Mocha Contributors
+Copyright (C) 2022-2023 Alex Guthrie
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as published by
