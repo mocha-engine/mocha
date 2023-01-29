@@ -4,13 +4,13 @@ using System.Runtime.CompilerServices;
 
 namespace Mocha.Hotload;
 
-public static class Upgrader
+internal static class Upgrader
 {
 	/// <summary>
 	/// Dictionary of old hash codes and upgraded objects used
 	/// for reference types
 	/// </summary>
-	public static Dictionary<int, object> UpgradedReferences { get; } = new();
+	internal static Dictionary<int, object> UpgradedReferences { get; } = new();
 
 	private static List<IMemberUpgrader> s_upgraders { get; set; }
 
@@ -18,7 +18,7 @@ public static class Upgrader
 	/// This must be called before invoking any other functions. Ideally, this should be
 	/// invoked at the very start of the program.
 	/// </summary>
-	public static void Init()
+	internal static void Init()
 	{
 		// We could alternatively use static constructors
 		// (https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/static-constructors)
@@ -42,7 +42,7 @@ public static class Upgrader
 		};
 	}
 
-	public static void UpgradeInstance( object? oldInstance, object? newInstance )
+	internal static void UpgradeInstance( object? oldInstance, object? newInstance )
 	{
 		if ( oldInstance == null )
 		{

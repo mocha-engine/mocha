@@ -9,16 +9,16 @@ namespace Mocha.Hotload;
 /// A wrapper for an external assembly to be loaded.
 /// </summary>
 /// <typeparam name="TEntryPoint">The type to retrieve from the assembly as its entry point.</typeparam>
-public class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
+internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 {
 	/// <summary>
 	/// The loaded assembly.
 	/// </summary>
-	public Assembly Assembly { get; private set; } = null!;
+	internal Assembly Assembly { get; private set; } = null!;
 	/// <summary>
 	/// The found entry point into the assembly.
 	/// </summary>
-	public TEntryPoint EntryPoint { get; private set; } = default!;
+	internal TEntryPoint EntryPoint { get; private set; } = default!;
 
 	private readonly ProjectAssemblyInfo _projectAssemblyInfo;
 	private FileSystemWatcher _watcher = null!;
@@ -28,7 +28,7 @@ public class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	private Task _buildTask;
 	private bool _buildRequested;
 
-	public ProjectAssembly( in ProjectAssemblyInfo assemblyInfo )
+	internal ProjectAssembly( in ProjectAssemblyInfo assemblyInfo )
 	{
 		_projectAssemblyInfo = assemblyInfo;
 		_loadContext = new AssemblyLoadContext( null, isCollectible: true );

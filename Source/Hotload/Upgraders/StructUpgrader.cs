@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Mocha.Hotload;
 
-public class StructUpgrader : IMemberUpgrader
+internal class StructUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )

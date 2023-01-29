@@ -3,30 +3,30 @@
 /// <summary>
 /// Represents a final compilation result.
 /// </summary>
-public readonly struct CompileResult
+internal readonly struct CompileResult
 {
 	/// <summary>
 	/// Whether or not the compilation completed successfully.
 	/// </summary>
-	public bool WasSuccessful { get; }
+	internal bool WasSuccessful { get; }
 
 	/// <summary>
 	/// The bytes of the compiled assembly.
 	/// </summary>
-	public byte[]? CompiledAssembly { get; }
+	internal byte[]? CompiledAssembly { get; }
 	/// <summary>
 	/// The bytes of the symbols in the assembly.
 	/// </summary>
-	public byte[]? CompiledAssemblySymbols { get; }
+	internal byte[]? CompiledAssemblySymbols { get; }
 	/// <summary>
 	/// An array of errors that occurred during compilation.
 	/// </summary>
-	public string[]? Errors { get; }
+	internal string[]? Errors { get; }
 
 	/// <summary>
 	/// Whether or not the compilation has assembly symbols.
 	/// </summary>
-	public bool HasSymbols => CompiledAssemblySymbols is not null;
+	internal bool HasSymbols => CompiledAssemblySymbols is not null;
 
 	private CompileResult( bool wasSuccessful, byte[]? compiledAssembly = null, byte[]? compiledAssemblySymbols = null, string[]? errors = null )
 	{
@@ -42,7 +42,7 @@ public readonly struct CompileResult
 	/// </summary>
 	/// <param name="errors">An array containing all of the errors that happened during the compilation.</param>
 	/// <returns>The newly created <see cref="CompileResult"/>.</returns>
-	public static CompileResult Failed( string[] errors )
+	internal static CompileResult Failed( string[] errors )
 	{
 		return new CompileResult(
 			wasSuccessful: false,
@@ -56,7 +56,7 @@ public readonly struct CompileResult
 	/// <param name="compiledAssembly">The bytes of the compiled assembly.</param>
 	/// <param name="compiledAssemblySymbols">The bytes of the symbols contained in the compiled assembly.</param>
 	/// <returns>The newly created <see cref="CompileResult"/>.</returns>
-	public static CompileResult Successful( byte[] compiledAssembly, byte[]? compiledAssemblySymbols )
+	internal static CompileResult Successful( byte[] compiledAssembly, byte[]? compiledAssemblySymbols )
 	{
 		return new CompileResult(
 			wasSuccessful: true,

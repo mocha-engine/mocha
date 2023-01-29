@@ -2,7 +2,7 @@
 
 namespace Mocha.Hotload;
 
-public interface IMemberUpgrader
+internal interface IMemberUpgrader
 {
 	/// <summary>
 	/// Does this upgrader support upgrading for this member?

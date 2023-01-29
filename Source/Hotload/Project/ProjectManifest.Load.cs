@@ -9,7 +9,7 @@ partial struct ProjectManifest
 		return Path.GetFullPath( Path.Combine( baseDir, path ) );
 	}
 
-	public static ProjectManifest Load( string path )
+	internal static ProjectManifest Load( string path )
 	{
 		if ( !File.Exists( path ) )
 			throw new Exception( $"Failed to load project at path '{path}'" );

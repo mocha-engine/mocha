@@ -7,6 +7,10 @@ using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
 namespace Mocha.Hotload;
+
+/// <summary>
+/// A collection of helper methods for the NuGet.Protocol package.
+/// </summary>
 internal static class NuGetHelper
 {
 	/// <summary>

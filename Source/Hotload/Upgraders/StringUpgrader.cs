@@ -2,7 +2,7 @@
 
 namespace Mocha.Hotload;
 
-public class StringUpgrader : IMemberUpgrader
+internal class StringUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )

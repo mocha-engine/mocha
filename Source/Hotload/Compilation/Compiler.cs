@@ -18,7 +18,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// Contains the core functionality for compilation of C# assemblies.
 /// </summary>
-public static class Compiler
+internal static class Compiler
 {
 	/// <summary>
 	/// The .NET references to include in every build.
@@ -94,7 +94,7 @@ public static class Compiler
 	/// <param name="assemblyInfo">The project assembly to compile.</param>
 	/// <param name="compileOptions">The options to give to the C# compilation.</param>
 	/// <returns>A task that represents the asynchronous operation. The tasks return value is the result of the compilation.</returns>
-	public static async Task<CompileResult> Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
+	internal static async Task<CompileResult> Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
 	{
 		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
 

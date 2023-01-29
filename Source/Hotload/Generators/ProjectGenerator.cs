@@ -3,7 +3,7 @@
 /// <summary>
 /// Generates a .csproj based on a given ProjectManfiest
 /// </summary>
-public static class ProjectGenerator
+internal static class ProjectGenerator
 {
 	/*
 	* - We want to generate a csproj based on the manifest given
@@ -22,7 +22,7 @@ public static class ProjectGenerator
 	/// generated project on disk.
 	/// </summary>
 	/// <returns>An absolute path to the generated .csproj file.</returns>
-	public static string GenerateProject( ProjectManifest manifest )
+	internal static string GenerateProject( ProjectManifest manifest )
 	{
 		// Generate the project file's contents
 		var baseReferenceDir = Path.GetFullPath( "build\\" );
