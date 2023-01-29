@@ -15,8 +15,14 @@ using System.Runtime.Versioning;
 
 namespace Mocha.Hotload;
 
+/// <summary>
+/// Contains the core functionality for compilation of C# assemblies.
+/// </summary>
 public static class Compiler
 {
+	/// <summary>
+	/// The .NET references to include in every build.
+	/// </summary>
 	private static readonly string[] s_systemReferences = new[]
 	{
 		"mscorlib.dll",
@@ -66,6 +72,9 @@ public static class Compiler
 		"System.Xml.ReaderWriter.dll",
 	};
 
+	/// <summary>
+	/// The references to Mocha related DLLs included in every build.
+	/// </summary>
 	private static readonly string[] s_mochaReferences = new string[]
 	{
 		// TODO: Ideally shouldn't be hardcoding the paths for these here
@@ -79,6 +88,12 @@ public static class Compiler
 		"build\\ImGui.NET.dll",
 	};
 
+	/// <summary>
+	/// Compiles a given project assembly.
+	/// </summary>
+	/// <param name="assemblyInfo">The project assembly to compile.</param>
+	/// <param name="compileOptions">The options to give to the C# compilation.</param>
+	/// <returns>A task that represents the asynchronous operation. The tasks return value is the result of the compilation.</returns>
 	public static async Task<CompileResult> Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
 	{
 		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
@@ -144,7 +159,7 @@ public static class Compiler
 
 		// NuGet references
 		foreach ( var packageReference in project.GetItems( "PackageReference" ) )
-			await FetchPackage( packageReference.EvaluatedInclude, new NuGetVersion( packageReference.GetMetadataValue( "Version" ) ), references );
+			await NuGetHelper.FetchPackage( packageReference.EvaluatedInclude, new NuGetVersion( packageReference.GetMetadataValue( "Version" ) ), references );
 
 		//
 		// Set up compiler
@@ -178,7 +193,6 @@ public static class Compiler
 		using var symbolsStream = compileOptions.GenerateSymbols ? new MemoryStream() : null;
 
 		EmitOptions? emitOptions = null;
-
 		if ( compileOptions.GenerateSymbols )
 		{
 			emitOptions = new EmitOptions(
@@ -186,7 +200,7 @@ public static class Compiler
 						pdbFilePath: $"{assemblyInfo.AssemblyName}.pdb" );
 		}
 
-		EmitResult result = compilation.Emit(
+		var result = compilation.Emit(
 			assemblyStream,
 			symbolsStream,
 			options: emitOptions
@@ -196,11 +210,11 @@ public static class Compiler
 		{
 			Log.Error( $"Failed to compile {assemblyInfo.AssemblyName}!" );
 
-			IEnumerable<Diagnostic> failures = result.Diagnostics.Where( diagnostic =>
+			var failures = result.Diagnostics.Where( diagnostic =>
 				diagnostic.IsWarningAsError ||
 				diagnostic.Severity == DiagnosticSeverity.Error );
 
-			string[] errors = failures.Select( diagnostic =>
+			var errors = failures.Select( diagnostic =>
 			{
 				var lineSpan = diagnostic.Location.GetLineSpan();
 				return $"\n{diagnostic.Id}: {diagnostic.GetMessage()}\n\tat {lineSpan.Path} line {lineSpan.StartLinePosition.Line}";
@@ -214,85 +228,42 @@ public static class Compiler
 		return CompileResult.Successful( assemblyStream.ToArray(), symbolsStream?.ToArray() );
 	}
 
-	private static IEnumerable<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
+	/// <summary>
+	/// Returns a set of <see cref="PortableExecutableReference"/> from a set of relative paths.
+	/// </summary>
+	/// <param name="assemblyPaths">A set of relative paths to create references from.</param>
+	/// <returns>A set of <see cref="PortableExecutableReference"/> from a set of relative paths.</returns>
+	internal static IEnumerable<PortableExecutableReference> CreateMetadataReferencesFromPaths( IEnumerable<string> assemblyPaths )
 	{
 		foreach ( var assemblyPath in assemblyPaths )
 			yield return CreateMetadataReferenceFromPath( assemblyPath );
 	}
 
-	private static PortableExecutableReference CreateMetadataReferenceFromPath( string assemblyPath )
+	/// <summary>
+	/// Creates a <see cref="PortableExecutableReference"/> from a relative path.
+	/// </summary>
+	/// <param name="assemblyPath">The relative path to create a reference from.</param>
+	/// <returns>A <see cref="PortableExecutableReference"/> from a relative path.</returns>
+	internal static PortableExecutableReference CreateMetadataReferenceFromPath( string assemblyPath )
 	{
 		return MetadataReference.CreateFromFile( assemblyPath );
 	}
 
-	private static string GetTargetFrameworkName()
+	/// <summary>
+	/// Returns the target framework of the application.
+	/// </summary>
+	/// <returns>The target framework of the application.</returns>
+	internal static string GetTargetFrameworkName()
 	{
+		// AppContext.TargetFrameworkName will always be null since the starting process is native code.
+		// Leave it here anyway in case this changes.
 		if ( !string.IsNullOrEmpty( AppContext.TargetFrameworkName ) )
 			return AppContext.TargetFrameworkName;
 
+		// Fallback on the TargetFrameworkAttribute of the Hotload assembly
 		if ( Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>() is not TargetFrameworkAttribute frameworkAttribute )
 			return string.Empty;
 
 		return frameworkAttribute.FrameworkName;
-	}
-
-	private static async Task FetchPackage( string id, NuGetVersion version, ICollection<PortableExecutableReference> references )
-	{
-		var logger = NullLogger.Instance;
-		var cancellationToken = CancellationToken.None;
-
-		var cache = new SourceCacheContext();
-		var repository = Repository.Factory.GetCoreV3( "https://api.nuget.org/v3/index.json" );
-		var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
-
-		using var packageStream = new MemoryStream();
-
-		await resource.CopyNupkgToStreamAsync(
-			id,
-			version,
-			packageStream,
-			cache,
-			logger,
-			cancellationToken );
-
-		using var packageReader = new PackageArchiveReader( packageStream );
-		var nuspecReader = await packageReader.GetNuspecReaderAsync( cancellationToken );
-
-		var currentFramework = NuGetFramework.ParseFrameworkName( GetTargetFrameworkName(), DefaultFrameworkNameProvider.Instance );
-		var targetFrameworkGroup = NuGetFrameworkExtensions.GetNearest( packageReader.GetLibItems(), currentFramework );
-		var dependencies = nuspecReader.GetDependencyGroups().First( group => group.TargetFramework == targetFrameworkGroup.TargetFramework ).Packages.ToArray();
-
-		if ( dependencies.Length > 0 )
-		{
-			foreach ( var dependency in dependencies )
-				await FetchPackageWithVersionRange( dependency.Id, dependency.VersionRange, references );
-		}
-
-		if ( !targetFrameworkGroup.Items.Any() )
-			return;
-
-		var dllFile = targetFrameworkGroup.Items.FirstOrDefault( item => item.EndsWith( "dll" ) );
-		if ( dllFile is null )
-			return;
-
-		packageReader.ExtractFile( dllFile, Path.Combine( Directory.GetCurrentDirectory(), $"build\\{id}.dll" ), logger );
-		references.Add( CreateMetadataReferenceFromPath( $"build\\{id}.dll" ) );
-	}
-
-	private static async Task FetchPackageWithVersionRange( string id, VersionRange versionRange, ICollection<PortableExecutableReference> references )
-	{
-		var cache = new SourceCacheContext();
-		var repository = Repository.Factory.GetCoreV3( "https://api.nuget.org/v3/index.json" );
-		var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
-
-		var versions = await resource.GetAllVersionsAsync(
-			id,
-			cache,
-			NullLogger.Instance,
-			CancellationToken.None
-			);
-
-		var bestVersion = versionRange.FindBestMatch( versions );
-		await FetchPackage( id, bestVersion, references );
 	}
 }
