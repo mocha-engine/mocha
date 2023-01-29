@@ -20,7 +20,7 @@ public partial class ShaderCompiler : BaseCompiler
 	/// Compiles a shader from GLSL into SPIR-V using Veldrid's libshaderc bindings.
 	/// </summary>
 	/// <returns>Vulkan-compatible SPIR-V bytecode.</returns>
-	private int[] CompileShader( string shaderSource, ShaderStages shaderStage, string debugName = "temp" )
+	private int[] CompileShader( string? commonSource, string shaderSource, ShaderStages shaderStage, string debugName = "temp" )
 	{
 		//
 		// Prepend a preamble with GLSL version & macro definitions
@@ -28,8 +28,7 @@ public partial class ShaderCompiler : BaseCompiler
 		var preamble = new StringBuilder();
 		preamble.AppendLine( $"#version 460" );
 
-		var shaderStageMacro = shaderStage == ShaderStages.Vertex ? "VERTEX" : "FRAGMENT";
-		preamble.AppendLine( $"#define {shaderStageMacro}" );
+		preamble.AppendLine( commonSource );
 
 		preamble.AppendLine();
 		shaderSource = preamble.ToString() + shaderSource;
@@ -38,7 +37,7 @@ public partial class ShaderCompiler : BaseCompiler
 		// Perform the compilation
 		//
 		var compileOptions = new GlslCompileOptions( false );
-		var compileResult = SpirvCompilation.CompileGlslToSpirv( shaderSource, $"{debugName}_{shaderStageMacro}.glsl", shaderStage, compileOptions );
+		var compileResult = SpirvCompilation.CompileGlslToSpirv( shaderSource, $"{debugName}_{shaderStage}.glsl", shaderStage, compileOptions );
 
 		// Data will be in bytes, but we want it in 32-bit integers as that is what Vulkan expects
 		var dataBytes = compileResult.SpirvBytes;
@@ -54,14 +53,22 @@ public partial class ShaderCompiler : BaseCompiler
 		byte[] shaderBytes = input.SourceData.ToArray();
 		string shaderString = Encoding.Default.GetString( shaderBytes );
 
+		var shaderParser = new ShaderParser( shaderString );
+		var shaderFile = shaderParser.Parse();
+
 		// Debug name is used for error messages and internally by the SPIR-V compiler.
 		var debugName = Path.GetFileNameWithoutExtension( input.SourcePath ) ?? "temp";
 
-		var shaderFormat = new ShaderInfo()
-		{
-			VertexShaderData = CompileShader( shaderString, ShaderStages.Vertex, debugName ),
-			FragmentShaderData = CompileShader( shaderString, ShaderStages.Fragment, debugName )
-		};
+		var shaderFormat = new ShaderInfo();
+
+		if ( shaderFile.Vertex != null )
+			shaderFormat.VertexShaderData = CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderStages.Vertex, debugName );
+
+		if ( shaderFile.Fragment != null )
+			shaderFormat.FragmentShaderData = CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderStages.Fragment, debugName );
+
+		if ( shaderFile.Compute != null )
+			shaderFormat.ComputeShaderData = CompileShader( shaderFile.Common, shaderFile.Compute, ShaderStages.Compute, debugName );
 
 		// Wrapper for file.
 		var mochaFile = new MochaFile<ShaderInfo>

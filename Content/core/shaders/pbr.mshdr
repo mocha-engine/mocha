@@ -1,431 +1,438 @@
-#ifdef RAYTRACING
-#extension GL_EXT_ray_tracing : enable
-#extension GL_EXT_ray_query : enable
-#endif
-
-#define DEBUG_VIEW_NONE 					0
-#define DEBUG_VIEW_DIFFUSE 					1
-#define DEBUG_VIEW_NORMAL 					2
-#define DEBUG_VIEW_AMBIENTOCCLUSION 		3
-#define DEBUG_VIEW_METALNESS 				4
-#define DEBUG_VIEW_ROUGHNESS 				5
-#define DEBUG_VIEW_OTHER					63
-
-struct fs_in
+Shader
 {
-	vec3 vColor;
-	vec3 vPositionWS;
-	vec3 vCameraWS;
-	vec2 vTexCoord;
-	vec3 vNormalWS;
+	Name = "Test";
+	Description = "Test Shader";
+}
 
-	vec4[4] vLightInfoTS;
-	vec3 vCameraTS;
-	vec3 vPositionTS;
-	vec3 vNormalTS;
-
-	vec3 vDebug;
-	mat3 mTBN;
-};
-
-//push constants block
-layout( push_constant ) uniform constants
+Common
 {
-	vec4 data;				// 4
+	#ifdef RAYTRACING
+	#extension GL_EXT_ray_tracing : enable
+	#extension GL_EXT_ray_query : enable
+	#endif
 
-	mat4 model_matrix;		// 16
+	#define DEBUG_VIEW_NONE 					0
+	#define DEBUG_VIEW_DIFFUSE 					1
+	#define DEBUG_VIEW_NORMAL 					2
+	#define DEBUG_VIEW_AMBIENTOCCLUSION 		3
+	#define DEBUG_VIEW_METALNESS 				4
+	#define DEBUG_VIEW_ROUGHNESS 				5
+	#define DEBUG_VIEW_OTHER					63
 
-	mat4 render_matrix;		// 16
-
-	vec3 vCameraPosWS;		// 3
-	float flTime;			// 1
-
-	vec4[4] vLightInfoWS;	// 16
-} PushConstants;
-
-#ifdef VERTEX
-
-layout (location = 0) in vec3 vPosition;
-layout (location = 1) in vec3 vNormal;
-layout (location = 2) in vec3 vColor;
-layout (location = 3) in vec2 vTexCoord;
-layout (location = 4) in vec3 vTangent;
-layout (location = 5) in vec3 vBitangent;
-
-layout (location = 0) out fs_in vs_out;
-
-void main()
-{
-	//
-	// Basic params
-	//
-	vs_out.vPositionWS = vec3( PushConstants.model_matrix * vec4( vPosition, 1.0f ) );
-	vs_out.vCameraWS = PushConstants.vCameraPosWS;
-	vs_out.vColor = vColor;
-	vs_out.vTexCoord = vTexCoord * vec2( -1, 1 );
-	vs_out.vNormalWS = vNormal;
-
-	//
-	// Calculate TBN matrix for lighting
-	//
-	vec3 T = normalize( vec3( PushConstants.model_matrix * vec4( vTangent, 0.0 ) ) );
-	vec3 B = normalize( vec3( PushConstants.model_matrix * vec4( vBitangent, 0.0 ) ) );
-	vec3 N = normalize( vec3( PushConstants.model_matrix * vec4( vNormal, 0.0 ) ) );
-	mat3 TBN = transpose( mat3( T, B, N ) );
-
-	//
-	// Transform into tangent space
-	//
-	for ( int i = 0; i < 4; i++ )
+	struct fs_in
 	{
-		vec3 lightPos = PushConstants.vLightInfoWS[i].xyz;
-		lightPos = TBN * lightPos;
+		vec3 vColor;
+		vec3 vPositionWS;
+		vec3 vCameraWS;
+		vec2 vTexCoord;
+		vec3 vNormalWS;
 
-		float lightIntensity = PushConstants.vLightInfoWS[i].w;
-		vs_out.vLightInfoTS[i] = vec4( lightPos, lightIntensity );
-	}
-	
-	vs_out.vCameraTS = TBN * vs_out.vCameraWS;
-	vs_out.vPositionTS = TBN * vs_out.vPositionWS;
-	vs_out.vNormalTS = TBN * vs_out.vNormalWS;
-	vs_out.mTBN = TBN;
+		vec4[4] vLightInfoTS;
+		vec3 vCameraTS;
+		vec3 vPositionTS;
+		vec3 vNormalTS;
 
-	vs_out.vDebug = vs_out.vPositionWS;
-	
-	//
-	// Finish - transform into clip space
-	//
-	gl_Position = PushConstants.render_matrix * vec4( vPosition, 1.0f );
-	
-	vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize
-}
+		vec3 vDebug;
+		mat3 mTBN;
+	};
 
-#endif
-
-#ifdef FRAGMENT
-
-#define PI				3.14159265359
-
-layout (location = 0) in fs_in vs_out;
-
-layout (location = 0) out vec4 outFragColor;
-
-layout (set = 0, binding = 0) uniform sampler2D diffuseTexture;
-layout (set = 0, binding = 1) uniform sampler2D normalTexture;
-layout (set = 0, binding = 2) uniform sampler2D ambientOcclusionTexture;
-layout (set = 0, binding = 3) uniform sampler2D metalnessTexture;
-layout (set = 0, binding = 4) uniform sampler2D roughnessTexture;
-layout (set = 0, binding = 5) uniform sampler2D blueNoiseTexture;
-
-#ifdef RAYTRACING
-layout (set = 1, binding = 0) uniform accelerationStructureEXT topLevelAS;
-#endif
-
-const vec2 BlueNoiseInDisk[64] = vec2[64](
-    vec2(0.478712,0.875764),
-    vec2(-0.337956,-0.793959),
-    vec2(-0.955259,-0.028164),
-    vec2(0.864527,0.325689),
-    vec2(0.209342,-0.395657),
-    vec2(-0.106779,0.672585),
-    vec2(0.156213,0.235113),
-    vec2(-0.413644,-0.082856),
-    vec2(-0.415667,0.323909),
-    vec2(0.141896,-0.939980),
-    vec2(0.954932,-0.182516),
-    vec2(-0.766184,0.410799),
-    vec2(-0.434912,-0.458845),
-    vec2(0.415242,-0.078724),
-    vec2(0.728335,-0.491777),
-    vec2(-0.058086,-0.066401),
-    vec2(0.202990,0.686837),
-    vec2(-0.808362,-0.556402),
-    vec2(0.507386,-0.640839),
-    vec2(-0.723494,-0.229240),
-    vec2(0.489740,0.317826),
-    vec2(-0.622663,0.765301),
-    vec2(-0.010640,0.929347),
-    vec2(0.663146,0.647618),
-    vec2(-0.096674,-0.413835),
-    vec2(0.525945,-0.321063),
-    vec2(-0.122533,0.366019),
-    vec2(0.195235,-0.687983),
-    vec2(-0.563203,0.098748),
-    vec2(0.418563,0.561335),
-    vec2(-0.378595,0.800367),
-    vec2(0.826922,0.001024),
-    vec2(-0.085372,-0.766651),
-    vec2(-0.921920,0.183673),
-    vec2(-0.590008,-0.721799),
-    vec2(0.167751,-0.164393),
-    vec2(0.032961,-0.562530),
-    vec2(0.632900,-0.107059),
-    vec2(-0.464080,0.569669),
-    vec2(-0.173676,-0.958758),
-    vec2(-0.242648,-0.234303),
-    vec2(-0.275362,0.157163),
-    vec2(0.382295,-0.795131),
-    vec2(0.562955,0.115562),
-    vec2(0.190586,0.470121),
-    vec2(0.770764,-0.297576),
-    vec2(0.237281,0.931050),
-    vec2(-0.666642,-0.455871),
-    vec2(-0.905649,-0.298379),
-    vec2(0.339520,0.157829),
-    vec2(0.701438,-0.704100),
-    vec2(-0.062758,0.160346),
-    vec2(-0.220674,0.957141),
-    vec2(0.642692,0.432706),
-    vec2(-0.773390,-0.015272),
-    vec2(-0.671467,0.246880),
-    vec2(0.158051,0.062859),
-    vec2(0.806009,0.527232),
-    vec2(-0.057620,-0.247071),
-    vec2(0.333436,-0.516710),
-    vec2(-0.550658,-0.315773),
-    vec2(-0.652078,0.589846),
-    vec2(0.008818,0.530556),
-    vec2(-0.210004,0.519896) 
-);
-
-vec3 fresnelSchlick( float cosTheta, vec3 F0 )
-{
-	return F0 + ( 1.0f - F0 ) * pow( 1.0f - cosTheta, 5.0f );
-}
-
-float DistributionGGX(vec3 N, vec3 H, float roughness)
-{
-    float a      = roughness*roughness;
-    float a2     = a*a;
-    float NdotH  = max(dot(N, H), 0.0);
-    float NdotH2 = NdotH*NdotH;
-	
-    float num   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
-    denom = PI * denom * denom;
-	
-    return num / denom;
-}
-
-float GeometrySchlickGGX(float NdotV, float roughness)
-{
-    float r = (roughness + 1.0);
-    float k = (r*r) / 8.0;
-
-    float num   = NdotV;
-    float denom = NdotV * (1.0 - k) + k;
-	
-    return num / denom;
-}
-
-float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
-{
-    float NdotV = max(dot(N, V), 0.0);
-    float NdotL = max(dot(N, L), 0.0);
-    float ggx2  = GeometrySchlickGGX(NdotV, roughness);
-    float ggx1  = GeometrySchlickGGX(NdotL, roughness);
-	
-    return ggx1 * ggx2;
-}
-
-vec3 calculateLighting( float roughness, float metallic, vec3 albedo, vec3 lightPos, float intensity, vec3 V, vec3 N )
-{
-	vec3 L = normalize( lightPos - vs_out.vPositionTS );
-	vec3 H = normalize( V + L );
-
-	float distance = length( lightPos - vs_out.vPositionTS );
-	float attenuation = 1.0f / ( distance * distance );
-	vec3 radiance = vec3( 1.0f, 1.0f, 1.0f ) * attenuation * intensity;
-
-	vec3 F0 = vec3( 0.04 );
-	F0 = mix( F0, albedo, metallic );
-
-	float NDF = DistributionGGX( N, H, roughness );
-	float G = GeometrySmith( N, V, L, roughness );
-	vec3 F = fresnelSchlick( max( dot( H, V ), 0.0 ), F0 );
-
-	vec3 kS = F;
-	vec3 kD = vec3( 1.0 ) - kS;
-	kD *= 1.0 - metallic;
-
-	vec3 numerator = NDF * G * F;
-	float denominator = 4.0 * max( dot( N, V ), 0.0 ) * max( dot( N, L ), 0.0 ) + 0.0001;
-	vec3 specular = numerator / denominator;
-
-	float NdotL = max( dot( N, L ), 0.0 );
-
-	return ( kD * albedo / PI + specular ) * radiance * NdotL;
-}
-
-float ambient()
-{
-	return 0.05;
-}
-
-vec3 sampleTexture( sampler2D target )
-{
-	return texture( target, vs_out.vTexCoord.xy ).rgb;
-}
-
-float luminance(vec3 v)
-{
-    return dot(v, vec3(0.2126f, 0.7152f, 0.0722f));
-}
-
-vec3 reinhard_jodie(vec3 v)
-{
-    float l = luminance(v);
-    vec3 tv = v / (1.0f + v);
-    return mix(v / (1.0f + l), tv, tv);
-}
-
-vec2 blueNoise( int index )
-{
-	return BlueNoiseInDisk[ index % 64 ].xy;
-}
-
-float hash( float n )
-{
-	return fract(sin(n) * 43758.5453123);
-}
-
-vec2 random2( vec2 uv )
-{
-	float noise = hash( uv.x * 0.5f + uv.y * 0.5f );
-	return vec2( noise, hash( noise ) );
-}
-
-vec3 random3( vec3 uv )
-{
-	float noise = hash( uv.x * 0.5f + uv.y * 0.5f + uv.z * 0.5f );
-	return vec3( noise, hash( noise ), hash( noise * 2.0f ) );
-}
-
-float traceShadow( vec3 L, vec3 origin, vec3 direction, float distance, int index )
-{
-#ifdef RAYTRACING
-	float tMin      = 0.01f;
-	float tMax      = distance;
-
-	vec2 rng = random3( origin ).xy;
-	
-	float r = sqrt( rng.x );
-	float phi = 2.0f * PI * rng.y;
-
-	vec2 diskPoint = vec2( r * cos( phi ), r * sin( phi ) );
-
-	vec3 lightTangent = normalize( cross( L, vec3( 0.0f, 0.0f, 1.0f ) ) );
-	vec3 lightBitangent = normalize( cross( L, lightTangent ) );
-
-	vec3 rayDir = normalize( direction + ( diskPoint.x * lightTangent + diskPoint.y * lightBitangent ) * 0.025f );
-
-	// Initializes a ray query object but does not start traversal
-	rayQueryEXT rayQuery;
-	rayQueryInitializeEXT( rayQuery, topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin, tMin, rayDir, tMax );
-
-	// Start traversal: return false if traversal is complete
-	while(rayQueryProceedEXT(rayQuery))
+	//push constants block
+	layout( push_constant ) uniform constants
 	{
-	}
+		vec4 data;				// 4
 
-	// Returns type of committed (true) intersection
-	if(rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionNoneEXT)
-	{
-		// Got an intersection == Shadow
-		return 1.0f;
-	}
-#endif
+		mat4 model_matrix;		// 16
 
-	return 0.0f;
+		mat4 render_matrix;		// 16
+
+		vec3 vCameraPosWS;		// 3
+		float flTime;			// 1
+
+		vec4[4] vLightInfoWS;	// 16
+	} PushConstants;
 }
 
-void main()
+Vertex
 {
-	// Collect material properties
-	vec3 albedo = sampleTexture( diffuseTexture );
-	float metallic = sampleTexture( metalnessTexture ).r;
-	float roughness = sampleTexture( roughnessTexture ).r;
-	float ao = sampleTexture( ambientOcclusionTexture ).r;
+	layout (location = 0) in vec3 vPosition;
+	layout (location = 1) in vec3 vNormal;
+	layout (location = 2) in vec3 vColor;
+	layout (location = 3) in vec2 vTexCoord;
+	layout (location = 4) in vec3 vTangent;
+	layout (location = 5) in vec3 vBitangent;
 
-	vec3 vNormalTS = sampleTexture( normalTexture );
-	vNormalTS = vNormalTS * 2.0 - 1.0;
-	
-	// If we don't have a normal map, use the vertex normal ( calculated in tangent space )
-	if ( vNormalTS.z > 0.0 )
+	layout (location = 0) out fs_in vs_out;
+
+	void main()
 	{
-		vNormalTS = vs_out.vNormalTS;
-	}
+		//
+		// Basic params
+		//
+		vs_out.vPositionWS = vec3( PushConstants.model_matrix * vec4( vPosition, 1.0f ) );
+		vs_out.vCameraWS = PushConstants.vCameraPosWS;
+		vs_out.vColor = vColor;
+		vs_out.vTexCoord = vTexCoord * vec2( -1, 1 );
+		vs_out.vNormalWS = vNormal;
 
-	// Recalculate Z axis - BC5 stomps it
-	vNormalTS.z = sqrt( 1.0 - vNormalTS.x * vNormalTS.x - vNormalTS.y * vNormalTS.y );
+		//
+		// Calculate TBN matrix for lighting
+		//
+		vec3 T = normalize( vec3( PushConstants.model_matrix * vec4( vTangent, 0.0 ) ) );
+		vec3 B = normalize( vec3( PushConstants.model_matrix * vec4( vBitangent, 0.0 ) ) );
+		vec3 N = normalize( vec3( PushConstants.model_matrix * vec4( vNormal, 0.0 ) ) );
+		mat3 TBN = transpose( mat3( T, B, N ) );
 
-	vec3 viewDir = normalize( vs_out.vCameraTS - vs_out.vPositionTS );
-	
-	vec3 ambient = ambient() * albedo;
-	vec3 color = vec3( 0.0 );
-	
-	for ( int i = 0; i < 4; ++i )
-	{
-		// Unpack lighting info
-		vec3 vLightPosTS = vs_out.vLightInfoTS[i].xyz;
-		vec3 vLightPosWS = PushConstants.vLightInfoWS[i].xyz;
-		float flLightIntensity = vs_out.vLightInfoTS[i].w;
-
-		vec3 vLightCol = calculateLighting( roughness, metallic, albedo, vLightPosTS, flLightIntensity, viewDir, vNormalTS );
-
-		// Trace them rays
-		vec3  L = vLightPosWS - vs_out.vPositionWS;
-		vec3  origin    = vs_out.vPositionWS;
-		vec3  direction = normalize( L );  // vector to light
-		float tMin      = 0.01f;
-		float tMax      = length( L );
-
-		int sampleCount = 4;
-
-		// Sample 8 random positions to average shadow from ( based on the position of the vertex )
-		float shadow = 0.0f;
-		for ( int j = 0; j < sampleCount; ++j )
+		//
+		// Transform into tangent space
+		//
+		for ( int i = 0; i < 4; i++ )
 		{
-			shadow += traceShadow( L, origin, direction, tMax, j );// * ( 1.0f / float( sampleCount ) );
+			vec3 lightPos = PushConstants.vLightInfoWS[i].xyz;
+			lightPos = TBN * lightPos;
+
+			float lightIntensity = PushConstants.vLightInfoWS[i].w;
+			vs_out.vLightInfoTS[i] = vec4( lightPos, lightIntensity );
+		}
+	
+		vs_out.vCameraTS = TBN * vs_out.vCameraWS;
+		vs_out.vPositionTS = TBN * vs_out.vPositionWS;
+		vs_out.vNormalTS = TBN * vs_out.vNormalWS;
+		vs_out.mTBN = TBN;
+
+		vs_out.vDebug = vs_out.vPositionWS;
+	
+		//
+		// Finish - transform into clip space
+		//
+		gl_Position = PushConstants.render_matrix * vec4( vPosition, 1.0f );
+	
+		vec3 ndc = gl_Position.xyz / gl_Position.w; //perspective divide/normalize
+	}
+}
+
+Fragment
+{
+	#define PI				3.14159265359
+
+	layout (location = 0) in fs_in vs_out;
+
+	layout (location = 0) out vec4 outFragColor;
+
+	layout (set = 0, binding = 0) uniform sampler2D diffuseTexture;
+	layout (set = 0, binding = 1) uniform sampler2D normalTexture;
+	layout (set = 0, binding = 2) uniform sampler2D ambientOcclusionTexture;
+	layout (set = 0, binding = 3) uniform sampler2D metalnessTexture;
+	layout (set = 0, binding = 4) uniform sampler2D roughnessTexture;
+	layout (set = 0, binding = 5) uniform sampler2D blueNoiseTexture;
+
+	#ifdef RAYTRACING
+	layout (set = 1, binding = 0) uniform accelerationStructureEXT topLevelAS;
+	#endif
+
+	const vec2 BlueNoiseInDisk[64] = vec2[64](
+		vec2(0.478712,0.875764),
+		vec2(-0.337956,-0.793959),
+		vec2(-0.955259,-0.028164),
+		vec2(0.864527,0.325689),
+		vec2(0.209342,-0.395657),
+		vec2(-0.106779,0.672585),
+		vec2(0.156213,0.235113),
+		vec2(-0.413644,-0.082856),
+		vec2(-0.415667,0.323909),
+		vec2(0.141896,-0.939980),
+		vec2(0.954932,-0.182516),
+		vec2(-0.766184,0.410799),
+		vec2(-0.434912,-0.458845),
+		vec2(0.415242,-0.078724),
+		vec2(0.728335,-0.491777),
+		vec2(-0.058086,-0.066401),
+		vec2(0.202990,0.686837),
+		vec2(-0.808362,-0.556402),
+		vec2(0.507386,-0.640839),
+		vec2(-0.723494,-0.229240),
+		vec2(0.489740,0.317826),
+		vec2(-0.622663,0.765301),
+		vec2(-0.010640,0.929347),
+		vec2(0.663146,0.647618),
+		vec2(-0.096674,-0.413835),
+		vec2(0.525945,-0.321063),
+		vec2(-0.122533,0.366019),
+		vec2(0.195235,-0.687983),
+		vec2(-0.563203,0.098748),
+		vec2(0.418563,0.561335),
+		vec2(-0.378595,0.800367),
+		vec2(0.826922,0.001024),
+		vec2(-0.085372,-0.766651),
+		vec2(-0.921920,0.183673),
+		vec2(-0.590008,-0.721799),
+		vec2(0.167751,-0.164393),
+		vec2(0.032961,-0.562530),
+		vec2(0.632900,-0.107059),
+		vec2(-0.464080,0.569669),
+		vec2(-0.173676,-0.958758),
+		vec2(-0.242648,-0.234303),
+		vec2(-0.275362,0.157163),
+		vec2(0.382295,-0.795131),
+		vec2(0.562955,0.115562),
+		vec2(0.190586,0.470121),
+		vec2(0.770764,-0.297576),
+		vec2(0.237281,0.931050),
+		vec2(-0.666642,-0.455871),
+		vec2(-0.905649,-0.298379),
+		vec2(0.339520,0.157829),
+		vec2(0.701438,-0.704100),
+		vec2(-0.062758,0.160346),
+		vec2(-0.220674,0.957141),
+		vec2(0.642692,0.432706),
+		vec2(-0.773390,-0.015272),
+		vec2(-0.671467,0.246880),
+		vec2(0.158051,0.062859),
+		vec2(0.806009,0.527232),
+		vec2(-0.057620,-0.247071),
+		vec2(0.333436,-0.516710),
+		vec2(-0.550658,-0.315773),
+		vec2(-0.652078,0.589846),
+		vec2(0.008818,0.530556),
+		vec2(-0.210004,0.519896) 
+	);
+
+	vec3 fresnelSchlick( float cosTheta, vec3 F0 )
+	{
+		return F0 + ( 1.0f - F0 ) * pow( 1.0f - cosTheta, 5.0f );
+	}
+
+	float DistributionGGX(vec3 N, vec3 H, float roughness)
+	{
+		float a      = roughness*roughness;
+		float a2     = a*a;
+		float NdotH  = max(dot(N, H), 0.0);
+		float NdotH2 = NdotH*NdotH;
+	
+		float num   = a2;
+		float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+		denom = PI * denom * denom;
+	
+		return num / denom;
+	}
+
+	float GeometrySchlickGGX(float NdotV, float roughness)
+	{
+		float r = (roughness + 1.0);
+		float k = (r*r) / 8.0;
+
+		float num   = NdotV;
+		float denom = NdotV * (1.0 - k) + k;
+	
+		return num / denom;
+	}
+
+	float GeometrySmith(vec3 N, vec3 V, vec3 L, float roughness)
+	{
+		float NdotV = max(dot(N, V), 0.0);
+		float NdotL = max(dot(N, L), 0.0);
+		float ggx2  = GeometrySchlickGGX(NdotV, roughness);
+		float ggx1  = GeometrySchlickGGX(NdotL, roughness);
+	
+		return ggx1 * ggx2;
+	}
+
+	vec3 calculateLighting( float roughness, float metallic, vec3 albedo, vec3 lightPos, float intensity, vec3 V, vec3 N )
+	{
+		vec3 L = normalize( lightPos - vs_out.vPositionTS );
+		vec3 H = normalize( V + L );
+
+		float distance = length( lightPos - vs_out.vPositionTS );
+		float attenuation = 1.0f / ( distance * distance );
+		vec3 radiance = vec3( 1.0f, 1.0f, 1.0f ) * attenuation * intensity;
+
+		vec3 F0 = vec3( 0.04 );
+		F0 = mix( F0, albedo, metallic );
+
+		float NDF = DistributionGGX( N, H, roughness );
+		float G = GeometrySmith( N, V, L, roughness );
+		vec3 F = fresnelSchlick( max( dot( H, V ), 0.0 ), F0 );
+
+		vec3 kS = F;
+		vec3 kD = vec3( 1.0 ) - kS;
+		kD *= 1.0 - metallic;
+
+		vec3 numerator = NDF * G * F;
+		float denominator = 4.0 * max( dot( N, V ), 0.0 ) * max( dot( N, L ), 0.0 ) + 0.0001;
+		vec3 specular = numerator / denominator;
+
+		float NdotL = max( dot( N, L ), 0.0 );
+
+		return ( kD * albedo / PI + specular ) * radiance * NdotL;
+	}
+
+	float ambient()
+	{
+		return 0.05;
+	}
+
+	vec3 sampleTexture( sampler2D target )
+	{
+		return texture( target, vs_out.vTexCoord.xy ).rgb;
+	}
+
+	float luminance(vec3 v)
+	{
+		return dot(v, vec3(0.2126f, 0.7152f, 0.0722f));
+	}
+
+	vec3 reinhard_jodie(vec3 v)
+	{
+		float l = luminance(v);
+		vec3 tv = v / (1.0f + v);
+		return mix(v / (1.0f + l), tv, tv);
+	}
+
+	vec2 blueNoise( int index )
+	{
+		return BlueNoiseInDisk[ index % 64 ].xy;
+	}
+
+	float hash( float n )
+	{
+		return fract(sin(n) * 43758.5453123);
+	}
+
+	vec2 random2( vec2 uv )
+	{
+		float noise = hash( uv.x * 0.5f + uv.y * 0.5f );
+		return vec2( noise, hash( noise ) );
+	}
+
+	vec3 random3( vec3 uv )
+	{
+		float noise = hash( uv.x * 0.5f + uv.y * 0.5f + uv.z * 0.5f );
+		return vec3( noise, hash( noise ), hash( noise * 2.0f ) );
+	}
+
+	float traceShadow( vec3 L, vec3 origin, vec3 direction, float distance, int index )
+	{
+	#ifdef RAYTRACING
+		float tMin      = 0.01f;
+		float tMax      = distance;
+
+		vec2 rng = random3( origin ).xy;
+	
+		float r = sqrt( rng.x );
+		float phi = 2.0f * PI * rng.y;
+
+		vec2 diskPoint = vec2( r * cos( phi ), r * sin( phi ) );
+
+		vec3 lightTangent = normalize( cross( L, vec3( 0.0f, 0.0f, 1.0f ) ) );
+		vec3 lightBitangent = normalize( cross( L, lightTangent ) );
+
+		vec3 rayDir = normalize( direction + ( diskPoint.x * lightTangent + diskPoint.y * lightBitangent ) * 0.025f );
+
+		// Initializes a ray query object but does not start traversal
+		rayQueryEXT rayQuery;
+		rayQueryInitializeEXT( rayQuery, topLevelAS, gl_RayFlagsTerminateOnFirstHitEXT, 0xFF, origin, tMin, rayDir, tMax );
+
+		// Start traversal: return false if traversal is complete
+		while(rayQueryProceedEXT(rayQuery))
+		{
 		}
 
-		// Average shadow
-		shadow = shadow * ( 1.0f / float( sampleCount ) );
-		shadow = clamp( 1.0f - shadow, 0, 1 );
-		color += vLightCol * shadow;
+		// Returns type of committed (true) intersection
+		if(rayQueryGetIntersectionTypeEXT(rayQuery, true) != gl_RayQueryCommittedIntersectionNoneEXT)
+		{
+			// Got an intersection == Shadow
+			return 1.0f;
+		}
+	#endif
+
+		return 0.0f;
 	}
 
-	vec3 fragColor = ambient + color;
+	void main()
+	{
+		// Collect material properties
+		vec3 albedo = sampleTexture( diffuseTexture );
+		float metallic = sampleTexture( metalnessTexture ).r;
+		float roughness = sampleTexture( roughnessTexture ).r;
+		float ao = sampleTexture( ambientOcclusionTexture ).r;
+
+		vec3 vNormalTS = sampleTexture( normalTexture );
+		vNormalTS = vNormalTS * 2.0 - 1.0;
 	
-	// Ambient occlusion
-	fragColor *= ao;
+		// If we don't have a normal map, use the vertex normal ( calculated in tangent space )
+		if ( vNormalTS.z > 0.0 )
+		{
+			vNormalTS = vs_out.vNormalTS;
+		}
 
-	// Gamma correction
-	fragColor = pow(fragColor, vec3(1.0f / 2.2f));
+		// Recalculate Z axis - BC5 stomps it
+		vNormalTS.z = sqrt( 1.0 - vNormalTS.x * vNormalTS.x - vNormalTS.y * vNormalTS.y );
 
-	// Tonemap
-	fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
-	fragColor = reinhard_jodie( fragColor );
+		vec3 viewDir = normalize( vs_out.vCameraTS - vs_out.vPositionTS );
+	
+		vec3 ambient = ambient() * albedo;
+		vec3 color = vec3( 0.0 );
+	
+		for ( int i = 0; i < 4; ++i )
+		{
+			// Unpack lighting info
+			vec3 vLightPosTS = vs_out.vLightInfoTS[i].xyz;
+			vec3 vLightPosWS = PushConstants.vLightInfoWS[i].xyz;
+			float flLightIntensity = vs_out.vLightInfoTS[i].w;
 
-	// Exposure
-	fragColor *= 2.5f;
+			vec3 vLightCol = calculateLighting( roughness, metallic, albedo, vLightPosTS, flLightIntensity, viewDir, vNormalTS );
 
-	int debugView = int( floor( PushConstants.data.x ) );
+			// Trace them rays
+			vec3  L = vLightPosWS - vs_out.vPositionWS;
+			vec3  origin    = vs_out.vPositionWS;
+			vec3  direction = normalize( L );  // vector to light
+			float tMin      = 0.01f;
+			float tMax      = length( L );
 
-	if ( debugView == DEBUG_VIEW_DIFFUSE )
-		fragColor = albedo;
-	else if ( debugView == DEBUG_VIEW_NORMAL )
-		fragColor = ( vNormalTS + vec3( 1.0 ) ) / vec3( 2.0 );
-	else if ( debugView == DEBUG_VIEW_AMBIENTOCCLUSION )
-		fragColor = ao.xxx;
-	else if ( debugView == DEBUG_VIEW_METALNESS )
-		fragColor = metallic.xxx;
-	else if ( debugView == DEBUG_VIEW_ROUGHNESS )
-		fragColor = roughness.xxx;
-	else if ( debugView == DEBUG_VIEW_OTHER )
-		fragColor = color;
+			int sampleCount = 4;
+
+			// Sample 8 random positions to average shadow from ( based on the position of the vertex )
+			float shadow = 0.0f;
+			for ( int j = 0; j < sampleCount; ++j )
+			{
+				shadow += traceShadow( L, origin, direction, tMax, j );// * ( 1.0f / float( sampleCount ) );
+			}
+
+			// Average shadow
+			shadow = shadow * ( 1.0f / float( sampleCount ) );
+			shadow = clamp( 1.0f - shadow, 0, 1 );
+			color += vLightCol * shadow;
+		}
+
+		vec3 fragColor = ambient + color;
+	
+		// Ambient occlusion
+		fragColor *= ao;
+
+		// Gamma correction
+		fragColor = pow(fragColor, vec3(1.0f / 2.2f));
+
+		// Tonemap
+		fragColor = fragColor / ( fragColor + vec3( 1.0f ) );
+		fragColor = reinhard_jodie( fragColor );
+
+		// Exposure
+		fragColor *= 2.5f;
+
+		int debugView = int( floor( PushConstants.data.x ) );
+
+		if ( debugView == DEBUG_VIEW_DIFFUSE )
+			fragColor = albedo;
+		else if ( debugView == DEBUG_VIEW_NORMAL )
+			fragColor = ( vNormalTS + vec3( 1.0 ) ) / vec3( 2.0 );
+		else if ( debugView == DEBUG_VIEW_AMBIENTOCCLUSION )
+			fragColor = ao.xxx;
+		else if ( debugView == DEBUG_VIEW_METALNESS )
+			fragColor = metallic.xxx;
+		else if ( debugView == DEBUG_VIEW_ROUGHNESS )
+			fragColor = roughness.xxx;
+		else if ( debugView == DEBUG_VIEW_OTHER )
+			fragColor = color;
 		
-	outFragColor = vec4(fragColor, 1.0f);
+		outFragColor = vec4(fragColor, 1.0f);
+	}
 }
-
-#endif

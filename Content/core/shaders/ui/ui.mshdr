@@ -1,232 +1,223 @@
-/*
- * ui.mshdr
- * Author: Alex
- * 
- * Copyright (c) 2022 Alex Guthrie
- */
-#pragma optionNV (unroll all)
-
-#define DEBUG_VIEW_NONE 					0
-#define DEBUG_VIEW_DIFFUSE 					1
-#define DEBUG_VIEW_NORMAL 					2
-#define DEBUG_VIEW_AMBIENTOCCLUSION 		3
-#define DEBUG_VIEW_METALNESS 				4
-#define DEBUG_VIEW_ROUGHNESS 				5
-#define DEBUG_VIEW_OTHER					63
-
-//
-// Common
-//
-#define PI 3.14159
-
-//
-// Uniforms
-//
-layout( set = 0, binding = 0 ) uniform sampler2D g_tAtlas;
-
-struct VS_OUT {
-    vec3 vPositionWS;
-    vec3 vPositionPS;
-    vec2 vTexCoords;
-    vec4 vColor;
-    float flScreenPxRange;
-    vec2 vPanelPos;
-    vec2 vPanelSize;
-};
-
-//push constants block
-layout( push_constant ) uniform constants
+Shader
 {
-	vec4 data;				// 4
+    Name = "UI Shader";
+    Description = "Uber shader for UI elements";
+}
 
-	mat4 model_matrix;		// 16
+Common
+{
+    #pragma optionNV (unroll all)
 
-	mat4 render_matrix;		// 16
+    #define DEBUG_VIEW_NONE 					0
+    #define DEBUG_VIEW_DIFFUSE 					1
+    #define DEBUG_VIEW_NORMAL 					2
+    #define DEBUG_VIEW_AMBIENTOCCLUSION 		3
+    #define DEBUG_VIEW_METALNESS 				4
+    #define DEBUG_VIEW_ROUGHNESS 				5
+    #define DEBUG_VIEW_OTHER					63
 
-	vec3 vCameraPosWS;		// 3
-	float flTime;			// 1
-
-	vec4[4] vLightInfoWS;	// 16
-} PushConstants;
-
-//
-// Flags
-//
-// GraphicsFlags
-const uint None        = 0;
-const uint UseRawImage = 1;
-const uint UseSdf      = 2;
-const uint HighDistMul = 4;
-// const uint Rounded     = 8;
-
-const uint RoundedTopLeft    = 8;
-const uint RoundedTopRight   = 16;
-const uint RoundedBottomLeft = 32;
-const uint RoundedBottomRight = 64;
-
-const uint Border = 128;
-
-// ==========================================================================================================================
-
-//
-// Vertex
-//
-#ifdef VERTEX
-
-//
-// Layout
-//
-layout( location = 0 ) in vec3 g_vPosition;
-layout( location = 1 ) in vec2 g_vTexCoords;
-layout( location = 2 ) in vec4 g_vColor;
-layout( location = 3 ) in vec2 g_vPanelPos;
-layout( location = 4 ) in vec2 g_vPanelSize;
-layout( location = 5 ) in int g_flags;
-
-//
-// Out
-//
-layout( location = 0 ) out VS_OUT vs_out;
-layout( location = 8 ) flat out int vs_flags;
-layout( location = 9 ) flat out float vs_rounding;
-
-void main() {
-    vec4 pos = vec4( g_vPosition.xy, 0.0, 1.0 );
-
-    vs_out.vPositionWS = g_vPosition;
-    vs_out.vPositionPS = pos.xyz;
-    vs_out.vTexCoords = g_vTexCoords;
-    vs_out.vColor = g_vColor;
-    vs_out.vPanelPos = g_vPanelPos;
-    vs_out.vPanelSize = g_vPanelSize;
-
-    //C#:
-    //var flagsInt = (int)flags;
-    //flagsInt |= (int)rounding << 16;
     //
+    // Common
+    //
+    #define PI 3.14159
 
-    vs_flags = g_flags & 0xFFFF;
-    vs_rounding = (g_flags >> 16);
-    
-    gl_Position = pos;
-}
+    //
+    // Uniforms
+    //
+    layout( set = 0, binding = 0 ) uniform sampler2D g_tAtlas;
 
-#endif
+    struct VS_OUT {
+        vec3 vPositionWS;
+        vec3 vPositionPS;
+        vec2 vTexCoords;
+        vec4 vColor;
+        float flScreenPxRange;
+        vec2 vPanelPos;
+        vec2 vPanelSize;
+    };
 
-// ==========================================================================================================================
-
-//
-// Fragment
-//
-#ifdef FRAGMENT
-
-//
-// In
-//
-layout( location = 0 ) in VS_OUT fs_in;
-layout( location = 8 ) flat in int fs_flags;
-layout( location = 9 ) flat in float fs_rounding;
-
-//
-// Out
-//
-layout( location = 0 ) out vec4 fragColor;
-
-vec4 GetTextureSample( sampler2D tex )
-{
-    return texture( tex, fs_in.vTexCoords );
-}
-
-float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
-{
-    r.xy = (p.x>0.0)?r.xy : r.zw;
-    r.x  = (p.y>0.0)?r.x  : r.y;
-    vec2 q = abs(p)-b+r.x;
-    return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
-}
-
-float sdBox( in vec2 p, in vec2 b )
-{
-    vec2 d = abs(p) - b;
-    return min(max(d.x,d.y),0.0) + length(max(d,0.0));
-}
-
-void main() 
-{
-    vec4 texSample = GetTextureSample( g_tAtlas );
-
-    if ( (fs_flags & UseRawImage) == UseRawImage )
+    //push constants block
+    layout( push_constant ) uniform constants
     {
-        fragColor = texSample;
+        vec4 data;				// 4
+
+        mat4 model_matrix;		// 16
+
+        mat4 render_matrix;		// 16
+
+        vec3 vCameraPosWS;		// 3
+        float flTime;			// 1
+
+        vec4[4] vLightInfoWS;	// 16
+    } PushConstants;
+
+    //
+    // Flags
+    //
+    // GraphicsFlags
+    const uint None        = 0;
+    const uint UseRawImage = 1;
+    const uint UseSdf      = 2;
+    const uint HighDistMul = 4;
+    // const uint Rounded     = 8;
+
+    const uint RoundedTopLeft    = 8;
+    const uint RoundedTopRight   = 16;
+    const uint RoundedBottomLeft = 32;
+    const uint RoundedBottomRight = 64;
+
+    const uint Border = 128;
+}
+
+Vertex
+{
+    //
+    // Layout
+    //
+    layout( location = 0 ) in vec3 g_vPosition;
+    layout( location = 1 ) in vec2 g_vTexCoords;
+    layout( location = 2 ) in vec4 g_vColor;
+    layout( location = 3 ) in vec2 g_vPanelPos;
+    layout( location = 4 ) in vec2 g_vPanelSize;
+    layout( location = 5 ) in int g_flags;
+
+    //
+    // Out
+    //
+    layout( location = 0 ) out VS_OUT vs_out;
+    layout( location = 8 ) flat out int vs_flags;
+    layout( location = 9 ) flat out float vs_rounding;
+
+    void main() {
+        vec4 pos = vec4( g_vPosition.xy, 0.0, 1.0 );
+
+        vs_out.vPositionWS = g_vPosition;
+        vs_out.vPositionPS = pos.xyz;
+        vs_out.vTexCoords = g_vTexCoords;
+        vs_out.vColor = g_vColor;
+        vs_out.vPanelPos = g_vPanelPos;
+        vs_out.vPanelSize = g_vPanelSize;
+
+        //C#:
+        //var flagsInt = (int)flags;
+        //flagsInt |= (int)rounding << 16;
+        //
+
+        vs_flags = g_flags & 0xFFFF;
+        vs_rounding = (g_flags >> 16);
+        
+        gl_Position = pos;
     }
-    else
-    {
-        float opacity = 1.0;
+}
 
-        if ( (fs_flags & UseSdf) == UseSdf )
+Fragment
+{
+    //
+    // In
+    //
+    layout( location = 0 ) in VS_OUT fs_in;
+    layout( location = 8 ) flat in int fs_flags;
+    layout( location = 9 ) flat in float fs_rounding;
+
+    //
+    // Out
+    //
+    layout( location = 0 ) out vec4 fragColor;
+
+    vec4 GetTextureSample( sampler2D tex )
+    {
+        return texture( tex, fs_in.vTexCoords );
+    }
+
+    float sdRoundedBox( in vec2 p, in vec2 b, in vec4 r )
+    {
+        r.xy = (p.x>0.0)?r.xy : r.zw;
+        r.x  = (p.y>0.0)?r.x  : r.y;
+        vec2 q = abs(p)-b+r.x;
+        return min(max(q.x,q.y),0.0) + length(max(q,0.0)) - r.x;
+    }
+
+    float sdBox( in vec2 p, in vec2 b )
+    {
+        vec2 d = abs(p) - b;
+        return min(max(d.x,d.y),0.0) + length(max(d,0.0));
+    }
+
+    void main() 
+    {
+        vec4 texSample = GetTextureSample( g_tAtlas );
+
+        if ( (fs_flags & UseRawImage) == UseRawImage )
         {
-            float r = texSample.r;
-            float g = texSample.g;
-            float b = texSample.b;
-            
-            float median = max(min(r, g), min(max(r, g), b));
-            float signed_dist = median;
-
-            float mul = fs_in.vPanelSize.y / 3.0;
-
-            signed_dist *= mul;
-            opacity = clamp( signed_dist, 0.0, 1.0 );
+            fragColor = texSample;
         }
-        
-        fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
-    }
+        else
+        {
+            float opacity = 1.0;
 
-    bool rounded = (fs_flags & RoundedTopLeft) == RoundedTopLeft 
-                || (fs_flags & RoundedTopRight) == RoundedTopRight 
-                || (fs_flags & RoundedBottomLeft) == RoundedBottomLeft 
-                || (fs_flags & RoundedBottomRight) == RoundedBottomRight;
-    
-    if ( rounded )
-    {
-        vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
-        vec4 rounding = vec4( fs_rounding );
+            if ( (fs_flags & UseSdf) == UseSdf )
+            {
+                float r = texSample.r;
+                float g = texSample.g;
+                float b = texSample.b;
+                
+                float median = max(min(r, g), min(max(r, g), b));
+                float signed_dist = median;
 
-        if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
-            rounding.w *= 0.0;
-        if ( (fs_flags & RoundedBottomLeft) != RoundedBottomLeft )
-            rounding.z *= 0.0;
-        if ( (fs_flags & RoundedBottomRight) != RoundedBottomRight )
-            rounding.x *= 0.0;
-        if ( (fs_flags & RoundedTopRight) != RoundedTopRight )
-            rounding.y *= 0.0;
+                float mul = fs_in.vPanelSize.y / 3.0;
+
+                signed_dist *= mul;
+                opacity = clamp( signed_dist, 0.0, 1.0 );
+            }
             
-        vec2 size = fs_in.vPanelSize;
+            fragColor = vec4( fs_in.vColor.rgb, opacity * fs_in.vColor.a );
+        }
+
+        bool rounded = (fs_flags & RoundedTopLeft) == RoundedTopLeft 
+                    || (fs_flags & RoundedTopRight) == RoundedTopRight 
+                    || (fs_flags & RoundedBottomLeft) == RoundedBottomLeft 
+                    || (fs_flags & RoundedBottomRight) == RoundedBottomRight;
         
-        float r = sdRoundedBox( uv, size, rounding );
-        float a = clamp( r + 0.5, 0.0, 1.0 );
-        
-        fragColor.a *= 1.0 - a;
+        if ( rounded )
+        {
+            vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
+            vec4 rounding = vec4( fs_rounding );
+
+            if ( (fs_flags & RoundedTopLeft) != RoundedTopLeft )
+                rounding.w *= 0.0;
+            if ( (fs_flags & RoundedBottomLeft) != RoundedBottomLeft )
+                rounding.z *= 0.0;
+            if ( (fs_flags & RoundedBottomRight) != RoundedBottomRight )
+                rounding.x *= 0.0;
+            if ( (fs_flags & RoundedTopRight) != RoundedTopRight )
+                rounding.y *= 0.0;
+                
+            vec2 size = fs_in.vPanelSize;
+            
+            float r = sdRoundedBox( uv, size, rounding );
+            float a = clamp( r + 0.5, 0.0, 1.0 );
+            
+            fragColor.a *= 1.0 - a;
+        }
+
+        if ( (fs_flags & Border) == Border )
+        {
+            vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
+            vec2 size = fs_in.vPanelSize;
+            
+            float r = sdBox( uv, size );
+            float a = clamp( r + 0.5, 0.0, 1.0 );
+            
+            fragColor.rgb = smoothstep( 1.0, 0.99, a ).xxx;
+        }
+
+        int debugView = int( floor( PushConstants.data.x ) );
+
+        if ( debugView == DEBUG_VIEW_DIFFUSE )
+            fragColor = vec4( texSample.rgb, 1 );
+        else if ( debugView == DEBUG_VIEW_NORMAL )
+            fragColor.a = 1.0;
+        else if ( debugView == DEBUG_VIEW_OTHER )
+            fragColor = vec4( fs_in.vTexCoords.x, fs_in.vTexCoords.y, 0, 1 );
     }
-
-    if ( (fs_flags & Border) == Border )
-    {
-        vec2 uv = ( fs_in.vPanelPos * 2.0 ) - fs_in.vPanelSize;
-        vec2 size = fs_in.vPanelSize;
-        
-        float r = sdBox( uv, size );
-        float a = clamp( r + 0.5, 0.0, 1.0 );
-        
-        fragColor.rgb = smoothstep( 1.0, 0.99, a ).xxx;
-    }
-
-	int debugView = int( floor( PushConstants.data.x ) );
-
-	if ( debugView == DEBUG_VIEW_DIFFUSE )
-		fragColor = vec4( texSample.rgb, 1 );
-    else if ( debugView == DEBUG_VIEW_NORMAL )
-        fragColor.a = 1.0;
-	else if ( debugView == DEBUG_VIEW_OTHER )
-		fragColor = vec4( fs_in.vTexCoords.x, fs_in.vTexCoords.y, 0, 1 );
 }
-#endif
-// ==========================================================================================================================

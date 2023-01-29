@@ -1,6 +1,6 @@
-﻿namespace Mocha.UI;
+﻿namespace Mocha.Common;
 
-class BaseParser
+public class BaseParser
 {
 	protected int Position { get; set; }
 	protected string Input { get; set; }
