@@ -50,7 +50,7 @@ Feel free to [open an issue](https://github.com/xezno/mocha/issues/new) if you e
 
 ## Free and Open Source
 
-Mocha is an open source game engine distributed under the AGPL-3.0 license. This allows anyone to freely use, modify, and distribute the engine as they see fit. The development of Mocha is driven by the community, with the goal of creating a powerful and flexible tool that meets the needs of developers.
+Mocha is an open source game engine distributed under the LGPL-3.0 license. This allows anyone to freely use, modify, and distribute the engine as they see fit. The development of Mocha is driven by the community, with the goal of creating a powerful and flexible tool that meets the needs of developers.
 
 ### License
 
@@ -73,6 +73,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with this program; if not, write to the Free Software Foundation,
 Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ```
+
+This license allows you to distribute your games under whatever license you wish (as Mocha would be considered a Library), however modifying and distributing the engine requires full source disclosure.
 
 A copy of this license is available at [LICENSE.md](https://github.com/xezno/mocha/blob/master/LICENSE.md).
 
