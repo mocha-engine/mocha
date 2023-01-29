@@ -34,8 +34,7 @@ public static class Main
 		s_manifest = ProjectManifest.Load( manifestPath );
 
 		// Generate project
-		var projectGenerator = new ProjectGenerator();
-		var csproj = projectGenerator.GenerateProject( s_manifest );
+		var csproj = ProjectGenerator.GenerateProject( s_manifest );
 
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
