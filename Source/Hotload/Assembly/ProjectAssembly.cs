@@ -21,7 +21,8 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	internal TEntryPoint EntryPoint { get; private set; } = default!;
 
 	private readonly ProjectAssemblyInfo _projectAssemblyInfo;
-	private FileSystemWatcher _watcher = null!;
+	private FileSystemWatcher _projWatcher = null!;
+	private FileSystemWatcher _codeWatcher = null!;
 	private AssemblyLoadContext _loadContext;
 
 	private TimeSince _timeSinceLastFileChange;
@@ -35,7 +36,7 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 
 		_buildTask = Build();
 		_buildTask.Wait();
-		CreateFileSystemWatcher( assemblyInfo.SourceRoot );
+		CreateFileWatchers();
 	}
 
 	/// <summary>
@@ -175,9 +176,26 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	/// Creates the file system watcher to check for file changes in the project.
 	/// </summary>
 	/// <param name="sourcePath"></param>
-	private void CreateFileSystemWatcher( string sourcePath )
+	private void CreateFileWatchers()
 	{
-		_watcher = new FileSystemWatcher( sourcePath, "*.cs" )
+		_projWatcher = new FileSystemWatcher(
+			Path.GetDirectoryName( _projectAssemblyInfo.ProjectPath )!,
+			Path.GetFileName( _projectAssemblyInfo.ProjectPath ) )
+		{
+			NotifyFilter = NotifyFilters.Attributes
+							 | NotifyFilters.CreationTime
+							 | NotifyFilters.DirectoryName
+							 | NotifyFilters.FileName
+							 | NotifyFilters.LastAccess
+							 | NotifyFilters.LastWrite
+							 | NotifyFilters.Security
+							 | NotifyFilters.Size
+		};
+
+		_projWatcher.Changed += OnCsProjChanged;
+		_projWatcher.EnableRaisingEvents = true;
+
+		_codeWatcher = new FileSystemWatcher( _projectAssemblyInfo.SourceRoot, "*.cs" )
 		{
 			NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
@@ -196,9 +214,20 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 		// is the last thing that happens in the order of operations
 
 		// This will typically happen twice, so we'll gate it with a TimeSince too
-		_watcher.Renamed += OnFileChanged;
-		_watcher.IncludeSubdirectories = true;
-		_watcher.EnableRaisingEvents = true;
+		_codeWatcher.Renamed += OnFileChanged;
+		_codeWatcher.IncludeSubdirectories = true;
+		_codeWatcher.EnableRaisingEvents = true;
+	}
+
+	/// <summary>
+	/// Invoked when the csproj has changed.
+	/// </summary>
+	private void OnCsProjChanged( object sender, FileSystemEventArgs e )
+	{
+		if ( _buildTask.IsCompleted )
+			_buildTask = Build();
+		else
+			_buildRequested = true;
 	}
 
 	/// <summary>
