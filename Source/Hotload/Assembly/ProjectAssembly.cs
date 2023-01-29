@@ -17,12 +17,16 @@ public class ProjectAssembly<T>
 	public T? Value => _managedClass;
 	public Assembly Assembly => _assembly;
 
+	private Task _buildTask;
+	private bool _buildRequested;
+
 	public ProjectAssembly( ProjectAssemblyInfo assemblyInfo )
 	{
 		_projectAssemblyInfo = assemblyInfo;
 		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
-		CompileIntoMemory();
+		_buildTask = CompileIntoMemory();
+		_buildTask.Wait();
 		CreateFileSystemWatcher( assemblyInfo.SourceRoot );
 	}
 
@@ -35,10 +39,10 @@ public class ProjectAssembly<T>
 		_managedClass = newInterface;
 	}
 
-	private void CompileIntoMemory()
+	private async Task CompileIntoMemory()
 	{
 		Notify.AddNotification( $"Building...", $"Compiling '{_projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
-		var compileResult = Compiler.Instance.Compile( _projectAssemblyInfo );
+		var compileResult = await Compiler.Compile( _projectAssemblyInfo );
 
 		if ( !compileResult.WasSuccessful )
 		{
@@ -62,14 +66,14 @@ public class ProjectAssembly<T>
 		var symbolsStream = compileResult.HasSymbols ? new MemoryStream( compileResult.CompiledAssemblySymbols! ) : null;
 
 		var newAssembly = _loadContext.LoadFromStream( assemblyStream, symbolsStream );
-		var newInterface = CreateInterfaceFromAssembly( newAssembly );
+		var newInterface = ProjectAssembly<T>.CreateInterfaceFromAssembly( newAssembly );
 
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
 			Upgrader.UpgradedReferences.Clear();
 
-			UpgradeEntities( oldAssembly, newAssembly );
+			ProjectAssembly<T>.UpgradeEntities( oldAssembly, newAssembly );
 
 			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 
@@ -83,28 +87,32 @@ public class ProjectAssembly<T>
 
 		Notify.AddNotification( $"Build successful!", $"Compiled '{_projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
 		Event.Run( Event.Game.HotloadAttribute.Name );
+
+		if ( !_buildRequested )
+			return;
+
+		_buildRequested = false;
+		await CompileIntoMemory();
 	}
 
-	private void UpgradeEntities( Assembly oldAssembly, Assembly newAssembly )
+	private static void UpgradeEntities( Assembly oldAssembly, Assembly newAssembly )
 	{
 		var entityRegistryCopy = EntityRegistry.Instance.ToList();
 
 		for ( int i = 0; i < entityRegistryCopy.Count; i++ )
 		{
 			var entity = entityRegistryCopy[i];
+			var entityType = entity.GetType();
 
-			// Do we actually want to upgrade this?
-			if ( entity.GetType().Assembly != oldAssembly )
-			{
-				// Not part of hotloaded assembly - skip
+			// Do we actually want to upgrade this? If not, skip.
+			if ( entityType.Assembly != oldAssembly )
 				continue;
-			}
 
 			// Unregister the old entity
 			EntityRegistry.Instance.UnregisterEntity( entity );
 
 			// Find new type for entity in new assembly
-			var newType = newAssembly.GetType( entity.GetType().FullName )!;
+			var newType = newAssembly.GetType( entityType.FullName ?? entityType.Name )!;
 			var newEntity = (IEntity)FormatterServices.GetUninitializedObject( newType )!;
 
 			// Have we already upgraded this?
@@ -119,14 +127,12 @@ public class ProjectAssembly<T>
 			}
 
 			// If we created a new entity successfully, register it
-			if ( newEntity != null )
-			{
+			if ( newEntity is not null )
 				EntityRegistry.Instance.RegisterEntity( newEntity );
-			}
 		}
 	}
 
-	private T CreateInterfaceFromAssembly( Assembly assembly )
+	private static T CreateInterfaceFromAssembly( Assembly assembly )
 	{
 		// Is T an interface?
 		if ( typeof( T ).IsInterface )
@@ -181,6 +187,10 @@ public class ProjectAssembly<T>
 			return;
 
 		_timeSinceLastChange = 0f;
-		CompileIntoMemory();
+
+		if ( _buildTask.IsCompleted )
+			_buildTask = CompileIntoMemory();
+		else
+			_buildRequested = true;
 	}
 }

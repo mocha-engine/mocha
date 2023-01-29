@@ -4,6 +4,15 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Mocha.Common;
+using NuGet.Common;
+using NuGet.Frameworks;
+using NuGet.Packaging;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
+using System.IO;
+using System.Reflection;
+using System.Runtime.Versioning;
 
 namespace Mocha.Hotload;
 
@@ -52,97 +61,84 @@ public struct CompileResult
 	}
 }
 
-public class Compiler
+public static class Compiler
 {
-	private static string[] s_systemReferences = new[]
-		{
-			"mscorlib.dll",
-			"System.dll",
-
-			"System.Core.dll",
-
-			"System.ComponentModel.Primitives.dll",
-			"System.ComponentModel.Annotations.dll",
-
-			"System.Collections.dll",
-			"System.Collections.Concurrent.dll",
-			"System.Collections.Immutable.dll",
-			"System.Collections.Specialized.dll",
-
-			"System.Console.dll",
-
-			"System.Data.dll",
-			"System.Diagnostics.Process.dll",
-
-			"System.IO.Compression.dll",
-			"System.IO.FileSystem.Watcher.dll",
-
-			"System.Linq.dll",
-			"System.Linq.Expressions.dll",
-
-			"System.Numerics.Vectors.dll",
-
-			"System.ObjectModel.dll",
-
-			"System.Private.CoreLib.dll",
-			"System.Private.Xml.dll",
-			"System.Private.Uri.dll",
-
-			"System.Runtime.Extensions.dll",
-			"System.Runtime.dll",
-
-			"System.Text.RegularExpressions.dll",
-			"System.Text.Json.dll",
-
-			"System.Security.Cryptography.dll",
-
-			"System.Threading.Channels.dll",
-
-			"System.Web.HttpUtility.dll",
-
-			"System.Xml.ReaderWriter.dll",
-		};
-
-	private static Compiler s_instance;
-  
-	public static Compiler Instance
+	private static readonly string[] s_systemReferences = new[]
 	{
-		get
-		{
-			s_instance ??= new();
-			return s_instance;
-		}
-	}
+		"mscorlib.dll",
+		"System.dll",
 
-	private List<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
+		"System.Core.dll",
+
+		"System.ComponentModel.Primitives.dll",
+		"System.ComponentModel.Annotations.dll",
+
+		"System.Collections.dll",
+		"System.Collections.Concurrent.dll",
+		"System.Collections.Immutable.dll",
+		"System.Collections.Specialized.dll",
+
+		"System.Console.dll",
+
+		"System.Data.dll",
+		"System.Diagnostics.Process.dll",
+
+		"System.IO.Compression.dll",
+		"System.IO.FileSystem.Watcher.dll",
+
+		"System.Linq.dll",
+		"System.Linq.Expressions.dll",
+
+		"System.Numerics.Vectors.dll",
+
+		"System.ObjectModel.dll",
+
+		"System.Private.CoreLib.dll",
+		"System.Private.Xml.dll",
+		"System.Private.Uri.dll",
+
+		"System.Runtime.Extensions.dll",
+		"System.Runtime.dll",
+
+		"System.Text.RegularExpressions.dll",
+		"System.Text.Json.dll",
+
+		"System.Security.Cryptography.dll",
+
+		"System.Threading.Channels.dll",
+
+		"System.Web.HttpUtility.dll",
+
+		"System.Xml.ReaderWriter.dll",
+	};
+
+	private static readonly string[] s_mochaReferences = new string[]
 	{
-		var references = new List<PortableExecutableReference>();
+		// TODO: Ideally shouldn't be hardcoding the paths for these here
+		"build\\Mocha.Engine.dll",
+		"build\\Mocha.Common.dll",
+		"build\\Mocha.UI.dll",
+		"build\\VConsoleLib.dll",
 
-		foreach ( var path in assemblyPaths )
-		{
-			references.Add( MetadataReference.CreateFromFile( path ) );
-		}
+		// Add a reference to ImGUI too (this is for the editor project -- we should probably
+		// allow users to configure custom imports somewhere!)
+		"build\\ImGui.NET.dll",
+	};
 
-		return references;
-	}
-
-	public CompileResult Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
+	public static async Task<CompileResult> Compile( ProjectAssemblyInfo assemblyInfo, CompileOptions? compileOptions = null )
 	{
 		using var _ = new Stopwatch( $"{assemblyInfo.AssemblyName} compile" );
 
-		if ( compileOptions is null )
+		compileOptions ??= new CompileOptions
 		{
-			compileOptions = new CompileOptions
-			{
-				OptimizationLevel = OptimizationLevel.Debug,
-				GenerateSymbols = true,
-			};
-		}
+			OptimizationLevel = OptimizationLevel.Debug,
+			GenerateSymbols = true,
+		};
 
 		//
 		// Fetch the project and all source files
 		//
-		var project = new Microsoft.Build.Evaluation.Project( assemblyInfo.ProjectPath );
+		var project = new Project( assemblyInfo.ProjectPath );
 
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
@@ -176,11 +172,7 @@ public class Compiler
 			syntaxTrees.Add( syntaxTree );
 
 			if ( compileOptions.GenerateSymbols )
-			{
-				var embeddedText = EmbeddedText.FromSource( filePath, sourceText );
-
-				embeddedTexts.Add( embeddedText );
-			}
+				embeddedTexts.Add( EmbeddedText.FromSource( filePath, sourceText ) );
 		}
 
 		//
@@ -189,25 +181,16 @@ public class Compiler
 		var references = new List<PortableExecutableReference>();
 
 		// System references
-		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location );
+		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location )!;
 		foreach ( var systemReference in s_systemReferences )
-		{
 			references.Add( MetadataReference.CreateFromFile( Path.Combine( dotnetBaseDir, systemReference ) ) );
-		}
 
 		// Mocha references
-		references.AddRange( CreateMetadataReferencesFromPaths( new[]
-		{
-			// TODO: Ideally shouldn't be hardcoding the paths for these here
-			"build\\Mocha.Engine.dll",
-			"build\\Mocha.Common.dll",
-			"build\\Mocha.UI.dll",
-			"build\\VConsoleLib.dll",
+		references.AddRange( CreateMetadataReferencesFromPaths( s_mochaReferences ) );
 
-			// Add a reference to ImGUI too (this is for the editor project -- we should probably
-			// allow users to configure custom imports somewhere!)
-			"build\\ImGui.NET.dll",
-		} ) );
+		// NuGet references
+		foreach ( var packageReference in project.GetItems( "PackageReference" ) )
+			await FetchPackage( packageReference.EvaluatedInclude, new NuGetVersion( packageReference.GetMetadataValue( "Version" ) ), references );
 
 		//
 		// Set up compiler
@@ -275,5 +258,87 @@ public class Compiler
 		Log.Info( $"Compiled {assemblyInfo.AssemblyName} successfully" );
 
 		return CompileResult.Successful( assemblyStream.ToArray(), symbolsStream?.ToArray() );
+	}
+
+	private static IEnumerable<PortableExecutableReference> CreateMetadataReferencesFromPaths( string[] assemblyPaths )
+	{
+		foreach ( var assemblyPath in assemblyPaths )
+			yield return CreateMetadataReferenceFromPath( assemblyPath );
+	}
+
+	private static PortableExecutableReference CreateMetadataReferenceFromPath( string assemblyPath )
+	{
+		return MetadataReference.CreateFromFile( assemblyPath );
+	}
+
+	private static string GetTargetFrameworkName()
+	{
+		if ( !string.IsNullOrEmpty( AppContext.TargetFrameworkName ) )
+			return AppContext.TargetFrameworkName;
+
+		if ( Assembly.GetExecutingAssembly().GetCustomAttribute<TargetFrameworkAttribute>() is not TargetFrameworkAttribute frameworkAttribute )
+			return string.Empty;
+
+		return frameworkAttribute.FrameworkName;
+	}
+
+	private static async Task FetchPackage( string id, NuGetVersion version, ICollection<PortableExecutableReference> references )
+	{
+		var logger = NullLogger.Instance;
+		var cancellationToken = CancellationToken.None;
+
+		var cache = new SourceCacheContext();
+		var repository = Repository.Factory.GetCoreV3( "https://api.nuget.org/v3/index.json" );
+		var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
+
+		using var packageStream = new MemoryStream();
+
+		await resource.CopyNupkgToStreamAsync(
+			id,
+			version,
+			packageStream,
+			cache,
+			logger,
+			cancellationToken );
+
+		using var packageReader = new PackageArchiveReader( packageStream );
+		var nuspecReader = await packageReader.GetNuspecReaderAsync( cancellationToken );
+
+		var currentFramework = NuGetFramework.ParseFrameworkName( GetTargetFrameworkName(), DefaultFrameworkNameProvider.Instance );
+		var targetFrameworkGroup = NuGetFrameworkExtensions.GetNearest( packageReader.GetLibItems(), currentFramework );
+		var dependencies = nuspecReader.GetDependencyGroups().First( group => group.TargetFramework == targetFrameworkGroup.TargetFramework ).Packages.ToArray();
+
+		if ( dependencies.Length > 0 )
+		{
+			foreach ( var dependency in dependencies )
+				await FetchPackageWithVersionRange( dependency.Id, dependency.VersionRange, references );
+		}
+
+		if ( !targetFrameworkGroup.Items.Any() )
+			return;
+
+		var dllFile = targetFrameworkGroup.Items.FirstOrDefault( item => item.EndsWith( "dll" ) );
+		if ( dllFile is null )
+			return;
+
+		packageReader.ExtractFile( dllFile, Path.Combine( Directory.GetCurrentDirectory(), $"build\\{id}.dll" ), logger );
+		references.Add( CreateMetadataReferenceFromPath( $"build\\{id}.dll" ) );
+	}
+
+	private static async Task FetchPackageWithVersionRange( string id, VersionRange versionRange, ICollection<PortableExecutableReference> references )
+	{
+		var cache = new SourceCacheContext();
+		var repository = Repository.Factory.GetCoreV3( "https://api.nuget.org/v3/index.json" );
+		var resource = await repository.GetResourceAsync<FindPackageByIdResource>();
+
+		var versions = await resource.GetAllVersionsAsync(
+			id,
+			cache,
+			NullLogger.Instance,
+			CancellationToken.None
+			);
+
+		var bestVersion = versionRange.FindBestMatch( versions );
+		await FetchPackage( id, bestVersion, references );
 	}
 }
