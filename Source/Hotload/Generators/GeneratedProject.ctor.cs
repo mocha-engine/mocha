@@ -2,12 +2,12 @@
 
 partial class GeneratedProject
 {
-	private readonly string baseReferenceDir;
-	private readonly ProjectManifest projectManifest;
+	private readonly string _baseReferenceDir;
+	private readonly ProjectManifest _projectManifest;
 
-	public GeneratedProject( string baseReferenceDir, ProjectManifest projectManifest )
+	public GeneratedProject( string baseReferenceDir, in ProjectManifest projectManifest )
 	{
-		this.baseReferenceDir = baseReferenceDir;
-		this.projectManifest = projectManifest;
+		_baseReferenceDir = baseReferenceDir;
+		_projectManifest = projectManifest;
 	}
 }

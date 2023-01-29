@@ -12,9 +12,7 @@ partial struct ProjectManifest
 	public static ProjectManifest Load( string path )
 	{
 		if ( !File.Exists( path ) )
-		{
 			throw new Exception( $"Failed to load project at path '{path}'" );
-		}
 
 		var fileContents = File.ReadAllText( path );
 		var projectManifest = JsonSerializer.Deserialize<ProjectManifest>( fileContents );
