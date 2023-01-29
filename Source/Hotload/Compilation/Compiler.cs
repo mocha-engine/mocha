@@ -10,56 +10,10 @@ using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
-using System.IO;
 using System.Reflection;
 using System.Runtime.Versioning;
 
 namespace Mocha.Hotload;
-
-public class CompileOptions
-{
-	public OptimizationLevel OptimizationLevel { get; set; }
-
-	// Does nothing with a Release optimization level
-	public bool GenerateSymbols { get; set; }
-}
-
-public struct CompileResult
-{
-	public readonly bool WasSuccessful;
-
-	public readonly byte[]? CompiledAssembly;
-	public readonly byte[]? CompiledAssemblySymbols;
-	public readonly string[]? Errors;
-
-	public bool HasSymbols => CompiledAssemblySymbols is not null;
-
-	private CompileResult( bool wasSuccessful, byte[]? compiledAssembly = null, byte[]? compiledAssemblySymbols = null, string[]? errors = null )
-	{
-		WasSuccessful = wasSuccessful;
-
-		CompiledAssembly = compiledAssembly;
-		CompiledAssemblySymbols = compiledAssemblySymbols;
-		Errors = errors;
-	}
-
-	public static CompileResult Failed( string[] errors )
-	{
-		return new CompileResult(
-			wasSuccessful: false,
-			errors: errors
-		);
-	}
-
-	public static CompileResult Successful( byte[] compiledAssembly, byte[]? compiledAssemblySymbols )
-	{
-		return new CompileResult(
-			wasSuccessful: true,
-			compiledAssembly: compiledAssembly,
-			compiledAssemblySymbols: compiledAssemblySymbols
-		);
-	}
-}
 
 public static class Compiler
 {
