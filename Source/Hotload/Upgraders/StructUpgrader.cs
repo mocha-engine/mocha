@@ -8,7 +8,7 @@ public class StructUpgrader : IMemberUpgrader
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
-		return memberInfo.IsStruct();
+		return memberInfo.IsTypeStruct();
 	}
 
 	/// <inheritdoc />

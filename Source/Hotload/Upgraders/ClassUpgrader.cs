@@ -8,7 +8,7 @@ public class ClassUpgrader : IMemberUpgrader
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
-		return memberInfo.IsClass() || memberInfo.IsInterface();
+		return memberInfo.IsTypeClass() || memberInfo.IsTypeInterface();
 	}
 
 	/// <inheritdoc />

@@ -9,7 +9,7 @@ public class CollectionUpgrader : IMemberUpgrader
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
-		return memberInfo.IsCollection();
+		return memberInfo.IsTypeCollection();
 	}
 
 	/// <inheritdoc />
