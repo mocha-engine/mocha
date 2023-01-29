@@ -5,41 +5,58 @@ using System.Runtime.Serialization;
 
 namespace Mocha.Hotload;
 
-public class ProjectAssembly<T>
+/// <summary>
+/// A wrapper for an external assembly to be loaded.
+/// </summary>
+/// <typeparam name="TEntryPoint">The type to retrieve from the assembly as its entry point.</typeparam>
+public class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 {
-	private readonly ProjectAssemblyInfo _projectAssemblyInfo;
+	/// <summary>
+	/// The loaded assembly.
+	/// </summary>
+	public Assembly Assembly { get; private set; } = null!;
+	/// <summary>
+	/// The found entry point into the assembly.
+	/// </summary>
+	public TEntryPoint EntryPoint { get; private set; } = default!;
 
-	private T? _managedClass;
-	private FileSystemWatcher _watcher;
-	private Assembly _assembly;
+	private readonly ProjectAssemblyInfo _projectAssemblyInfo;
+	private FileSystemWatcher _watcher = null!;
 	private AssemblyLoadContext _loadContext;
 
-	public T? Value => _managedClass;
-	public Assembly Assembly => _assembly;
-
+	private TimeSince _timeSinceLastFileChange;
 	private Task _buildTask;
 	private bool _buildRequested;
 
-	public ProjectAssembly( ProjectAssemblyInfo assemblyInfo )
+	public ProjectAssembly( in ProjectAssemblyInfo assemblyInfo )
 	{
 		_projectAssemblyInfo = assemblyInfo;
 		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
-		_buildTask = CompileIntoMemory();
+		_buildTask = Build();
 		_buildTask.Wait();
 		CreateFileSystemWatcher( assemblyInfo.SourceRoot );
 	}
 
-	private void Swap( Assembly newAssembly, T newInterface )
+	/// <summary>
+	/// Unloads the current assembly and swaps it with a new one.
+	/// </summary>
+	/// <param name="newAssembly">The new assembly to swap in.</param>
+	/// <param name="newEntryPoint">The new entry point to the assembly.</param>
+	private void Swap( Assembly newAssembly, TEntryPoint newEntryPoint )
 	{
-		_loadContext?.Unload();
+		_loadContext.Unload();
 		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
-		_assembly = newAssembly;
-		_managedClass = newInterface;
+		Assembly = newAssembly;
+		EntryPoint = newEntryPoint;
 	}
 
-	private async Task CompileIntoMemory()
+	/// <summary>
+	/// Builds the projects assembly.
+	/// </summary>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	private async Task Build()
 	{
 		Notify.AddNotification( $"Building...", $"Compiling '{_projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
 		var compileResult = await Compiler.Compile( _projectAssemblyInfo );
@@ -49,31 +66,29 @@ public class ProjectAssembly<T>
 			var errorStr = string.Join( '\n', compileResult.Errors! );
 
 			foreach ( var error in compileResult.Errors! )
-			{
 				Log.Error( error );
-			}
 
 			Notify.AddError( $"Build failed", $"Failed to compile '{_projectAssemblyInfo.AssemblyName}'\n{errorStr}", FontAwesome.FaceSadTear );
 			return;
 		}
 
 		// Keep old assembly as reference. Should be destroyed once out of scope
-		var oldAssembly = _assembly;
-		var oldGameInterface = _managedClass;
+		var oldAssembly = Assembly;
+		var oldGameInterface = EntryPoint;
 
 		// Load new assembly
 		var assemblyStream = new MemoryStream( compileResult.CompiledAssembly! );
 		var symbolsStream = compileResult.HasSymbols ? new MemoryStream( compileResult.CompiledAssemblySymbols! ) : null;
 
 		var newAssembly = _loadContext.LoadFromStream( assemblyStream, symbolsStream );
-		var newInterface = ProjectAssembly<T>.CreateInterfaceFromAssembly( newAssembly );
+		var newInterface = CreateEntryPointFromAssembly( newAssembly );
 
 		// Invoke upgrader to move values from oldAssembly into assembly
 		if ( oldAssembly != null && oldGameInterface != null )
 		{
 			Upgrader.UpgradedReferences.Clear();
 
-			ProjectAssembly<T>.UpgradeEntities( oldAssembly, newAssembly );
+			UpgradeEntities( oldAssembly, newAssembly );
 
 			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 
@@ -92,9 +107,14 @@ public class ProjectAssembly<T>
 			return;
 
 		_buildRequested = false;
-		await CompileIntoMemory();
+		await Build();
 	}
 
+	/// <summary>
+	/// Upgrades all entities that were affected by the swap.
+	/// </summary>
+	/// <param name="oldAssembly">The old assembly being unloaded.</param>
+	/// <param name="newAssembly">The new assembly being loaded.</param>
 	private static void UpgradeEntities( Assembly oldAssembly, Assembly newAssembly )
 	{
 		var entityRegistryCopy = EntityRegistry.Instance.ToList();
@@ -132,35 +152,42 @@ public class ProjectAssembly<T>
 		}
 	}
 
-	private static T CreateInterfaceFromAssembly( Assembly assembly )
+	/// <summary>
+	/// Finds and creates an entry point from the project assembly.
+	/// </summary>
+	/// <param name="assembly">The assembly to search.</param>
+	/// <returns>The created entry point from the project assembly.</returns>
+	/// <exception cref="EntryPointNotFoundException">Thrown when no valid entry point was found.</exception>
+	private static TEntryPoint CreateEntryPointFromAssembly( Assembly assembly )
 	{
-		// Is T an interface?
-		if ( typeof( T ).IsInterface )
+		var tType = typeof( TEntryPoint );
+		// Find first type that derives from interface T
+		foreach ( var type in assembly.GetTypes() )
 		{
-			// Find first type that derives from interface T
-			foreach ( var type in assembly.GetTypes() )
-			{
-				if ( type.GetInterface( typeof( T ).FullName! ) != null )
-				{
-					return (T)Activator.CreateInstance( type )!;
-				}
-			}
+			if ( type.GetInterface( tType.FullName ?? tType.Name ) is not null )
+				return (TEntryPoint)Activator.CreateInstance( type )!;
 		}
 
-		throw new Exception( $"Could not find implementation of '{typeof( T ).Name}'" );
+		throw new EntryPointNotFoundException( $"Could not find implementation of '{tType.Name}'" );
 	}
 
+	/// <summary>
+	/// Creates the file system watcher to check for file changes in the project.
+	/// </summary>
+	/// <param name="sourcePath"></param>
 	private void CreateFileSystemWatcher( string sourcePath )
 	{
-		_watcher = new FileSystemWatcher( sourcePath, "*.cs" );
-		_watcher.NotifyFilter = NotifyFilters.Attributes
+		_watcher = new FileSystemWatcher( sourcePath, "*.cs" )
+		{
+			NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
 							 | NotifyFilters.DirectoryName
 							 | NotifyFilters.FileName
 							 | NotifyFilters.LastAccess
 							 | NotifyFilters.LastWrite
 							 | NotifyFilters.Security
-							 | NotifyFilters.Size;
+							 | NotifyFilters.Size
+		};
 
 		// Visual Studio will create a new temporary file, write to it,
 		// delete the cs file and then rename the temporary file to
@@ -174,22 +201,23 @@ public class ProjectAssembly<T>
 		_watcher.EnableRaisingEvents = true;
 	}
 
-	private TimeSince _timeSinceLastChange;
-
+	/// <summary>
+	/// Invoked when a file system change has occurred.
+	/// </summary>
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
 		// This will typically fire twice, so gate it with a TimeSince
-		if ( _timeSinceLastChange < 1f )
+		if ( _timeSinceLastFileChange < 1f )
 			return;
 
 		// This might be a directory - if it is then skip
 		if ( string.IsNullOrEmpty( Path.GetExtension( e.FullPath ) ) )
 			return;
 
-		_timeSinceLastChange = 0f;
+		_timeSinceLastFileChange = 0f;
 
 		if ( _buildTask.IsCompleted )
-			_buildTask = CompileIntoMemory();
+			_buildTask = Build();
 		else
 			_buildRequested = true;
 	}

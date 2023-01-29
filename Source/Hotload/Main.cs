@@ -7,10 +7,9 @@ namespace Mocha.Hotload;
 
 public static class Main
 {
-	private static ProjectAssembly<IGame> s_game;
-	private static ProjectAssembly<IGame> s_editor;
+	private static ProjectAssembly<IGame> s_game = null!;
+	private static ProjectAssembly<IGame> s_editor = null!;
 
-	private static bool s_hasInitialized;
 	private static ProjectManifest s_manifest;
 
 	[UnmanagedCallersOnly]
@@ -55,69 +54,45 @@ public static class Main
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 		s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
-		InitFileSystem();
-
-		if ( !s_hasInitialized )
-			Init();
-	}
-
-	private static void InitFileSystem()
-	{
 		FileSystem.Mounted = new FileSystem(
 			s_manifest.Resources.Content,
 			"content\\core"
 		);
-
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
-	}
 
-	private static void Init()
-	{
-		s_editor.Value?.Startup();
-		s_game.Value?.Startup();
-
-		s_hasInitialized = true;
+		s_editor.EntryPoint.Startup();
+		s_game.EntryPoint.Startup();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Update()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 
-		s_game.Value?.Update();
+		s_game.EntryPoint.Update();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
-		s_game.Value?.FrameUpdate();
+		s_game.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
-		s_editor.Value?.FrameUpdate();
+		s_editor.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void FireEvent( IntPtr ptrEventName )
 	{
 		var eventName = Marshal.PtrToStringUTF8( ptrEventName );
-
-		if ( eventName == null )
+		if ( eventName is null )
 			return;
 
 		Event.Run( eventName );
