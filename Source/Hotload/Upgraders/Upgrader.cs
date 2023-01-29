@@ -1,4 +1,5 @@
 ﻿using Mocha.Common;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -28,21 +29,14 @@ internal static class Upgrader
 		// but these are lazy loaded and we want to make sure all upgraders are set up
 		// ahead-of-time rather than setting them up on-demand.
 
-		// These actually have a specific hierarchy / order, so we don't use reflection here
-		// at the moment
-		s_upgraders = new List<IMemberUpgrader>()
-		{
-			new ArrayUpgrader(),
-			new PrimitiveUpgrader(),
-			new StringUpgrader(),
-			new CollectionUpgrader(),
+		var upgraderTypes = Assembly.GetExecutingAssembly().GetTypes()
+			.Where( t => t.GetInterface( nameof( IMemberUpgrader ) ) is not null )
+			.ToImmutableArray();
 
-			new ClassUpgrader(),
-
-			// We call this last because things like strings are ValueTypes, which
-			// means they are also structures, but we upgrade them differently.
-			new StructUpgrader()
-		};
+		var upgraders = new IMemberUpgrader[upgraderTypes.Length];
+		for ( var i = 0; i < upgraders.Length; i++ )
+			upgraders[i] = (IMemberUpgrader)Activator.CreateInstance( upgraderTypes[i] )!;
+		s_upgraders = upgraders.OrderByDescending( upgrader => upgrader.Priority ).ToList();
 	}
 
 	internal static void UpgradeInstance( object? oldInstance, object? newInstance )

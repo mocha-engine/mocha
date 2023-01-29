@@ -8,6 +8,9 @@ namespace Mocha.Hotload;
 internal class StringUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 40;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo ) => memberInfo switch
 	{
 		PropertyInfo propertyInfo => propertyInfo.PropertyType == typeof( string ),

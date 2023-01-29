@@ -9,6 +9,9 @@ namespace Mocha.Hotload;
 internal class StructUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 10;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
 		return memberInfo.IsTypeStruct();

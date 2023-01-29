@@ -10,6 +10,9 @@ namespace Mocha.Hotload;
 internal class CollectionUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 30;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
 		return memberInfo.IsTypeCollection();

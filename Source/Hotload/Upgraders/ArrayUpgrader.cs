@@ -8,6 +8,9 @@ namespace Mocha.Hotload;
 internal class ArrayUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 60;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo ) => memberInfo switch
 	{
 		PropertyInfo propertyInfo => propertyInfo.PropertyType.IsArray,

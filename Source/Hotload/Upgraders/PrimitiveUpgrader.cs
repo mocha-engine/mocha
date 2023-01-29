@@ -8,6 +8,9 @@ namespace Mocha.Hotload;
 internal class PrimitiveUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 50;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo ) => memberInfo switch
 	{
 		PropertyInfo propertyInfo => propertyInfo.PropertyType.IsPrimitive,

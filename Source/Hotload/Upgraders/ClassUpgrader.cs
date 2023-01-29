@@ -9,6 +9,9 @@ namespace Mocha.Hotload;
 internal class ClassUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
+	public int Priority => 20;
+
+	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
 		return memberInfo.IsTypeClass() || memberInfo.IsTypeInterface();
