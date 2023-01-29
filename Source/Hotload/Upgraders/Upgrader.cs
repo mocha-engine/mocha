@@ -4,6 +4,9 @@ using System.Runtime.CompilerServices;
 
 namespace Mocha.Hotload;
 
+/// <summary>
+/// The core class for upgrading members when swapping assemblies.
+/// </summary>
 internal static class Upgrader
 {
 	/// <summary>
@@ -12,7 +15,7 @@ internal static class Upgrader
 	/// </summary>
 	internal static Dictionary<int, object> UpgradedReferences { get; } = new();
 
-	private static List<IMemberUpgrader> s_upgraders { get; set; }
+	private static List<IMemberUpgrader> s_upgraders { get; set; } = null!;
 
 	/// <summary>
 	/// This must be called before invoking any other functions. Ideally, this should be
@@ -44,17 +47,9 @@ internal static class Upgrader
 
 	internal static void UpgradeInstance( object? oldInstance, object? newInstance )
 	{
-		if ( oldInstance == null )
-		{
-			// Bail
+		// Bail
+		if ( oldInstance is null || newInstance is null )
 			return;
-		}
-
-		if ( newInstance == null )
-		{
-			// Bail
-			return;
-		}
 
 		var oldType = oldInstance.GetType();
 		var newType = newInstance.GetType();
@@ -71,16 +66,16 @@ internal static class Upgrader
 			//
 			// Old member
 			//
-			if ( oldMember.GetCustomAttribute<CompilerGeneratedAttribute>() != null )
+			if ( oldMember.GetCustomAttribute<CompilerGeneratedAttribute>() is not null )
 				continue;
 
-			if ( oldMember.GetCustomAttribute<HotloadSkipAttribute>() != null )
+			if ( oldMember.GetCustomAttribute<HotloadSkipAttribute>() is not null )
 				continue;
 
 			var oldUpgradable = UpgradableMember.FromMember( oldMember );
 
 			// Can we upgrade this?
-			if ( oldUpgradable == null )
+			if ( oldUpgradable is null )
 				continue;
 
 			//
@@ -90,7 +85,7 @@ internal static class Upgrader
 								   .FirstOrDefault();
 
 			// Does this member exist? (eg. might have been deleted)
-			if ( newMember == null )
+			if ( newMember is null )
 				continue;
 
 			if ( newMember.GetCustomAttribute<HotloadSkipAttribute>() != null )
@@ -99,13 +94,13 @@ internal static class Upgrader
 			var newUpgradable = UpgradableMember.FromMember( newMember );
 
 			// Can we upgrade this?
-			if ( newUpgradable == null )
+			if ( newUpgradable is null )
 				continue;
 
 			//
 			// Upgrade!
 			//
-			bool wasUpgraded = false;
+			var wasUpgraded = false;
 
 			foreach ( var upgrader in s_upgraders )
 			{
@@ -119,9 +114,7 @@ internal static class Upgrader
 			}
 
 			if ( !wasUpgraded )
-			{
 				Log.Warning( $"Don't know how to upgrade {oldMember.MemberType.ToString().ToLower()} '{oldMember.Name}' in '{oldType.Name}'" );
-			}
 		}
 	}
 }

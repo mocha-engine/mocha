@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Mocha.Hotload;
 
+/// <summary>
+/// A member upgrader for structs.
+/// </summary>
 internal class StructUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
@@ -14,13 +17,12 @@ internal class StructUpgrader : IMemberUpgrader
 	/// <inheritdoc />
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
-		object? oldValue = oldMember.GetValue( oldInstance );
-
-		if ( oldValue == null )
+		var oldValue = oldMember.GetValue( oldInstance );
+		if ( oldValue is null )
 			return;
 
 		// Create a new instance of the struct WITHOUT calling the constructor
-		object newValue = FormatterServices.GetUninitializedObject( newMember.Type );
+		var newValue = FormatterServices.GetUninitializedObject( newMember.Type );
 
 		Upgrader.UpgradeInstance( oldValue!, newValue! );
 

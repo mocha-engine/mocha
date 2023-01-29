@@ -2,8 +2,21 @@
 
 namespace Mocha.Hotload;
 
+/// <summary>
+/// A wrapper class for property and field infos.
+/// </summary>
 internal class UpgradableMember
 {
+	/// <summary>
+	/// The name of the member.
+	/// </summary>
+	internal string Name { get; }
+
+	/// <summary>
+	/// The type that this member contains.
+	/// </summary>
+	internal Type Type { get; }
+
 	// In object: instance
 	// Out object: value
 	private readonly Func<object, object?> _getter;
@@ -11,10 +24,6 @@ internal class UpgradableMember
 	// In object: instance
 	// In object: value
 	private readonly Action<object, object> _setter;
-
-	internal Type Type { get; }
-
-	internal string Name { get; }
 
 	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type, string name )
 	{
@@ -87,10 +96,10 @@ internal class UpgradableMember
 		var getMethod = propertyInfo.GetGetMethod( true );
 		var setMethod = propertyInfo.GetSetMethod( true );
 
-		if ( getMethod == null )
+		if ( getMethod is null )
 			return null;
 
-		if ( setMethod == null )
+		if ( setMethod is null )
 			return null;
 
 		// Some get methods (array indexers) have parameters which we don't support
