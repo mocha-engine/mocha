@@ -11,6 +11,8 @@ public static class Main
 	private static ProjectAssembly<IGame> s_editor = null!;
 
 	private static ProjectManifest s_manifest;
+	private static FileSystemWatcher s_manifestWatcher = null!;
+	private static TimeSince s_timeSinceLastManifestChange;
 
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
@@ -31,15 +33,28 @@ public static class Main
 
 		// Get the current loaded project from native
 		var manifestPath = Glue.Engine.GetProjectPath();
-		s_manifest = ProjectManifest.Load( manifestPath );
+		var csprojPath = ReloadProjectManifest( manifestPath );
+		s_manifestWatcher = new FileSystemWatcher(
+			Path.GetDirectoryName( manifestPath )!,
+			Path.GetFileName( manifestPath )!)
+		{
+			NotifyFilter = NotifyFilters.Attributes
+							 | NotifyFilters.CreationTime
+							 | NotifyFilters.DirectoryName
+							 | NotifyFilters.FileName
+							 | NotifyFilters.LastAccess
+							 | NotifyFilters.LastWrite
+							 | NotifyFilters.Security
+							 | NotifyFilters.Size
+		};
 
-		// Generate project
-		var csproj = ProjectGenerator.GenerateProject( s_manifest );
+		s_manifestWatcher.Changed += OnProjectManifestChanged;
+		s_manifestWatcher.EnableRaisingEvents = true;
 
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = s_manifest.Name,
-			ProjectPath = csproj,
+			ProjectPath = csprojPath,
 			SourceRoot = s_manifest.Resources.Code,
 		};
 
@@ -95,5 +110,33 @@ public static class Main
 			return;
 
 		Event.Run( eventName );
+	}
+
+	/// <summary>
+	/// Invoked when the game project manifest has changed.
+	/// </summary>
+	private static async void OnProjectManifestChanged( object sender, FileSystemEventArgs e )
+	{
+		// This will typically fire twice, so gate it with a TimeSince
+		if ( s_timeSinceLastManifestChange <= 1 )
+			return;
+
+		s_timeSinceLastManifestChange = 0;
+		// Wait for the program editing the file to release it.
+		await Task.Delay( 10 );
+		ReloadProjectManifest( e.FullPath );
+	}
+
+	/// <summary>
+	/// Reloads the game project manifest.
+	/// </summary>
+	/// <param name="manifestPath">The absolute path to the manifest.</param>
+	/// <returns>The absolute path to the generated csproj file.</returns>
+	private static string ReloadProjectManifest( string manifestPath )
+	{
+		s_manifest = ProjectManifest.Load( manifestPath );
+
+		var csprojPath = ProjectGenerator.GenerateProject( s_manifest );
+		return csprojPath;
 	}
 }

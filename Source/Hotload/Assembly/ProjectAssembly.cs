@@ -25,6 +25,7 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	private FileSystemWatcher _codeWatcher = null!;
 	private AssemblyLoadContext _loadContext;
 
+	private TimeSince _timeSinceCsProjChange;
 	private TimeSince _timeSinceLastFileChange;
 	private Task _buildTask;
 	private bool _buildRequested;
@@ -224,6 +225,12 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	/// </summary>
 	private void OnCsProjChanged( object sender, FileSystemEventArgs e )
 	{
+		// This will typically fire twice, so gate it with a TimeSince
+		if ( _timeSinceCsProjChange < 1 )
+			return;
+
+		_timeSinceCsProjChange = 0;
+
 		if ( _buildTask.IsCompleted )
 			_buildTask = Build();
 		else
@@ -236,7 +243,7 @@ internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	private void OnFileChanged( object sender, FileSystemEventArgs e )
 	{
 		// This will typically fire twice, so gate it with a TimeSince
-		if ( _timeSinceLastFileChange < 1f )
+		if ( _timeSinceLastFileChange < 1 )
 			return;
 
 		// This might be a directory - if it is then skip

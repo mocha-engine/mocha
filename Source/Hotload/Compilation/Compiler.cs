@@ -107,7 +107,8 @@ internal static class Compiler
 		//
 		// Fetch the project and all source files
 		//
-		var project = new Project( assemblyInfo.ProjectPath );
+		var project = Project.FromFile( assemblyInfo.ProjectPath, new Microsoft.Build.Definition.ProjectOptions() );
+
 
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
