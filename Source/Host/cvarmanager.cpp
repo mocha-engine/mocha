@@ -106,19 +106,19 @@ void CVarSystem::Run( const char* command )
 	}
 }
 
-void CVarSystem::RegisterString( std::string name, std::string value, CVarFlags flags, std::string description )
+void CVarSystem::RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback )
 {
-	Register<std::string>( name, value, flags, description );
+	Register<std::string>( name, value, flags, description, callback );
 }
 
-void CVarSystem::RegisterFloat( std::string name, float value, CVarFlags flags, std::string description )
+void CVarSystem::RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback )
 {
-	Register<float>( name, value, flags, description );
+	Register<float>( name, value, flags, description, callback );
 }
 
-void CVarSystem::RegisterBool( std::string name, bool value, CVarFlags flags, std::string description )
+void CVarSystem::RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback )
 {
-	Register<bool>( name, value, flags, description );
+	Register<bool>( name, value, flags, description, callback );
 }
 
 std::string CVarSystem::GetString( std::string name )
@@ -247,3 +247,14 @@ void CVarManager::Shutdown()
 {
 	CVarSystem::Instance().Shutdown();
 }
+
+// ----------------------------------------
+// Test CVars
+// ----------------------------------------
+
+FloatCVar cvar_test_float( "cvartest.float", 0.0f, CVarFlags::None, "Yeah",
+	[]( float oldValue, float newValue )
+	{
+		spdlog::trace( "cvartest.float changed! old {}, new {}", oldValue, newValue );
+	}
+);

@@ -13,6 +13,9 @@
 // Core CVar functionality
 // ----------------------------------------
 
+template <typename T>
+using CVarCallback = std::function<void( T, T )>;
+
 enum CVarFlags
 {
 	None = 0,
@@ -24,7 +27,13 @@ enum CVarFlags
 	Cheat = 1 << 1,
 
 	// TODO
-	Temp = 1 << 2
+	Temp = 1 << 2,
+
+	// TODO: Networked variables server -> client
+	Replicated = 1 << 3,
+
+	// TODO: CVars created by the game, hotload these?
+	Game = 1 << 4
 };
 
 struct CVarEntry
@@ -35,6 +44,7 @@ struct CVarEntry
 	CVarFlags m_flags;
 
 	std::any m_value;
+	std::any m_callback;
 };
 
 class CVarManager : ISubSystem
@@ -51,7 +61,7 @@ private:
 	size_t GetHash( std::string string );
 
 	template <typename T>
-	void Register( std::string name, T value, CVarFlags flags, std::string description );
+	void Register( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
 
 	template <typename T>
 	T Get( std::string name );
@@ -79,9 +89,9 @@ public:
 
 	bool Exists( std::string name );
 
-	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description );
-	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description );
-	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description );
+	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
+	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
+	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
 
 	std::string GetString( std::string name );
 	float GetFloat( std::string name );
@@ -99,13 +109,14 @@ public:
 };
 
 template <typename T>
-inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description )
+inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
 {
 	CVarEntry entry = {};
 	entry.m_name = name;
 	entry.m_description = description;
 	entry.m_flags = flags;
 	entry.m_value = value;
+	entry.m_callback = callback;
 
 	size_t hash = GetHash( name );
 	m_cvarEntries[hash] = entry;
@@ -130,7 +141,16 @@ inline void CVarSystem::Set( std::string name, T value )
 	size_t hash = GetHash( name );
 	CVarEntry& entry = m_cvarEntries[hash];
 
+	T lastValue = std::any_cast<T>( entry.m_value );
+
 	entry.m_value = value;
+
+	auto callback = std::any_cast<CVarCallback<T>>( entry.m_callback );
+
+	if ( callback )
+	{
+		callback( lastValue, value );
+	}
 
 	spdlog::info( "{} was set to '{}'.", entry.m_name, value );
 }
@@ -151,11 +171,17 @@ public:
 class StringCVar : CVarParameter
 {
 public:
-	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description )
+	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterString( name, value, flags, description );
+		CVarSystem::Instance().RegisterString( name, value, flags, description, callback );
+	}
+
+	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description )
+	    : StringCVar( name, value, flags, description, nullptr )
+	{
+	
 	}
 
 	std::string GetValue() { return CVarSystem::Instance().GetString( m_name ); }
@@ -167,11 +193,17 @@ public:
 class FloatCVar : CVarParameter
 {
 public:
-	FloatCVar( std::string name, float value, CVarFlags flags, std::string description )
+	FloatCVar( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterFloat( name, value, flags, description );
+		CVarSystem::Instance().RegisterFloat( name, value, flags, description, callback );
+	}
+
+	FloatCVar( std::string name, float value, CVarFlags flags, std::string description )
+	    : FloatCVar( name, value, flags, description, nullptr )
+	{
+
 	}
 
 	float GetValue() { return CVarSystem::Instance().GetFloat( m_name ); }
@@ -183,11 +215,17 @@ public:
 class BoolCVar : CVarParameter
 {
 public:
-	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
+	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterBool( name, value, flags, description );
+		CVarSystem::Instance().RegisterBool( name, value, flags, description, callback );
+	}
+
+	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
+	    : BoolCVar( name, value, flags, description, nullptr )
+	{
+
 	}
 
 	bool GetValue() { return CVarSystem::Instance().GetBool( m_name ); }
