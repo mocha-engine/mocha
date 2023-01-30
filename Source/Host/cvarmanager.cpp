@@ -77,40 +77,28 @@ void CVarSystem::Run( const char* command )
 
 	std::stringstream valueStream( cvarValue );
 
-	if ( cvarName == "list" )
-	{
-// This fails on libclang so we'll ignore it for now...
-#ifndef __clang__
-		// List all available cvars
-		ForEach( [&]( CVarEntry& entry ) {
-			spdlog::info( "- '{}': '{}'", entry.m_name, ToString( entry.m_name ) );
-			spdlog::info( "\t{}", entry.m_description );
-		} );
-#endif
-	}
-	else if ( !Exists( cvarName ) )
+	if ( !Exists( cvarName ) )
 	{
 		spdlog::info( "{} is not a valid command or variable", cvarName );
+		return;
+	}
+
+	CVarEntry& entry = GetEntry( cvarName );
+
+	if ( entry.m_flags & CVarFlags::Command )
+	{
+		InvokeCommand( entry, {} );
 	}
 	else
 	{
-		CVarEntry& entry = GetEntry( cvarName );
-
-		if ( entry.m_flags & CVarFlags::Command )
+		if ( valueStream.str().size() > 0 )
 		{
-			InvokeCommand( entry, {} );
+			FromString( entry, cvarValue );
 		}
 		else
 		{
-			if ( valueStream.str().size() > 0 )
-			{
-				FromString( entry, cvarValue );
-			}
-			else
-			{
-				cvarValue = ToString( entry );
-				spdlog::info( "{} is '{}'", cvarName, cvarValue );
-			}
+			cvarValue = ToString( entry );
+			spdlog::info( "{} is '{}'", cvarName, cvarValue );
 		}
 	}
 }
@@ -340,18 +328,39 @@ void CVarManager::Shutdown()
 }
 
 // ----------------------------------------
+// Built-in CVars
+// ----------------------------------------
+
+static CCmd ccmd_list( "list", CVarFlags::None, "List all commands and variables",
+	[]( std::vector<std::string> arguments )
+	{
+		auto instance = CVarSystem::Instance();
+
+// This fails on libclang so we'll ignore it for now...
+#ifndef __clang__
+		// List all available cvars
+		instance.ForEach( [&]( CVarEntry& entry ) {
+			spdlog::info( "- '{}': '{}'", entry.m_name, instance.ToString( entry ) );
+			spdlog::info( "\t{}", entry.m_description );
+		} );
+#endif
+	}
+);
+
+// ----------------------------------------
 // Test CVars
 // ----------------------------------------
 
-FloatCVar cvartest_float( "cvartest.float", 0.0f, CVarFlags::None, "Yeah",
+static FloatCVar cvartest_float( "cvartest.float", 0.0f, CVarFlags::None, "Yeah",
 	[]( float oldValue, float newValue )
 	{
 		spdlog::trace( "cvartest.float changed! old {}, new {}", oldValue, newValue );
 	}
 );
 
-CCmd cvartest_command( "cvartest.command", CVarFlags::None, "A test command",
-	[]( std::vector<std::string> arguments ) {
+static CCmd cvartest_command( "cvartest.command", CVarFlags::None, "A test command",
+	[]( std::vector<std::string> arguments )
+	{
 		spdlog::trace( "cvartest.command has been invoked! Hooray" );
 	}
 );
