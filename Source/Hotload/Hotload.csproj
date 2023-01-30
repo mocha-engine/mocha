@@ -50,20 +50,4 @@
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Compile Update="Generators\GeneratedProject.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>GeneratedProject.tt</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Generators\GeneratedProject.tt">
-	    <Generator>TextTemplatingFilePreprocessor</Generator>
-	    <LastGenOutput>GeneratedProject.cs</LastGenOutput>
-	    <CustomToolNamespace>Mocha.Hotload</CustomToolNamespace>
-	  </None>
-	</ItemGroup>
-
 </Project>
