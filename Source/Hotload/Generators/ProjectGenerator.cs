@@ -121,6 +121,14 @@ internal static class ProjectGenerator
 			}
 		}
 
+		// Literal DLL references.
+		if ( project.References is not null )
+		{
+			var references = rootElement.CreateElement( "ItemGroup" );
+			foreach ( var reference in project.References )
+				references.CreateElementWithAttributes( "Reference", "Include", baseReferenceDir + reference );
+		}
+
 		// Write csproj to disk.
 		var stream = File.OpenWrite( destinationPath );
 		var writer = new XmlTextWriter( stream, Encoding.UTF8 )

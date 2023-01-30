@@ -70,6 +70,9 @@ internal struct ProjectInfo
 	[JsonPropertyName( "projectReferences" )]
 	public ProjectReference[]? ProjectReferences { get; set; }
 
+	[JsonPropertyName( "references" )]
+	public string[]? References { get; set; }
+
 	[JsonPropertyName( "rawEntry" )]
 	public string? RawEntry { get; set; }
 }
