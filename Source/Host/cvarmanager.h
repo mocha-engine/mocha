@@ -1,5 +1,6 @@
 #pragma once
 #include <any>
+#include <cstdint>
 #include <fstream>
 #include <globalvars.h>
 #include <memory>
@@ -16,24 +17,29 @@
 template <typename T>
 using CVarCallback = std::function<void( T, T )>;
 
-enum CVarFlags
+using CCmdCallback = std::function<void( std::vector<std::string> )>;
+
+enum CVarFlags : uint32_t
 {
 	None = 0,
 
+	// If this isn't present, it's inherently assumed to be a variable
+	Command = 1 << 0,
+
 	// Save this convar to cvars.json
-	Archive = 1 << 0,
+	Archive = 1 << 1,
 
 	// TODO
-	Cheat = 1 << 1,
+	Cheat = 1 << 2,
 
 	// TODO
-	Temp = 1 << 2,
+	Temp = 1 << 3,
 
 	// TODO: Networked variables server -> client
-	Replicated = 1 << 3,
+	Replicated = 1 << 4,
 
 	// TODO: CVars created by the game, hotload these?
-	Game = 1 << 4
+	Game = 1 << 5
 };
 
 struct CVarEntry
@@ -41,7 +47,7 @@ struct CVarEntry
 	std::string m_name;
 	std::string m_description;
 
-	CVarFlags m_flags;
+	uint32_t m_flags;
 
 	std::any m_value;
 	std::any m_callback;
@@ -61,16 +67,17 @@ private:
 	size_t GetHash( std::string string );
 
 	template <typename T>
-	void Register( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
+	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
 
 	template <typename T>
-	T Get( std::string name );
+	T GetVariable( std::string name );
 
 	template <typename T>
-	void Set( std::string name, T value );
+	void SetVariable( std::string name, T value );
+
+	CVarEntry& GetEntry( std::string name );
 
 public:
-	friend class StringCVar;
 
 	//
 	// CVarSystem is a singleton because it needs creating *as soon as* it's referenced
@@ -87,11 +94,20 @@ public:
 
 	void Run( const char* command );
 
+	/// <summary>
+	/// Check if a specific convar exists
+	/// </summary>
+	/// <param name="name"></param>
+	/// <returns></returns>
 	bool Exists( std::string name );
+
+	void RegisterCommand( std::string name, CVarFlags flags, std::string description, CCmdCallback callback );
 
 	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
 	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
 	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
+
+	void InvokeCommand( std::string name, std::vector<std::string> arguments );
 
 	std::string GetString( std::string name );
 	float GetFloat( std::string name );
@@ -104,12 +120,15 @@ public:
 	void ForEach( std::function<void( CVarEntry& entry )> func );
 	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );
 
+	inline static float AsFloat( std::string& argument ) { return std::strtof( argument.c_str(), nullptr ); }
+	inline static bool AsBool( std::string& argument ) { return argument == "true"; }
+
 	void FromString( std::string name, std::string valueStr );
 	std::string ToString( std::string name );
 };
 
 template <typename T>
-inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
+inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
 {
 	CVarEntry entry = {};
 	entry.m_name = name;
@@ -123,23 +142,21 @@ inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, st
 }
 
 template <typename T>
-inline T CVarSystem::Get( std::string name )
+inline T CVarSystem::GetVariable( std::string name )
 {
-	assert( Exists( name ) ); // Doesn't exist! Register it first
+	CVarEntry& entry = GetEntry( name );
 
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
+	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
 
 	return std::any_cast<T>( entry.m_value );
 }
 
 template <typename T>
-inline void CVarSystem::Set( std::string name, T value )
+inline void CVarSystem::SetVariable( std::string name, T value )
 {
-	assert( Exists( name ) ); // Doesn't exist! Register it first
+	CVarEntry& entry = GetEntry( name );
 
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
+	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
 
 	T lastValue = std::any_cast<T>( entry.m_value );
 
@@ -232,4 +249,27 @@ public:
 	void SetValue( bool value ) { CVarSystem::Instance().SetBool( m_name, value ); }
 
 	operator bool() { return GetValue(); };
+};
+
+class CCmd : CVarParameter
+{
+public:
+	CCmd( std::string name, CVarFlags flags, std::string description, CCmdCallback callback )
+	{
+		m_name = name;
+
+		CVarSystem::Instance().RegisterCommand( name, flags, description, callback );
+	}
+
+	//
+	// You can invoke like this, but honestly, just define a separate function.
+	// This is not going to be as clean as C#.
+	//
+
+	void Invoke( std::vector<std::string> arguments )
+	{
+		CVarSystem::Instance().InvokeCommand( m_name, arguments );
+	}
+
+	void operator()( std::vector<std::string> arguments ) { Invoke( arguments ); }
 };
