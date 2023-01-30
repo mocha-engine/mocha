@@ -3,33 +3,36 @@ using System.Runtime.Serialization;
 
 namespace Mocha.Hotload;
 
-public class ClassUpgrader : IMemberUpgrader
+/// <summary>
+/// A member upgrader for any classes and interfaces.
+/// </summary>
+internal sealed class ClassUpgrader : IMemberUpgrader
 {
+	/// <inheritdoc />
+	public int Priority => 20;
+
 	/// <inheritdoc />
 	public bool CanUpgrade( MemberInfo memberInfo )
 	{
-		return memberInfo.IsClass() || memberInfo.IsInterface();
+		return memberInfo.IsTypeClass() || memberInfo.IsTypeInterface();
 	}
 
 	/// <inheritdoc />
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
-		object? oldValue = oldMember.GetValue( oldInstance );
-
-		if ( oldValue == null )
+		var oldValue = oldMember.GetValue( oldInstance );
+		if ( oldValue is null )
 			return;
 
-		Type type = newMember.Type;
+		var type = newMember.Type;
 
 		// Check for a derived type if any
 		{
 			var oldDerivedType = oldValue.GetType();
 			var derivedType = newInstance.GetType().Assembly.GetTypes().FirstOrDefault( x => x.FullName == oldDerivedType.FullName );
 
-			if ( derivedType != null && type != derivedType )
-			{
+			if ( derivedType is not null && type != derivedType )
 				type = derivedType;
-			}
 		}
 
 		// Have we already upgraded this? If so, use a reference so that we're not 
@@ -41,7 +44,7 @@ public class ClassUpgrader : IMemberUpgrader
 		}
 
 		// Create a new instance of the class WITHOUT calling the constructor
-		object newValue = FormatterServices.GetUninitializedObject( type );
+		var newValue = FormatterServices.GetUninitializedObject( type );
 
 		// Save the reference for later
 		Upgrader.UpgradedReferences[oldValue.GetHashCode()] = newValue;

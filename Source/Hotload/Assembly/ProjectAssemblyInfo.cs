@@ -1,8 +1,22 @@
 ﻿namespace Mocha.Hotload;
 
-public struct ProjectAssemblyInfo
+/// <summary>
+/// Represents the required information for a project assembly.
+/// </summary>
+internal readonly struct ProjectAssemblyInfo
 {
-	public string AssemblyName;
-	public string SourceRoot;
-	public string ProjectPath;
+	/// <summary>
+	/// The name of the projects assembly.
+	/// </summary>
+	internal string AssemblyName { get; init; }
+
+	/// <summary>
+	/// The relative path to the project.
+	/// </summary>
+	internal string SourceRoot { get; init; }
+
+	/// <summary>
+	/// The relative path to the projects csproj file.
+	/// </summary>
+	internal string ProjectPath { get; init; }
 }

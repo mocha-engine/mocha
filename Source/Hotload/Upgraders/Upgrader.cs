@@ -1,60 +1,49 @@
 ﻿using Mocha.Common;
+using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
 namespace Mocha.Hotload;
 
-public static class Upgrader
+/// <summary>
+/// The core class for upgrading members when swapping assemblies.
+/// </summary>
+internal static class Upgrader
 {
 	/// <summary>
 	/// Dictionary of old hash codes and upgraded objects used
 	/// for reference types
 	/// </summary>
-	public static Dictionary<int, object> UpgradedReferences { get; } = new();
+	internal static Dictionary<int, object> UpgradedReferences { get; } = new();
 
-	private static List<IMemberUpgrader> s_upgraders { get; set; }
+	private static List<IMemberUpgrader> s_upgraders { get; set; } = null!;
 
 	/// <summary>
 	/// This must be called before invoking any other functions. Ideally, this should be
 	/// invoked at the very start of the program.
 	/// </summary>
-	public static void Init()
+	internal static void Init()
 	{
 		// We could alternatively use static constructors
 		// (https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/static-constructors)
 		// but these are lazy loaded and we want to make sure all upgraders are set up
 		// ahead-of-time rather than setting them up on-demand.
 
-		// These actually have a specific hierarchy / order, so we don't use reflection here
-		// at the moment
-		s_upgraders = new List<IMemberUpgrader>()
-		{
-			new ArrayUpgrader(),
-			new PrimitiveUpgrader(),
-			new StringUpgrader(),
-			new CollectionUpgrader(),
+		var upgraderTypes = Assembly.GetExecutingAssembly().GetTypes()
+			.Where( t => t.GetInterface( nameof( IMemberUpgrader ) ) is not null )
+			.ToImmutableArray();
 
-			new ClassUpgrader(),
-
-			// We call this last because things like strings are ValueTypes, which
-			// means they are also structures, but we upgrade them differently.
-			new StructUpgrader()
-		};
+		var upgraders = new IMemberUpgrader[upgraderTypes.Length];
+		for ( var i = 0; i < upgraders.Length; i++ )
+			upgraders[i] = (IMemberUpgrader)Activator.CreateInstance( upgraderTypes[i] )!;
+		s_upgraders = upgraders.OrderByDescending( upgrader => upgrader.Priority ).ToList();
 	}
 
-	public static void UpgradeInstance( object? oldInstance, object? newInstance )
+	internal static void UpgradeInstance( object? oldInstance, object? newInstance )
 	{
-		if ( oldInstance == null )
-		{
-			// Bail
+		// Bail
+		if ( oldInstance is null || newInstance is null )
 			return;
-		}
-
-		if ( newInstance == null )
-		{
-			// Bail
-			return;
-		}
 
 		var oldType = oldInstance.GetType();
 		var newType = newInstance.GetType();
@@ -71,16 +60,16 @@ public static class Upgrader
 			//
 			// Old member
 			//
-			if ( oldMember.GetCustomAttribute<CompilerGeneratedAttribute>() != null )
+			if ( oldMember.GetCustomAttribute<CompilerGeneratedAttribute>() is not null )
 				continue;
 
-			if ( oldMember.GetCustomAttribute<HotloadSkipAttribute>() != null )
+			if ( oldMember.GetCustomAttribute<HotloadSkipAttribute>() is not null )
 				continue;
 
 			var oldUpgradable = UpgradableMember.FromMember( oldMember );
 
 			// Can we upgrade this?
-			if ( oldUpgradable == null )
+			if ( oldUpgradable is null )
 				continue;
 
 			//
@@ -90,7 +79,7 @@ public static class Upgrader
 								   .FirstOrDefault();
 
 			// Does this member exist? (eg. might have been deleted)
-			if ( newMember == null )
+			if ( newMember is null )
 				continue;
 
 			if ( newMember.GetCustomAttribute<HotloadSkipAttribute>() != null )
@@ -99,13 +88,13 @@ public static class Upgrader
 			var newUpgradable = UpgradableMember.FromMember( newMember );
 
 			// Can we upgrade this?
-			if ( newUpgradable == null )
+			if ( newUpgradable is null )
 				continue;
 
 			//
 			// Upgrade!
 			//
-			bool wasUpgraded = false;
+			var wasUpgraded = false;
 
 			foreach ( var upgrader in s_upgraders )
 			{
@@ -119,9 +108,7 @@ public static class Upgrader
 			}
 
 			if ( !wasUpgraded )
-			{
 				Log.Warning( $"Don't know how to upgrade {oldMember.MemberType.ToString().ToLower()} '{oldMember.Name}' in '{oldType.Name}'" );
-			}
 		}
 	}
 }

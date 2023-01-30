@@ -34,6 +34,7 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="7.0.0" />
+		<PackageReference Include="NuGet.Protocol" Version="6.4.0" />
 		<PackageReference Include="System.CodeDom" Version="7.0.0" />
 	</ItemGroup>
 
@@ -47,22 +48,6 @@
 
 	<ItemGroup>
 	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Compile Update="Generators\GeneratedProject.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>GeneratedProject.tt</DependentUpon>
-	  </Compile>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Update="Generators\GeneratedProject.tt">
-	    <Generator>TextTemplatingFilePreprocessor</Generator>
-	    <LastGenOutput>GeneratedProject.cs</LastGenOutput>
-	    <CustomToolNamespace>Mocha.Hotload</CustomToolNamespace>
-	  </None>
 	</ItemGroup>
 
 </Project>

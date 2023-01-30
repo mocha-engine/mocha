@@ -7,11 +7,12 @@ namespace Mocha.Hotload;
 
 public static class Main
 {
-	private static ProjectAssembly<IGame> s_game;
-	private static ProjectAssembly<IGame> s_editor;
+	private static ProjectAssembly<IGame> s_game = null!;
+	private static ProjectAssembly<IGame> s_editor = null!;
 
-	private static bool s_hasInitialized;
 	private static ProjectManifest s_manifest;
+	private static FileSystemWatcher s_manifestWatcher = null!;
+	private static TimeSince s_timeSinceLastManifestChange;
 
 	[UnmanagedCallersOnly]
 	public static void Run( IntPtr args )
@@ -32,16 +33,31 @@ public static class Main
 
 		// Get the current loaded project from native
 		var manifestPath = Glue.Engine.GetProjectPath();
-		s_manifest = ProjectManifest.Load( manifestPath );
+		var csprojPath = ReloadProjectManifest( manifestPath );
 
-		// Generate project
-		var projectGenerator = new ProjectGenerator();
-		var csproj = projectGenerator.GenerateProject( s_manifest );
+		// Setup a watcher for the project manifest.
+		s_manifestWatcher = new FileSystemWatcher(
+			Path.GetDirectoryName( manifestPath )!,
+			Path.GetFileName( manifestPath )! )
+		{
+			NotifyFilter = NotifyFilters.Attributes
+							 | NotifyFilters.CreationTime
+							 | NotifyFilters.DirectoryName
+							 | NotifyFilters.FileName
+							 | NotifyFilters.LastAccess
+							 | NotifyFilters.LastWrite
+							 | NotifyFilters.Security
+							 | NotifyFilters.Size
+		};
 
+		s_manifestWatcher.Changed += OnProjectManifestChanged;
+		s_manifestWatcher.EnableRaisingEvents = true;
+
+		// Setup project assemblies.
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = s_manifest.Name,
-			ProjectPath = csproj,
+			ProjectPath = csprojPath,
 			SourceRoot = s_manifest.Resources.Code,
 		};
 
@@ -55,71 +71,77 @@ public static class Main
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 		s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
-		InitFileSystem();
-
-		if ( !s_hasInitialized )
-			Init();
-	}
-
-	private static void InitFileSystem()
-	{
+		// Setup file system.
 		FileSystem.Mounted = new FileSystem(
 			s_manifest.Resources.Content,
 			"content\\core"
 		);
-
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
-	}
 
-	private static void Init()
-	{
-		s_editor.Value?.Startup();
-		s_game.Value?.Startup();
-
-		s_hasInitialized = true;
+		// Start.
+		s_editor.EntryPoint.Startup();
+		s_game.EntryPoint.Startup();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Update()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 
-		s_game.Value?.Update();
+		s_game.EntryPoint.Update();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
 		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
-		s_game.Value?.FrameUpdate();
+		s_game.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		if ( s_game == null )
-			throw new Exception( "Invoke Run() first" );
-
-		s_editor.Value?.FrameUpdate();
+		s_editor.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void FireEvent( IntPtr ptrEventName )
 	{
 		var eventName = Marshal.PtrToStringUTF8( ptrEventName );
-
-		if ( eventName == null )
+		if ( eventName is null )
 			return;
 
 		Event.Run( eventName );
+	}
+
+	/// <summary>
+	/// Invoked when the game project manifest has changed.
+	/// </summary>
+	private static async void OnProjectManifestChanged( object sender, FileSystemEventArgs e )
+	{
+		// This will typically fire twice, so gate it with a TimeSince
+		if ( s_timeSinceLastManifestChange <= 1 )
+			return;
+
+		s_timeSinceLastManifestChange = 0;
+		// Wait for the program editing the file to release it.
+		await Task.Delay( 10 );
+		ReloadProjectManifest( e.FullPath );
+	}
+
+	/// <summary>
+	/// Reloads the game project manifest.
+	/// </summary>
+	/// <param name="manifestPath">The absolute path to the manifest.</param>
+	/// <returns>The absolute path to the generated csproj file.</returns>
+	private static string ReloadProjectManifest( string manifestPath )
+	{
+		s_manifest = ProjectManifest.Load( manifestPath );
+
+		var csprojPath = ProjectGenerator.Generate( s_manifest );
+		return csprojPath;
 	}
 }

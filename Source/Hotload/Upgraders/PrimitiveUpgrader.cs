@@ -2,29 +2,27 @@
 
 namespace Mocha.Hotload;
 
-public class PrimitiveUpgrader : IMemberUpgrader
+/// <summary>
+/// A member upgrader for primitives.
+/// </summary>
+internal sealed class PrimitiveUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
-	public bool CanUpgrade( MemberInfo memberInfo )
-	{
-		if ( memberInfo is PropertyInfo propertyInfo )
-		{
-			return propertyInfo.PropertyType.IsPrimitive;
-		}
-		else if ( memberInfo is FieldInfo fieldInfo )
-		{
-			return fieldInfo.FieldType.IsPrimitive;
-		}
+	public int Priority => 50;
 
-		return false;
-	}
+	/// <inheritdoc />
+	public bool CanUpgrade( MemberInfo memberInfo ) => memberInfo switch
+	{
+		PropertyInfo propertyInfo => propertyInfo.PropertyType.IsPrimitive,
+		FieldInfo fieldInfo => fieldInfo.FieldType.IsPrimitive,
+		_ => false
+	};
 
 	/// <inheritdoc />
 	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
 	{
-		object? oldValue = oldMember.GetValue( oldInstance );
-
-		if ( oldValue == null )
+		var oldValue = oldMember.GetValue( oldInstance );
+		if ( oldValue is null )
 			return;
 
 		newMember.SetValue( newInstance, oldValue );

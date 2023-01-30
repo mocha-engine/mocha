@@ -2,8 +2,16 @@
 
 namespace Mocha.Hotload;
 
-public interface IMemberUpgrader
+/// <summary>
+/// A contract defining an object that can upgrade members from two different assemblies.
+/// </summary>
+internal interface IMemberUpgrader
 {
+	/// <summary>
+	/// The priority level at which to place the upgrader. Higher means more priority.
+	/// </summary>
+	int Priority { get; }
+
 	/// <summary>
 	/// Does this upgrader support upgrading for this member?
 	/// </summary>

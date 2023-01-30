@@ -4,17 +4,27 @@ namespace Mocha.Hotload;
 
 partial struct ProjectManifest
 {
+	/// <summary>
+	/// Converts a relative path in the project manifest to an absolute path.
+	/// </summary>
+	/// <param name="path">The relative path.</param>
+	/// <param name="baseDir">The path to the directory that contained the manifest.</param>
+	/// <returns>The constructed absolute path.</returns>
 	private static string GetAbsolutePath( string path, string baseDir )
 	{
 		return Path.GetFullPath( Path.Combine( baseDir, path ) );
 	}
 
-	public static ProjectManifest Load( string path )
+	/// <summary>
+	/// Loads a project manifest.
+	/// </summary>
+	/// <param name="path">The absolute path to the manifest file.</param>
+	/// <returns>The constructed project manfifest.</returns>
+	/// <exception cref="FileNotFoundException">Thrown when no file exists at the given path.</exception>
+	internal static ProjectManifest Load( string path )
 	{
 		if ( !File.Exists( path ) )
-		{
-			throw new Exception( $"Failed to load project at path '{path}'" );
-		}
+			throw new FileNotFoundException( $"Failed to load project at path '{path}'" );
 
 		var fileContents = File.ReadAllText( path );
 		var projectManifest = JsonSerializer.Deserialize<ProjectManifest>( fileContents );

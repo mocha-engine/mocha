@@ -2,8 +2,21 @@
 
 namespace Mocha.Hotload;
 
-public class UpgradableMember
+/// <summary>
+/// A wrapper class for property and field infos.
+/// </summary>
+internal sealed class UpgradableMember
 {
+	/// <summary>
+	/// The name of the member.
+	/// </summary>
+	internal string Name { get; }
+
+	/// <summary>
+	/// The type that this member contains.
+	/// </summary>
+	internal Type Type { get; }
+
 	// In object: instance
 	// Out object: value
 	private readonly Func<object, object?> _getter;
@@ -11,10 +24,6 @@ public class UpgradableMember
 	// In object: instance
 	// In object: value
 	private readonly Action<object, object> _setter;
-
-	public Type Type { get; }
-
-	public string Name { get; }
 
 	private UpgradableMember( Func<object, object> getter, Action<object, object> setter, Type type, string name )
 	{
@@ -29,7 +38,7 @@ public class UpgradableMember
 	/// Set the value that this member represents.
 	/// This will bail if <see cref="Type"/> is not assignable from <paramref name="value"/>.
 	/// </summary>
-	public void SetValue( object instance, object value )
+	internal void SetValue( object instance, object value )
 	{
 		if ( !Type.IsAssignableFrom( value.GetType() ) )
 		{
@@ -43,7 +52,7 @@ public class UpgradableMember
 	/// <summary>
 	/// Get the value that this member represents.
 	/// </summary>
-	public object? GetValue( object instance )
+	internal object? GetValue( object instance )
 	{
 		return _getter?.Invoke( instance );
 	}
@@ -56,7 +65,7 @@ public class UpgradableMember
 	/// <see cref="FromField(FieldInfo)"/> depending on the member type.
 	/// Null is returned if this cannot be made into an UpgradableMember.
 	/// </summary>
-	public static UpgradableMember? FromMember( MemberInfo memberInfo )
+	internal static UpgradableMember? FromMember( MemberInfo memberInfo )
 	{
 		if ( memberInfo is PropertyInfo propertyInfo )
 		{
@@ -74,7 +83,7 @@ public class UpgradableMember
 	/// <summary>
 	/// Create an <see cref="UpgradableMember"/> given a field
 	/// </summary>
-	public static UpgradableMember FromField( FieldInfo fieldInfo )
+	internal static UpgradableMember FromField( FieldInfo fieldInfo )
 	{
 		return new( fieldInfo.GetValue, fieldInfo.SetValue, fieldInfo.FieldType, fieldInfo.Name );
 	}
@@ -82,15 +91,15 @@ public class UpgradableMember
 	/// <summary>
 	/// Create an <see cref="UpgradableMember"/> given a property
 	/// </summary>
-	public static UpgradableMember? FromProperty( PropertyInfo propertyInfo )
+	internal static UpgradableMember? FromProperty( PropertyInfo propertyInfo )
 	{
 		var getMethod = propertyInfo.GetGetMethod( true );
 		var setMethod = propertyInfo.GetSetMethod( true );
 
-		if ( getMethod == null )
+		if ( getMethod is null )
 			return null;
 
-		if ( setMethod == null )
+		if ( setMethod is null )
 			return null;
 
 		// Some get methods (array indexers) have parameters which we don't support
