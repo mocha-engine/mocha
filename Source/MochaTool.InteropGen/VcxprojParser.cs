@@ -62,11 +62,11 @@ internal static class VcxprojParser
 		var environmentVariables = new Dictionary<string, string>()
 		{
 			{ "VULKAN_SDK", Environment.GetEnvironmentVariable( "VULKAN_SDK" ) ?? @"C:\VulkanSDK\1.3.224.1\Include" },
-			{ "ProjectDir", "..\\Host\\" },
+			{ "ProjectDir", "..\\Mocha.Host\\" },
 			{ "SolutionDir", "..\\" },
 			{ "Platform", "x64" },
 			{ "VcpkgRoot", Environment.GetEnvironmentVariable( "VCPKG_ROOT" ) ?? $@"C:\Users\{Environment.UserName}\vcpkg" },
-			{ "IncludePath", "..\\Host\\" },
+			{ "IncludePath", "..\\Mocha.Host\\" },
 			{ "ExternalIncludePath", "" }
 		};
 

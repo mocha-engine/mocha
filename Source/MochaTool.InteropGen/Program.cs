@@ -15,14 +15,14 @@ public static class Program
 
 		var managedGenerator = new ManagedCodeGenerator( units );
 		var managedCode = managedGenerator.GenerateManagedCode();
-		File.WriteAllText( $"{baseDir}/Common/Glue/{fileName}.generated.cs", managedCode );
+		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/{fileName}.generated.cs", managedCode );
 
 		var nativeGenerator = new NativeCodeGenerator( units );
-		var relativePath = Path.GetRelativePath( $"{baseDir}/Host/", path );
+		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
 		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
 
-		Console.WriteLine( $"{baseDir}/Host/generated/{fileName}.generated.h" );
-		File.WriteAllText( $"{baseDir}/Host/generated/{fileName}.generated.h", nativeCode );
+		Console.WriteLine( $"{baseDir}/Mocha.Host/generated/{fileName}.generated.h" );
+		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/{fileName}.generated.h", nativeCode );
 
 		s_files.Add( fileName );
 		s_units.AddRange( units );
@@ -93,7 +93,7 @@ public static class Program
 		managedStructWriter.WriteLine( $"}}" );
 		managedStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}/Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
+		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
 	}
 
 	private static void WriteNativeStruct( string baseDir, ref List<(string Name, Method method)> methods )
@@ -131,7 +131,7 @@ public static class Program
 		nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		nativeStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}/Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
 	}
 
 	private static void WriteNativeIncludes( string baseDir )
@@ -151,13 +151,13 @@ public static class Program
 		nativeListWriter.WriteLine();
 		nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
 
-		File.WriteAllText( $"{baseDir}/Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
+		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
 	}
 
 	private static void DeleteExistingFiles( string baseDir )
 	{
-		var destCsDir = $"{baseDir}\\Common\\Glue\\";
-		var destHeaderDir = $"{baseDir}\\Host\\generated\\";
+		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue\\";
+		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated\\";
 
 		if ( Directory.Exists( destHeaderDir ) )
 			Directory.Delete( destHeaderDir, true );

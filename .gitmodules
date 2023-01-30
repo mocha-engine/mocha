@@ -1,17 +1,17 @@
 [submodule "Source/Host/thirdparty/imgui"]
-	path = Source/Host/thirdparty/imgui
+	path = Source/Mocha.Host/thirdparty/imgui
 	url = https://github.com/ocornut/imgui/
 [submodule "Source/Host/thirdparty/JoltPhysics"]
-	path = Source/Host/thirdparty/JoltPhysics
+	path = Source/Mocha.Host/thirdparty/JoltPhysics
 	url = https://github.com/jrouwe/JoltPhysics/
 [submodule "Source/Host/thirdparty/vk-bootstrap"]
-	path = Source/Host/thirdparty/vk-bootstrap
+	path = Source/Mocha.Host/thirdparty/vk-bootstrap
 	url = https://github.com/charles-lunarg/vk-bootstrap
 [submodule "Source/Host/thirdparty/implot"]
-	path = Source/Host/thirdparty/implot
+	path = Source/Mocha.Host/thirdparty/implot
 	url = https://github.com/epezent/implot
 [submodule "Source/Host/thirdparty/volk"]
-	path = Source/Host/thirdparty/volk
+	path = Source/Mocha.Host/thirdparty/volk
 	url = https://github.com/zeux/volk
 [submodule "Source/VConsoleLib"]
 	path = Source/VConsoleLib

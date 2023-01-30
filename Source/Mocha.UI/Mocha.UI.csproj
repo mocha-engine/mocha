@@ -14,7 +14,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Common\Common.csproj" />
+		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
 	</ItemGroup>
 
 </Project>

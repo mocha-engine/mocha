@@ -17,9 +17,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\Engine\Engine.csproj" />
-    <ProjectReference Include="..\UI\UI.csproj" />
+    <ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
+    <ProjectReference Include="..\Mocha.Engine\Mocha.Engine.csproj" />
+    <ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
   </ItemGroup>
 
 </Project>
