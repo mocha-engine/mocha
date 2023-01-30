@@ -70,12 +70,10 @@ private:
 	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
 
 	template <typename T>
-	T GetVariable( std::string name );
+	T GetVariable( CVarEntry& entry );
 
 	template <typename T>
-	void SetVariable( std::string name, T value );
-
-	CVarEntry& GetEntry( std::string name );
+	void SetVariable( CVarEntry& entry, T value );
 
 public:
 
@@ -101,30 +99,46 @@ public:
 	/// <returns></returns>
 	bool Exists( std::string name );
 
+	CVarEntry& GetEntry( std::string name );
+
 	void RegisterCommand( std::string name, CVarFlags flags, std::string description, CCmdCallback callback );
 
 	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
 	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
 	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
 
+	void InvokeCommand( CVarEntry& entry, std::vector<std::string> arguments );
 	void InvokeCommand( std::string name, std::vector<std::string> arguments );
 
+	std::string GetString( CVarEntry& entry );
 	std::string GetString( std::string name );
+
+	float GetFloat( CVarEntry& entry );
 	float GetFloat( std::string name );
+
+	bool GetBool( CVarEntry& entry );
 	bool GetBool( std::string name );
 
+	void SetString( CVarEntry& entry, std::string value );
 	void SetString( std::string name, std::string value );
+
+	void SetFloat( CVarEntry& entry, float value );
 	void SetFloat( std::string name, float value );
+
+	void SetBool( CVarEntry& entry, bool value );
 	void SetBool( std::string name, bool value );
+
+	void FromString( CVarEntry& entry, std::string valueStr );
+	void FromString( std::string name, std::string valueStr );
+
+	std::string ToString( CVarEntry& entry );
+	std::string ToString( std::string name );
 
 	void ForEach( std::function<void( CVarEntry& entry )> func );
 	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );
 
 	inline static float AsFloat( std::string& argument ) { return std::strtof( argument.c_str(), nullptr ); }
 	inline static bool AsBool( std::string& argument ) { return argument == "true"; }
-
-	void FromString( std::string name, std::string valueStr );
-	std::string ToString( std::string name );
 };
 
 template <typename T>
@@ -142,20 +156,16 @@ inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags f
 }
 
 template <typename T>
-inline T CVarSystem::GetVariable( std::string name )
+inline T CVarSystem::GetVariable( CVarEntry& entry )
 {
-	CVarEntry& entry = GetEntry( name );
-
 	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
 
 	return std::any_cast<T>( entry.m_value );
 }
 
 template <typename T>
-inline void CVarSystem::SetVariable( std::string name, T value )
+inline void CVarSystem::SetVariable( CVarEntry& entry, T value )
 {
-	CVarEntry& entry = GetEntry( name );
-
 	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
 
 	T lastValue = std::any_cast<T>( entry.m_value );
