@@ -13,6 +13,3 @@
 [submodule "Source/Host/thirdparty/volk"]
 	path = Source/Mocha.Host/thirdparty/volk
 	url = https://github.com/zeux/volk
-[submodule "Source/VConsoleLib"]
-	path = Source/VConsoleLib
-	url = https://github.com/xezno/VConsoleLib

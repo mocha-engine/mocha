@@ -371,7 +371,6 @@ content/models/rainier
 # InteropGen
 *.generated.h
 *.generated.cs
-[Ss]ource/Mocha.Common/Glue/UnmanagedArgs.cs
 
 # Builds
 build/
@@ -384,7 +383,8 @@ vcpkg_installed/
 *.*_c
 
 # Auto-generated content
-[Ss]ource/Host/gitdefs.h
+[Ss]ource/Mocha.Host/gitdefs.h
+[Ss]ource/Mocha.Common/Glue/UnmanagedArgs.cs
 cvars.json
 [Ss]amples/mocha-minimal/code/*.csproj
 

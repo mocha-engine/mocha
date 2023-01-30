@@ -54,7 +54,6 @@
 		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
 		<ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
 		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
-		<ProjectReference Include="..\VConsoleLib\VConsoleLib\VConsoleLib.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
