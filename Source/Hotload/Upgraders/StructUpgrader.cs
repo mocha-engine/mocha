@@ -6,7 +6,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A member upgrader for structs.
 /// </summary>
-internal class StructUpgrader : IMemberUpgrader
+internal sealed class StructUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public int Priority => 10;

@@ -5,7 +5,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A member upgrader for arrays.
 /// </summary>
-internal class ArrayUpgrader : IMemberUpgrader
+internal sealed class ArrayUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public int Priority => 60;

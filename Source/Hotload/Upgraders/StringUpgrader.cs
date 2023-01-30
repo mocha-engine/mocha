@@ -5,7 +5,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A member upgrader for strings.
 /// </summary>
-internal class StringUpgrader : IMemberUpgrader
+internal sealed class StringUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public int Priority => 40;

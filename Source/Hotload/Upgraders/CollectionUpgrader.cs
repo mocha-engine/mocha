@@ -7,7 +7,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A member upgrader for any collections.
 /// </summary>
-internal class CollectionUpgrader : IMemberUpgrader
+internal sealed class CollectionUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public int Priority => 30;

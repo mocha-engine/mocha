@@ -5,7 +5,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A wrapper class for property and field infos.
 /// </summary>
-internal class UpgradableMember
+internal sealed class UpgradableMember
 {
 	/// <summary>
 	/// The name of the member.

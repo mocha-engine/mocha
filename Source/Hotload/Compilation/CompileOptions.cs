@@ -5,7 +5,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A container for all options to give to the compiler.
 /// </summary>
-internal class CompileOptions
+internal sealed class CompileOptions
 {
 	/// <summary>
 	/// The level of optimization to be applied to the source code.

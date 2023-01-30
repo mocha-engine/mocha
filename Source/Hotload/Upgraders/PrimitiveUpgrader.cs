@@ -5,7 +5,7 @@ namespace Mocha.Hotload;
 /// <summary>
 /// A member upgrader for primitives.
 /// </summary>
-internal class PrimitiveUpgrader : IMemberUpgrader
+internal sealed class PrimitiveUpgrader : IMemberUpgrader
 {
 	/// <inheritdoc />
 	public int Priority => 50;

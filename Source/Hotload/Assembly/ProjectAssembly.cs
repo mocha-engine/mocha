@@ -9,7 +9,7 @@ namespace Mocha.Hotload;
 /// A wrapper for an external assembly to be loaded.
 /// </summary>
 /// <typeparam name="TEntryPoint">The type to retrieve from the assembly as its entry point.</typeparam>
-internal class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
+internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 {
 	/// <summary>
 	/// The loaded assembly.
