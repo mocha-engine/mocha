@@ -34,6 +34,8 @@ public static class Main
 		// Get the current loaded project from native
 		var manifestPath = Glue.Engine.GetProjectPath();
 		var csprojPath = ReloadProjectManifest( manifestPath );
+
+		// Setup a watcher for the project manifest.
 		s_manifestWatcher = new FileSystemWatcher(
 			Path.GetDirectoryName( manifestPath )!,
 			Path.GetFileName( manifestPath )!)
@@ -51,6 +53,7 @@ public static class Main
 		s_manifestWatcher.Changed += OnProjectManifestChanged;
 		s_manifestWatcher.EnableRaisingEvents = true;
 
+		// Setup project assemblies.
 		var gameAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = s_manifest.Name,
@@ -68,12 +71,14 @@ public static class Main
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 		s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
+		// Setup file system.
 		FileSystem.Mounted = new FileSystem(
 			s_manifest.Resources.Content,
 			"content\\core"
 		);
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
+		// Start.
 		s_editor.EntryPoint.Startup();
 		s_game.EntryPoint.Startup();
 	}

@@ -2,6 +2,9 @@
 
 namespace Mocha.Hotload;
 
+/// <summary>
+/// A contract defining an object that can upgrade members from two different assemblies.
+/// </summary>
 internal interface IMemberUpgrader
 {
 	/// <summary>
