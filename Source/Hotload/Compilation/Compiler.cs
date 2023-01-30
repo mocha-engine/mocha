@@ -4,11 +4,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Mocha.Common;
-using NuGet.Common;
-using NuGet.Frameworks;
-using NuGet.Packaging;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using System.Reflection;
 using System.Runtime.Versioning;
@@ -70,22 +65,6 @@ internal static class Compiler
 		"System.Web.HttpUtility.dll",
 
 		"System.Xml.ReaderWriter.dll",
-	};
-
-	/// <summary>
-	/// The references to Mocha related DLLs included in every build.
-	/// </summary>
-	private static readonly string[] s_mochaReferences = new string[]
-	{
-		// TODO: Ideally shouldn't be hardcoding the paths for these here
-		"build\\Mocha.Engine.dll",
-		"build\\Mocha.Common.dll",
-		"build\\Mocha.UI.dll",
-		"build\\VConsoleLib.dll",
-
-		// Add a reference to ImGUI too (this is for the editor project -- we should probably
-		// allow users to configure custom imports somewhere!)
-		"build\\ImGui.NET.dll",
 	};
 
 	/// <summary>
@@ -153,14 +132,25 @@ internal static class Compiler
 		// System references
 		string dotnetBaseDir = Path.GetDirectoryName( typeof( object ).Assembly.Location )!;
 		foreach ( var systemReference in s_systemReferences )
-			references.Add( MetadataReference.CreateFromFile( Path.Combine( dotnetBaseDir, systemReference ) ) );
-
-		// Mocha references
-		references.AddRange( CreateMetadataReferencesFromPaths( s_mochaReferences ) );
+			references.Add( CreateMetadataReferenceFromPath( Path.Combine( dotnetBaseDir, systemReference ) ) );
 
 		// NuGet references
 		foreach ( var packageReference in project.GetItems( "PackageReference" ) )
 			await NuGetHelper.FetchPackage( packageReference.EvaluatedInclude, new NuGetVersion( packageReference.GetMetadataValue( "Version" ) ), references );
+
+		// Project references
+		// TODO: This is nightmare fuel, need a better solution long-term.
+		foreach ( var projectReference in project.GetItems( "ProjectReference" ) )
+		{
+			var referenceCsprojPath = Path.GetFullPath( Path.Combine( Path.GetDirectoryName( assemblyInfo.ProjectPath )!, projectReference.EvaluatedInclude ) );
+			var referenceProject = Project.FromFile( referenceCsprojPath, new Microsoft.Build.Definition.ProjectOptions() );
+			var assemblyName = referenceProject.GetPropertyValue( "AssemblyName" );
+
+			if ( !string.IsNullOrEmpty( assemblyName ) )
+				references.Add( CreateMetadataReferenceFromPath( "build\\" + assemblyName + ".dll" ) );
+			else
+				references.Add( CreateMetadataReferenceFromPath( "build\\" + Path.GetFileNameWithoutExtension( referenceCsprojPath ) + ".dll" ) );
+		}
 
 		//
 		// Set up compiler
