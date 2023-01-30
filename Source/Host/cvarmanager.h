@@ -48,10 +48,10 @@ struct CVarEntry
 {
 private:
 	template <typename T>
-	T GetVariable();
+	T GetValue();
 
 	template <typename T>
-	void SetVariable( T value );
+	void SetValue( T value );
 
 public:
 	std::string m_name;
@@ -61,6 +61,8 @@ public:
 
 	std::any m_value;
 	std::any m_callback;
+
+	inline bool IsCommand() const { return m_flags & CVarFlags::Command; }
 
 	void InvokeCommand( std::vector<std::string> arguments );
 
@@ -72,22 +74,28 @@ public:
 	void SetFloat( float value );
 	void SetBool( bool value );
 
-	void FromString( std::string valueStr );
 	std::string ToString();
+	void FromString( std::string valueStr );
 };
 
 template <typename T>
-inline T CVarEntry::GetVariable()
+inline T CVarEntry::GetValue()
 {
-	assert( !( m_flags & CVarFlags::Command ) ); // Should be a variable
+	if ( IsCommand() || m_value.type() != typeid( T ) )
+	{
+		return {};
+	}
 
 	return std::any_cast<T>( m_value );
 }
 
 template <typename T>
-inline void CVarEntry::SetVariable( T value )
+inline void CVarEntry::SetValue( T value )
 {
-	assert( !( m_flags & CVarFlags::Command ) ); // Should be a variable
+	if ( IsCommand() || m_value.type() != typeid( T ) )
+	{
+		return;
+	}
 
 	T lastValue = std::any_cast<T>( m_value );
 
@@ -186,8 +194,8 @@ public:
 	void SetFloat( std::string name, float value );
 	void SetBool( std::string name, bool value );
 
-	void FromString( std::string name, std::string valueStr );
 	std::string ToString( std::string name );
+	void FromString( std::string name, std::string valueStr );
 
 	void ForEach( std::function<void( CVarEntry& entry )> func );
 	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );

@@ -325,7 +325,7 @@ void CVarSystem::Run( const char* command )
 
 		CVarEntry& entry = GetEntry( arg0 );
 
-		if ( entry.m_flags & CVarFlags::Command )
+		if ( entry.IsCommand() )
 		{
 			auto passedArguments = std::vector<std::string>( arguments.begin() + 1, arguments.end() );
 			entry.InvokeCommand( passedArguments );
@@ -392,7 +392,7 @@ void CVarSystem::RegisterBool( std::string name, bool value, CVarFlags flags, st
 
 void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 {
-	assert( m_flags & CVarFlags::Command ); // Should be a command
+	assert( IsCommand() );
 
 	auto callback = std::any_cast<CCmdCallback>( m_callback );
 
@@ -404,113 +404,118 @@ void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 
 void CVarSystem::InvokeCommand( std::string name, std::vector<std::string> arguments )
 {
-	GetEntry( name ).InvokeCommand( arguments );
+	if ( !Exists( name ) )
+	{
+		spdlog::error( "Tried to invoke command '{}', but it doesn't exist!", name );
+		return;
+	}
+
+	CVarEntry& entry = GetEntry( name );
+
+	if ( !entry.IsCommand() )
+	{
+		spdlog::error( "Tried to invoke command '{}', but it's a variable!", name );
+		return;
+	}
+	
+	entry.InvokeCommand( arguments );
 }
 
 
 std::string CVarEntry::GetString()
 {
-	return GetVariable<std::string>();
+	return GetValue<std::string>();
 }
 
 std::string CVarSystem::GetString( std::string name )
 {
+	if ( !Exists( name ) )
+	{
+		return "";
+	}
+
 	return GetEntry( name ).GetString();
 }
 
 
 float CVarEntry::GetFloat()
 {
-	return GetVariable<float>();
+	return GetValue<float>();
 }
 
 float CVarSystem::GetFloat( std::string name )
 {
+	if ( !Exists( name ) )
+	{
+		return 0.0f;
+	}
+
 	return GetEntry( name ).GetFloat();
 }
 
 
 bool CVarEntry::GetBool()
 {
-	return GetVariable<bool>();
+	return GetValue<bool>();
 }
 
 bool CVarSystem::GetBool( std::string name )
 {
+	if ( !Exists( name ) )
+	{
+		return false;
+	}
+
 	return GetEntry( name ).GetBool();
 }
 
 
 void CVarEntry::SetString( std::string value )
 {
-	SetVariable<std::string>( value );
+	SetValue<std::string>( value );
 }
 
 void CVarSystem::SetString( std::string name, std::string value )
 {
+	if ( !Exists( name ) )
+	{
+		return;
+	}
+	
 	GetEntry( name ).SetString( value );
 }
 
 
 void CVarEntry::SetFloat( float value )
 {
-	SetVariable<float>( value );
+	SetValue<float>( value );
 }
 
 void CVarSystem::SetFloat( std::string name, float value )
 {
+	if ( !Exists( name ) )
+	{
+		return;
+	}
+	
 	GetEntry( name ).SetFloat( value );
 }
 
 
 void CVarEntry::SetBool( bool value )
 {
-	SetVariable<bool>( value );
+	SetValue<bool>( value );
 }
 
 void CVarSystem::SetBool( std::string name, bool value )
 {
+	if ( !Exists( name ) )
+	{
+		return;
+	}
+	
 	GetEntry( name ).SetBool( value );
 }
-
-
-void CVarEntry::FromString( std::string valueStr )
-{
-	std::stringstream valueStream( valueStr );
-
-	auto& type = m_value.type();
-
-	if ( type == typeid( float ) )
-	{
-		float value;
-		valueStream >> value;
-
-		SetVariable<float>( value );
-	}
-	else if ( type == typeid( bool ) )
-	{
-		bool value;
-
-		if ( valueStr == "true" || valueStr == "1" || valueStr == "yes" )
-			value = true;
-		else if ( valueStr == "false" || valueStr == "0" || valueStr == "no" )
-			value = false;
-		else
-			assert( false ); // Invalid bool value
-
-		SetVariable<bool>( value );
-	}
-	else if ( type == typeid( std::string ) )
-	{
-		SetVariable<std::string>( valueStr );
-	}
-}
-
-void CVarSystem::FromString( std::string name, std::string valueStr )
-{
-	GetEntry( name ).FromString( valueStr );
-}
-
 
 std::string CVarEntry::ToString()
 {
@@ -529,7 +534,55 @@ std::string CVarEntry::ToString()
 
 std::string CVarSystem::ToString( std::string name )
 {
+	if ( !Exists( name ) )
+	{
+		return "";
+	}
+
 	return GetEntry( name ).ToString();
+}
+
+
+void CVarEntry::FromString( std::string valueStr )
+{
+	std::stringstream valueStream( valueStr );
+
+	auto& type = m_value.type();
+
+	if ( type == typeid( float ) )
+	{
+		float value;
+		valueStream >> value;
+
+		SetValue<float>( value );
+	}
+	else if ( type == typeid( bool ) )
+	{
+		bool value;
+
+		if ( valueStr == "true" || valueStr == "1" || valueStr == "yes" )
+			value = true;
+		else if ( valueStr == "false" || valueStr == "0" || valueStr == "no" )
+			value = false;
+		else
+			assert( false ); // Invalid bool value
+
+		SetValue<bool>( value );
+	}
+	else if ( type == typeid( std::string ) )
+	{
+		SetValue<std::string>( valueStr );
+	}
+}
+
+void CVarSystem::FromString( std::string name, std::string valueStr )
+{
+	if ( !Exists( name ) )
+	{
+		return;
+	}
+	
+	GetEntry( name ).FromString( valueStr );
 }
 
 
@@ -582,7 +635,7 @@ static CCmd ccmd_list( "list", CVarFlags::None, "List all commands and variables
 #ifndef __clang__
 		// List all available cvars
 		instance.ForEach( [&]( CVarEntry& entry ) {
-		    if ( entry.m_flags & CVarFlags::Command )
+		    if ( entry.IsCommand() )
 			    spdlog::info( "- '{}' (command)", entry.m_name );
 		    else
 			    spdlog::info( "- '{}': '{}' (variable)", entry.m_name, entry.ToString() );
