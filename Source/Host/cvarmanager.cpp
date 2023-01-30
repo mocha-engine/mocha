@@ -42,7 +42,7 @@ void CVarSystem::Startup()
 		CVarEntry& entry = m_cvarEntries[hash];
 
 		if ( entry.m_flags & CVarFlags::Archive )
-			FromString( name, value );
+			FromString( entry, value );
 	}
 }
 
@@ -61,44 +61,286 @@ void CVarSystem::Shutdown()
 	cvarFile << std::setw( 4 ) << cvarArchive << std::endl;
 }
 
+#pragma region Parsing
 
-	// Run a console command.
-// The following formats are currently supported:
-// - [convar name]: Output the current value for a console variable
-// - [convar name] [value]: Update a console variable with a new value
+// I hate parsing text in C/C++. This is super messy.
+// It works though.
+
+std::vector<std::string> CVarSystem::GetStatementArguments( std::string_view statement, size_t cursor, size_t& cursorIndex )
+{
+	std::vector<std::string> arguments;
+
+	auto begin = statement.begin();
+	auto end = statement.end();
+
+	bool quoted = false;
+	bool commented = false;
+	std::string_view::const_iterator argumentStart = begin;
+	char lastChar = ' ';
+
+	cursorIndex = -1;
+	bool cursorReached = false;
+
+	auto setCursor = [&]( auto argStart, auto argEnd ) {
+		size_t argStartIndex = argStart - begin;
+		size_t argEndIndex = argEnd - begin;
+		bool set = !cursorReached && ( argStartIndex <= cursor && cursor < argEndIndex );
+		if ( set )
+		{
+			cursorIndex = arguments.size() - 1;
+			cursorReached = true;
+		}
+	};
+
+	for ( auto curChar = begin; curChar != end; curChar++ )
+	{
+		size_t curCharIndex = curChar - begin;
+		auto nextChar = curChar + 1;
+
+		if ( quoted )
+		{
+			if ( *curChar == '"' )
+			{
+				quoted = !quoted;
+				arguments.emplace_back( argumentStart + 1, curChar );
+				setCursor( argumentStart, curChar );
+			}
+			else if ( nextChar == end )
+			{
+				arguments.emplace_back( argumentStart + 1, end );
+				setCursor( argumentStart, end );
+			}
+		}
+		else
+		{
+			switch ( *curChar )
+			{
+			case '"':
+				if ( lastChar != ' ' )
+				{
+					arguments.emplace_back( argumentStart, curChar );
+					setCursor( argumentStart, curChar );
+				}
+
+				quoted = !quoted;
+				argumentStart = curChar;
+				break;
+
+			case ' ':
+				switch ( lastChar )
+				{
+				case ' ':
+				case '"':
+					break;
+				default:
+					arguments.emplace_back( argumentStart, curChar );
+					setCursor( argumentStart, curChar );
+					break;
+				}
+				break;
+
+			case '/':
+				if ( nextChar != end )
+				{
+					if ( *nextChar == '/' )
+					{
+						switch ( lastChar )
+						{
+						case ' ':
+						case '"':
+							break;
+						default:
+							arguments.emplace_back( argumentStart, curChar );
+
+							break;
+						}
+
+						setCursor( argumentStart, curChar );
+
+						// We've entered a comment, nothing left to do, so we bail
+						return arguments;
+					}
+				}
+				break;
+
+			default:
+				switch ( lastChar )
+				{
+				case ' ':
+				case '"':
+					argumentStart = curChar;
+					break;
+				}
+
+				if ( nextChar == end )
+				{
+					arguments.emplace_back( argumentStart, end );
+					setCursor( argumentStart, end );
+				}
+
+				break;
+			}
+		}
+
+		lastChar = *curChar;
+	}
+
+	return arguments;
+}
+
+static std::tuple<int, bool> GetNextStatementLength( std::string_view line )
+{
+	bool skip = false;
+	bool quoted = false;
+	bool commented = false;
+	int totalLength = line.length();
+	int length = 0;
+
+	auto curChar = line.begin();
+	auto nextChar = curChar + 1;
+
+	for ( ; curChar != line.end(); curChar++, length++ )
+	{
+		nextChar = curChar + 1;
+
+		if ( !commented )
+		{
+			if ( *curChar == '"' )
+			{
+				quoted = !quoted;
+				continue;
+			}
+
+			if ( !quoted )
+			{
+				if ( nextChar != line.end() )
+				{
+					if ( *curChar == '/' && *nextChar == '/' )
+					{
+						commented = true;
+						continue;
+					}
+				}
+
+				if ( *curChar == ';' )
+				{
+					skip = true;
+					break;
+				}
+			}
+
+			if ( *curChar == '\n' )
+			{
+				skip = true;
+				break;
+			}
+		}
+	}
+
+	return { ( curChar != line.end() ? length : totalLength ), skip };
+}
+
+std::vector<std::string_view> CVarSystem::GetStatements( const std::string& line, size_t cursor, size_t& cursorIndex )
+{
+	auto begin = line.begin();
+	auto end = line.end();
+	std::vector<std::string_view> statements;
+
+	std::string_view remaining( line );
+	bool cursorReached = false;
+
+	cursorIndex = -1;
+
+	auto setCursor = [&]( size_t statementLength ) {
+		if ( statementLength < cursor )
+		{
+			cursor -= statementLength;
+		}
+		else if ( !cursorReached )
+		{
+			cursorIndex = statements.size() - 1;
+			cursorReached = true;
+		}
+	};
+
+	while ( !remaining.empty() )
+	{
+		auto [length, skip] = GetNextStatementLength( remaining );
+		int skip_length = skip ? length + 1 : length;
+
+		std::string_view statement = remaining.substr( 0, length );
+
+		const char* whitespace = " \t\r";
+
+		size_t prefix = std::min( statement.find_first_not_of( whitespace ), statement.size() );
+		statement.remove_prefix( prefix );
+
+		size_t suffix = std::min( statement.size() - statement.find_last_not_of( whitespace ) - 1, statement.size() );
+		statement.remove_suffix( suffix );
+
+		if ( !statement.empty() )
+			statements.push_back( statement );
+		setCursor( skip_length );
+
+		remaining = remaining.substr( skip_length, remaining.length() );
+	}
+
+	return statements;
+}
+
+std::vector<std::string> CVarSystem::GetStatementArguments( std::string_view statement )
+{
+	size_t cursorIndex;
+	return GetStatementArguments( statement, 0, cursorIndex );
+}
+
+std::vector<std::string_view> CVarSystem::GetStatements( const std::string& line )
+{
+	size_t cursor = 0, cursorIndex;
+	return GetStatements( line, cursor, cursorIndex );
+}
+
+#pragma endregion
+
 void CVarSystem::Run( const char* command )
 {
 	std::string inputString = std::string( command );
 
-	std::stringstream ss( inputString );
+	std::vector<std::string_view> statements = GetStatements( inputString );
 
-	std::string cvarName, cvarValue;
-	ss >> cvarName >> cvarValue;
-
-	std::stringstream valueStream( cvarValue );
-
-	if ( !Exists( cvarName ) )
+	for ( std::string_view& statement : statements )
 	{
-		spdlog::info( "{} is not a valid command or variable", cvarName );
-		return;
-	}
+		std::vector<std::string> arguments = GetStatementArguments( statement );
 
-	CVarEntry& entry = GetEntry( cvarName );
+		if ( arguments.size() < 1 )
+			continue;
 
-	if ( entry.m_flags & CVarFlags::Command )
-	{
-		InvokeCommand( entry, {} );
-	}
-	else
-	{
-		if ( valueStream.str().size() > 0 )
+		std::string& arg0 = arguments.at( 0 );
+
+		if ( !Exists( arg0 ) )
 		{
-			FromString( entry, cvarValue );
+			spdlog::info( "{} is not a valid command or variable", arg0 );
+			continue;
+		}
+
+		CVarEntry& entry = GetEntry( arg0 );
+
+		if ( entry.m_flags & CVarFlags::Command )
+		{
+			auto passedArguments = std::vector<std::string>( arguments.begin() + 1, arguments.end() );
+			InvokeCommand( entry, passedArguments );
 		}
 		else
 		{
-			cvarValue = ToString( entry );
-			spdlog::info( "{} is '{}'", cvarName, cvarValue );
+			if ( arguments.size() == 1 )
+			{
+				spdlog::info( "{} is '{}'", arg0, ToString( entry ) );
+			}
+			else
+			{
+				// Guaranteed to be at least 2
+				FromString( entry, arguments.at( 1 ) );
+			}
 		}
 	}
 }
@@ -340,7 +582,10 @@ static CCmd ccmd_list( "list", CVarFlags::None, "List all commands and variables
 #ifndef __clang__
 		// List all available cvars
 		instance.ForEach( [&]( CVarEntry& entry ) {
-			spdlog::info( "- '{}': '{}'", entry.m_name, instance.ToString( entry ) );
+		    if ( entry.m_flags & CVarFlags::Command )
+			    spdlog::info( "- '{}' (command)", entry.m_name );
+		    else
+				spdlog::info( "- '{}': '{}' (variable)", entry.m_name, instance.ToString( entry ) );
 			spdlog::info( "\t{}", entry.m_description );
 		} );
 #endif
@@ -362,5 +607,10 @@ static CCmd cvartest_command( "cvartest.command", CVarFlags::None, "A test comma
 	[]( std::vector<std::string> arguments )
 	{
 		spdlog::trace( "cvartest.command has been invoked! Hooray" );
+		
+		for ( int i = 0; i < arguments.size(); i++ )
+		{
+		    spdlog::trace( "\t{} - '{}'", i, arguments.at( i ) );
+		}
 	}
 );

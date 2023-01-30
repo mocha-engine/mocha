@@ -90,6 +90,30 @@ public:
 	void Startup();
 	void Shutdown();
 
+	/// <summary>
+	/// Get command arguments from a statement, for use with GetStatements
+	/// Ignores comments starting with "//"
+	/// </summary>
+	/// <param name="statement">The statement to get arguments from</param>
+	/// <param name="cursor">Where the user's cursor is currently within the statement line</param>
+	/// <param name="cursorIndex">Return value of 
+	static std::vector<std::string> GetStatementArguments( std::string_view statement, size_t cursor, size_t& cursorIndex );
+
+	/// <summary>
+	/// Get the statements of a line, with each statement separated by ";"
+	/// </summary>
+	/// <param name="name"></param>
+	/// <returns></returns>
+	static std::vector<std::string_view> GetStatements( const std::string& line, size_t cursor, size_t& cursorIndex );
+
+	// Variants for when you don't care about any cursor
+	static std::vector<std::string> GetStatementArguments( std::string_view statement );
+	static std::vector<std::string_view> GetStatements( const std::string& line );
+
+	/// <summary>
+	/// Run a command in the console
+	/// </summary>
+	/// <param name="command"></param>
 	void Run( const char* command );
 
 	/// <summary>
