@@ -152,6 +152,10 @@ internal static class Compiler
 				references.Add( CreateMetadataReferenceFromPath( "build\\" + Path.GetFileNameWithoutExtension( referenceCsprojPath ) + ".dll" ) );
 		}
 
+		// Literal references
+		foreach ( var reference in project.GetItems( "Reference" ) )
+			references.Add( CreateMetadataReferenceFromPath( Path.GetFullPath( reference.EvaluatedInclude ) ) );
+
 		//
 		// Set up compiler
 		//
