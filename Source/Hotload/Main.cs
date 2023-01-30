@@ -38,7 +38,7 @@ public static class Main
 		// Setup a watcher for the project manifest.
 		s_manifestWatcher = new FileSystemWatcher(
 			Path.GetDirectoryName( manifestPath )!,
-			Path.GetFileName( manifestPath )!)
+			Path.GetFileName( manifestPath )! )
 		{
 			NotifyFilter = NotifyFilters.Attributes
 							 | NotifyFilters.CreationTime
