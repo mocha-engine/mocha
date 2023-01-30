@@ -80,6 +80,8 @@ public:
 	void Startup();
 	void Shutdown();
 
+	void Run( const char* command );
+
 	bool Exists( std::string name );
 
 	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description );

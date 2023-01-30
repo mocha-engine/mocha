@@ -61,6 +61,51 @@ void CVarSystem::Shutdown()
 	cvarFile << std::setw( 4 ) << cvarArchive << std::endl;
 }
 
+
+	// Run a console command.
+// The following formats are currently supported:
+// - [convar name]: Output the current value for a console variable
+// - [convar name] [value]: Update a console variable with a new value
+void CVarSystem::Run( const char* command )
+{
+	std::string inputString = std::string( command );
+
+	std::stringstream ss( inputString );
+
+	std::string cvarName, cvarValue;
+	ss >> cvarName >> cvarValue;
+
+	std::stringstream valueStream( cvarValue );
+
+	if ( cvarName == "list" )
+	{
+// This fails on libclang so we'll ignore it for now...
+#ifndef __clang__
+		// List all available cvars
+		ForEach( [&]( CVarEntry& entry ) {
+			spdlog::info( "- '{}': '{}'", entry.m_name, ToString( entry.m_name ) );
+			spdlog::info( "\t{}", entry.m_description );
+		} );
+#endif
+	}
+	else if ( !Exists( cvarName ) )
+	{
+		spdlog::info( "{} is not a valid command or variable", cvarName );
+	}
+	else
+	{
+		if ( valueStream.str().size() > 0 )
+		{
+			FromString( cvarName, cvarValue );
+		}
+		else
+		{
+			cvarValue = ToString( cvarName );
+			spdlog::info( "{} is '{}'", cvarName, cvarValue );
+		}
+	}
+}
+
 void CVarSystem::RegisterString( std::string name, std::string value, CVarFlags flags, std::string description )
 {
 	Register<std::string>( name, value, flags, description );
