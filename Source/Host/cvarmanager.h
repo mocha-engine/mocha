@@ -9,6 +9,10 @@
 #include <subsystem.h>
 #include <unordered_map>
 
+// ----------------------------------------
+// Core CVar functionality
+// ----------------------------------------
+
 enum CVarFlags
 {
 	None = 0,
@@ -31,15 +35,6 @@ struct CVarEntry
 	CVarFlags m_flags;
 
 	std::any m_value;
-};
-
-class CVarParameter
-{
-protected:
-	std::string m_name;
-
-public:
-	friend class CVarSystem;
 };
 
 class CVarManager : ISubSystem
@@ -103,6 +98,56 @@ public:
 	std::string ToString( std::string name );
 };
 
+template <typename T>
+inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description )
+{
+	CVarEntry entry = {};
+	entry.m_name = name;
+	entry.m_description = description;
+	entry.m_flags = flags;
+	entry.m_value = value;
+
+	size_t hash = GetHash( name );
+	m_cvarEntries[hash] = entry;
+}
+
+template <typename T>
+inline T CVarSystem::Get( std::string name )
+{
+	assert( Exists( name ) ); // Doesn't exist! Register it first
+
+	size_t hash = GetHash( name );
+	CVarEntry& entry = m_cvarEntries[hash];
+
+	return std::any_cast<T>( entry.m_value );
+}
+
+template <typename T>
+inline void CVarSystem::Set( std::string name, T value )
+{
+	assert( Exists( name ) ); // Doesn't exist! Register it first
+
+	size_t hash = GetHash( name );
+	CVarEntry& entry = m_cvarEntries[hash];
+
+	entry.m_value = value;
+
+	spdlog::info( "{} was set to '{}'.", entry.m_name, value );
+}
+
+// ----------------------------------------
+// Native CVar interface
+// ----------------------------------------
+
+class CVarParameter
+{
+protected:
+	std::string m_name;
+
+public:
+	friend class CVarSystem;
+};
+
 class StringCVar : CVarParameter
 {
 public:
@@ -150,40 +195,3 @@ public:
 
 	operator bool() { return GetValue(); };
 };
-
-template <typename T>
-inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description )
-{
-	CVarEntry entry = {};
-	entry.m_name = name;
-	entry.m_description = description;
-	entry.m_flags = flags;
-	entry.m_value = value;
-
-	size_t hash = GetHash( name );
-	m_cvarEntries[hash] = entry;
-}
-
-template <typename T>
-inline T CVarSystem::Get( std::string name )
-{
-	assert( Exists( name ) ); // Doesn't exist! Register it first
-
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
-
-	return std::any_cast<T>( entry.m_value );
-}
-
-template <typename T>
-inline void CVarSystem::Set( std::string name, T value )
-{
-	assert( Exists( name ) ); // Doesn't exist! Register it first
-
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
-
-	entry.m_value = value;
-
-	spdlog::info( "{} was set to '{}'.", entry.m_name, value );
-}
