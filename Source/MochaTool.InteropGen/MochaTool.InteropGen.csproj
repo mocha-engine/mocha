@@ -7,8 +7,9 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<Platforms>AnyCPU;x64;x86</Platforms>
-		<RootNamespace>MochaTool.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-		<AssemblyName>MochaTool.$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<StartupObject>MochaTool.InteropGen.Program</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>

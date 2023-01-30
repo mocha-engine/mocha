@@ -4,11 +4,11 @@
 	  <TargetFramework>net7.0</TargetFramework>
 	  <ImplicitUsings>disable</ImplicitUsings>
 	  <Nullable>enable</Nullable>
-	  <RootNamespace>Mocha.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 	  <BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
 	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 	  <OutputPath>$(SolutionDir)..\build</OutputPath>
-	  <AssemblyName>Mocha.$(MSBuildProjectName)</AssemblyName>
+	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	  <AssemblyName>$(MSBuildProjectName)</AssemblyName>
 	  <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 

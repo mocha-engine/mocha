@@ -6,8 +6,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<Platforms>AnyCPU;x64;x86</Platforms>
-		<RootNamespace>MochaTool.$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
-		<AssemblyName>MochaTool.$(MSBuildProjectName)</AssemblyName>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<StartupObject>MochaTool.AssetCompiler.CommandLine</StartupObject>
 	</PropertyGroup>
 
 	<ItemGroup>
