@@ -8,21 +8,21 @@ public static class Program
 
 	private static void ProcessHeader( string baseDir, string path )
 	{
-		Console.WriteLine( $"\t Processing header {path}" );
+		Console.WriteLine( $"Processing header {path}..." );
 
 		var units = Parser.GetUnits( path );
 		var fileName = Path.GetFileNameWithoutExtension( path );
 
 		var managedGenerator = new ManagedCodeGenerator( units );
 		var managedCode = managedGenerator.GenerateManagedCode();
-		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/{fileName}.generated.cs", managedCode );
+		File.WriteAllText( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
 
 		var nativeGenerator = new NativeCodeGenerator( units );
 		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
 		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
 
-		Console.WriteLine( $"{baseDir}/Mocha.Host/generated/{fileName}.generated.h" );
-		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/{fileName}.generated.h", nativeCode );
+		Console.WriteLine( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h" );
+		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
 
 		s_files.Add( fileName );
 		s_units.AddRange( units );
@@ -131,7 +131,7 @@ public static class Program
 		nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		nativeStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
 	}
 
 	private static void WriteNativeIncludes( string baseDir )
@@ -151,7 +151,7 @@ public static class Program
 		nativeListWriter.WriteLine();
 		nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
 
-		File.WriteAllText( $"{baseDir}/Mocha.Host/generated/InteropList.generated.h", baseNativeListWriter.ToString() );
+		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\InteropList.generated.h", baseNativeListWriter.ToString() );
 	}
 
 	private static void DeleteExistingFiles( string baseDir )
