@@ -19,6 +19,7 @@ using CVarCallback = std::function<void( T, T )>;
 
 using CCmdCallback = std::function<void( std::vector<std::string> )>;
 
+
 enum CVarFlags : uint32_t
 {
 	None = 0,
@@ -42,8 +43,17 @@ enum CVarFlags : uint32_t
 	Game = 1 << 5
 };
 
+
 struct CVarEntry
 {
+private:
+	template <typename T>
+	T GetVariable();
+
+	template <typename T>
+	void SetVariable( T value );
+
+public:
 	std::string m_name;
 	std::string m_description;
 
@@ -51,7 +61,48 @@ struct CVarEntry
 
 	std::any m_value;
 	std::any m_callback;
+
+	void InvokeCommand( std::vector<std::string> arguments );
+
+	std::string GetString();
+	float GetFloat();
+	bool GetBool();
+
+	void SetString( std::string value );
+	void SetFloat( float value );
+	void SetBool( bool value );
+
+	void FromString( std::string valueStr );
+	std::string ToString();
 };
+
+template <typename T>
+inline T CVarEntry::GetVariable()
+{
+	assert( !( m_flags & CVarFlags::Command ) ); // Should be a variable
+
+	return std::any_cast<T>( m_value );
+}
+
+template <typename T>
+inline void CVarEntry::SetVariable( T value )
+{
+	assert( !( m_flags & CVarFlags::Command ) ); // Should be a variable
+
+	T lastValue = std::any_cast<T>( m_value );
+
+	m_value = value;
+
+	auto callback = std::any_cast<CVarCallback<T>>( m_callback );
+
+	if ( callback )
+	{
+		callback( lastValue, value );
+	}
+
+	spdlog::info( "{} was set to '{}'.", m_name, value );
+}
+
 
 class CVarManager : ISubSystem
 {
@@ -68,12 +119,6 @@ private:
 
 	template <typename T>
 	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
-
-	template <typename T>
-	T GetVariable( CVarEntry& entry );
-
-	template <typename T>
-	void SetVariable( CVarEntry& entry, T value );
 
 public:
 
@@ -131,31 +176,17 @@ public:
 	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
 	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
 
-	void InvokeCommand( CVarEntry& entry, std::vector<std::string> arguments );
 	void InvokeCommand( std::string name, std::vector<std::string> arguments );
 
-	std::string GetString( CVarEntry& entry );
 	std::string GetString( std::string name );
-
-	float GetFloat( CVarEntry& entry );
 	float GetFloat( std::string name );
-
-	bool GetBool( CVarEntry& entry );
 	bool GetBool( std::string name );
 
-	void SetString( CVarEntry& entry, std::string value );
 	void SetString( std::string name, std::string value );
-
-	void SetFloat( CVarEntry& entry, float value );
 	void SetFloat( std::string name, float value );
-
-	void SetBool( CVarEntry& entry, bool value );
 	void SetBool( std::string name, bool value );
 
-	void FromString( CVarEntry& entry, std::string valueStr );
 	void FromString( std::string name, std::string valueStr );
-
-	std::string ToString( CVarEntry& entry );
 	std::string ToString( std::string name );
 
 	void ForEach( std::function<void( CVarEntry& entry )> func );
@@ -177,33 +208,6 @@ inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags f
 
 	size_t hash = GetHash( name );
 	m_cvarEntries[hash] = entry;
-}
-
-template <typename T>
-inline T CVarSystem::GetVariable( CVarEntry& entry )
-{
-	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
-
-	return std::any_cast<T>( entry.m_value );
-}
-
-template <typename T>
-inline void CVarSystem::SetVariable( CVarEntry& entry, T value )
-{
-	assert( !( entry.m_flags & CVarFlags::Command ) ); // Should be a variable
-
-	T lastValue = std::any_cast<T>( entry.m_value );
-
-	entry.m_value = value;
-
-	auto callback = std::any_cast<CVarCallback<T>>( entry.m_callback );
-
-	if ( callback )
-	{
-		callback( lastValue, value );
-	}
-
-	spdlog::info( "{} was set to '{}'.", entry.m_name, value );
 }
 
 // ----------------------------------------
