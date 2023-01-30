@@ -141,7 +141,7 @@ public static class Main
 	{
 		s_manifest = ProjectManifest.Load( manifestPath );
 
-		var csprojPath = ProjectGenerator.GenerateProject( s_manifest );
+		var csprojPath = ProjectGenerator.Generate( s_manifest );
 		return csprojPath;
 	}
 }

@@ -26,7 +26,7 @@ internal static class ProjectGenerator
 	/// generated project on disk.
 	/// </summary>
 	/// <returns>An absolute path to the generated .csproj file.</returns>
-	internal static string GenerateProject( in ProjectManifest manifest )
+	internal static string Generate( in ProjectManifest manifest )
 	{
 		// Setup.
 		var destinationPath = Path.Combine( manifest.Resources.Code, "code.csproj" );
