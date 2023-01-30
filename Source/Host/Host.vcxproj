@@ -78,6 +78,7 @@
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
@@ -88,6 +89,7 @@
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
     <VcpkgEnableManifest>true</VcpkgEnableManifest>
