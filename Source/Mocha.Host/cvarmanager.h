@@ -1,5 +1,6 @@
 #pragma once
 #include <any>
+#include <cstdint>
 #include <fstream>
 #include <globalvars.h>
 #include <memory>
@@ -9,38 +10,98 @@
 #include <subsystem.h>
 #include <unordered_map>
 
-enum CVarFlags
+// ----------------------------------------
+// Core CVar functionality
+// ----------------------------------------
+
+template <typename T>
+using CVarCallback = std::function<void( T, T )>;
+
+using CCmdCallback = std::function<void( std::vector<std::string> )>;
+
+
+struct CVarManagedCmdDispatchInfo
+{
+	const char* name;
+	void* data;
+	int size;
+};
+
+template <typename T>
+struct CVarManagedVarDispatchInfo
+{
+	const char* name;
+	T oldValue;
+	T newValue;
+};
+
+
+enum CVarFlags : int32_t
 {
 	None = 0,
 
+	// If this isn't present, it's inherently assumed to be a variable
+	Command = 1 << 0,
+
+	// If this is present, it lives in managed space
+	Managed = 1 << 1,
+
+	// This cvar was created by the game, it should be wiped on hotload
+	Game = 1 << 2,
+
 	// Save this convar to cvars.json
-	Archive = 1 << 0,
+	Archive = 1 << 3,
 
 	// TODO
-	Cheat = 1 << 1,
+	Cheat = 1 << 4,
 
 	// TODO
-	Temp = 1 << 2
+	Temp = 1 << 5,
+
+	// TODO: Networked variables server -> client
+	Replicated = 1 << 6,
 };
+
 
 struct CVarEntry
 {
+private:
+	template <typename T>
+	T GetValue();
+
+	template <typename T>
+	void SetValue( T value );
+
+public:
 	std::string m_name;
 	std::string m_description;
 
-	CVarFlags m_flags;
+	int32_t m_flags;
 
 	std::any m_value;
+	std::any m_callback;
+
+	inline bool IsCommand() const { return m_flags & CVarFlags::Command; }
+	inline bool IsManaged() const { return m_flags & CVarFlags::Managed; }
+
+	// Commands
+
+	void InvokeCommand( std::vector<std::string> arguments );
+
+	// Variables
+
+	std::string GetString();
+	float GetFloat();
+	bool GetBool();
+
+	void SetString( std::string value );
+	void SetFloat( float value );
+	void SetBool( bool value );
+
+	std::string ToString();
+	void FromString( std::string valueStr );
 };
 
-class CVarParameter
-{
-protected:
-	std::string m_name;
-
-public:
-	friend class CVarSystem;
-};
 
 class CVarManager : ISubSystem
 {
@@ -56,16 +117,9 @@ private:
 	size_t GetHash( std::string string );
 
 	template <typename T>
-	void Register( std::string name, T value, CVarFlags flags, std::string description );
-
-	template <typename T>
-	T Get( std::string name );
-
-	template <typename T>
-	void Set( std::string name, T value );
+	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
 
 public:
-	friend class StringCVar;
 
 	//
 	// CVarSystem is a singleton because it needs creating *as soon as* it's referenced
@@ -80,11 +134,53 @@ public:
 	void Startup();
 	void Shutdown();
 
+	/// <summary>
+	/// Get command arguments from a statement, for use with GetStatements.
+	/// Ignores comments, starting with "//".
+	/// </summary>
+	/// <param name="statement">The statement to get arguments from</param>
+	/// <param name="cursor">Where the user's cursor currently is within the statement string</param>
+	/// <param name="cursorIndex">Returns which argument the cursor is within</param>
+	static std::vector<std::string> GetStatementArguments( std::string_view statement, size_t cursor, size_t& cursorIndex );
+
+	/// <summary>
+	/// Get the statements from a string, with each statement separated either by ";" or a newline.
+	/// </summary>
+	/// <param name="text"></param>
+	/// <param name="cursor">Where the user's cursor currently is within the input string</param>
+	/// <param name="cursorIndex">Returns which statement the cursor is within</param>
+	static std::vector<std::string_view> GetStatements( const std::string& input, size_t cursor, size_t& cursorIndex );
+
+	// Variants for uses without a text cursor
+	static std::vector<std::string> GetStatementArguments( std::string_view statement );
+	static std::vector<std::string_view> GetStatements( const std::string& input );
+
+	/// <summary>
+	/// Run statements in the console
+	/// </summary>
+	/// <param name="input"></param>
+	void Run( const char* input );
+
+	/// <summary>
+	/// Check if a specific convar exists
+	/// </summary>
+	/// <param name="name"></param>
+	/// <returns></returns>
 	bool Exists( std::string name );
 
-	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description );
-	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description );
-	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description );
+	CVarEntry& GetEntry( std::string name );
+
+	void RegisterCommand( std::string name, CVarFlags flags, std::string description, CCmdCallback callback );
+
+	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
+	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
+	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
+
+	void Remove( std::string name );
+
+	void InvokeCommand( std::string name, std::vector<std::string> arguments );
+
+	CVarFlags GetFlags( std::string name );
 
 	std::string GetString( std::string name );
 	float GetFloat( std::string name );
@@ -94,21 +190,43 @@ public:
 	void SetFloat( std::string name, float value );
 	void SetBool( std::string name, bool value );
 
+	std::string ToString( std::string name );
+	void FromString( std::string name, std::string valueStr );
+
 	void ForEach( std::function<void( CVarEntry& entry )> func );
 	void ForEach( std::string filter, std::function<void( CVarEntry& entry )> func );
 
-	void FromString( std::string name, std::string valueStr );
-	std::string ToString( std::string name );
+	inline static float AsFloat( std::string& argument ) { return std::strtof( argument.c_str(), nullptr ); }
+	inline static bool AsBool( std::string& argument ) { return argument == "true"; }
+};
+
+// ----------------------------------------
+// Native CVar interface
+// ----------------------------------------
+
+class CVarParameter
+{
+protected:
+	std::string m_name;
+
+public:
+	friend class CVarSystem;
 };
 
 class StringCVar : CVarParameter
 {
 public:
-	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description )
+	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterString( name, value, flags, description );
+		CVarSystem::Instance().RegisterString( name, value, flags, description, callback );
+	}
+
+	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description )
+	    : StringCVar( name, value, flags, description, nullptr )
+	{
+	
 	}
 
 	std::string GetValue() { return CVarSystem::Instance().GetString( m_name ); }
@@ -120,11 +238,17 @@ public:
 class FloatCVar : CVarParameter
 {
 public:
-	FloatCVar( std::string name, float value, CVarFlags flags, std::string description )
+	FloatCVar( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterFloat( name, value, flags, description );
+		CVarSystem::Instance().RegisterFloat( name, value, flags, description, callback );
+	}
+
+	FloatCVar( std::string name, float value, CVarFlags flags, std::string description )
+	    : FloatCVar( name, value, flags, description, nullptr )
+	{
+
 	}
 
 	float GetValue() { return CVarSystem::Instance().GetFloat( m_name ); }
@@ -136,11 +260,17 @@ public:
 class BoolCVar : CVarParameter
 {
 public:
-	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
+	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback )
 	{
 		m_name = name;
 
-		CVarSystem::Instance().RegisterBool( name, value, flags, description );
+		CVarSystem::Instance().RegisterBool( name, value, flags, description, callback );
+	}
+
+	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
+	    : BoolCVar( name, value, flags, description, nullptr )
+	{
+
 	}
 
 	bool GetValue() { return CVarSystem::Instance().GetBool( m_name ); }
@@ -149,39 +279,25 @@ public:
 	operator bool() { return GetValue(); };
 };
 
-template <typename T>
-inline void CVarSystem::Register( std::string name, T value, CVarFlags flags, std::string description )
+class CCmd : CVarParameter
 {
-	CVarEntry entry = {};
-	entry.m_name = name;
-	entry.m_description = description;
-	entry.m_flags = flags;
-	entry.m_value = value;
+public:
+	CCmd( std::string name, CVarFlags flags, std::string description, CCmdCallback callback )
+	{
+		m_name = name;
 
-	size_t hash = GetHash( name );
-	m_cvarEntries[hash] = entry;
-}
+		CVarSystem::Instance().RegisterCommand( name, flags, description, callback );
+	}
 
-template <typename T>
-inline T CVarSystem::Get( std::string name )
-{
-	assert( Exists( name ) ); // Doesn't exist! Register it first
+	//
+	// You can invoke like this, but honestly, just define a separate function.
+	// This is not going to be as clean as C#.
+	//
 
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
+	void Invoke( std::vector<std::string> arguments )
+	{
+		CVarSystem::Instance().InvokeCommand( m_name, arguments );
+	}
 
-	return std::any_cast<T>( entry.m_value );
-}
-
-template <typename T>
-inline void CVarSystem::Set( std::string name, T value )
-{
-	assert( Exists( name ) ); // Doesn't exist! Register it first
-
-	size_t hash = GetHash( name );
-	CVarEntry& entry = m_cvarEntries[hash];
-
-	entry.m_value = value;
-
-	spdlog::info( "{} was set to '{}'.", entry.m_name, value );
-}
+	void operator()( std::vector<std::string> arguments ) { Invoke( arguments ); }
+};

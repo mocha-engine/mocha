@@ -1,5 +1,6 @@
 ﻿global using static Mocha.Common.Global;
 using Mocha.Common;
+using Mocha.Common.Console;
 using MochaTool.AssetCompiler;
 using System.Runtime.InteropServices;
 
@@ -26,6 +27,12 @@ public static class Main
 
 		// Initialize the logger
 		Log = new NativeLogger();
+
+		// TODO: Is there a better way to register these cvars?
+		// Register cvars for assemblies that will never hotload
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Hotload.Main ).Assembly );	// Hotload
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Common.IGame ).Assembly );	// Common
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.BaseGame ).Assembly );		// Engine
 
 		// Initialize upgrader, we do this as early as possible to prevent
 		// slowdowns while the engine is running.
@@ -115,6 +122,73 @@ public static class Main
 			return;
 
 		Event.Run( eventName );
+	}
+
+	[UnmanagedCallersOnly]
+	public static void DispatchCommand( IntPtr infoPtr )
+	{
+		var info = Marshal.PtrToStructure<ConCmdDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		var arguments = new List<string>();
+
+		if ( info.size != 0 )
+		{
+			// TODO: Remove this alloc
+			var stringPtrs = new IntPtr[info.size];
+			Marshal.Copy( info.data, stringPtrs, 0, info.size );
+
+			arguments.Capacity = info.size;
+
+			for ( int i = 0; i < info.size; i++ )
+			{
+				arguments.Add( Marshal.PtrToStringUTF8( stringPtrs[i] ) ?? "" );
+			}
+		}
+
+		ConsoleSystem.Internal.DispatchCommand( name, arguments );
+	}
+
+	[UnmanagedCallersOnly]
+	public static void DispatchStringCVarCallback( IntPtr infoPtr )
+	{
+		var info = Marshal.PtrToStructure<StringCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		string oldValue = Marshal.PtrToStringUTF8( info.oldValue ) ?? "";
+		string newValue = Marshal.PtrToStringUTF8( info.newValue ) ?? "";
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, oldValue, newValue );
+	}
+
+	[UnmanagedCallersOnly]
+	public static void DispatchFloatCVarCallback( IntPtr infoPtr )
+	{
+		var info = Marshal.PtrToStructure<FloatCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
+	}
+
+	[UnmanagedCallersOnly]
+	public static void DispatchBoolCVarCallback( IntPtr infoPtr )
+	{
+		var info = Marshal.PtrToStructure<BoolCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
 	}
 
 	/// <summary>

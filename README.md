@@ -4,7 +4,7 @@
     <a href="https://github.com/xezno/mocha/blob/master/LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/xezno/mocha"></a>
     <a href="https://discord.gg/SDP4R6Wsza"><img alt="Discord" src="https://img.shields.io/discord/1051715074043150336"></a>
     <a href="https://github.com/xezno/mocha/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/xezno/mocha"></a>
-    <a href="https://wiki.gu3.me/index.php/Main_Page"><img alt="Wiki" src="https://img.shields.io/badge/wiki-click%20here-blue"></a>
+    <a href="https://wiki.getmocha.org/index.php/Main_Page"><img alt="Wiki" src="https://img.shields.io/badge/wiki-click%20here-blue"></a>
 </p>
 
 Mocha is a work-in-progress game engine that aims to (eventually) leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.
@@ -45,7 +45,7 @@ Contributions to this project are greatly appreciated; please follow these steps
 2. Create a branch under the name `YourName/FeatureName`
 3. Once you've made all the changes you need to make, go ahead and submit a Pull Request.
 
-Style conventions are detailed on [the Mocha wiki](https://wiki.gu3.me/index.php/Style_Guidelines). In your pull requests, you should take care to ensure these style guidelines are followed closely.
+Style conventions are detailed on [the Mocha wiki](https://wiki.getmocha.org/index.php/Style_Guidelines). In your pull requests, you should take care to ensure these style guidelines are followed closely.
 
 ## Issues and Support
 

@@ -1,5 +1,7 @@
 #include "hostmanager.h"
 
+#include <cvarmanager.h>
+
 void* HostGlobals::load_library( const char_t* path )
 {
 	HMODULE h = ::LoadLibraryW( path );
@@ -116,6 +118,26 @@ void HostManager::Shutdown() {}
 void HostManager::FireEvent( std::string eventName )
 {
 	Invoke( "FireEvent", ( void* )eventName.c_str() );
+}
+
+void HostManager::DispatchCommand( CVarManagedCmdDispatchInfo info )
+{
+	Invoke( "DispatchCommand", &info );
+}
+
+void HostManager::DispatchStringCVarCallback( CVarManagedVarDispatchInfo<const char*> info )
+{
+	Invoke( "DispatchStringCVarCallback", &info );
+}
+
+void HostManager::DispatchFloatCVarCallback( CVarManagedVarDispatchInfo<float> info )
+{
+	Invoke( "DispatchFloatCVarCallback", &info );
+}
+
+void HostManager::DispatchBoolCVarCallback( CVarManagedVarDispatchInfo<bool> info )
+{
+	Invoke( "DispatchBoolCVarCallback", &info );
 }
 
 inline void HostManager::Invoke( std::string _method, void* params, const char_t* delegateTypeName )
