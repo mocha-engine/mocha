@@ -240,13 +240,13 @@ static std::tuple<int, bool> GetNextStatementLength( std::string_view line )
 	return { ( curChar != line.end() ? length : totalLength ), skip };
 }
 
-std::vector<std::string_view> CVarSystem::GetStatements( const std::string& line, size_t cursor, size_t& cursorIndex )
+std::vector<std::string_view> CVarSystem::GetStatements( const std::string& input, size_t cursor, size_t& cursorIndex )
 {
-	auto begin = line.begin();
-	auto end = line.end();
+	auto begin = input.begin();
+	auto end = input.end();
 	std::vector<std::string_view> statements;
 
-	std::string_view remaining( line );
+	std::string_view remaining( input );
 	bool cursorReached = false;
 
 	cursorIndex = -1;
@@ -294,17 +294,17 @@ std::vector<std::string> CVarSystem::GetStatementArguments( std::string_view sta
 	return GetStatementArguments( statement, 0, cursorIndex );
 }
 
-std::vector<std::string_view> CVarSystem::GetStatements( const std::string& line )
+std::vector<std::string_view> CVarSystem::GetStatements( const std::string& input )
 {
 	size_t cursor = 0, cursorIndex;
-	return GetStatements( line, cursor, cursorIndex );
+	return GetStatements( input, cursor, cursorIndex );
 }
 
 #pragma endregion
 
-void CVarSystem::Run( const char* command )
+void CVarSystem::Run( const char* input )
 {
-	std::string inputString = std::string( command );
+	std::string inputString = std::string( input );
 
 	std::vector<std::string_view> statements = GetStatements( inputString );
 

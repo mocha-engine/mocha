@@ -144,30 +144,31 @@ public:
 	void Shutdown();
 
 	/// <summary>
-	/// Get command arguments from a statement, for use with GetStatements
-	/// Ignores comments starting with "//"
+	/// Get command arguments from a statement, for use with GetStatements.
+	/// Ignores comments, starting with "//".
 	/// </summary>
 	/// <param name="statement">The statement to get arguments from</param>
-	/// <param name="cursor">Where the user's cursor is currently within the statement line</param>
-	/// <param name="cursorIndex">Return value of 
+	/// <param name="cursor">Where the user's cursor currently is within the statement string</param>
+	/// <param name="cursorIndex">Returns which argument the cursor is within</param>
 	static std::vector<std::string> GetStatementArguments( std::string_view statement, size_t cursor, size_t& cursorIndex );
 
 	/// <summary>
-	/// Get the statements of a line, with each statement separated by ";"
+	/// Get the statements from a string, with each statement separated either by ";" or a newline.
 	/// </summary>
-	/// <param name="name"></param>
-	/// <returns></returns>
-	static std::vector<std::string_view> GetStatements( const std::string& line, size_t cursor, size_t& cursorIndex );
+	/// <param name="text"></param>
+	/// <param name="cursor">Where the user's cursor currently is within the input string</param>
+	/// <param name="cursorIndex">Returns which statement the cursor is within</param>
+	static std::vector<std::string_view> GetStatements( const std::string& input, size_t cursor, size_t& cursorIndex );
 
-	// Variants for when you don't care about any cursor
+	// Variants for uses without a text cursor
 	static std::vector<std::string> GetStatementArguments( std::string_view statement );
-	static std::vector<std::string_view> GetStatements( const std::string& line );
+	static std::vector<std::string_view> GetStatements( const std::string& input );
 
 	/// <summary>
-	/// Run a command in the console
+	/// Run statements in the console
 	/// </summary>
-	/// <param name="command"></param>
-	void Run( const char* command );
+	/// <param name="input"></param>
+	void Run( const char* input );
 
 	/// <summary>
 	/// Check if a specific convar exists
