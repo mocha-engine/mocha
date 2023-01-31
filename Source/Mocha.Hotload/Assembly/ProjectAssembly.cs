@@ -35,6 +35,13 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 		_projectAssemblyInfo = assemblyInfo;
 		_loadContext = new AssemblyLoadContext( null, isCollectible: true );
 
+		/*
+		 * Mocha.Common must always be "Private" (ie. "Copy Local" as "No" in the reference's properties)
+		 * otherwise **the engine will load Mocha.Common twice incorrectly, causing a mismatch between types**.
+		 * If you ever need to delete and re-add this reference please make sure this is always the case.
+		 * 
+		 * If you didn't do that then you'll get an exception around here!
+		 */
 		_buildTask = Build();
 		_buildTask.Wait();
 		CreateFileWatchers();

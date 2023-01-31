@@ -64,8 +64,8 @@ public static class Main
 		var editorAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = "Mocha.Editor",
-			ProjectPath = "source\\Editor\\Editor.csproj",
-			SourceRoot = "source\\Editor",
+			ProjectPath = "source\\Mocha.Editor\\Mocha.Editor.csproj",
+			SourceRoot = "source\\Mocha.Editor",
 		};
 
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );

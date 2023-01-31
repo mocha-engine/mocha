@@ -12,6 +12,7 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>$(SolutionDir)..\build</OutputPath>
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<PreserveCompilationContext>true</PreserveCompilationContext>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -51,11 +52,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
 		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj">
 			<Private></Private>
 		</ProjectReference>
 		<ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
-		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

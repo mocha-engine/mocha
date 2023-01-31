@@ -39,7 +39,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
+		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj">
+			<Private>False</Private>
+		</ProjectReference>
 		<ProjectReference Include="..\Mocha.Engine\Mocha.Engine.csproj" />
 		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
 	</ItemGroup>
