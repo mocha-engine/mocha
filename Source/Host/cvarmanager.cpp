@@ -382,7 +382,7 @@ template <typename T>
 inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
 {
 	// This *must not* have the command flag
-	flags = flags & ~( CVarFlags::Command );
+	flags = ( CVarFlags )( flags & ~( CVarFlags::Command ) );
 
 	CVarEntry entry = {};
 	entry.m_name = name;
