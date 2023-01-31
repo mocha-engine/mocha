@@ -128,7 +128,7 @@ public static class Main
 	public static void DispatchCommand( IntPtr infoPtr )
 	{
 		var info = Marshal.PtrToStructure<ConCmdDispatchInfo>( infoPtr );
-		var name = Marshal.PtrToStringUTF8( info.name );
+		string? name = Marshal.PtrToStringUTF8( info.name );
 
 		if ( name is null )
 			return;
@@ -156,18 +156,39 @@ public static class Main
 	public static void DispatchStringCVarCallback( IntPtr infoPtr )
 	{
 		var info = Marshal.PtrToStructure<StringCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		string oldValue = Marshal.PtrToStringUTF8( info.oldValue ) ?? "";
+		string newValue = Marshal.PtrToStringUTF8( info.newValue ) ?? "";
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, oldValue, newValue );
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DispatchFloatCVarCallback( IntPtr infoPtr )
 	{
 		var info = Marshal.PtrToStructure<FloatCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DispatchBoolCVarCallback( IntPtr infoPtr )
 	{
 		var info = Marshal.PtrToStructure<BoolCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
 	}
 
 	/// <summary>
