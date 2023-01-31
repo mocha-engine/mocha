@@ -79,7 +79,7 @@ public static partial class ConsoleSystem
 							parameters = parameters
 						};
 
-						RegisterCommand( customAttribute.Name, customAttribute.Flags | extraFlags, customAttribute.Description, callbackInfo );
+						RegisterCommand( customAttribute.Name ?? method.Name, customAttribute.Flags | extraFlags, customAttribute.Description ?? "", callbackInfo );
 					}
 				}
 			}
