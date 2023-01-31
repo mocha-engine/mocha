@@ -1,6 +1,10 @@
-﻿namespace Mocha.Common;
+﻿using System;
+using System.Reflection;
+using Mocha.Common.Console;
 
-public static class ConsoleSystem
+namespace Mocha.Common;
+
+public static partial class ConsoleSystem
 {
 	public static void Run( string command )
 	{
@@ -19,9 +23,7 @@ public static class ConsoleSystem
 
 	public static void Set( string name, string value )
 	{
-		// I figure we won't even want to think about what the underlying type is,
-		// so let's use FromString by default
-		Glue.ConsoleSystem.FromString( name, value );
+		Glue.ConsoleSystem.SetString( name, value );
 	}
 
 	public static void Set( string name, float value )
@@ -32,5 +34,10 @@ public static class ConsoleSystem
 	public static void Set( string name, bool value )
 	{
 		Glue.ConsoleSystem.SetBool( name, value );
+	}
+
+	public static void SetFromString( string name, string value )
+	{
+		Glue.ConsoleSystem.FromString( name, value );
 	}
 }

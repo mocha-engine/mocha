@@ -1,6 +1,7 @@
 #include "cvarmanager.h"
 
 #include <sstream>
+#include <hostmanager.h>
 
 size_t CVarSystem::GetHash( std::string string )
 {
@@ -362,12 +363,32 @@ CVarEntry& CVarSystem::GetEntry( std::string name )
 
 void CVarSystem::RegisterCommand( std::string name, CVarFlags flags, std::string description, CCmdCallback callback )
 {
-	assert( callback != nullptr );
+	// This *has* to have the command flag
+	flags = ( CVarFlags )( flags | CVarFlags::Command );
 
 	CVarEntry entry = {};
 	entry.m_name = name;
-	entry.m_description = description;
-	entry.m_flags = CVarFlags::Command | flags;
+	entry.m_description = ( description != "" ) ? description : "(no description)";
+	entry.m_flags = flags;
+	entry.m_callback = callback;
+
+	assert( entry.IsManaged() || callback != nullptr );
+
+	size_t hash = GetHash( name );
+	m_cvarEntries[hash] = entry;
+}
+
+template <typename T>
+inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
+{
+	// This *must not* have the command flag
+	flags = flags & ~( CVarFlags::Command );
+
+	CVarEntry entry = {};
+	entry.m_name = name;
+	entry.m_description = ( description != "" ) ? description : "(no description)";
+	entry.m_flags = flags;
+	entry.m_value = value;
 	entry.m_callback = callback;
 
 	size_t hash = GetHash( name );
@@ -390,15 +411,40 @@ void CVarSystem::RegisterBool( std::string name, bool value, CVarFlags flags, st
 }
 
 
+void CVarSystem::Remove( std::string name )
+{
+	size_t hash = GetHash( name );
+	m_cvarEntries.erase( hash );
+}
+
+
 void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 {
 	assert( IsCommand() );
 
-	auto callback = std::any_cast<CCmdCallback>( m_callback );
-
-	if ( callback )
+	if ( IsManaged() )
 	{
-		callback( arguments );
+		std::vector<const char*> managedArguments;
+
+		for ( auto& argument : arguments )
+			managedArguments.push_back( argument.c_str() );
+
+		CVarManagedCmdDispatchInfo info
+		{
+		    m_name.c_str(),
+			managedArguments.data(),
+			managedArguments.size()
+		};
+
+		g_hostManager->DispatchCommand( info );
+	}
+	else {
+		auto callback = std::any_cast<CCmdCallback>( m_callback );
+
+		if ( callback )
+		{
+			callback( arguments );
+		}
 	}
 }
 
@@ -419,6 +465,78 @@ void CVarSystem::InvokeCommand( std::string name, std::vector<std::string> argum
 	}
 	
 	entry.InvokeCommand( arguments );
+}
+
+
+CVarFlags CVarSystem::GetFlags( std::string name )
+{
+	if ( !Exists( name ) )
+	{
+		return CVarFlags::None;
+	}
+
+	return ( CVarFlags )GetEntry( name ).m_flags;
+}
+
+
+// Putting this stuff in the header caused bad juju
+
+template <typename T>
+inline T CVarEntry::GetValue()
+{
+	if ( IsCommand() || m_value.type() != typeid( T ) )
+	{
+		return {};
+	}
+
+	return std::any_cast<T>( m_value );
+}
+
+template <typename T>
+inline void CVarEntry::SetValue( T value )
+{
+	if ( IsCommand() || m_value.type() != typeid( T ) )
+	{
+		return;
+	}
+
+	T oldValue = std::any_cast<T>( m_value );
+	m_value = value;
+
+	if ( IsManaged() )
+	{
+		// This is kinda dirty
+
+		if constexpr ( std::is_same<T, std::string>::value )
+		{
+			CVarManagedVarDispatchInfo<const char*> stringInfo{ m_name.c_str(), oldValue.c_str(), value.c_str() };
+
+			g_hostManager->DispatchStringCVarCallback( stringInfo );
+		}
+		else if constexpr ( std::is_same<T, float>::value )
+		{
+			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
+
+			g_hostManager->DispatchFloatCVarCallback( primitiveInfo );
+		}
+		else if constexpr ( std::is_same<T, bool>::value )
+		{
+			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
+
+			g_hostManager->DispatchBoolCVarCallback( primitiveInfo );
+		}
+	}
+	else
+	{
+		auto callback = std::any_cast<CVarCallback<T>>( m_callback );
+
+		if ( callback )
+		{
+			callback( oldValue, value );
+		}
+	}
+
+	spdlog::info( "{} was set to '{}'.", m_name, value );
 }
 
 
@@ -626,6 +744,46 @@ void CVarManager::Shutdown()
 // Built-in CVars
 // ----------------------------------------
 
+static std::string GetFlagsString(CVarFlags flags)
+{
+	std::vector<const char*> flagNames;
+
+	if ( flags & CVarFlags::Command )
+		flagNames.push_back( "command" );
+	else
+		flagNames.push_back( "variable" );
+
+	if ( flags & CVarFlags::Managed )
+		flagNames.push_back( "managed" );
+
+	if ( flags & CVarFlags::Game )
+		flagNames.push_back( "game" );
+
+	if ( flags & CVarFlags::Archive )
+		flagNames.push_back( "archive" );
+
+	if ( flags & CVarFlags::Cheat )
+		flagNames.push_back( "cheat" );
+
+	if ( flags & CVarFlags::Temp )
+		flagNames.push_back( "temp" );
+
+	if ( flags & CVarFlags::Replicated )
+		flagNames.push_back( "replicated" );
+
+	std::stringstream ss;
+
+	size_t len = flagNames.size();
+	for ( int i = 0; i < len; i++ )
+	{
+		ss << flagNames[i];
+		if ( i != len - 1 )
+			ss << ", ";
+	}
+
+	return ss.str();
+}
+
 static CCmd ccmd_list( "list", CVarFlags::None, "List all commands and variables",
 	[]( std::vector<std::string> arguments )
 	{
@@ -634,11 +792,13 @@ static CCmd ccmd_list( "list", CVarFlags::None, "List all commands and variables
 // This fails on libclang so we'll ignore it for now...
 #ifndef __clang__
 		// List all available cvars
-		instance.ForEach( [&]( CVarEntry& entry ) {
+	    instance.ForEach( [&]( CVarEntry& entry ) {
+		    std::string flagNames = GetFlagsString( (CVarFlags) entry.m_flags );
+
 		    if ( entry.IsCommand() )
-			    spdlog::info( "- '{}' (command)", entry.m_name );
+			    spdlog::info( "- '{}' - {}", entry.m_name, flagNames );
 		    else
-			    spdlog::info( "- '{}': '{}' (variable)", entry.m_name, entry.ToString() );
+			    spdlog::info( "- '{}': '{}' - {}", entry.m_name, entry.ToString(), flagNames );
 			spdlog::info( "\t{}", entry.m_description );
 		} );
 #endif

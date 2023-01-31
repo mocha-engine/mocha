@@ -20,27 +20,46 @@ using CVarCallback = std::function<void( T, T )>;
 using CCmdCallback = std::function<void( std::vector<std::string> )>;
 
 
-enum CVarFlags : uint32_t
+struct CVarManagedCmdDispatchInfo
+{
+	const char* name;
+	void* data;
+	int size;
+};
+
+template <typename T>
+struct CVarManagedVarDispatchInfo
+{
+	const char* name;
+	T oldValue;
+	T newValue;
+};
+
+
+enum CVarFlags : int32_t
 {
 	None = 0,
 
 	// If this isn't present, it's inherently assumed to be a variable
 	Command = 1 << 0,
 
+	// If this is present, it lives in managed space
+	Managed = 1 << 1,
+
+	// This cvar was created by the game, it should be wiped on hotload
+	Game = 1 << 2,
+
 	// Save this convar to cvars.json
-	Archive = 1 << 1,
+	Archive = 1 << 3,
 
 	// TODO
-	Cheat = 1 << 2,
+	Cheat = 1 << 4,
 
 	// TODO
-	Temp = 1 << 3,
+	Temp = 1 << 5,
 
 	// TODO: Networked variables server -> client
-	Replicated = 1 << 4,
-
-	// TODO: CVars created by the game, hotload these?
-	Game = 1 << 5
+	Replicated = 1 << 6,
 };
 
 
@@ -57,14 +76,19 @@ public:
 	std::string m_name;
 	std::string m_description;
 
-	uint32_t m_flags;
+	int32_t m_flags;
 
 	std::any m_value;
 	std::any m_callback;
 
 	inline bool IsCommand() const { return m_flags & CVarFlags::Command; }
+	inline bool IsManaged() const { return m_flags & CVarFlags::Managed; }
+
+	// Commands
 
 	void InvokeCommand( std::vector<std::string> arguments );
+
+	// Variables
 
 	std::string GetString();
 	float GetFloat();
@@ -77,39 +101,6 @@ public:
 	std::string ToString();
 	void FromString( std::string valueStr );
 };
-
-template <typename T>
-inline T CVarEntry::GetValue()
-{
-	if ( IsCommand() || m_value.type() != typeid( T ) )
-	{
-		return {};
-	}
-
-	return std::any_cast<T>( m_value );
-}
-
-template <typename T>
-inline void CVarEntry::SetValue( T value )
-{
-	if ( IsCommand() || m_value.type() != typeid( T ) )
-	{
-		return;
-	}
-
-	T lastValue = std::any_cast<T>( m_value );
-
-	m_value = value;
-
-	auto callback = std::any_cast<CVarCallback<T>>( m_callback );
-
-	if ( callback )
-	{
-		callback( lastValue, value );
-	}
-
-	spdlog::info( "{} was set to '{}'.", m_name, value );
-}
 
 
 class CVarManager : ISubSystem
@@ -185,7 +176,11 @@ public:
 	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
 	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
 
+	void Remove( std::string name );
+
 	void InvokeCommand( std::string name, std::vector<std::string> arguments );
+
+	CVarFlags GetFlags( std::string name );
 
 	std::string GetString( std::string name );
 	float GetFloat( std::string name );
@@ -204,20 +199,6 @@ public:
 	inline static float AsFloat( std::string& argument ) { return std::strtof( argument.c_str(), nullptr ); }
 	inline static bool AsBool( std::string& argument ) { return argument == "true"; }
 };
-
-template <typename T>
-inline void CVarSystem::RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback )
-{
-	CVarEntry entry = {};
-	entry.m_name = name;
-	entry.m_description = description;
-	entry.m_flags = flags;
-	entry.m_value = value;
-	entry.m_callback = callback;
-
-	size_t hash = GetHash( name );
-	m_cvarEntries[hash] = entry;
-}
 
 // ----------------------------------------
 // Native CVar interface
