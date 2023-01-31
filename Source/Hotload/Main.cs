@@ -149,8 +149,6 @@ public static class Main
 			}
 		}
 
-		Log.Trace( $"Dispatching managed command '{name}'" );
-
 		ConsoleSystem.Internal.DispatchCommand( name, arguments );
 	}
 
