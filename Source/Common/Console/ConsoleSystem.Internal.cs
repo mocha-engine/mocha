@@ -11,18 +11,25 @@ public static partial class ConsoleSystem
 {
 	public static class Internal
 	{
-		internal static List<string> s_items = new();
-		internal static Dictionary<string, Action<List<string>>> s_commandCallbacks = new();
+		internal struct ConCmdCallbackInfo
+		{
+			public required MethodInfo method;
+			public required ParameterInfo[] parameters;
+		}
 
 		internal static class ConVarCallbackStore<T>
 		{
 			public static Dictionary<string, Action<T, T>> Callbacks = new();
 		}
 
-		internal static void RegisterCommand( string name, CVarFlags flags, string description, Action<List<string>> callback )
+		internal static List<string> s_items = new();
+
+		internal static Dictionary<string, ConCmdCallbackInfo> s_commandCallbacks = new();
+
+		internal static void RegisterCommand( string name, CVarFlags flags, string description, ConCmdCallbackInfo callbackInfo )
 		{
 			Glue.ConsoleSystem.RegisterCommand( name, flags, description );
-			s_commandCallbacks[name] = callback;
+			s_commandCallbacks[name] = callbackInfo;
 			s_items.Add( name );
 		}
 
@@ -64,8 +71,15 @@ public static partial class ConsoleSystem
 					ConCmd.BaseAttribute? customAttribute = method.GetCustomAttribute<ConCmd.BaseAttribute>();
 					if ( customAttribute is not null )
 					{
-						RegisterCommand( customAttribute.Name, customAttribute.Flags | extraFlags, customAttribute.Description,
-							( List<string> arguments ) => method.Invoke( null, new object[] { arguments } ) );
+						var parameters = method.GetParameters();
+
+						var callbackInfo = new ConCmdCallbackInfo
+						{
+							method = method,
+							parameters = parameters
+						};
+
+						RegisterCommand( customAttribute.Name, customAttribute.Flags | extraFlags, customAttribute.Description, callbackInfo );
 					}
 				}
 			}
@@ -91,20 +105,72 @@ public static partial class ConsoleSystem
 			}
 		}
 
-		public static void DispatchCommand( string name, List<string> arguments )
+		public static void DispatchCommand( string name, List<string> dispatchArguments )
 		{
-			if ( s_commandCallbacks.TryGetValue( name, out var callback ) )
+			if ( !s_commandCallbacks.TryGetValue( name, out ConCmdCallbackInfo callbackInfo ) )
+				return;
+
+			ParameterInfo[] callbackParameters = callbackInfo.parameters;
+
+			if ( callbackParameters.Length == 1 &&
+				callbackParameters[0].ParameterType == dispatchArguments.GetType() )
 			{
-				callback( arguments );
+				// All it takes is a List<string> so we can probably assume they want direct access to the arguments
+				callbackInfo.method.Invoke( null, new object[] { dispatchArguments } );
+				return;
 			}
+
+			object?[]? arguments = null;
+
+			if ( callbackParameters.Length > 0 )
+			{
+				//
+				// Softly convert arguments from strings to whatever the callback expects
+				//
+
+				arguments = new object[callbackParameters.Length];
+
+				for ( int i = 0; i < callbackParameters.Length; i++ )
+				{
+					object? value;
+
+					ParameterInfo parameter = callbackParameters[i];
+					Type parameterType = parameter.ParameterType;
+
+					if ( i < dispatchArguments.Count )
+					{
+						// Try to convert
+						if ( !dispatchArguments[i].TryConvert( parameterType, out value ) )
+						{
+							Log.Error( $"Error dispatching ConCmd '{name}': Couldn't convert '{dispatchArguments[i]}' to type {parameterType}" );
+							return;
+						}
+					}
+					else if ( parameter.HasDefaultValue )
+					{
+						// There weren't enough arguments passed in,
+						// but we have a default value, so use that instead
+						value = parameter.DefaultValue;
+					}
+					else
+					{
+						Log.Error( $"Error dispatching ConCmd '{name}': Not enough arguments - expected {callbackParameters.Length}, got {dispatchArguments.Count}" );
+						return;
+					}
+
+					arguments[i] = value;
+				}
+			}
+
+			callbackInfo.method.Invoke( null, arguments );
 		}
 
 		public static void DispatchConVarCallback<T>( string name, T oldValue, T newValue )
 		{
-			if ( ConVarCallbackStore<T>.Callbacks.TryGetValue( name, out var callback ) )
-			{
-				callback( oldValue, newValue );
-			}
+			if ( !ConVarCallbackStore<T>.Callbacks.TryGetValue( name, out var callback ) )
+				return;
+
+			callback( oldValue, newValue );
 		}
 	}
 }
