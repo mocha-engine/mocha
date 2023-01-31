@@ -408,8 +408,6 @@ internal class BrowserWindow : EditorWindow
 			ImGui.EndChild();
 		}
 
-		ImGui.EndChild();
-
 		ImGui.SameLine();
 
 		if ( ImGui.BeginChild( "main", new System.Numerics.Vector2( -1, -1 ) ) )
@@ -529,9 +527,9 @@ internal class BrowserWindow : EditorWindow
 
 				ImGui.EndListBox();
 			}
-		}
 
-		ImGui.EndChild();
+			ImGui.EndChild();
+		}
 
 		ImGui.PopStyleColor();
 
