@@ -23,7 +23,7 @@ public partial class BasePropertyEditor
 	/// <summary>
 	/// The nicely formatted name of the property.
 	/// </summary>
-	protected string FormattedPropertyName { get; }
+	public string FormattedPropertyName { get; }
 
 	/// <summary>
 	/// The Regex responsible for creating the <see ref="FormattedPropertyName"/>.
@@ -52,6 +52,8 @@ public partial class BasePropertyEditor
 
 	/// <summary>
 	/// Draws the ImGui element.
+	/// This will not draw the label. You must draw the label manually before calling this
+	/// using <see cref="FormattedPropertyName"/>.
 	/// </summary>
 	public virtual void Draw()
 	{

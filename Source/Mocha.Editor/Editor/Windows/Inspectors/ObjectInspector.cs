@@ -82,13 +82,29 @@ public class ObjectInspector : BaseInspector
 		{
 			foreach ( var (editorCategory, propertyEditors) in _propertyEditors )
 			{
-				ImGuiX.TextBold( s_padding + editorCategory );
-				ImGuiX.Separator();
+				if ( ImGui.CollapsingHeader( editorCategory, ImGuiTreeNodeFlags.DefaultOpen ) )
+				{
+					if ( ImGui.BeginTable( $"##property_table_{propertyEditors.GetHashCode()}", 2, ImGuiTableFlags.PadOuterX ) )
+					{
+						ImGui.TableSetupColumn( "Name", ImGuiTableColumnFlags.WidthStretch, 1f );
+						ImGui.TableSetupColumn( "Value", ImGuiTableColumnFlags.WidthStretch, 2f );
 
-				foreach ( var propertyEditor in propertyEditors )
-					propertyEditor.Draw();
+						ImGui.TableNextRow();
+						ImGui.TableNextColumn();
 
-				ImGuiX.Separator();
+						foreach ( var propertyEditor in propertyEditors )
+						{
+							ImGui.Text( propertyEditor.FormattedPropertyName );
+							ImGui.TableNextColumn();
+
+							ImGui.SetNextItemWidth( -1f );
+							propertyEditor.Draw();
+							ImGui.TableNextColumn();
+						}
+
+						ImGui.EndTable();
+					}
+				}
 			}
 		}
 

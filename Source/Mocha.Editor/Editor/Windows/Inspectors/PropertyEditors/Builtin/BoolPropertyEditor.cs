@@ -17,7 +17,7 @@ public class BoolPropertyEditor : SimplePropertyEditor
 	protected override void DrawInput()
 	{
 		var boolean = GetValue<bool>();
-		if ( ImGui.Checkbox( FormattedPropertyName, ref boolean ) )
+		if ( ImGui.Checkbox( $"##FormattedPropertyName", ref boolean ) )
 			SetValue( boolean );
 	}
 }

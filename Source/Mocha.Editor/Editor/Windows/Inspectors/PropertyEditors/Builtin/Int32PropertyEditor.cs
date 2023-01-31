@@ -20,15 +20,15 @@ public class Int32PropertyEditor : SimplePropertyEditor
 		switch ( DisplayMode )
 		{
 			case DisplayMode.Text:
-				if ( ImGui.InputInt( FormattedPropertyName, ref num ) && num >= Min && num <= Max )
+				if ( ImGui.InputInt( $"##{FormattedPropertyName}", ref num ) && num >= Min && num <= Max )
 					SetValue( num );
 				break;
 			case DisplayMode.Drag:
-				if ( ImGui.DragInt( FormattedPropertyName, ref num, DefaultDragSpeed, Min, Max ) )
+				if ( ImGui.DragInt( $"##{FormattedPropertyName}", ref num, DefaultDragSpeed, Min, Max ) )
 					SetValue( num );
 				break;
 			case DisplayMode.Slider:
-				if ( ImGui.SliderInt( FormattedPropertyName, ref num, Min, Max ) )
+				if ( ImGui.SliderInt( $"##{FormattedPropertyName}", ref num, Min, Max ) )
 					SetValue( num );
 				break;
 		}

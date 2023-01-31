@@ -20,15 +20,15 @@ public class FloatPropertyEditor : SimplePropertyEditor
 		switch ( DisplayMode )
 		{
 			case DisplayMode.Text:
-				if ( ImGui.InputFloat( FormattedPropertyName, ref num ) && num >= Min && num <= Max )
+				if ( ImGui.InputFloat( $"##{FormattedPropertyName}", ref num ) && num >= Min && num <= Max )
 					SetValue( num );
 				break;
 			case DisplayMode.Drag:
-				if ( ImGui.DragFloat( FormattedPropertyName, ref num, DefaultDragSpeed, Min, Max ) )
+				if ( ImGui.DragFloat( $"##{FormattedPropertyName}", ref num, DefaultDragSpeed, Min, Max ) )
 					SetValue( num );
 				break;
 			case DisplayMode.Slider:
-				if ( ImGui.SliderFloat( FormattedPropertyName, ref num, Min, Max ) )
+				if ( ImGui.SliderFloat( $"##{FormattedPropertyName}", ref num, Min, Max ) )
 					SetValue( num );
 				break;
 		}

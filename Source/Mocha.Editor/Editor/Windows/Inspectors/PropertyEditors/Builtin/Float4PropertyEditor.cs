@@ -23,7 +23,7 @@ public class Float4PropertyEditor : SimplePropertyEditor
 		switch ( DisplayMode )
 		{
 			case DisplayMode.Text:
-				if ( !ImGui.InputFloat4( FormattedPropertyName, ref float4 ) )
+				if ( !ImGui.InputFloat4( $"##{FormattedPropertyName}", ref float4 ) )
 					break;
 
 				if ( float4.X < Min || float4.X > Max ||
@@ -35,11 +35,11 @@ public class Float4PropertyEditor : SimplePropertyEditor
 				SetVector( float4 );
 				break;
 			case DisplayMode.Drag:
-				if ( ImGui.DragFloat4( FormattedPropertyName, ref float4, DefaultDragSpeed, Min, Max ) )
+				if ( ImGui.DragFloat4( $"##{FormattedPropertyName}", ref float4, DefaultDragSpeed, Min, Max ) )
 					SetVector( float4 );
 				break;
 			case DisplayMode.Slider:
-				if ( ImGui.SliderFloat4( FormattedPropertyName, ref float4, Min, Max ) )
+				if ( ImGui.SliderFloat4( $"##{FormattedPropertyName}", ref float4, Min, Max ) )
 					SetVector( float4 );
 				break;
 		}

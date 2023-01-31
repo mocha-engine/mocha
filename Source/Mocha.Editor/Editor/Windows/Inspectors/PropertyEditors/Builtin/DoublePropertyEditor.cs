@@ -17,7 +17,7 @@ public class DoublePropertyEditor : SimplePropertyEditor
 	protected override void DrawInput()
 	{
 		var num = GetValue<double>();
-		if ( ImGui.InputDouble( FormattedPropertyName, ref num ) && num >= Min && num <= Max )
+		if ( ImGui.InputDouble( $"##{FormattedPropertyName}", ref num ) && num >= Min && num <= Max )
 			SetValue( num );
 	}
 }

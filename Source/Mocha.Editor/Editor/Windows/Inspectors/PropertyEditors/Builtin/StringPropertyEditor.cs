@@ -27,13 +27,13 @@ public class StringPropertyEditor : SimplePropertyEditor
 
 		if ( obj is string str )
 		{
-			if ( ImGui.InputText( FormattedPropertyName, ref str, (uint)Max ) )
+			if ( ImGui.InputText( $"##{FormattedPropertyName}", ref str, (uint)Max ) )
 				SetValue( str );
 		}
 		else
 		{
 			var objStr = obj?.ToString() ?? "null";
-			if ( ImGui.InputText( FormattedPropertyName, ref objStr, (uint)Max ) )
+			if ( ImGui.InputText( $"##{FormattedPropertyName}", ref objStr, (uint)Max ) )
 				SetValue( objStr );
 		}
 	}
