@@ -88,7 +88,6 @@ internal static class Compiler
 		//
 		var project = Project.FromFile( assemblyInfo.ProjectPath, new Microsoft.Build.Definition.ProjectOptions() );
 
-
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
 
@@ -110,6 +109,9 @@ internal static class Compiler
 
 			// Get path based on project root
 			filePath = Path.Combine( assemblyInfo.SourceRoot, filePath );
+
+			// File path should be absolute
+			filePath = Path.GetFullPath( filePath );
 
 			var encoding = System.Text.Encoding.Default;
 
