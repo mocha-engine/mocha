@@ -51,40 +51,42 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
+		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj">
+			<Private></Private>
+		</ProjectReference>
 		<ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
 		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Runtimes\cimgui.dll">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Runtimes\cimgui.exp">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Runtimes\cimgui.lib">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Runtimes\cimgui.pdb">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Runtimes\FlexLayoutSharp.dll">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
-	  <None Update="Runtimes\ImGui.NET.dll">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </None>
+		<None Update="Runtimes\cimgui.dll">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Runtimes\cimgui.exp">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Runtimes\cimgui.lib">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Runtimes\cimgui.pdb">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Runtimes\FlexLayoutSharp.dll">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
+		<None Update="Runtimes\ImGui.NET.dll">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
-	
+
 	<PropertyGroup>
 		<PreserveCompilationReferences>true</PreserveCompilationReferences>
 		<PreserveCompilationContext>true</PreserveCompilationContext>
 		<RootNamespace>Mocha</RootNamespace>
 	</PropertyGroup>
-	
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="xcopy /E /Y &quot;$(ProjectDir)Runtimes\&quot; &quot;$(SolutionDir)..\build\&quot;&#xD;&#xA;" />
+		<Exec Command="xcopy /E /Y &quot;$(ProjectDir)Runtimes\&quot; &quot;$(SolutionDir)..\build\&quot;&#xD;&#xA;" />
 	</Target>
 
 </Project>
