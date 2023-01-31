@@ -76,4 +76,109 @@ public static class StringExtension
 		return result;
 	}
 
+	public static bool TryConvert( this string str, Type t, out object? Value )
+	{
+		Value = null;
+
+		if ( t == typeof( string ) )
+		{
+			Value = str;
+			return true;
+		}
+
+		if ( t == typeof( float ) )
+		{
+			Value = str.ToFloat();
+			return true;
+		}
+
+		if ( t == typeof( double ) )
+		{
+			Value = str.ToDouble();
+			return true;
+		}
+
+		if ( t == typeof( int ) )
+		{
+			Value = str.ToInt();
+			return true;
+		}
+
+		if ( t == typeof( uint ) )
+		{
+			Value = str.ToUInt();
+			return true;
+		}
+
+		if ( t == typeof( long ) )
+		{
+			Value = str.ToLong();
+			return true;
+		}
+
+		if ( t == typeof( ulong ) )
+		{
+			Value = str.ToULong();
+			return true;
+		}
+
+		if ( t == typeof( bool ) )
+		{
+			Value = str.ToBool();
+			return true;
+		}
+
+		return false;
+	}
+
+	public static float ToFloat( this string str, float Default = default )
+	{
+		return float.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static double ToDouble( this string str, double Default = default )
+	{
+		return double.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static int ToInt( this string str, int Default = default )
+	{
+		return int.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static uint ToUInt( this string str, uint Default = default )
+	{
+		return uint.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static long ToLong( this string str, long Default = default )
+	{
+		return long.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static ulong ToULong( this string str, ulong Default = default )
+	{
+		return ulong.TryParse( str, out var result ) ? result : Default;
+	}
+
+	public static bool ToBool( this string str )
+	{
+		switch ( str )
+		{
+			case null:
+			case "":
+			case "0":
+				return false;
+
+			default:
+				if ( str.Equals( "yes", StringComparison.OrdinalIgnoreCase ) ||
+					str.Equals( "true", StringComparison.OrdinalIgnoreCase ) ||
+					str.Equals( "on", StringComparison.OrdinalIgnoreCase ) )
+					return true;
+
+				// If it fails to parse as a number, it returns false
+				// If it succeeds and it's not 0, it returns true
+				return float.TryParse( str, out var result ) && result != 0.0f;
+		}
+	}
 }

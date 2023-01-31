@@ -16,6 +16,11 @@ using string_t = std::basic_string<char_t>;
 
 typedef int( CORECLR_DELEGATE_CALLTYPE* run_fn )( UnmanagedArgs* args );
 
+struct CVarManagedCmdDispatchInfo;
+
+template <typename T>
+struct CVarManagedVarDispatchInfo;
+
 namespace HostGlobals
 {
 	// Globals to hold hostfxr exports
@@ -52,4 +57,9 @@ public:
 	void Render();
 	void DrawEditor();
 	void FireEvent( std::string eventName );
+
+	void DispatchCommand( CVarManagedCmdDispatchInfo info );
+	void DispatchStringCVarCallback( CVarManagedVarDispatchInfo<const char*> info );
+	void DispatchFloatCVarCallback( CVarManagedVarDispatchInfo<float> info );
+	void DispatchBoolCVarCallback( CVarManagedVarDispatchInfo<bool> info );
 };
