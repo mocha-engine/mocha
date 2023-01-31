@@ -5,6 +5,8 @@
 
 size_t CVarSystem::GetHash( std::string string )
 {
+	std::transform( string.begin(), string.end(), string.begin(),
+		[]( unsigned char c ) { return std::tolower( c ); } );
 	return std::hash<std::string>{}( string );
 }
 
