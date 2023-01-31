@@ -297,8 +297,8 @@ std::vector<std::string> CVarSystem::GetStatementArguments( std::string_view sta
 
 std::vector<std::string_view> CVarSystem::GetStatements( const std::string& input )
 {
-	size_t cursor = 0, cursorIndex;
-	return GetStatements( input, cursor, cursorIndex );
+	size_t cursorIndex;
+	return GetStatements( input, 0, cursorIndex );
 }
 
 #pragma endregion
