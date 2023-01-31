@@ -29,7 +29,7 @@ public class MaterialInspector : BaseInspector
 		ImGui.SetCursorPos( startPos + new System.Numerics.Vector2( 0, 4 ) );
 
 		if ( ImGui.Selectable( $"##select_{name}", false, ImGuiSelectableFlags.SpanAllColumns, rectSize ) )
-			BrowserWindow.SetSelectedObject( texture );
+			InspectorWindow.SetSelectedObject( texture );
 	}
 
 	public override void Draw()

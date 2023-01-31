@@ -9,7 +9,9 @@ public class Editor
 	public static List<EditorWindow> EditorWindows = new()
 	{
 		new ConsoleWindow(),
-		new BrowserWindow()
+		new BrowserWindow(),
+		new InspectorWindow(),
+		new ViewportWindow()
 	};
 
 	public static void Draw()
@@ -49,6 +51,14 @@ public class Editor
 
 				if ( ImGui.MenuItem( "Performance Overlay" ) )
 					drawPerformanceOverlay = !drawPerformanceOverlay;
+
+				ImGui.EndMenu();
+			}
+
+			if ( ImGui.BeginMenu( "Layout" ) )
+			{
+				if ( ImGui.MenuItem( "Reset to Default" ) )
+					ResetLayout();
 
 				ImGui.EndMenu();
 			}
@@ -93,8 +103,13 @@ public class Editor
 			ImGui.Text( $"FPS: {Time.FPS}" );
 			ImGui.Text( $"Current time: {Time.Now}" );
 			ImGui.Text( $"Frame time: {(Time.Delta * 1000f).CeilToInt()}ms" );
-
-			ImGui.End();
 		}
+
+		ImGui.End();
+	}
+
+	private static void ResetLayout()
+	{
+
 	}
 }
