@@ -8,47 +8,89 @@
 
 namespace ConsoleSystem
 {
-	// Run a console command.
-	// The following formats are currently supported:
-	// - [convar name]: Output the current value for a console variable
-	// - [convar name] [value]: Update a console variable with a new value
 	GENERATE_BINDINGS inline void Run( const char* command )
 	{
-		std::string inputString = std::string( command );
+		CVarSystem::Instance().Run( command );
+	}
 
-		std::stringstream ss( inputString );
+	GENERATE_BINDINGS inline bool Exists( const char* name )
+	{
+		return CVarSystem::Instance().Exists( name );
+	}
 
-		std::string cvarName, cvarValue;
-		ss >> cvarName >> cvarValue;
+	GENERATE_BINDINGS inline void RegisterCommand( const char* name, CVarFlags flags, const char* description )
+	{
+		CVarSystem::Instance().RegisterCommand( name, ( CVarFlags )( CVarFlags::Managed | flags ), description, nullptr );
+	}
 
-		std::stringstream valueStream( cvarValue );
+	GENERATE_BINDINGS inline void RegisterString( const char* name, const char* value, CVarFlags flags, const char* description )
+	{
+		CVarSystem::Instance().RegisterString( name, value, ( CVarFlags )( CVarFlags::Managed | flags ), description, nullptr );
+	}
 
-		if ( cvarName == "list" )
-		{
-// This fails on libclang so we'll ignore it for now...
-#ifndef __clang__
-			// List all available cvars
-			CVarSystem::Instance().ForEach( [&]( CVarEntry& entry ) {
-				spdlog::info( "- '{}': '{}'", entry.m_name, CVarSystem::Instance().ToString( entry.m_name ) );
-				spdlog::info( "\t{}", entry.m_description );
-			} );
-#endif
-		}
-		else if ( !CVarSystem::Instance().Exists( cvarName ) )
-		{
-			spdlog::info( "{} is not a valid command or variable", cvarName );
-		}
-		else
-		{
-			if ( valueStream.str().size() > 0 )
-			{
-				CVarSystem::Instance().FromString( cvarName, cvarValue );
-			}
-			else
-			{
-				cvarValue = CVarSystem::Instance().ToString( cvarName );
-				spdlog::info( "{} is '{}'", cvarName, cvarValue );
-			}
-		}
+	GENERATE_BINDINGS inline void RegisterFloat( const char* name, float value, CVarFlags flags, const char* description )
+	{
+		CVarSystem::Instance().RegisterFloat( name, value, ( CVarFlags )( CVarFlags::Managed | flags ), description, nullptr );
+	}
+
+	GENERATE_BINDINGS inline void RegisterBool( const char* name, bool value, CVarFlags flags, const char* description )
+	{
+		CVarSystem::Instance().RegisterBool( name, value, ( CVarFlags )( CVarFlags::Managed | flags ), description, nullptr );
+	}
+
+	GENERATE_BINDINGS inline void Remove( const char* name )
+	{
+		CVarSystem::Instance().Remove( name );
+	}
+
+	GENERATE_BINDINGS inline CVarFlags GetFlags( const char* name )
+	{
+		return CVarSystem::Instance().GetFlags( name );
+	}
+	
+	// TODO: Not until all memory leak concerns are addressed
+/*
+	GENERATE_BINDINGS inline const char* GetString( const char* name )
+	{
+		return CVarSystem::Instance().GetString( name ).c_str();
+	}
+*/
+
+	GENERATE_BINDINGS inline float GetFloat( const char* name )
+	{
+		return CVarSystem::Instance().GetFloat( name );
+	}
+
+	GENERATE_BINDINGS inline bool GetBool( const char* name )
+	{
+		return CVarSystem::Instance().GetBool( name );
+	}
+
+	GENERATE_BINDINGS inline void SetString( const char* name, const char* value )
+	{
+		CVarSystem::Instance().SetString( name, value );
+	}
+
+	GENERATE_BINDINGS inline void SetFloat( const char* name, float value )
+	{
+		CVarSystem::Instance().SetFloat( name, value );
+	}
+
+	GENERATE_BINDINGS inline void SetBool( const char* name, bool value )
+	{
+		CVarSystem::Instance().SetBool( name, value );
+	}
+
+	// TODO: Not until all memory leak concerns are addressed
+/*
+	GENERATE_BINDINGS inline const char* ToString( const char* name )
+	{
+		
+	}
+*/
+
+	GENERATE_BINDINGS inline void FromString( const char* name, const char* valueStr )
+	{
+		CVarSystem::Instance().FromString( name, valueStr );
 	}
 } // namespace ConsoleSystem

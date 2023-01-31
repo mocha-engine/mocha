@@ -96,6 +96,8 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 
 			// Unregister events for old interface
 			Event.Unregister( oldGameInterface );
+
+			ConsoleSystem.Internal.ClearGameCVars();
 		}
 
 		// Now that everything's been upgraded, swap the new interface
@@ -103,6 +105,9 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 		Swap( newAssembly, newInterface );
 
 		Notify.AddNotification( $"Build successful!", $"Compiled '{_projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
+
+		ConsoleSystem.Internal.RegisterAssembly( newAssembly, extraFlags: CVarFlags.Game );
+
 		Event.Run( Event.Game.HotloadAttribute.Name );
 
 		if ( !_buildRequested )
