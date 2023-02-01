@@ -466,4 +466,86 @@ public static class ImGuiX
 
 		return res;
 	}
+
+	private static Vector2 s_iconSize = new( 100f, 150f );
+
+	public static void Icon( string text, string icon, Vector4 color, ref bool selected )
+	{
+		var drawList = ImGui.GetWindowDrawList();
+		var startPos = (Vector2)ImGui.GetCursorPos();
+
+		var windowPos = (Vector2)ImGui.GetWindowPos();
+		var scrollPos = new Vector2( 0, ImGui.GetScrollY() );
+
+		{
+			drawList.AddRectFilledMultiColor(
+				windowPos + startPos - new Vector2( 8, 8 ) - scrollPos,
+				windowPos + startPos + new Vector2( s_iconSize.X + 8, s_iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( color * 0.6f ),
+				ImGui.GetColorU32( color * 0.6f ),
+				ImGui.GetColorU32( color * 0.4f ),
+				ImGui.GetColorU32( color * 0.4f )
+			);
+
+			drawList.AddRect(
+				windowPos + startPos - new Vector2( 10, 10 ) - scrollPos,
+				windowPos + startPos + new Vector2( s_iconSize.X + 10, s_iconSize.Y + 10 ) - scrollPos,
+				ImGui.GetColorU32( ImGuiCol.FrameBg ),
+				4,
+				ImDrawFlags.None,
+				3 // rounding - 1px
+			);
+
+			drawList.AddRectFilled(
+				windowPos + startPos + new Vector2( -8, s_iconSize.Y + 4 ) - scrollPos,
+				windowPos + startPos + new Vector2( s_iconSize.X + 8, s_iconSize.Y + 8 ) - scrollPos,
+				ImGui.GetColorU32( color * 0.75f ),
+				4f,
+				ImDrawFlags.RoundCornersBottom );
+		}
+
+		Vector2 center = (s_iconSize - 96f) / 2.0f;
+
+		ImGui.SetCursorPos( startPos + new Vector2( center.X, 24 + 2 ) );
+		ImGuiX.Image( icon, new Vector2( 96f ), new Vector4( 0, 0, 0, 0.1f ) );
+
+		ImGui.SetCursorPos( startPos + new Vector2( center.X, 24 ) );
+		ImGuiX.Image( icon, new Vector2( 96f ) );
+
+		if ( selected )
+		{
+			drawList.AddRect(
+				windowPos + startPos - new Vector2( 12, 12 ) - scrollPos,
+				windowPos + startPos + new Vector2( s_iconSize.X + 12, s_iconSize.Y + 12 ) - scrollPos,
+				ImGui.GetColorU32( Theme.Blue ),
+				4f,
+				ImDrawFlags.None,
+				2f );
+		}
+
+		ImGui.SetCursorPos( startPos );
+		if ( ImGui.InvisibleButton( $"##icon_{text}", s_iconSize ) )
+		{
+			selected = true;
+		}
+
+		var textSize = ImGui.CalcTextSize( text, s_iconSize.X );
+
+		var textPos = (s_iconSize.X - textSize.X) / 2.0f;
+		if ( textSize.Y > 16 )
+			textPos = 0.0f;
+
+		var textStartPos = startPos + new Vector2( textPos, s_iconSize.Y - textSize.Y - 4 );
+		ImGui.SetCursorPos( textStartPos );
+
+		ImGui.SetCursorPos( textStartPos );
+		ImGui.PushTextWrapPos( ImGui.GetCursorPosX() + s_iconSize.X );
+		ImGui.TextWrapped( text );
+		ImGui.PopTextWrapPos();
+
+		ImGui.SetCursorPos( startPos );
+		ImGui.Dummy( s_iconSize + new Vector2( 16, 16 ) );
+
+		selected = false;
+	}
 }
