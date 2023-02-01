@@ -11,13 +11,25 @@ internal class ProjectCreatorWindow : EditorWindow
 		{
 			"Mocha-minimal",
 			"Sponza",
-			"MyCoolGame"
+			"MyCoolGame",
+			"ABC",
+			"DEF",
+			"GHI"
 		};
 	}
 
 	private void DrawProject( string project )
 	{
 		bool selected = false;
+
+		float w = ImGui.GetWindowSize().X - 100;
+
+		if ( ImGui.GetCursorPos().X > w )
+		{
+			ImGui.NewLine();
+			ImGuiX.BumpCursorX( 8 );
+		}
+
 		ImGuiX.Icon( project, "textures/placeholder.mtex", Vector4.One, ref selected );
 
 		ImGui.SameLine();
@@ -27,37 +39,43 @@ internal class ProjectCreatorWindow : EditorWindow
 	{
 		if ( ImGuiX.BeginWindow( "Project Browser", ref isVisible ) )
 		{
-			var windowSize = ImGui.GetWindowSize();
-
 			ImGuiX.Title( $"{FontAwesome.Folder} Your Projects", "Here's a list of your projects. Click one to load it, or click 'New' to make a new one.", drawSubpanel: true );
 
 			ImGuiX.Separator();
 
 			if ( ImGui.BeginChild( "##projects_list", new Vector2( -1, -52 ), false, ImGuiWindowFlags.AlwaysUseWindowPadding ) )
 			{
-				ImGuiX.BumpCursorX( 8 );
-				ImGuiX.BumpCursorY( 8 );
+				float padding = 8f;
+				ImGuiX.BumpCursorX( padding );
+				ImGuiX.BumpCursorY( padding );
 
 				foreach ( var project in _projects )
 				{
 					DrawProject( project );
 				}
-
-				DrawProject( "New..." );
 			}
 
 			ImGui.EndChild();
 
 			ImGuiX.Separator();
 
-			ImGui.Dummy( new Vector2( windowSize.X - 190, 0 ) );
+			using ( var layout = new HorizontalLayout( "new_project", LayoutAlignment.Start ) )
+			{
+				layout.Add( ImGui.Button( "New..." ) );
+			}
+
 			ImGui.SameLine();
 
-			ImGui.Button( "Browse" );
-			ImGui.SameLine();
-			ImGui.Button( "Open" );
-			ImGui.SameLine();
-			ImGui.Button( "Exit" );
+			using ( var layout = new HorizontalLayout( "browse_and_open", LayoutAlignment.End ) )
+			{
+				layout.Add( ImGui.Button( "Browse" ) );
+				layout.Add( ImGui.Button( "Open" ) );
+
+				if ( layout.Add( ImGui.Button( "Exit" ) ) )
+				{
+					Environment.Exit( 0 ); // TODO: Graceful exit
+				}
+			}
 
 			ImGui.End();
 		}

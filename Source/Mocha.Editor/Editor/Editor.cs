@@ -13,7 +13,9 @@ public class Editor
 		new InspectorWindow(),
 		new ViewportWindow(),
 
-		new ProjectCreatorWindow()
+		new ProjectCreatorWindow(),
+
+		new LayoutTestWindow()
 	};
 
 	public static void Draw()
