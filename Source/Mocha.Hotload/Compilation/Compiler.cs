@@ -86,7 +86,8 @@ internal static class Compiler
 		//
 		// Fetch the project and all source files
 		//
-		var project = Project.FromFile( assemblyInfo.ProjectPath, new Microsoft.Build.Definition.ProjectOptions() );
+		ProjectCollection projectCollection = new();
+		var project = new Project( assemblyInfo.ProjectPath, null, null, projectCollection );
 
 		var syntaxTrees = new List<SyntaxTree>();
 		var embeddedTexts = new List<EmbeddedText>();
@@ -145,7 +146,7 @@ internal static class Compiler
 		foreach ( var projectReference in project.GetItems( "ProjectReference" ) )
 		{
 			var referenceCsprojPath = Path.GetFullPath( Path.Combine( Path.GetDirectoryName( assemblyInfo.ProjectPath )!, projectReference.EvaluatedInclude ) );
-			var referenceProject = Project.FromFile( referenceCsprojPath, new Microsoft.Build.Definition.ProjectOptions() );
+			var referenceProject = new Project( referenceCsprojPath, null, null, projectCollection );
 			var assemblyName = referenceProject.GetPropertyValue( "AssemblyName" );
 
 			if ( !string.IsNullOrEmpty( assemblyName ) )
@@ -180,8 +181,8 @@ internal static class Compiler
 			options
 		);
 
-		// Unload project
-		project.ProjectCollection.UnloadProject( project );
+		// Unload projects
+		projectCollection.UnloadAllProjects();
 
 		//
 		// Compile assembly into memory
