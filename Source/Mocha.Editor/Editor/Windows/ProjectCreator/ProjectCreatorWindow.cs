@@ -14,7 +14,8 @@ internal class ProjectCreatorWindow : EditorWindow
 			"MyCoolGame",
 			"ABC",
 			"DEF",
-			"GHI"
+			"GHI",
+			"I am a really long project name"
 		};
 	}
 
@@ -30,7 +31,7 @@ internal class ProjectCreatorWindow : EditorWindow
 			ImGuiX.BumpCursorX( 8 );
 		}
 
-		ImGuiX.Icon( project, "textures/placeholder.mtex", Vector4.One, ref selected );
+		ImGuiX.Icon( project, "Project", "textures/placeholder.mtex", Vector4.One, selected );
 
 		ImGui.SameLine();
 	}
