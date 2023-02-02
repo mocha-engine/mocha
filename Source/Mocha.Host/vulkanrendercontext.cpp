@@ -818,11 +818,11 @@ void VulkanRenderContext::CreateImGui()
 	name = io.Fonts->AddFontFromFileTTF( path, size ); \
 	CreateImGuiIconFont();
 
-	ADD_FONT( m_mainFont, "C:\\Windows\\Fonts\\segoeui.ttf", 16.0f );
-	ADD_FONT( m_boldFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 16.0f );
-	ADD_FONT( m_subheadingFont, "C:\\Windows\\Fonts\\seguisb.ttf", 22.0f );
-	ADD_FONT( m_headingFont, "C:\\Windows\\Fonts\\segoeuib.ttf", 26.0f );
-	ADD_FONT( m_monospaceFont, "C:\\Windows\\Fonts\\CascadiaCode.ttf", 13.0f );
+	ADD_FONT( m_mainFont, "Content\\core\\fonts\\editor\\Inter-Regular.ttf", 14.0f );
+	ADD_FONT( m_boldFont, "Content\\core\\fonts\\editor\\Inter-Bold.ttf", 14.0f );
+	ADD_FONT( m_subheadingFont, "Content\\core\\fonts\\editor\\Inter-Medium.ttf", 16.0f );
+	ADD_FONT( m_headingFont, "Content\\core\\fonts\\editor\\Inter-Bold.ttf", 24.0f );
+	ADD_FONT( m_monospaceFont, "Content\\core\\fonts\\editor\\JetBrainsMono-Regular.ttf", 14.0f );
 #undef ADD_FONT
 
 	io.Fonts->Build();
