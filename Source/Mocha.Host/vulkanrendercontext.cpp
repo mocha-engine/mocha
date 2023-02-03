@@ -1137,6 +1137,16 @@ RenderStatus VulkanRenderContext::Shutdown()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 
+	//
+	// Delete everything
+	//
+	m_buffers.ForEach( []( std::shared_ptr<VulkanBuffer> buffer ) { buffer->Delete(); } );
+	m_imageTextures.ForEach( []( std::shared_ptr<VulkanImageTexture> imageTexture ) { imageTexture->Delete(); } );
+	m_renderTextures.ForEach( []( std::shared_ptr<VulkanRenderTexture> renderTexture ) { renderTexture->Delete(); } );
+	m_descriptors.ForEach( []( std::shared_ptr<VulkanDescriptor> descriptor ) { descriptor->Delete(); } );
+	m_pipelines.ForEach( []( std::shared_ptr<VulkanPipeline> pipeline ) { pipeline->Delete(); } );
+	m_shaders.ForEach( []( std::shared_ptr<VulkanShader> shader ) { shader->Delete(); } );
+
 	m_hasInitialized = false;
 	return RENDER_STATUS_OK;
 }

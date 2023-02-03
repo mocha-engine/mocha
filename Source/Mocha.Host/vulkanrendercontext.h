@@ -438,6 +438,8 @@ private:
 	//    }
 	// }
 	//
+	// If you are adding a new HandleMap here, **make sure everything in it
+	// is deleted inside Shutdown()**.
 	HandleMap<VulkanBuffer> m_buffers = {};
 	HandleMap<VulkanImageTexture> m_imageTextures = {};
 	HandleMap<VulkanRenderTexture> m_renderTextures = {};
@@ -465,6 +467,11 @@ private:
 	} m_fullScreenTri;
 	void CreateFullScreenTri();
 
+	/// <summary>
+	/// Everything in here will be deleted once the current frame ends.
+	/// If we're not currently rendering a frame, then everything will be
+	/// deleted when the next frame ends instead.
+	/// </summary>
 	VulkanDeletionQueue m_frameDeletionQueue = {};
 
 protected:
