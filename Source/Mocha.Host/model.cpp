@@ -12,6 +12,7 @@ void Model::UploadMesh( Mesh& mesh )
 	//
 	{
 		BufferInfo_t vertexBufferInfo = {};
+		vertexBufferInfo.name = mesh.name + " vertex buffer";
 		vertexBufferInfo.size = mesh.vertices.size;
 		vertexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		vertexBufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
@@ -30,6 +31,7 @@ void Model::UploadMesh( Mesh& mesh )
 	if ( mesh.indices.size > 0 )
 	{
 		BufferInfo_t indexBufferInfo = {};
+		indexBufferInfo.name = mesh.name + " index buffer";
 		indexBufferInfo.size = mesh.indices.size;
 		indexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		indexBufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
@@ -46,11 +48,11 @@ void Model::UploadMesh( Mesh& mesh )
 	m_isInitialized = true;
 }
 
-void Model::AddMesh( UtilArray vertices, UtilArray indices, Material* material )
+void Model::AddMesh( const char* name, UtilArray vertices, UtilArray indices, Material* material )
 {
 	if ( vertices.size == 0 )
 		return;
 
-	Mesh mesh( vertices, indices, material );
+	Mesh mesh( std::string( name ), vertices, indices, material );
 	UploadMesh( mesh );
 }

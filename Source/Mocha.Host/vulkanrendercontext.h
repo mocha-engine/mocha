@@ -110,6 +110,8 @@ protected:
 		m_parent = parent;
 	}
 
+	void SetDebugName( const char* name, VkObjectType objectType, uint64_t handle );
+
 public:
 	/// <summary>
 	/// This will delete any Vulkan resources stored within this object.
@@ -261,8 +263,10 @@ public:
 	VkImageView imageView;
 	VkFormat format;
 
+	ImageTextureInfo_t textureInfo;
+
 	VulkanImageTexture() {}
-	VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t textureInfo );
+	VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t _textureInfo );
 
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
@@ -497,6 +501,19 @@ protected:
 	RenderStatus CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle ) override;
 	RenderStatus CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle ) override;
 	RenderStatus CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) override;
+
+	// ----------------------------------------
+
+	inline void SetDebugName( const char* name, VkObjectType objectType, uint64_t handle )
+	{
+		// Set the name of the object.
+		VkDebugUtilsObjectNameInfoEXT nameInfo{};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		nameInfo.objectType = objectType;
+		nameInfo.objectHandle = handle;
+		nameInfo.pObjectName = name;
+		vkSetDebugUtilsObjectNameEXT( m_device, &nameInfo );
+	}
 
 public:
 	// All vulkan types should be able to access render context internals.

@@ -96,13 +96,13 @@ struct TextureInfo_t
 
 struct RenderTextureInfo_t : public TextureInfo_t
 {
+	std::string name = "Unnamed Render Texture";
 	RenderTextureType type;
 };
 
 struct ImageTextureInfo_t : public TextureInfo_t
 {
-	// TODO: Replace
-	int imageFormat = 0;
+	std::string name = "Unnamed Image Texture";
 };
 
 struct TextureData_t
@@ -130,6 +130,7 @@ struct TextureCopyData_t
 
 struct BufferInfo_t
 {
+	std::string name = "Unnamed Buffer";
 	uint32_t size = 0;
 	BufferType type = BUFFER_TYPE_STAGING;
 	BufferUsageFlags usage = BUFFER_USAGE_FLAG_INDEX_BUFFER;
@@ -148,6 +149,7 @@ struct DescriptorBindingInfo_t
 
 struct DescriptorInfo_t
 {
+	std::string name = "Unnamed Descriptor";
 	std::vector<DescriptorBindingInfo_t> bindings = {};
 };
 
@@ -160,6 +162,7 @@ struct DescriptorUpdateInfo_t
 
 struct ShaderInfo_t
 {
+	std::string name = "Unnamed Shader";
 	std::vector<uint32_t> fragmentShaderData;
 	std::vector<uint32_t> vertexShaderData;
 };
@@ -172,6 +175,7 @@ struct VertexAttributeInfo_t
 
 struct PipelineInfo_t
 {
+	std::string name = "Unnamed Pipeline";
 	ShaderInfo_t shaderInfo = {};
 	std::vector<Descriptor*> descriptors = {};
 	std::vector<VertexAttributeInfo_t> vertexAttributes = {};

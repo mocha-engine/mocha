@@ -21,7 +21,7 @@ public:
 	bool m_hasIndexBuffer;
 	bool m_isInitialized;
 
-	GENERATE_BINDINGS void AddMesh( UtilArray vertices, UtilArray indices, Material* material );
+	GENERATE_BINDINGS void AddMesh( const char* name, UtilArray vertices, UtilArray indices, Material* material );
 
 	const std::vector<Mesh> GetMeshes() { return m_meshes; }
 };

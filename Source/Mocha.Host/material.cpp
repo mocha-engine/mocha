@@ -6,7 +6,7 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Material::Material( UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes, UtilArray textures,
+Material::Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes, UtilArray textures,
     SamplerType samplerType, bool ignoreDepth )
 {
 	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();	
@@ -30,6 +30,7 @@ Material::Material( UtilArray vertexShaderData, UtilArray fragmentShaderData, Ut
 
 	m_samplerType = samplerType;
 	m_ignoreDepth = ignoreDepth;
+	m_name = std::string( name );
 }
 
 void Material::Reload()
@@ -41,12 +42,14 @@ void Material::CreateResources()
 {
 	PipelineInfo_t pipelineInfo = {};
 
+	pipelineInfo.name = m_name + " pipeline";
 	pipelineInfo.shaderInfo = {};
 	pipelineInfo.shaderInfo.vertexShaderData = m_vertexShaderData;
 	pipelineInfo.shaderInfo.fragmentShaderData = m_fragmentShaderData;
 	pipelineInfo.vertexAttributes = m_vertexAttribInfo;
 
 	DescriptorInfo_t descriptorInfo;
+	descriptorInfo.name = m_name + " descriptor";
 	descriptorInfo.bindings = {};
 
 	for ( int i = 0; i < m_textures.size(); ++i )

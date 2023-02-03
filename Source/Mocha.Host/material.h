@@ -25,6 +25,7 @@ private:
 	std::atomic<bool> m_isDirty;
 	std::vector<uint32_t> m_vertexShaderData;
 	std::vector<uint32_t> m_fragmentShaderData;
+	std::string m_name;
 
 public:
 	std::vector<Texture> m_textures;
@@ -41,7 +42,7 @@ public:
 	bool m_ignoreDepth;
 	bool IsDirty() { return m_isDirty.load( std::memory_order_relaxed ); }
 
-	GENERATE_BINDINGS Material( UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes,
+	GENERATE_BINDINGS Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes,
 	    UtilArray textures, SamplerType samplerType, bool ignoreDepth );
 
 	Material( const Material& other ) noexcept
