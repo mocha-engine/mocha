@@ -1184,8 +1184,9 @@ RenderStatus VulkanRenderContext::Shutdown()
 	// Delete main swapchain
 	m_swapchain.Delete();
 
-	// Delete raw vulkan objects (eg. device, instance, descriptor pool, semaphores)
+	// Delete raw vulkan objects (eg. device, instance, descriptor pool, semaphores, debugm essenger)
 	// Must also be done in a specific order
+	vkDestroyDebugUtilsMessengerEXT( m_instance, m_debugMessenger, nullptr );
 	vkDestroySemaphore( m_device, m_presentSemaphore, nullptr );
 	vkDestroySemaphore( m_device, m_renderSemaphore, nullptr );
 
