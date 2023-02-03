@@ -23,6 +23,11 @@ void LogManager::Startup()
 	spdlog::set_pattern( "%H:%M:%S %-8n %^%-8l%$ %v" );
 }
 
+void LogManager::Shutdown()
+{
+	spdlog::drop_all();
+}
+
 void LogManager::ManagedInfo( std::string str )
 {
 	spdlog::get( "managed" )->info( str );

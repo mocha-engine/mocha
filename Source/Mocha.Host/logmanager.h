@@ -30,7 +30,7 @@ class LogManager : ISubSystem
 {
 public:
 	void Startup();
-	void Shutdown(){};
+	void Shutdown();
 
 	std::vector<LogEntryInterop> m_logHistory;
 

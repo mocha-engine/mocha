@@ -1132,6 +1132,13 @@ RenderStatus VulkanRenderContext::Shutdown()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 
+	ImGui::EndFrame();
+	
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+
+	ImGui::Shutdown();
+	
 	m_hasInitialized = false;
 	return RENDER_STATUS_OK;
 }
