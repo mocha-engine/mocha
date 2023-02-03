@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net7.0</TargetFramework>
+	  <ImplicitUsings>disable</ImplicitUsings>
+	  <Nullable>enable</Nullable>
+	  <BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
+	  <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+	  <OutputPath>$(SolutionDir)..\build</OutputPath>
+	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+	  <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+	  <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ImGui.NET" Version="1.89.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
+    <ProjectReference Include="..\Mocha.Engine\Mocha.Engine.csproj" />
+    <ProjectReference Include="..\Mocha.UI\Mocha.UI.csproj" />
+  </ItemGroup>
+
+</Project>

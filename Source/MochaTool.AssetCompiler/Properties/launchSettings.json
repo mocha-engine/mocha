@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Run Asset Compiler": {
+      "commandName": "Project",
+      "commandLineArgs": "--mountpoints \"samples/mocha-minimal/content/\" \"content/core/\"",
+      "workingDirectory": "$(SolutionDir)..",
+      "remoteDebugEnabled": false
+    }
+  }
+}

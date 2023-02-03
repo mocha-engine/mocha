@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net7.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
+		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
+		<StartupObject>MochaTool.InteropGen.Program</StartupObject>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="ClangSharp" Version="15.0.2" />
+		<PackageReference Include="libClangSharp.runtime.win-x64" Version="15.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="libclang.dll">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="$(TargetDir)$(TargetName).exe $(SolutionDir)" />
+	</Target>
+
+</Project>
