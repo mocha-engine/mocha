@@ -60,6 +60,11 @@ void VulkanSwapchain::Update( Size2D newSize )
 	CreateMainSwapchain( newSize );
 }
 
+void VulkanSwapchain::Delete() const
+{
+	vkDestroySwapchainKHR( m_parent->m_device, m_swapchain, nullptr );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VkImageUsageFlagBits VulkanRenderTexture::GetUsageFlagBits( RenderTextureType type )
@@ -1736,6 +1741,12 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );
 }
 
+void VulkanShader::Delete() const
+{
+	vkDestroyShaderModule( m_parent->m_device, fragmentShader, nullptr );
+	vkDestroyShaderModule( m_parent->m_device, vertexShader, nullptr );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo )
@@ -1775,6 +1786,11 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 	}
 
 	__debugbreak(); // Invalid / unsupported descriptor binding type
+}
+
+void VulkanDescriptor::Delete() const
+{
+	vkDestroyDescriptorSetLayout( m_parent->m_device, descriptorSetLayout, nullptr );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -1923,4 +1939,10 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	{
 		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
 	}
+}
+
+void VulkanPipeline::Delete() const
+{
+	vkDestroyPipeline( m_parent->m_device, pipeline, nullptr );
+	vkDestroyPipelineLayout( m_parent->m_device, layout, nullptr );
 }

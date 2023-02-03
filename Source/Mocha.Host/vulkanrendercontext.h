@@ -288,6 +288,8 @@ public:
 	VulkanSwapchain() {}
 	VulkanSwapchain( VulkanRenderContext* parent, Size2D size );
 	void Update( Size2D newSize );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -305,6 +307,8 @@ public:
 
 	VulkanDescriptor() {}
 	VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -320,6 +324,8 @@ public:
 
 	VulkanShader() {}
 	VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -336,6 +342,8 @@ public:
 
 	VulkanPipeline() {}
 	VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipelineInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
