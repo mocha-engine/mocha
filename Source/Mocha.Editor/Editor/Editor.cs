@@ -10,8 +10,7 @@ public class Editor
 	{
 		new ConsoleWindow(),
 		new BrowserWindow(),
-		new InspectorWindow(),
-		new ViewportWindow()
+		new InspectorWindow()
 	};
 
 	public static void Draw()
