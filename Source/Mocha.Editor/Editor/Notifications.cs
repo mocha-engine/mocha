@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Editor;
 
-public static partial class Notifications
+public static partial class NotificationOverlay
 {
 	private static void DrawNotifications()
 	{
@@ -14,18 +14,18 @@ public static partial class Notifications
 			ImGuiWindowFlags.NoMove;
 
 		const float padding = 24.0f;
-		const float margin = 16.0f;
+		const float margin = 8.0f;
 
 		var viewport = ImGui.GetMainViewport();
 		var workPos = viewport.WorkPos;
 		var workSize = viewport.WorkSize;
 
-		System.Numerics.Vector2 windowPos;
+		Vector2 windowPos = new(
+			workPos.X + workSize.X - padding,
+			workPos.Y + workSize.Y + padding
+		);
 
-		windowPos.X = workPos.X + workSize.X - padding;
-		windowPos.Y = workPos.Y + padding;
-
-		float y = 0;
+		float y = 96f;
 
 		var notifications = Common.Notify.Notifications.ToArray();
 		for ( int i = 0; i < notifications.Length; i++ )
@@ -45,9 +45,13 @@ public static partial class Notifications
 			float xOffset = 1.0f - t;
 			var windowPivot = new System.Numerics.Vector2( xOffset, 0 );
 
+			var color = notification.Category == Notify.NotificationCategory.Error ? Theme.Red : Theme.Blue;
+			color.W = alpha;
+
 			ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 1 );
 			ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
-			ImGui.SetNextWindowPos( windowPos + new System.Numerics.Vector2( 0, y ), ImGuiCond.Always, windowPivot );
+			ImGui.PushStyleColor( ImGuiCol.WindowBg, Theme.DarkGray );
+			ImGui.SetNextWindowPos( windowPos - new Vector2( 0, y ), ImGuiCond.Always, windowPivot );
 			ImGui.SetNextWindowBgAlpha( 0.0f.LerpTo( 1, alpha ) );
 			ImGui.SetNextWindowSize( new System.Numerics.Vector2( 0, 0 ) );
 			ImGui.SetNextWindowViewport( ImGui.GetMainViewport().ID );
@@ -69,9 +73,6 @@ public static partial class Notifications
 				var lineStart = pos + new System.Numerics.Vector2( size.X - thickness / 2f, 0 );
 				var lineEnd = lineStart + new System.Numerics.Vector2( 0, size.Y );
 
-				var color = notification.Category == Notify.NotificationCategory.Error ? Theme.Red : Theme.Blue;
-				color.W = alpha;
-
 				drawList.AddLine( lineStart, lineEnd, ImGui.GetColorU32( color ), thickness );
 
 				ImGui.SameLine();
@@ -87,6 +88,7 @@ public static partial class Notifications
 
 			ImGui.End();
 
+			ImGui.PopStyleColor();
 			ImGui.PopStyleVar( 2 );
 		}
 

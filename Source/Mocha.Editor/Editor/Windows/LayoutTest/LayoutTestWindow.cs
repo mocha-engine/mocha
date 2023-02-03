@@ -1,11 +1,16 @@
 ﻿namespace Mocha.Editor;
 
-[Icon( FontAwesome.Folder ), Title( "Layout Test" ), Category( "Engine" )]
-internal class LayoutTestWindow : EditorWindow
+[Icon( FontAwesome.Folder ), Title( "ImGui Test" ), Category( "Engine" )]
+internal class ImGuiTestWindow : EditorWindow
 {
+	public ImGuiTestWindow()
+	{
+		isVisible = false;
+	}
+
 	public override void Draw()
 	{
-		if ( ImGuiX.BeginWindow( "Layout Test", ref isVisible ) )
+		if ( ImGuiX.BeginWindow( "ImGui Test", ref isVisible ) )
 		{
 			using ( var layout = new HorizontalLayout( "Horizontal Layout Start" ) )
 			{

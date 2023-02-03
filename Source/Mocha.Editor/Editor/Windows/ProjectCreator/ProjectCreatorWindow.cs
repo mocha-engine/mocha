@@ -17,6 +17,8 @@ internal class ProjectCreatorWindow : EditorWindow
 			"GHI",
 			"I am a really long project name"
 		};
+
+		isVisible = false;
 	}
 
 	private void DrawProject( string project )

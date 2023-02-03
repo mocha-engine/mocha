@@ -15,7 +15,7 @@ public class Editor
 
 		new ProjectCreatorWindow(),
 
-		new LayoutTestWindow()
+		new ImGuiTestWindow()
 	};
 
 	public static void Draw()
