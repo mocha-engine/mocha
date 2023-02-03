@@ -375,6 +375,15 @@ void* VulkanImageTexture::GetImGuiTextureID()
 	return ( void* )m_imGuiDescriptorSet;
 }
 
+void VulkanImageTexture::Delete() const
+{
+	if ( m_parent == nullptr )
+		return;
+
+	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
+	vmaDestroyImage( m_parent->m_allocator, image, allocation );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
@@ -515,6 +524,11 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 		return RENDER_STATUS_OK;
 	} );
+}
+
+void VulkanBuffer::Delete() const
+{
+	vmaDestroyBuffer( m_parent->m_allocator, buffer, allocation );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------

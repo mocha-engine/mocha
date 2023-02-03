@@ -136,6 +136,8 @@ public:
 	VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VmaMemoryUsage memoryUsage );
 
 	void SetData( BufferUploadInfo_t uploadInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -262,6 +264,8 @@ public:
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
 	void* GetImGuiTextureID();
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
