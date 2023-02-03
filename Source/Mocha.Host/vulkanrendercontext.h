@@ -118,6 +118,7 @@ public:
 	{
 		// TODO: If making vulkan resources, delete them here. This will be called by any context-level
 		// deletion functions (i.e. when a deletion queue is processed)
+		spdlog::warn( "Delete() was called on {}, but hasn't been overridden!", typeid( *this ).name() );
 	}
 };
 
