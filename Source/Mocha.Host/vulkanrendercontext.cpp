@@ -1154,12 +1154,35 @@ RenderStatus VulkanRenderContext::Shutdown()
 	//
 	// Delete everything
 	//
+
+	// Delete command contexts
+	m_mainContext.Delete();
+	for ( auto& context : m_uploadContexts )
+	{
+		context.second->Delete();
+	}
+
+	// Delete allocated objects
+	// Must be done in a specific order
+	m_pipelines.ForEach( []( std::shared_ptr<VulkanPipeline> pipeline ) { pipeline->Delete(); } );
+	m_descriptors.ForEach( []( std::shared_ptr<VulkanDescriptor> descriptor ) { descriptor->Delete(); } );
+	m_shaders.ForEach( []( std::shared_ptr<VulkanShader> shader ) { shader->Delete(); } );
 	m_buffers.ForEach( []( std::shared_ptr<VulkanBuffer> buffer ) { buffer->Delete(); } );
 	m_imageTextures.ForEach( []( std::shared_ptr<VulkanImageTexture> imageTexture ) { imageTexture->Delete(); } );
 	m_renderTextures.ForEach( []( std::shared_ptr<VulkanRenderTexture> renderTexture ) { renderTexture->Delete(); } );
-	m_descriptors.ForEach( []( std::shared_ptr<VulkanDescriptor> descriptor ) { descriptor->Delete(); } );
-	m_pipelines.ForEach( []( std::shared_ptr<VulkanPipeline> pipeline ) { pipeline->Delete(); } );
-	m_shaders.ForEach( []( std::shared_ptr<VulkanShader> shader ) { shader->Delete(); } );
+
+	// Delete main swapchain
+	m_swapchain.Delete();
+
+	// Delete raw vulkan objects (eg. device, instance, descriptor pool, semaphores)
+	// Must also be done in a specific order
+	vkDestroySemaphore( m_device, m_presentSemaphore, nullptr );
+	vkDestroySemaphore( m_device, m_renderSemaphore, nullptr );
+
+	vkDestroyDescriptorPool( m_device, m_descriptorPool, nullptr );
+
+	vkDestroyDevice( m_device, nullptr );
+	vkDestroyInstance( m_instance, nullptr );
 
 	m_hasInitialized = false;
 	return RENDER_STATUS_OK;
