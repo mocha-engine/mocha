@@ -1,5 +1,3 @@
-#define _CRTDBG_MAP_ALLOC
-
 #include "root.h"
 
 #include <crtdbg.h>
@@ -94,8 +92,6 @@ void Root::Shutdown()
 	g_projectManager->Shutdown();
 	g_cvarManager->Shutdown();
 	g_logManager->Shutdown();
-
-	_CrtDumpMemoryLeaks();
 }
 
 double HiresTimeInSeconds()
