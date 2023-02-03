@@ -417,6 +417,16 @@ VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
 	VK_CHECK( vkCreateFence( parent->m_device, &fenceInfo, nullptr, &fence ) );
 }
 
+void VulkanCommandContext::Delete() const
+{
+	if ( m_parent == nullptr )
+		return;
+
+	vkDestroyFence( m_parent->m_device, fence, nullptr );
+	vkFreeCommandBuffers( m_parent->m_device, commandPool, 1, &commandBuffer );
+	vkDestroyCommandPool( m_parent->m_device, commandPool, nullptr );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )

@@ -165,6 +165,8 @@ struct VulkanCommandContext : public VulkanObject
 
 	VulkanCommandContext() {}
 	VulkanCommandContext( VulkanRenderContext* parent );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
