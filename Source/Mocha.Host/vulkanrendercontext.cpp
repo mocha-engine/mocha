@@ -405,9 +405,6 @@ void* VulkanImageTexture::GetImGuiTextureID()
 
 void VulkanImageTexture::Delete() const
 {
-	if ( m_parent == nullptr )
-		return;
-
 	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
 	vmaDestroyImage( m_parent->m_allocator, image, allocation );
 }
@@ -838,6 +835,7 @@ void VulkanRenderContext::CreateRenderTargets()
 
 	// HACK: Horrific hack to get render textures working with descriptor sets for now
 	VulkanImageTexture vkImageTexture;
+	vkImageTexture.SetParent( this );
 	vkImageTexture.image = m_colorTarget.image;
 	vkImageTexture.imageView = m_colorTarget.imageView;
 	vkImageTexture.format = m_colorTarget.format;
@@ -1100,6 +1098,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 
 	// HACK: Horrific hack to get render textures working with descriptor sets for now
 	VulkanImageTexture vkImageTexture;
+	vkImageTexture.SetParent( this );
 	vkImageTexture.image = m_colorTarget.image;
 	vkImageTexture.imageView = m_colorTarget.imageView;
 	vkImageTexture.format = m_colorTarget.format;

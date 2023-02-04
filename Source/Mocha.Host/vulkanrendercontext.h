@@ -113,6 +113,8 @@ protected:
 	void SetDebugName( const char* name, VkObjectType objectType, uint64_t handle );
 
 public:
+	friend class VulkanRenderContext;
+
 	/// <summary>
 	/// This will delete any Vulkan resources stored within this object.
 	/// </summary>
