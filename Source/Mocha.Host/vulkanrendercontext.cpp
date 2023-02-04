@@ -1233,6 +1233,9 @@ RenderStatus VulkanRenderContext::Shutdown()
 	m_imageTextures.ForEach( []( std::shared_ptr<VulkanImageTexture> imageTexture ) { imageTexture->Delete(); } );
 	m_renderTextures.ForEach( []( std::shared_ptr<VulkanRenderTexture> renderTexture ) { renderTexture->Delete(); } );
 
+	m_depthTarget.Delete();
+	m_colorTarget.Delete();
+
 	// Delete main swapchain
 	m_swapchain.Delete();
 
