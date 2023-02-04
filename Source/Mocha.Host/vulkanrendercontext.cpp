@@ -909,8 +909,8 @@ void VulkanRenderContext::CreateImGui()
 	init_info.Device = m_device;
 	init_info.Queue = m_graphicsQueue;
 	init_info.DescriptorPool = imguiPool;
-	init_info.MinImageCount = 3;
-	init_info.ImageCount = 3;
+	init_info.MinImageCount = 2;
+	init_info.ImageCount = m_swapchain.m_swapchainTextures.size();
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 	init_info.UseDynamicRendering = true;
 	init_info.ColorAttachmentFormat = m_swapchain.m_swapchainTextures[0].format;
