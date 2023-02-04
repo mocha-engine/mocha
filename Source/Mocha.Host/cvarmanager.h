@@ -162,6 +162,12 @@ public:
 	void Run( const char* input );
 
 	/// <summary>
+	/// Run statements from a .cfg file
+	/// </summary>
+	/// <param name="fileName"></param>
+	void RunFile( std::string fileName );
+
+	/// <summary>
 	/// Check if a specific convar exists
 	/// </summary>
 	/// <param name="name"></param>

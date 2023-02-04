@@ -47,6 +47,19 @@ void CVarSystem::Startup()
 		if ( entry.m_flags & CVarFlags::Archive )
 			entry.FromString( value );
 	}
+
+	// Register commands
+	RegisterCommand( "cvars.run", CVarFlags::Command, "Run commands from a file", [&]( std::vector<std::string> args ) {
+		if ( args.size() != 1 )
+		{
+			spdlog::error( "Invalid number of arguments" );
+			return;
+		}
+
+		std::string fileName = args[0];
+
+		RunFile( fileName );
+	} );
 }
 
 void CVarSystem::Shutdown()
@@ -346,6 +359,26 @@ void CVarSystem::Run( const char* input )
 			}
 		}
 	}
+}
+
+void CVarSystem::RunFile( std::string fileName )
+{
+	std::ifstream file( fileName );
+
+	if ( !file.is_open() )
+	{
+		spdlog::error( "Couldn't open '{}'", fileName );
+		return;
+	}
+
+	std::string line;
+
+	while ( std::getline( file, line ) )
+	{
+		Run( line.c_str() );
+	}
+
+	file.close();
 }
 
 bool CVarSystem::Exists( std::string name )
