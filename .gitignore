@@ -393,3 +393,6 @@ cvars.json
 
 # Cmake build files
 [Cc]ompile/
+
+# Server configuration
+server.cfg
