@@ -6,6 +6,14 @@
 #include <shadercompiler.h>
 #include <volk.h>
 
+#define VMA_DEBUG_LOG( format, ... )                     \
+	{                                                    \
+		/* Use snprintf->spdlog::trace */                \
+		char buffer[1024];                               \
+		snprintf( buffer, 1024, format, ##__VA_ARGS__ ); \
+		spdlog::trace( buffer );                         \
+	}
+
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
