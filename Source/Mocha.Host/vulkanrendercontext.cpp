@@ -447,6 +447,9 @@ void VulkanCommandContext::Delete() const
 	if ( m_parent == nullptr )
 		return;
 
+	// Wait for the fence to be signaled
+	vkWaitForFences( m_parent->m_device, 1, &fence, VK_TRUE, 1000000000 );
+
 	vkDestroyFence( m_parent->m_device, fence, nullptr );
 	vkFreeCommandBuffers( m_parent->m_device, commandPool, 1, &commandBuffer );
 	vkDestroyCommandPool( m_parent->m_device, commandPool, nullptr );
@@ -561,6 +564,9 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 		return RENDER_STATUS_OK;
 	} );
+
+	// Destroy staging buffer
+	vmaDestroyBuffer( m_parent->m_allocator, stagingBuffer.buffer, stagingBuffer.allocation );
 }
 
 void VulkanBuffer::Delete() const
@@ -1201,6 +1207,10 @@ RenderStatus VulkanRenderContext::Shutdown()
 	//
 	// Delete everything
 	//
+	ImGui_ImplSDL2_Shutdown();
+	ImGui_ImplVulkan_Shutdown();
+
+	ImGui::Shutdown();
 
 	// Delete command contexts
 	m_mainContext.Delete();
