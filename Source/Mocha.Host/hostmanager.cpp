@@ -140,6 +140,11 @@ void HostManager::DispatchBoolCVarCallback( CVarManagedVarDispatchInfo<bool> inf
 	Invoke( "DispatchBoolCVarCallback", &info );
 }
 
+void HostManager::DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info )
+{
+	Invoke( "DispatchIntCVarCallback", &info );
+}
+
 inline void HostManager::Invoke( std::string _method, void* params, const char_t* delegateTypeName )
 {
 	// Convert to std::wstring

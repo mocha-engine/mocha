@@ -90,10 +90,12 @@ public:
 	std::string GetString();
 	float GetFloat();
 	bool GetBool();
+	int GetInt();
 
 	void SetString( std::string value );
 	void SetFloat( float value );
 	void SetBool( bool value );
+	void SetInt( int value );
 
 	std::string ToString();
 	void FromString( std::string valueStr );
@@ -174,9 +176,11 @@ public:
 
 	void RegisterCommand( std::string name, CVarFlags flags, std::string description, CCmdCallback callback );
 
-	void RegisterString( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
+	void RegisterString(
+	    std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback );
 	void RegisterFloat( std::string name, float value, CVarFlags flags, std::string description, CVarCallback<float> callback );
 	void RegisterBool( std::string name, bool value, CVarFlags flags, std::string description, CVarCallback<bool> callback );
+	void RegisterInt( std::string name, int value, CVarFlags flags, std::string description, CVarCallback<int> callback );
 
 	void Remove( std::string name );
 
@@ -187,10 +191,12 @@ public:
 	std::string GetString( std::string name );
 	float GetFloat( std::string name );
 	bool GetBool( std::string name );
+	int GetInt( std::string name );
 
 	void SetString( std::string name, std::string value );
 	void SetFloat( std::string name, float value );
 	void SetBool( std::string name, bool value );
+	void SetInt( std::string name, int value );
 
 	std::string ToString( std::string name );
 	void FromString( std::string name, std::string valueStr );
@@ -277,6 +283,27 @@ public:
 	void SetValue( bool value ) { CVarSystem::Instance().SetBool( m_name, value ); }
 
 	operator bool() { return GetValue(); };
+};
+
+class IntCVar : CVarParameter
+{
+public:
+	IntCVar( std::string name, int value, CVarFlags flags, std::string description, CVarCallback<int> callback )
+	{
+		m_name = name;
+
+		CVarSystem::Instance().RegisterInt( name, value, flags, description, callback );
+	}
+
+	IntCVar( std::string name, int value, CVarFlags flags, std::string description )
+	    : IntCVar( name, value, flags, description, nullptr )
+	{
+	}
+
+	int GetValue() { return CVarSystem::Instance().GetInt( m_name ); }
+	void SetValue( int value ) { CVarSystem::Instance().SetInt( m_name, value ); }
+
+	operator int() { return GetValue(); };
 };
 
 class CCmd : CVarParameter

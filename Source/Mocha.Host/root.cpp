@@ -45,6 +45,11 @@ namespace EngineProperties
 	    "project.current", "Samples\\mocha-minimal\\project.json", CVarFlags::Archive, "Which project should we load?" );
 	BoolCVar Raytracing( "render.raytracing", true, CVarFlags::Archive, "Enable raytracing" );
 	BoolCVar Renderdoc( "render.renderdoc", false, CVarFlags::Archive, "Enable renderdoc" );
+
+	extern StringCVar ServerName( "server.name", "Mocha Dedicated Server", CVarFlags::None, "Server name" );
+	extern StringCVar ServerPassword( "server.password", "", CVarFlags::None, "Server password" );
+	extern IntCVar ServerPort( "server.port", 7777, CVarFlags::None, "Server port" );
+	extern IntCVar ServerMaxPlayers( "server.maxplayers", 16, CVarFlags::None, "Server max players" );
 } // namespace EngineProperties
 
 FloatCVar timescale( "game.timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );

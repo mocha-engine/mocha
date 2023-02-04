@@ -34,3 +34,11 @@ public struct BoolCVarDispatchInfo
 	public bool oldValue;
 	public bool newValue;
 }
+
+[StructLayout( LayoutKind.Sequential )]
+public struct IntCVarDispatchInfo
+{
+	public IntPtr name;
+	public int oldValue;
+	public int newValue;
+}

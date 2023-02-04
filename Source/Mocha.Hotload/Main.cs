@@ -198,6 +198,18 @@ public static class Main
 		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
 	}
 
+	[UnmanagedCallersOnly]
+	public static void DispatchIntCVarCallback( IntPtr infoPtr )
+	{
+		var info = Marshal.PtrToStructure<IntCVarDispatchInfo>( infoPtr );
+		string? name = Marshal.PtrToStringUTF8( info.name );
+
+		if ( name is null )
+			return;
+
+		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
+	}
+
 	/// <summary>
 	/// Invoked when the game project manifest has changed.
 	/// </summary>

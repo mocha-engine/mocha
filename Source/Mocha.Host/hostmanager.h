@@ -62,4 +62,5 @@ public:
 	void DispatchStringCVarCallback( CVarManagedVarDispatchInfo<const char*> info );
 	void DispatchFloatCVarCallback( CVarManagedVarDispatchInfo<float> info );
 	void DispatchBoolCVarCallback( CVarManagedVarDispatchInfo<bool> info );
+	void DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info );
 };

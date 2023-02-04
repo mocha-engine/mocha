@@ -448,6 +448,11 @@ void CVarSystem::RegisterBool(
 	RegisterVariable<bool>( name, value, flags, description, callback );
 }
 
+void CVarSystem::RegisterInt(
+    std::string name, int value, CVarFlags flags, std::string description, CVarCallback<int> callback )
+{
+	RegisterVariable<int>( name, value, flags, description, callback );
+}
 
 void CVarSystem::Remove( std::string name )
 {
@@ -556,6 +561,12 @@ inline void CVarEntry::SetValue( T value )
 
 			g_hostManager->DispatchBoolCVarCallback( primitiveInfo );
 		}
+		else if constexpr ( std::is_same<T, int>::value )
+		{
+			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
+
+			g_hostManager->DispatchIntCVarCallback( primitiveInfo );
+		}
 	}
 	else
 	{
@@ -615,6 +626,20 @@ bool CVarSystem::GetBool( std::string name )
 	return GetEntry( name ).GetBool();
 }
 
+int CVarEntry::GetInt()
+{
+	return GetValue<int>();
+}
+
+int CVarSystem::GetInt( std::string name )
+{
+	if ( !Exists( name ) )
+	{
+		return false;
+	}
+
+	return GetEntry( name ).GetInt();
+}
 
 void CVarEntry::SetString( std::string value )
 {
@@ -657,8 +682,23 @@ void CVarSystem::SetBool( std::string name, bool value )
 	{
 		return;
 	}
-	
+
 	GetEntry( name ).SetBool( value );
+}
+
+void CVarEntry::SetInt( int value )
+{
+	SetValue<int>( value );
+}
+
+void CVarSystem::SetInt( std::string name, int value )
+{
+	if ( !Exists( name ) )
+	{
+		return;
+	}
+
+	GetEntry( name ).SetInt( value );
 }
 
 std::string CVarEntry::ToString()
@@ -672,6 +712,8 @@ std::string CVarEntry::ToString()
 		valueStr = std::to_string( std::any_cast<float>( m_value ) );
 	else if ( type == typeid( bool ) )
 		valueStr = std::any_cast<bool>( m_value ) ? "true" : "false";
+	else if ( type == typeid( int ) )
+		valueStr = std::to_string( std::any_cast<int>( m_value ) );
 
 	return valueStr;
 }
@@ -715,6 +757,13 @@ void CVarEntry::FromString( std::string valueStr )
 	else if ( type == typeid( std::string ) )
 	{
 		SetValue<std::string>( valueStr );
+	}
+	else if ( type == typeid( int ) )
+	{
+		float value;
+		valueStream >> value;
+
+		SetValue<int>( value );
 	}
 }
 
