@@ -37,6 +37,7 @@ float g_cameraFov;
 float g_cameraZNear;
 float g_cameraZFar;
 RenderDebugViews g_debugView;
+Realm g_realm;
 
 namespace EngineProperties
 {

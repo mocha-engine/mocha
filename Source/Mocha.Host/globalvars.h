@@ -14,6 +14,12 @@ enum RenderDebugViews
 	OTHER = 63
 };
 
+enum Realm
+{
+	REALM_SERVER,
+	REALM_CLIENT
+};
+
 class RenderManager;
 class RenderdocManager;
 class HostManager;

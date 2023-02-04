@@ -81,9 +81,6 @@
     <ClCompile Include="root.cpp">
       <Filter>Root</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Root</Filter>
-    </ClCompile>
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp">
       <Filter>Thirdparty\ImGUI</Filter>
     </ClCompile>
