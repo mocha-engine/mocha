@@ -6,6 +6,14 @@
 #include <shadercompiler.h>
 #include <volk.h>
 
+#define VMA_DEBUG_LOG( format, ... )                     \
+	{                                                    \
+		/* Use snprintf->spdlog::trace */                \
+		char buffer[1024];                               \
+		snprintf( buffer, 1024, format, ##__VA_ARGS__ ); \
+		spdlog::trace( buffer );                         \
+	}
+
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
 
@@ -16,6 +24,13 @@
 #include <imgui.h>
 #include <implot.h>
 #endif
+
+// ----------------------------------------------------------------------------------------------------------------------------
+
+void VulkanObject::SetDebugName( const char* name, VkObjectType objectType, uint64_t handle )
+{
+	m_parent->SetDebugName( name, objectType, handle );
+}
 
 // ----------------------------------------------------------------------------------------------------------------------------
 
@@ -31,6 +46,7 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 	                                  .value();
 
 	m_swapchain = vkbSwapchain.swapchain;
+	SetDebugName( "Main Swapchain", VK_OBJECT_TYPE_SWAPCHAIN_KHR, ( uint64_t )m_swapchain );
 
 	m_swapchainTextures = {};
 	auto images = vkbSwapchain.get_images().value();
@@ -43,6 +59,9 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 		renderTexture.image = images[i];
 		renderTexture.imageView = imageViews[i];
 		renderTexture.format = imageFormat;
+
+		SetDebugName( "Swapchain Texture", VK_OBJECT_TYPE_IMAGE, ( uint64_t )renderTexture.image );
+		SetDebugName( "Swapchain Texture View", VK_OBJECT_TYPE_IMAGE_VIEW, ( uint64_t )renderTexture.imageView );
 
 		m_swapchainTextures.emplace_back( renderTexture );
 	}
@@ -58,6 +77,11 @@ VulkanSwapchain::VulkanSwapchain( VulkanRenderContext* parent, Size2D size )
 void VulkanSwapchain::Update( Size2D newSize )
 {
 	CreateMainSwapchain( newSize );
+}
+
+void VulkanSwapchain::Delete() const
+{
+	vkDestroySwapchainKHR( m_parent->m_device, m_swapchain, nullptr );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -125,29 +149,36 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-
+	
 	vmaCreateImage( m_parent->m_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
 
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
 	VK_CHECK( vkCreateImageView( parent->m_device, &viewInfo, nullptr, &imageView ) );
+
+	SetDebugName( "RenderTexture Image", VK_OBJECT_TYPE_IMAGE, ( uint64_t )image );
+	SetDebugName( "RenderTexture Image View", VK_OBJECT_TYPE_IMAGE_VIEW, ( uint64_t )imageView );
 }
 
 void VulkanRenderTexture::Delete() const
 {
 	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
-	vkDestroyImage( m_parent->m_device, image, nullptr );
-	vmaFreeMemory( m_parent->m_allocator, allocation );
+	vmaDestroyImage( m_parent->m_allocator, image, allocation );
 }
 #pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
 
-VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t textureInfo )
+VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t _textureInfo )
 {
 	SetParent( parent );
+
+	textureInfo = _textureInfo;
 }
 
 void VulkanImageTexture::SetData( TextureData_t textureData )
 {
+	// Destroy old image
+	Delete();
+	
 	VkFormat imageFormat = ( VkFormat )textureData.imageFormat;
 	uint32_t imageSize = 0;
 
@@ -184,8 +215,9 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
-
+	
 	vmaCreateImage( m_parent->m_allocator, &imageCreateInfo, &allocInfo, &image, &allocation, nullptr );
+	vmaSetAllocationName( m_parent->m_allocator, allocation, textureInfo.name.c_str() );
 
 	m_parent->ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
 		{
@@ -249,6 +281,11 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 	VkImageViewCreateInfo imageViewInfo =
 	    VKInit::ImageViewCreateInfo( ( VkFormat )imageFormat, image, VK_IMAGE_ASPECT_COLOR_BIT, textureData.mipCount );
 	vkCreateImageView( m_parent->m_device, &imageViewInfo, nullptr, &imageView );
+
+	SetDebugName( textureInfo.name.c_str(), VK_OBJECT_TYPE_IMAGE, ( uint64_t )image );
+
+	std::string imageViewName = textureInfo.name + " View";
+	SetDebugName( imageViewName.c_str(), VK_OBJECT_TYPE_IMAGE_VIEW, ( uint64_t )imageView );
 }
 
 inline void VulkanImageTexture::TransitionLayout(
@@ -370,6 +407,12 @@ void* VulkanImageTexture::GetImGuiTextureID()
 	return ( void* )m_imGuiDescriptorSet;
 }
 
+void VulkanImageTexture::Delete() const
+{
+	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
+	vmaDestroyImage( m_parent->m_allocator, image, allocation );
+}
+
 // ----------------------------------------------------------------------------------------------------------------------------
 
 VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
@@ -401,6 +444,23 @@ VulkanCommandContext::VulkanCommandContext( VulkanRenderContext* parent )
 	fenceInfo.flags = VK_FENCE_CREATE_SIGNALED_BIT;
 
 	VK_CHECK( vkCreateFence( parent->m_device, &fenceInfo, nullptr, &fence ) );
+
+	SetDebugName( "VulkanCommandContext Command Pool", VK_OBJECT_TYPE_COMMAND_POOL, ( uint64_t )commandPool );
+	SetDebugName( "VulkanCommandContext Command Buffer", VK_OBJECT_TYPE_COMMAND_BUFFER, ( uint64_t )commandBuffer );
+	SetDebugName( "VulkanCommandContext Fence", VK_OBJECT_TYPE_FENCE, ( uint64_t )fence );
+}
+
+void VulkanCommandContext::Delete() const
+{
+	if ( m_parent == nullptr )
+		return;
+
+	// Wait for the fence to be signaled
+	vkWaitForFences( m_parent->m_device, 1, &fence, VK_TRUE, 1000000000 );
+
+	vkDestroyFence( m_parent->m_device, fence, nullptr );
+	vkFreeCommandBuffers( m_parent->m_device, commandPool, 1, &commandBuffer );
+	vkDestroyCommandPool( m_parent->m_device, commandPool, nullptr );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -443,6 +503,8 @@ VulkanBuffer::VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo
 	allocInfo.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
 
 	VK_CHECK( vmaCreateBuffer( m_parent->m_allocator, &bufferCreateInfo, &allocInfo, &buffer, &allocation, nullptr ) );
+
+	SetDebugName( bufferInfo.name.c_str(), VK_OBJECT_TYPE_BUFFER, ( uint64_t )buffer );
 }
 
 VkBufferUsageFlags VulkanBuffer::GetBufferUsageFlags( BufferInfo_t bufferInfo )
@@ -510,6 +572,14 @@ void VulkanBuffer::SetData( BufferUploadInfo_t uploadInfo )
 
 		return RENDER_STATUS_OK;
 	} );
+
+	// Destroy staging buffer
+	vmaDestroyBuffer( m_parent->m_allocator, stagingBuffer.buffer, stagingBuffer.allocation );
+}
+
+void VulkanBuffer::Delete() const
+{
+	vmaDestroyBuffer( m_parent->m_allocator, buffer, allocation );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -540,6 +610,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 	               .require_api_version( 1, 3, 0 )
 	               .use_default_debug_messenger()
 	               .enable_extension( VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME )
+	               .enable_extension( VK_EXT_DEBUG_UTILS_EXTENSION_NAME )
 	               .build();
 
 	vkbInstance = ret.value();
@@ -583,6 +654,11 @@ void VulkanRenderContext::FinalizeAndCreateDevice( vkb::PhysicalDevice physicalD
 	// Save device properties for later
 	VkPhysicalDeviceProperties deviceProperties = {};
 	vkGetPhysicalDeviceProperties( m_chosenGPU, &m_deviceProperties );
+
+	SetDebugName( "Main Device", VK_OBJECT_TYPE_DEVICE, ( uint64_t )m_device );
+	SetDebugName( "Main Physical Device", VK_OBJECT_TYPE_PHYSICAL_DEVICE, ( uint64_t )m_chosenGPU );
+
+	SetDebugName( "Graphics Queue", VK_OBJECT_TYPE_QUEUE, ( uint64_t )m_graphicsQueue );
 }
 
 vkb::PhysicalDevice VulkanRenderContext::CreatePhysicalDevice( vkb::Instance vkbInstance )
@@ -733,6 +809,7 @@ void VulkanRenderContext::CreateRenderTargets()
 	// Create render targets
 	//
 	RenderTextureInfo_t renderTextureInfo;
+	renderTextureInfo.name = "Main render target";
 	renderTextureInfo.width = size.x * renderScale;
 	renderTextureInfo.height = size.y * renderScale;
 
@@ -762,6 +839,7 @@ void VulkanRenderContext::CreateRenderTargets()
 
 	// HACK: Horrific hack to get render textures working with descriptor sets for now
 	VulkanImageTexture vkImageTexture;
+	vkImageTexture.SetParent( this );
 	vkImageTexture.image = m_colorTarget.image;
 	vkImageTexture.imageView = m_colorTarget.imageView;
 	vkImageTexture.format = m_colorTarget.format;
@@ -840,8 +918,8 @@ void VulkanRenderContext::CreateImGui()
 	init_info.Device = m_device;
 	init_info.Queue = m_graphicsQueue;
 	init_info.DescriptorPool = imguiPool;
-	init_info.MinImageCount = 3;
-	init_info.ImageCount = 3;
+	init_info.MinImageCount = 2;
+	init_info.ImageCount = m_swapchain.m_swapchainTextures.size();
 	init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 	init_info.UseDynamicRendering = true;
 	init_info.ColorAttachmentFormat = m_swapchain.m_swapchainTextures[0].format;
@@ -979,6 +1057,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		// clang-format on
 
 		BufferInfo_t bufferInfo = {};
+		bufferInfo.name = "Fullscreen triangle vertex buffer";
 		bufferInfo.size = sizeof( float ) * vertices.size();
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		bufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
@@ -1000,6 +1079,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		std::vector<uint32_t> indices = { 0, 1, 2 };
 
 		BufferInfo_t bufferInfo = {};
+		bufferInfo.name = "Fullscreen triangle index buffer";
 		bufferInfo.size = sizeof( uint32_t ) * indices.size();
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		bufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
@@ -1022,6 +1102,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 
 	// HACK: Horrific hack to get render textures working with descriptor sets for now
 	VulkanImageTexture vkImageTexture;
+	vkImageTexture.SetParent( this );
 	vkImageTexture.image = m_colorTarget.image;
 	vkImageTexture.imageView = m_colorTarget.imageView;
 	vkImageTexture.format = m_colorTarget.format;
@@ -1031,6 +1112,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 	colorTextureBinding.texture = &m_fullScreenTri.imageTexture;
 	colorTextureBinding.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 
+	descriptorInfo.name = "Fullscreen triangle descriptor";
 	descriptorInfo.bindings = std::vector<DescriptorBindingInfo_t>{ colorTextureBinding };
 
 	m_fullScreenTri.descriptor = Descriptor( descriptorInfo );
@@ -1131,6 +1213,49 @@ RenderStatus VulkanRenderContext::Startup()
 RenderStatus VulkanRenderContext::Shutdown()
 {
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
+
+	//
+	// Delete everything
+	//
+	ImGui_ImplVulkan_Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
+
+	// Delete command contexts
+	m_mainContext.Delete();
+	for ( auto& context : m_uploadContexts )
+	{
+		context.second->Delete();
+	}
+
+	// Delete allocated objects
+	// Must be done in a specific order
+	m_pipelines.ForEach( []( std::shared_ptr<VulkanPipeline> pipeline ) { pipeline->Delete(); } );
+	m_descriptors.ForEach( []( std::shared_ptr<VulkanDescriptor> descriptor ) { descriptor->Delete(); } );
+	m_shaders.ForEach( []( std::shared_ptr<VulkanShader> shader ) { shader->Delete(); } );
+	m_buffers.ForEach( []( std::shared_ptr<VulkanBuffer> buffer ) { buffer->Delete(); } );
+	m_imageTextures.ForEach( []( std::shared_ptr<VulkanImageTexture> imageTexture ) { imageTexture->Delete(); } );
+	m_renderTextures.ForEach( []( std::shared_ptr<VulkanRenderTexture> renderTexture ) { renderTexture->Delete(); } );
+
+	m_depthTarget.Delete();
+	m_colorTarget.Delete();
+
+	// Delete main swapchain
+	m_swapchain.Delete();
+
+	// Delete raw vulkan objects (eg. device, instance, descriptor pool, semaphores, debugm essenger)
+	// Must also be done in a specific order
+	vkDestroyDebugUtilsMessengerEXT( m_instance, m_debugMessenger, nullptr );
+	vkDestroySemaphore( m_device, m_presentSemaphore, nullptr );
+	vkDestroySemaphore( m_device, m_renderSemaphore, nullptr );
+
+	vkDestroyDescriptorPool( m_device, m_descriptorPool, nullptr );
+
+	// Finally, destroy the allocator
+	vmaDestroyAllocator( m_allocator );
+
+	vkDestroyDevice( m_device, nullptr );
+	vkDestroyInstance( m_instance, nullptr );
 
 	m_hasInitialized = false;
 	return RENDER_STATUS_OK;
@@ -1734,6 +1859,15 @@ VulkanShader::VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo
 
 	if ( LoadShaderModule( shaderInfo.vertexShaderData, SHADER_TYPE_VERTEX, &vertexShader ) != RENDER_STATUS_OK )
 		spdlog::error( "VulkanShader::VulkanShader: Vertex shader failed to compile" );
+
+	SetDebugName( shaderInfo.name.c_str(), VK_OBJECT_TYPE_SHADER_MODULE, ( uint64_t )fragmentShader );
+	SetDebugName( shaderInfo.name.c_str(), VK_OBJECT_TYPE_SHADER_MODULE, ( uint64_t )vertexShader );
+}
+
+void VulkanShader::Delete() const
+{
+	vkDestroyShaderModule( m_parent->m_device, fragmentShader, nullptr );
+	vkDestroyShaderModule( m_parent->m_device, vertexShader, nullptr );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -1764,6 +1898,11 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 	    VKInit::DescriptorSetAllocateInfo( m_parent->m_descriptorPool, &descriptorSetLayout, 1 );
 
 	VK_CHECK( vkAllocateDescriptorSets( m_parent->m_device, &allocInfo, &descriptorSet ) );
+
+	SetDebugName( descriptorInfo.name.c_str(), VK_OBJECT_TYPE_DESCRIPTOR_SET, ( uint64_t )descriptorSet );
+
+	std::string descriptorSetName = descriptorInfo.name + " Set";
+	SetDebugName( descriptorSetName.c_str(), VK_OBJECT_TYPE_DESCRIPTOR_SET_LAYOUT, ( uint64_t )descriptorSetLayout );
 }
 
 VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type )
@@ -1775,6 +1914,11 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 	}
 
 	__debugbreak(); // Invalid / unsupported descriptor binding type
+}
+
+void VulkanDescriptor::Delete() const
+{
+	vkDestroyDescriptorSetLayout( m_parent->m_device, descriptorSetLayout, nullptr );
 }
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -1859,6 +2003,9 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 
 	layout = builder.m_pipelineLayout;
 
+	std::string pipelineLayoutName = pipelineInfo.name + " Layout";
+	SetDebugName( pipelineLayoutName.c_str(), VK_OBJECT_TYPE_PIPELINE_LAYOUT, ( uint64_t )layout );
+
 	builder.m_rasterizer = VKInit::PipelineRasterizationStateCreateInfo( VK_POLYGON_MODE_FILL );
 	builder.m_multisampling = VKInit::PipelineMultisampleStateCreateInfo();
 	builder.m_colorBlendAttachment = VKInit::PipelineColorBlendAttachmentState();
@@ -1923,4 +2070,12 @@ VulkanPipeline::VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipe
 	{
 		pipeline = builder.Build( m_parent->m_device, m_parent->m_colorTarget.format, m_parent->m_depthTarget.format );
 	}
+
+	SetDebugName( pipelineInfo.name.c_str(), VK_OBJECT_TYPE_PIPELINE, ( uint64_t )pipeline );
+}
+
+void VulkanPipeline::Delete() const
+{
+	vkDestroyPipeline( m_parent->m_device, pipeline, nullptr );
+	vkDestroyPipelineLayout( m_parent->m_device, layout, nullptr );
 }

@@ -14,13 +14,16 @@ struct Mesh
 
 	Material* material;
 
+	std::string name{};
+
 	Mesh( Material* _material )
 	    : material( _material )
 	{
 	}
 
-	Mesh( UtilArray _vertices, UtilArray _indices, Material* _material )
-	    : material( _material )
+	Mesh( std::string _name, UtilArray _vertices, UtilArray _indices, Material* _material )
+	    : name( _name )
+	    , material( _material )
 	    , indices( _indices )
 	    , vertices( _vertices )
 	{

@@ -4,9 +4,10 @@
 #include <rendermanager.h>
 #include <vkinit.h>
 
-Texture::Texture( uint32_t width, uint32_t height )
+Texture::Texture( const char* name, uint32_t width, uint32_t height )
 {
 	ImageTextureInfo_t info = {};
+	info.name = std::string( name );
 	info.width = width;
 	info.height = height;
 

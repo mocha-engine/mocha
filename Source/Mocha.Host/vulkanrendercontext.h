@@ -110,7 +110,11 @@ protected:
 		m_parent = parent;
 	}
 
+	void SetDebugName( const char* name, VkObjectType objectType, uint64_t handle );
+
 public:
+	friend class VulkanRenderContext;
+
 	/// <summary>
 	/// This will delete any Vulkan resources stored within this object.
 	/// </summary>
@@ -118,6 +122,7 @@ public:
 	{
 		// TODO: If making vulkan resources, delete them here. This will be called by any context-level
 		// deletion functions (i.e. when a deletion queue is processed)
+		spdlog::warn( "Delete() was called on {}, but hasn't been overridden!", typeid( *this ).name() );
 	}
 };
 
@@ -136,6 +141,8 @@ public:
 	VulkanBuffer( VulkanRenderContext* parent, BufferInfo_t bufferInfo, VmaMemoryUsage memoryUsage );
 
 	void SetData( BufferUploadInfo_t uploadInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -162,6 +169,8 @@ struct VulkanCommandContext : public VulkanObject
 
 	VulkanCommandContext() {}
 	VulkanCommandContext( VulkanRenderContext* parent );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -256,12 +265,16 @@ public:
 	VkImageView imageView;
 	VkFormat format;
 
+	ImageTextureInfo_t textureInfo;
+
 	VulkanImageTexture() {}
-	VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t textureInfo );
+	VulkanImageTexture( VulkanRenderContext* parent, ImageTextureInfo_t _textureInfo );
 
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
 	void* GetImGuiTextureID();
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -288,6 +301,8 @@ public:
 	VulkanSwapchain() {}
 	VulkanSwapchain( VulkanRenderContext* parent, Size2D size );
 	void Update( Size2D newSize );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -305,6 +320,8 @@ public:
 
 	VulkanDescriptor() {}
 	VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_t descriptorInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -320,6 +337,8 @@ public:
 
 	VulkanShader() {}
 	VulkanShader( VulkanRenderContext* parent, ShaderInfo_t shaderInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -336,6 +355,8 @@ public:
 
 	VulkanPipeline() {}
 	VulkanPipeline( VulkanRenderContext* parent, PipelineInfo_t pipelineInfo );
+
+	void Delete() const override;
 };
 
 // ----------------------------------------------------------------------------------------------------------------------------
@@ -430,6 +451,8 @@ private:
 	//    }
 	// }
 	//
+	// If you are adding a new HandleMap here, **make sure everything in it
+	// is deleted inside Shutdown()**.
 	HandleMap<VulkanBuffer> m_buffers = {};
 	HandleMap<VulkanImageTexture> m_imageTextures = {};
 	HandleMap<VulkanRenderTexture> m_renderTextures = {};
@@ -457,6 +480,11 @@ private:
 	} m_fullScreenTri;
 	void CreateFullScreenTri();
 
+	/// <summary>
+	/// Everything in here will be deleted once the current frame ends.
+	/// If we're not currently rendering a frame, then everything will be
+	/// deleted when the next frame ends instead.
+	/// </summary>
 	VulkanDeletionQueue m_frameDeletionQueue = {};
 
 protected:
@@ -475,6 +503,19 @@ protected:
 	RenderStatus CreatePipeline( PipelineInfo_t pipelineInfo, Handle* outHandle ) override;
 	RenderStatus CreateDescriptor( DescriptorInfo_t pipelineInfo, Handle* outHandle ) override;
 	RenderStatus CreateShader( ShaderInfo_t pipelineInfo, Handle* outHandle ) override;
+
+	// ----------------------------------------
+
+	inline void SetDebugName( const char* name, VkObjectType objectType, uint64_t handle )
+	{
+		// Set the name of the object.
+		VkDebugUtilsObjectNameInfoEXT nameInfo{};
+		nameInfo.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_OBJECT_NAME_INFO_EXT;
+		nameInfo.objectType = objectType;
+		nameInfo.objectHandle = handle;
+		nameInfo.pObjectName = name;
+		vkSetDebugUtilsObjectNameEXT( m_device, &nameInfo );
+	}
 
 public:
 	// All vulkan types should be able to access render context internals.
