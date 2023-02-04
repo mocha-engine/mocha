@@ -37,7 +37,7 @@ float g_cameraFov;
 float g_cameraZNear;
 float g_cameraZFar;
 RenderDebugViews g_debugView;
-Realm g_realm;
+Realm g_executingRealm;
 
 namespace EngineProperties
 {
@@ -152,11 +152,11 @@ void Root::Run()
 			// Update game
 			g_hostManager->Update();
 
-// TODO: Server / client
-// #ifndef DEDICATED_SERVER
+			// TODO: Server / client
+			// #ifndef DEDICATED_SERVER
 			// Update window
 			g_renderContext->UpdateWindow();
-// #endif
+			// #endif
 
 			if ( GetQuitRequested() )
 			{
@@ -174,9 +174,9 @@ void Root::Run()
 		}
 
 		g_frameDeltaTime = ( float )loopDeltaTime;
-		
-// TODO: Server / client
-// #ifndef DEDICATED_SERVER
+
+		// TODO: Server / client
+		// #ifndef DEDICATED_SERVER
 		// Render
 		{
 			const double alpha = accumulator / logicDelta;
@@ -195,16 +195,16 @@ void Root::Run()
 
 			g_renderManager->DrawGame();
 		}
-// #endif
+		// #endif
 	}
 }
 
 bool Root::GetQuitRequested()
 {
-// TODO: Server / client
-// #ifdef DEDICATED_SERVER
-// ...
-// #else
+	// TODO: Server / client
+	// #ifdef DEDICATED_SERVER
+	// ...
+	// #else
 	return g_renderContext->GetWindowCloseRequested();
-// #endif
+	// #endif
 }

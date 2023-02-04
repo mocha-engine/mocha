@@ -1,5 +1,4 @@
 #pragma once
-#include <vk_mem_alloc.h>
 
 // TODO: Remove
 enum RenderDebugViews
@@ -19,6 +18,20 @@ enum Realm
 	REALM_SERVER,
 	REALM_CLIENT
 };
+
+inline const char* RealmToString( const Realm& realm )
+{
+	switch ( realm )
+	{
+	case REALM_SERVER:
+		return "Server";
+	case REALM_CLIENT:
+		return "Client";
+	}
+
+	__debugbreak();
+	return "Unknown";
+}
 
 class RenderManager;
 class RenderdocManager;
@@ -60,3 +73,4 @@ extern float g_cameraZNear;
 extern float g_cameraZFar;
 
 extern RenderDebugViews g_debugView;
+extern Realm g_executingRealm;

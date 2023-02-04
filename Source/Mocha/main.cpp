@@ -3,6 +3,8 @@
 
 int main()
 {
+	g_executingRealm = REALM_CLIENT;
+
 	auto& root = Root::GetInstance();
 
 	root.Startup();
