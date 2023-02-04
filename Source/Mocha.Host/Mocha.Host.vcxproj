@@ -361,6 +361,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="mesh.h" />
+    <ClInclude Include="nullrendercontext.h" />
     <ClInclude Include="projectmanager.h" />
     <ClInclude Include="projectmanifest.h" />
     <ClInclude Include="rendering.h" />

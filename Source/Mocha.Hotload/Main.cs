@@ -30,9 +30,9 @@ public static class Main
 
 		// TODO: Is there a better way to register these cvars?
 		// Register cvars for assemblies that will never hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Hotload.Main ).Assembly );	// Hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Common.IGame ).Assembly );	// Common
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.BaseGame ).Assembly );		// Engine
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Hotload.Main ).Assembly );   // Hotload
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Common.IGame ).Assembly );   // Common
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.BaseGame ).Assembly );       // Engine
 
 		// Initialize upgrader, we do this as early as possible to prevent
 		// slowdowns while the engine is running.
@@ -76,7 +76,9 @@ public static class Main
 		};
 
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
-		s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
+
+		if ( Host.IsClient )
+			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
 		// Setup file system.
 		FileSystem.Mounted = new FileSystem(
@@ -86,7 +88,9 @@ public static class Main
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Start.
-		s_editor.EntryPoint.Startup();
+		if ( Host.IsClient )
+			s_editor.EntryPoint.Startup();
+
 		s_game.EntryPoint.Startup();
 	}
 
@@ -111,6 +115,9 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
+		if ( !Host.IsClient )
+			return;
+
 		s_editor.EntryPoint.FrameUpdate();
 	}
 

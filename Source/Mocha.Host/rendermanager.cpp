@@ -37,6 +37,7 @@
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui.h>
 #include <implot.h>
+#include <nullrendercontext.h>
 
 FloatCVar maxFramerate(
     "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
@@ -88,7 +89,17 @@ void RenderManager::Startup()
 {
 	g_renderManager = this;
 
-	m_renderContext = std::make_unique<VulkanRenderContext>();
+	if ( IS_CLIENT )
+	{
+		// Client uses Vulkan for rendering
+		m_renderContext = std::make_unique<VulkanRenderContext>();
+	}
+	else
+	{
+		// Server is headless - use a null render context
+		m_renderContext = std::make_unique<NullRenderContext>();
+	}
+
 	g_renderContext = m_renderContext.get();
 
 	m_renderContext->Startup();
@@ -134,6 +145,10 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 
 void RenderManager::DrawOverlaysAndEditor()
 {
+	// Server is headless - no overlays or editor
+	if ( IS_SERVER )
+		return;
+	
 	m_renderContext->BeginImGui();
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
@@ -146,6 +161,10 @@ void RenderManager::DrawOverlaysAndEditor()
 
 void RenderManager::DrawGame()
 {
+	// Server is headless - don't render
+	if ( IS_SERVER )
+		return;
+
 	RenderStatus res = m_renderContext->BeginRendering();
 
 	if ( res == RENDER_STATUS_WINDOW_SIZE_INVALID )

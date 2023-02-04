@@ -58,6 +58,9 @@
     <Filter Include="Managed\Bindings">
       <UniqueIdentifier>{adff9618-14a2-4b36-b617-c90e0464d6a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Platform\Null">
+      <UniqueIdentifier>{a6ab7305-4387-4823-9506-9137221613fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="modelentity.cpp">
@@ -1450,6 +1453,9 @@
     </ClInclude>
     <ClInclude Include="projectmanager.h">
       <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="nullrendercontext.h">
+      <Filter>Rendering\Platform\Null</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

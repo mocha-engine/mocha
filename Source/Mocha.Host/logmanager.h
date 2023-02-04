@@ -81,7 +81,17 @@ protected:
 	{
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
-		OutputDebugStringA( fmt::to_string( formatted ).c_str() );
+
+		if ( IS_CLIENT )
+		{
+			// In client, use visual studio's output window
+			OutputDebugStringA( fmt::to_string( formatted ).c_str() );
+		}
+		else
+		{
+			// Servers use the console
+			std::cout << fmt::to_string( formatted );
+		}
 
 		// Format everything to std::string
 		std::string time = TimePointToString( msg.time );

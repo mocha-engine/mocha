@@ -63,14 +63,14 @@ void Root::Startup()
 	g_projectManager = new ProjectManager();
 	g_projectManager->Startup();
 
-	g_renderdocManager = new RenderdocManager();
-	g_renderdocManager->Startup();
-
 	g_entityDictionary = new EntityManager();
 	g_entityDictionary->Startup();
 
 	g_physicsManager = new PhysicsManager();
 	g_physicsManager->Startup();
+
+	g_renderdocManager = new RenderdocManager();
+	g_renderdocManager->Startup();
 
 	g_inputManager = new InputManager();
 	g_inputManager->Startup();
@@ -85,11 +85,12 @@ void Root::Startup()
 void Root::Shutdown()
 {
 	g_hostManager->Shutdown();
+
 	g_renderManager->Shutdown();
 	g_inputManager->Shutdown();
+	g_renderdocManager->Shutdown();
 	g_physicsManager->Shutdown();
 	g_entityDictionary->Shutdown();
-	g_renderdocManager->Shutdown();
 	g_projectManager->Shutdown();
 	g_cvarManager->Shutdown();
 	g_logManager->Shutdown();
