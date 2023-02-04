@@ -176,6 +176,9 @@ VulkanImageTexture::VulkanImageTexture( VulkanRenderContext* parent, ImageTextur
 
 void VulkanImageTexture::SetData( TextureData_t textureData )
 {
+	// Destroy old image
+	Delete();
+	
 	VkFormat imageFormat = ( VkFormat )textureData.imageFormat;
 	uint32_t imageSize = 0;
 
@@ -212,8 +215,9 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
-
+	
 	vmaCreateImage( m_parent->m_allocator, &imageCreateInfo, &allocInfo, &image, &allocation, nullptr );
+	vmaSetAllocationName( m_parent->m_allocator, allocation, textureInfo.name.c_str() );
 
 	m_parent->ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
 		{
@@ -1246,6 +1250,9 @@ RenderStatus VulkanRenderContext::Shutdown()
 	vkDestroySemaphore( m_device, m_renderSemaphore, nullptr );
 
 	vkDestroyDescriptorPool( m_device, m_descriptorPool, nullptr );
+
+	// Finally, destroy the allocator
+	vmaDestroyAllocator( m_allocator );
 
 	vkDestroyDevice( m_device, nullptr );
 	vkDestroyInstance( m_instance, nullptr );
