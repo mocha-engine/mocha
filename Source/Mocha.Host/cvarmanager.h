@@ -118,7 +118,6 @@ private:
 	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
 
 public:
-
 	//
 	// CVarSystem is a singleton because it needs creating *as soon as* it's referenced
 	// and not after.

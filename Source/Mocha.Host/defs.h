@@ -57,6 +57,11 @@ namespace EngineProperties
 	extern StringCVar LoadedProject;
 	extern BoolCVar Raytracing;
 	extern BoolCVar Renderdoc;
+
+	extern StringCVar ServerHostname;
+	extern StringCVar ServerPassword;
+	extern IntCVar ServerPort;
+	extern IntCVar ServerMaxPlayers;
 };
 
 //
