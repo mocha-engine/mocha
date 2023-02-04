@@ -19,7 +19,6 @@ using CVarCallback = std::function<void( T, T )>;
 
 using CCmdCallback = std::function<void( std::vector<std::string> )>;
 
-
 struct CVarManagedCmdDispatchInfo
 {
 	const char* name;
@@ -34,7 +33,6 @@ struct CVarManagedVarDispatchInfo
 	T oldValue;
 	T newValue;
 };
-
 
 enum CVarFlags : int32_t
 {
@@ -61,7 +59,6 @@ enum CVarFlags : int32_t
 	// TODO: Networked variables server -> client
 	Replicated = 1 << 6,
 };
-
 
 struct CVarEntry
 {
@@ -101,7 +98,6 @@ public:
 	std::string ToString();
 	void FromString( std::string valueStr );
 };
-
 
 class CVarManager : ISubSystem
 {
@@ -222,7 +218,8 @@ public:
 class StringCVar : CVarParameter
 {
 public:
-	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback )
+	StringCVar(
+	    std::string name, std::string value, CVarFlags flags, std::string description, CVarCallback<std::string> callback )
 	{
 		m_name = name;
 
@@ -232,12 +229,11 @@ public:
 	StringCVar( std::string name, std::string value, CVarFlags flags, std::string description )
 	    : StringCVar( name, value, flags, description, nullptr )
 	{
-	
 	}
 
 	std::string GetValue() { return CVarSystem::Instance().GetString( m_name ); }
 	void SetValue( std::string value ) { CVarSystem::Instance().SetString( m_name, value ); }
-	
+
 	operator std::string() { return GetValue(); }
 };
 
@@ -254,12 +250,11 @@ public:
 	FloatCVar( std::string name, float value, CVarFlags flags, std::string description )
 	    : FloatCVar( name, value, flags, description, nullptr )
 	{
-
 	}
 
 	float GetValue() { return CVarSystem::Instance().GetFloat( m_name ); }
 	void SetValue( float value ) { CVarSystem::Instance().SetFloat( m_name, value ); }
-	
+
 	operator float() { return GetValue(); }
 };
 
@@ -276,7 +271,6 @@ public:
 	BoolCVar( std::string name, bool value, CVarFlags flags, std::string description )
 	    : BoolCVar( name, value, flags, description, nullptr )
 	{
-
 	}
 
 	bool GetValue() { return CVarSystem::Instance().GetBool( m_name ); }
@@ -300,10 +294,7 @@ public:
 	// This is not going to be as clean as C#.
 	//
 
-	void Invoke( std::vector<std::string> arguments )
-	{
-		CVarSystem::Instance().InvokeCommand( m_name, arguments );
-	}
+	void Invoke( std::vector<std::string> arguments ) { CVarSystem::Instance().InvokeCommand( m_name, arguments ); }
 
 	void operator()( std::vector<std::string> arguments ) { Invoke( arguments ); }
 };
