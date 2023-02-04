@@ -45,7 +45,7 @@
     <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -71,7 +71,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
-    <TargetName>Mocha</TargetName>
+    <TargetName>Mocha.Host</TargetName>
     <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
@@ -82,7 +82,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
-    <TargetName>Mocha</TargetName>
+    <TargetName>Mocha.Host</TargetName>
     <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
