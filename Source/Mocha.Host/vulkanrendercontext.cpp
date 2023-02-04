@@ -149,7 +149,7 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-
+	
 	vmaCreateImage( m_parent->m_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
 
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
@@ -162,8 +162,7 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 void VulkanRenderTexture::Delete() const
 {
 	vkDestroyImageView( m_parent->m_device, imageView, nullptr );
-	vkDestroyImage( m_parent->m_device, image, nullptr );
-	vmaFreeMemory( m_parent->m_allocator, allocation );
+	vmaDestroyImage( m_parent->m_allocator, image, allocation );
 }
 #pragma endregion
 // ----------------------------------------------------------------------------------------------------------------------------
