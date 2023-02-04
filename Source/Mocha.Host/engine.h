@@ -1,9 +1,9 @@
 #pragma once
 #include <defs.h>
 #include <globalvars.h>
-#include <root.h>
 #include <projectmanager.h>
 #include <projectmanifest.h>
+#include <root.h>
 
 namespace Engine
 {
@@ -41,11 +41,21 @@ namespace Engine
 	GENERATE_BINDINGS inline const char* GetProjectPath()
 	{
 		std::string str = EngineProperties::LoadedProject.GetValue();
-		
+
 		// Copy string so we can use it out-of-scope
 		char* cstr = new char[str.length() + 1];
 		strcpy_s( cstr, str.length() + 1, str.c_str() );
-				
+
 		return cstr;
 	};
+
+	GENERATE_BINDINGS inline bool IsServer()
+	{
+		return IS_SERVER;
+	}
+
+	GENERATE_BINDINGS inline bool IsClient()
+	{
+		return IS_CLIENT;
+	}
 }; // namespace Engine

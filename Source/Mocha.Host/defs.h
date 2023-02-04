@@ -66,6 +66,9 @@ namespace EngineProperties
 #define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
 #define WINDOW_TITLE					std::string( g_projectManager->GetProject().name + " [" + g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
 
+#define IS_SERVER						g_executingRealm == REALM_SERVER
+#define IS_CLIENT						g_executingRealm == REALM_CLIENT
+
 //
 // Types
 //
