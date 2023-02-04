@@ -1,8 +1,9 @@
 #include <globalvars.h>
 #include <iostream>
 #include <root.h>
+#include <Windows.h>
 
-int main()
+int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 {
 	g_executingRealm = REALM_CLIENT;
 
