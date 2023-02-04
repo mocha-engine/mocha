@@ -1207,10 +1207,9 @@ RenderStatus VulkanRenderContext::Shutdown()
 	//
 	// Delete everything
 	//
-	ImGui_ImplSDL2_Shutdown();
 	ImGui_ImplVulkan_Shutdown();
-
-	ImGui::Shutdown();
+	ImGui_ImplSDL2_Shutdown();
+	ImGui::DestroyContext();
 
 	// Delete command contexts
 	m_mainContext.Delete();
