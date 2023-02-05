@@ -1,6 +1,7 @@
 ﻿using Microsoft.Build.Evaluation;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Emit;
 using Microsoft.CodeAnalysis.Text;
 using Mocha.Common;
@@ -127,6 +128,37 @@ internal static class Compiler
 				embeddedTexts.Add( EmbeddedText.FromSource( filePath, sourceText ) );
 		}
 
+		// Strip out methods marked with [ServerOnly] or [ClientOnly] attribute
+		// based on the current realm
+		var newSyntaxTrees = new List<SyntaxTree>();
+
+		foreach ( var tree in syntaxTrees )
+		{
+			var root = tree.GetRoot();
+			var methodsToRemove = new List<MethodDeclarationSyntax>();
+
+			foreach ( var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>() )
+			{
+				// Which attribute do we want to remove (or, in other words, which realm are we not in)
+				var targetAttribute = Host.IsServer ? "ClientOnly" : "ServerOnly";
+
+				var obsoleteAttribute = method.AttributeLists
+					.SelectMany( al => al.Attributes )
+					.Where( a => a.Name.ToString() == targetAttribute )
+					.FirstOrDefault();
+
+				if ( obsoleteAttribute != null )
+				{
+					methodsToRemove.Add( method );
+				}
+			}
+
+			root = root.RemoveNodes( methodsToRemove, SyntaxRemoveOptions.KeepNoTrivia );
+			newSyntaxTrees.Add( root.SyntaxTree );
+		}
+
+		syntaxTrees = newSyntaxTrees;
+
 		//
 		// Build up references
 		//
@@ -162,7 +194,6 @@ internal static class Compiler
 		//
 		// Set up compiler
 		//
-
 		var options = new CSharpCompilationOptions( OutputKind.DynamicallyLinkedLibrary )
 			.WithPlatform( Platform.X64 )
 			.WithOptimizationLevel( compileOptions.OptimizationLevel )
