@@ -53,16 +53,19 @@ public class BaseGame : IGame
 		TryCallMethodOnEntity( "FrameUpdate" );
 	}
 
-	public virtual void Update()
+	public void Update()
 	{
-		// HACK: Clear DebugOverlay here because doing it
-		// per-frame doesn't play nice with tick-based
-		// entries (needs fix)
+		if ( Host.IsClient )
+		{
+			// HACK: Clear DebugOverlay here because doing it
+			// per-frame doesn't play nice with tick-based
+			// entries (needs fix)
 
-		DebugOverlay.screenTextList.Clear();
-		DebugOverlay.currentLine = 0;
+			DebugOverlay.screenTextList.Clear();
+			DebugOverlay.currentLine = 0;
+		}
 
-		TryCallMethodOnEntity( "Update" );
+		Event.Run( Event.TickAttribute.Name );
 	}
 
 	public virtual void Shutdown()

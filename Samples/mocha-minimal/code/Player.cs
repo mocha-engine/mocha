@@ -33,7 +33,8 @@ public class Player : Mocha.Player
 		Position = new Vector3( 0.0f, 4.0f, 0.9f );
 	}
 
-	public override void Update()
+	[Event.Tick]
+	public void PredictedUpdate()
 	{
 		UpdateEyeTransform();
 

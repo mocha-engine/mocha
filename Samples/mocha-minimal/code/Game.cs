@@ -21,4 +21,25 @@ public class Game : BaseGame
 		// Spawn a player
 		var player = new Player();
 	}
+
+	// This runs on client, and is stripped from the server dll
+	[ClientOnly, Event.Tick]
+	public void ClientUpdate()
+	{
+		Log.Trace( "Hello from client" );
+	}
+
+	// This runs on server, and is stripped from the client dll
+	[ServerOnly, Event.Tick]
+	public void ServerUpdate()
+	{
+		Log.Trace( "Hello from server" );
+	}
+
+	// This runs on both client & server
+	[Event.Tick]
+	public void PredictedUpdate()
+	{
+		Log.Trace( "Hello from either client or server" );
+	}
 }

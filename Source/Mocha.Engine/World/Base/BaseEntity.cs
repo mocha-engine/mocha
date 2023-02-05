@@ -66,6 +66,8 @@ public class BaseEntity : IEntity
 		var displayInfo = DisplayInfo.For( this );
 		Name = $"[{displayInfo.Category}] {displayInfo.Name} {NativeHandle}";
 
+		Event.Register( this );
+
 		Spawn();
 	}
 
