@@ -1,5 +1,4 @@
-﻿using NuGet.Packaging;
-using System.Text;
+﻿using System.Text;
 using System.Xml;
 
 namespace Mocha.Hotload;

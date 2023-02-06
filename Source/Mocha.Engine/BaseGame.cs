@@ -55,7 +55,7 @@ public class BaseGame : IGame
 
 	public void Update()
 	{
-		if ( Host.IsClient )
+		if ( Core.IsClient )
 		{
 			// HACK: Clear DebugOverlay here because doing it
 			// per-frame doesn't play nice with tick-based

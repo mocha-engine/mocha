@@ -77,7 +77,7 @@ public static class Main
 
 		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 
-		if ( Host.IsClient )
+		if ( Core.IsClient )
 			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 
 		// Setup file system.
@@ -88,7 +88,7 @@ public static class Main
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Start.
-		if ( Host.IsClient )
+		if ( Core.IsClient )
 			s_editor.EntryPoint.Startup();
 
 		s_game.EntryPoint.Startup();
@@ -105,7 +105,7 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		Time.UpdateFrom( Glue.Engine.GetTickDeltaTime() );
+		Time.UpdateFrom( Glue.Engine.GetFrameDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
@@ -115,7 +115,7 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		if ( !Host.IsClient )
+		if ( !Core.IsClient )
 			return;
 
 		s_editor.EntryPoint.FrameUpdate();
@@ -234,7 +234,18 @@ public static class Main
 	{
 		s_manifest = ProjectManifest.Load( manifestPath );
 
+		SetGlobals();
+
 		var csprojPath = ProjectGenerator.Generate( s_manifest );
 		return csprojPath;
+	}
+
+	/// <summary>
+	/// Set the values in the <see cref="Project"/> global class so that
+	/// developers can use values like tick rate, etc. in their games
+	/// </summary>
+	private static void SetGlobals()
+	{
+		Core.TickRate = s_manifest.Properties.TickRate;
 	}
 }

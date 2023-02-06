@@ -140,7 +140,7 @@ internal static class Compiler
 			foreach ( var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>() )
 			{
 				// Which attribute do we want to remove (or, in other words, which realm are we not in)
-				var targetAttribute = Host.IsServer ? "ClientOnly" : "ServerOnly";
+				var targetAttribute = Core.IsServer ? "ClientOnly" : "ServerOnly";
 
 				var obsoleteAttribute = method.AttributeLists
 					.SelectMany( al => al.Attributes )

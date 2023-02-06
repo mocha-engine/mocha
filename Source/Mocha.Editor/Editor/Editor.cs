@@ -146,7 +146,7 @@ public class Editor
 
 			DrawProperty( $"Elapsed time", $"{Time.Now:F0}s" );
 			DrawProperty( $"Current tick", $"{Glue.Engine.GetCurrentTick():F0}" );
-			DrawProperty( $"Tick rate", $"{Project.TickRate}" );
+			DrawProperty( $"Tick rate", $"{Core.TickRate}" );
 
 			ImGuiX.Separator( new Vector4( 1, 1, 1, 0.05f ) );
 
