@@ -10,14 +10,15 @@ public static partial class ConsoleOverlay
 		// Setup invisible window
 		//
 		ImGui.SetNextWindowViewport( ImGui.GetMainViewport().ID );
-		ImGui.SetNextWindowSize( new Vector2( 0 ) );
 
-		ImGui.PushStyleColor( ImGuiCol.WindowBg, Theme.Gray.ToBackground( 0.75f ) );
-		ImGui.PushStyleColor( ImGuiCol.Border, Theme.Transparent );
-		ImGui.PushStyleVar( ImGuiStyleVar.WindowRounding, 0 );
-
-		if ( ImGui.Begin( "consoleoverlay", ImGuiWindowFlags.NoDocking | ImGuiWindowFlags.NoInputs | ImGuiWindowFlags.NoTitleBar ) )
+		if ( ImGuiX.BeginOverlay( "ConsoleOverlay" ) )
 		{
+			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
+			Vector2 workSize = ImGui.GetMainViewport().WorkSize;
+			Vector2 windowSize = ImGui.GetWindowSize();
+
+			ImGui.SetWindowPos( new Vector2( workPos.X + workSize.X - windowSize.X - 16, workPos.Y + workSize.Y - windowSize.Y - 16 ) );
+
 			var logEntries = Log.GetHistory().TakeLast( Count ).ToArray();
 
 			for ( int i = 0; i < Count; ++i )
@@ -43,13 +44,6 @@ public static partial class ConsoleOverlay
 			}
 		}
 
-		var windowSize = ImGui.GetWindowSize();
-		var windowPos = ImGui.GetMainViewport().WorkPos + new System.Numerics.Vector2( ImGui.GetMainViewport().WorkSize.X - windowSize.X, ImGui.GetMainViewport().WorkSize.Y - windowSize.Y );
-		ImGui.SetWindowPos( windowPos );
-
 		ImGui.End();
-
-		ImGui.PopStyleColor( 2 );
-		ImGui.PopStyleVar();
 	}
 }

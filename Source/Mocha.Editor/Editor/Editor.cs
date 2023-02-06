@@ -94,14 +94,65 @@ public class Editor
 
 	private static void DrawPerformanceOverlay()
 	{
-		if ( ImGuiX.BeginOverlay( "Time" ) )
+		if ( ImGuiX.BeginOverlay( "PerformanceOverlay" ) )
 		{
-			var gpuName = ImGuiX.GetGPUName();
+			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
+			ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
 
-			ImGui.Text( $"GPU: {gpuName}" );
-			ImGui.Text( $"FPS: {Time.FPS}" );
-			ImGui.Text( $"Current time: {Time.Now}" );
-			ImGui.Text( $"Frame time: {(Time.Delta * 1000f).CeilToInt()}ms" );
+			var cursorPos = ImGui.GetCursorPos();
+			void DrawProperty( string name, string value )
+			{
+				ImGuiX.TextBold( name );
+				ImGui.SameLine();
+
+				var textWidth = ImGui.CalcTextSize( value ).X;
+				ImGui.SetCursorPosX( cursorPos.X + 128 - textWidth );
+				ImGui.Text( value );
+			}
+
+			{
+				var left = $"{Time.FPS} FPS";
+				var right = $"{Time.Delta * 1000f:F0}ms";
+
+				ImGuiX.TextSubheading( left );
+				ImGui.SameLine();
+
+				var textWidth = ImGui.CalcTextSize( right ).X * 1.15f;
+				ImGui.SetCursorPosX( cursorPos.X + 128 - textWidth );
+				ImGui.SetCursorPosY( cursorPos.Y );
+				ImGuiX.TextSubheading( right );
+			}
+
+			var windowSize = ImGui.GetWindowSize();
+			var fpsHistory = Time.FPSHistory.Select( x => (float)x ).ToArray();
+			var scaleMax = fpsHistory.Max();
+
+			ImGui.PushStyleColor( ImGuiCol.FrameBg, Vector4.Zero );
+			ImGui.PushStyleVar( ImGuiStyleVar.FramePadding, new Vector2( 0, 0 ) );
+			ImGui.PlotHistogram( "##FrameTimes", ref fpsHistory[0], Time.FPSHistory.Count, 0, "", 0f, scaleMax, new Vector2( 128f, 32 ) );
+			ImGui.PopStyleVar();
+			ImGui.PopStyleColor();
+
+			ImGuiX.Separator( new Vector4( 1, 1, 1, 0.05f ) );
+
+			var min = fpsHistory.Min();
+			DrawProperty( $"Min", $"{min:F0}fps" );
+			var max = fpsHistory.Max();
+			DrawProperty( $"Max", $"{max:F0}fps" );
+			var avg = fpsHistory.Average();
+			DrawProperty( $"Avg", $"{avg:F0}fps" );
+
+			ImGuiX.Separator( new Vector4( 1, 1, 1, 0.05f ) );
+
+			DrawProperty( $"Elapsed time", $"{Time.Now:F0}s" );
+			DrawProperty( $"Current tick", $"{Glue.Engine.GetCurrentTick():F0}" );
+			DrawProperty( $"Tick rate", $"{Project.TickRate}" );
+
+			ImGuiX.Separator( new Vector4( 1, 1, 1, 0.05f ) );
+
+			DrawProperty( $"Ping", $"{0}ms" );
+			DrawProperty( $"Jitter", $"{0}ms" );
+			DrawProperty( $"Loss", $"{0}" );
 		}
 
 		ImGui.End();

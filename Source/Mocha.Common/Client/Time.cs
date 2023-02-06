@@ -8,15 +8,22 @@ public static class Time
 
 	public static List<int> FPSHistory { get; } = new();
 
-	public static void UpdateFrom( float tickDeltaTime )
+	private static TimeSince s_timeSinceLastClear;
+
+	private const int TimeScale = 5;
+
+	public static void UpdateFrom( float deltaTime )
 	{
-		Delta = tickDeltaTime;
+		Delta = deltaTime;
 		Now = Glue.Engine.GetTime();
 
 		FPS = Glue.Engine.GetFramesPerSecond().CeilToInt();
-
 		FPSHistory.Add( FPS );
-		if ( FPSHistory.Count > 512 )
+
+		if ( s_timeSinceLastClear > TimeScale )
+		{
 			FPSHistory.RemoveAt( 0 );
+			s_timeSinceLastClear = 0;
+		}
 	}
 }

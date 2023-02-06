@@ -86,15 +86,15 @@ public static class ImGuiX
 	{
 		ImGui.SetNextWindowViewport( ImGui.GetMainViewport().ID );
 
+		ImGui.SetNextWindowBgAlpha( 0.5f );
+		ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 0 );
+
 		bool b = ImGui.Begin( name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs );
 
 		if ( b )
-		{
-			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
-
-			ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
 			ImGui.SetWindowSize( new Vector2( -1, -1 ) );
-		}
+
+		ImGui.PopStyleVar();
 
 		return b;
 	}
@@ -153,10 +153,12 @@ public static class ImGuiX
 		Image( Texture.FromCache( texture ), size, tint );
 	}
 
-	public static void Separator()
+	public static void Separator( Vector4? _color = null )
 	{
+		var color = _color ?? new Vector4( 0.28f, 0.28f, 0.28f, 0.29f );
+
 		ImGui.Dummy( new( 0, 4 ) );
-		ImGui.PushStyleColor( ImGuiCol.Separator, new System.Numerics.Vector4( 0.28f, 0.28f, 0.28f, 0.29f ) );
+		ImGui.PushStyleColor( ImGuiCol.Separator, color );
 		ImGui.Separator();
 		ImGui.PopStyleColor();
 		ImGui.Dummy( new( 0, 4 ) );
