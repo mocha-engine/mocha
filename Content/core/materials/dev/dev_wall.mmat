@@ -1,3 +1,1 @@
-{
-    "DiffuseTexture": "textures/dev/dev_wall.mtex"
-}
+{"DiffuseTexture":"textures/dev/wall_basecolor.mtex","NormalTexture":"textures/dev/wall_normal.mtex","AmbientOcclusionTexture":"textures/dev/wall_ambientocclusion.mtex","MetalnessTexture":"textures/dev/wall_metallic.mtex","RoughnessTexture":"textures/dev/wall_roughness.mtex"}
