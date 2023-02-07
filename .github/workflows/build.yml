@@ -35,7 +35,7 @@ jobs:
         vcpkgDirectory: 'C:\vcpkg'
     
     - name: Run setup_x64.cmd
-      working-directory: ${{env.GITHUB_WORKSPACE}}/Source
+      working-directory: ./Source
       shell: cmd
       run: call Setup_x64.cmd
 
