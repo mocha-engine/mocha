@@ -118,11 +118,6 @@ namespace Editor
 		return { ( float )size.x, ( float )size.y };
 	}
 
-	GENERATE_BINDINGS inline const char* GetVersionName()
-	{
-		return GAME_VERSION;
-	}
-
 	GENERATE_BINDINGS inline void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 	{
 		void* imguiTextureID;

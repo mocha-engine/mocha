@@ -1361,9 +1361,6 @@
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h">
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClInclude>
-    <ClInclude Include="gitdefs.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="handlemap.h">
       <Filter>Misc</Filter>
     </ClInclude>

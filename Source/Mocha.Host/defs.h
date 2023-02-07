@@ -1,6 +1,5 @@
 #pragma once
 #include <cvarmanager.h>
-#include <gitdefs.h>
 
 // clang-format off
 
@@ -63,8 +62,7 @@ namespace EngineProperties
 // Engine properties
 //
 #define ENGINE_NAME						"Mocha"
-#define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define WINDOW_TITLE					std::string( g_projectManager->GetProject().name + " [" + g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
+#define WINDOW_TITLE					std::string( g_projectManager->GetProject().name + " [" + g_projectManager->GetProject().version + "]" ).c_str()
 
 //
 // Types
