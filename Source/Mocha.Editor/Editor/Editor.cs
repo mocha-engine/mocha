@@ -97,7 +97,10 @@ public class Editor
 		if ( ImGuiX.BeginOverlay( "PerformanceOverlay" ) )
 		{
 			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
-			ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
+			Vector2 workSize = ImGui.GetMainViewport().WorkSize;
+			Vector2 windowSize = ImGui.GetWindowSize();
+
+			ImGui.SetWindowPos( new Vector2( workPos.X + workSize.X - windowSize.X - 16, workPos.Y + workSize.Y - windowSize.Y - 128 - 16 ) );
 
 			var cursorPos = ImGui.GetCursorPos();
 			void DrawProperty( string name, string value )
@@ -123,7 +126,6 @@ public class Editor
 				ImGuiX.TextSubheading( right );
 			}
 
-			var windowSize = ImGui.GetWindowSize();
 			var fpsHistory = Time.FPSHistory.Select( x => (float)x ).ToArray();
 			var scaleMax = fpsHistory.Max();
 
