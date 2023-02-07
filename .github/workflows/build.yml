@@ -2,9 +2,11 @@ name: MSBuild
 
 on:
   push:
-    branches: [ "master" ]
+    branches: 
+      - '*'
   pull_request:
-    branches: [ "master" ]
+    branches: 
+      - '*'
 
 env:
   SOLUTION_FILE_PATH: Source/Mocha.sln
