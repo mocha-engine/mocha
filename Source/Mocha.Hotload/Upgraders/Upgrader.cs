@@ -45,6 +45,9 @@ internal static class Upgrader
 		if ( oldInstance is null || newInstance is null )
 			return;
 
+		// Unregister events for old object
+		Event.Unregister( oldInstance );
+
 		var oldType = oldInstance.GetType();
 		var newType = newInstance.GetType();
 
@@ -110,5 +113,8 @@ internal static class Upgrader
 			if ( !wasUpgraded )
 				Log.Warning( $"Don't know how to upgrade {oldMember.MemberType.ToString().ToLower()} '{oldMember.Name}' in '{oldType.Name}'" );
 		}
+
+		// Register events for new object
+		Event.Register( newInstance );
 	}
 }

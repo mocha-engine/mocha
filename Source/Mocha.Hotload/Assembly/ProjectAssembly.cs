@@ -101,9 +101,6 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 
 			Upgrader.UpgradeInstance( oldGameInterface, newInterface );
 
-			// Unregister events for old interface
-			Event.Unregister( oldGameInterface );
-
 			ConsoleSystem.Internal.ClearGameCVars();
 		}
 

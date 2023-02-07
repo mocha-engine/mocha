@@ -46,7 +46,7 @@ public static partial class Event
 
 	public static void Run( string name, params object[] parameters )
 	{
-		s_events.ForEach( e =>
+		s_events.ToList().ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, parameters );
@@ -55,7 +55,7 @@ public static partial class Event
 
 	public static void Run( string name )
 	{
-		s_events.ForEach( e =>
+		s_events.ToList().ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, null );
