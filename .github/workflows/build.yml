@@ -21,6 +21,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
 
     - name: Install Vulkan SDK
       uses: humbletim/install-vulkan-sdk@v1.1.1
