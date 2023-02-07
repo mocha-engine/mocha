@@ -33,12 +33,11 @@ jobs:
       with:
         vcpkgGitCommitId: '0d239eb4d32f125c3da90e612096b14a11ef1474'
         vcpkgDirectory: 'C:\vcpkg'
-        vcpkgJsonGlob: '${{env.GITHUB_WORKSPACE}}/Source/vcpkg.json'
     
     - name: Run setup_x64.cmd
-      working-directory: ${{env.GITHUB_WORKSPACE}}
+      working-directory: ${{env.GITHUB_WORKSPACE}}/Source
       shell: cmd
-      run: call Source/Setup_x64.cmd
+      run: call Setup_x64.cmd
 
     - name: Add MSBuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
