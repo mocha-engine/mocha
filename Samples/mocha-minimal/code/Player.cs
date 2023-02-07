@@ -1,20 +1,20 @@
-﻿using System.ComponentModel;
-
-namespace Minimal;
+﻿namespace Minimal;
 
 public class Player : Mocha.Player
 {
 	private Vector3 PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
 
-	public QuakeWalkController WalkController { get; private set; }
-
-	[Category( "Player" )]
-	public bool IsGrounded => WalkController.IsGrounded;
-
-	[Category( "Player" )]
-	public BaseEntity GroundEntity => WalkController.GroundEntity;
+	public WalkController WalkController { get; private set; }
 
 	public float Health { get; set; }
+
+	protected override void Spawn()
+	{
+		// TODO: This would be better as just a ctor
+		base.Spawn();
+
+		SetCubePhysics( PlayerBounds, false );
+	}
 
 	private void UpdateEyeTransform()
 	{
@@ -37,8 +37,9 @@ public class Player : Mocha.Player
 	public void PredictedUpdate()
 	{
 		UpdateEyeTransform();
+		WalkController.PredictedUpdate();
 
-		WalkController.Update();
+		DebugOverlay.ScreenText( $"Assembly Hash: {GetType().Assembly.GetHashCode()}" );
 	}
 
 	public override void FrameUpdate()
@@ -72,10 +73,6 @@ public class Player : Mocha.Player
 		// Field of view
 		//
 		float targetFov = 90f;
-
-		// Interpolate velocity when sprinting
-		if ( WalkController?.Sprinting ?? false && Velocity.WithZ( 0 ).Length > 1.0f )
-			targetFov = 100f;
 
 		Camera.FieldOfView = lastFov.LerpTo( targetFov, 10 * Time.Delta );
 		lastFov = Camera.FieldOfView;
