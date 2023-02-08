@@ -3,18 +3,11 @@
 
 class Root : ISubSystem
 {
-private:
+protected:
 	bool m_shouldQuit = false;
-
-	bool GetQuitRequested();
+	virtual bool GetQuitRequested() = 0;
 
 public:
-	inline static Root& GetInstance()
-	{
-		static Root instance;
-		return instance;
-	}
-
 	void Startup();
 	void Run();
 	void Shutdown();

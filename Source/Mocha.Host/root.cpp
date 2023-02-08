@@ -13,50 +13,6 @@
 #include <rendermanager.h>
 #include <stdlib.h>
 
-// These global variables are all defined in globalvars.h,
-// because the naming makes more sense (imagine if we
-// included Root.h everywhere!)
-RenderManager* g_renderManager;
-LogManager* g_logManager;
-HostManager* g_hostManager;
-RenderdocManager* g_renderdocManager;
-EntityManager* g_entityDictionary;
-PhysicsManager* g_physicsManager;
-InputManager* g_inputManager;
-BaseRenderContext* g_renderContext; // TODO: Remove
-CVarManager* g_cvarManager;
-ProjectManager* g_projectManager;
-
-float g_curTime;
-float g_frameDeltaTime;
-float g_tickDeltaTime;
-int g_curTick;
-Vector3 g_cameraPos;
-Quaternion g_cameraRot;
-float g_cameraFov;
-float g_cameraZNear;
-float g_cameraZFar;
-RenderDebugViews g_debugView;
-Realm g_executingRealm;
-
-namespace EngineProperties
-{
-	StringCVar LoadedProject(
-	    "project.current", "Samples\\mocha-minimal\\project.json", CVarFlags::Archive, "Which project should we load?" );
-	BoolCVar Raytracing( "render.raytracing", true, CVarFlags::Archive, "Enable raytracing" );
-	BoolCVar Renderdoc( "render.renderdoc", false, CVarFlags::Archive, "Enable renderdoc" );
-
-	extern StringCVar ServerName( "server.name", "Mocha Dedicated Server", CVarFlags::None, "Server name" );
-	extern StringCVar ServerPassword( "server.password", "", CVarFlags::None, "Server password" );
-	extern IntCVar ServerPort( "server.port", 7777, CVarFlags::None, "Server port" );
-	extern IntCVar ServerMaxPlayers( "server.maxplayers", 16, CVarFlags::None, "Server max players" );
-} // namespace EngineProperties
-
-FloatCVar timescale( "game.timescale", 1.0f, CVarFlags::Archive, "The speed at which the game world runs." );
-
-// TODO: Server / client
-extern FloatCVar maxFramerate;
-
 void Root::Startup()
 {
 	g_logManager = new LogManager();
@@ -203,14 +159,4 @@ void Root::Run()
 		}
 		// #endif
 	}
-}
-
-bool Root::GetQuitRequested()
-{
-	// TODO: Server / client
-	// #ifdef DEDICATED_SERVER
-	// ...
-	// #else
-	return g_renderContext->GetWindowCloseRequested();
-	// #endif
 }

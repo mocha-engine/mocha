@@ -47,22 +47,7 @@ inline ENUMTYPE &operator &= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 inline ENUMTYPE operator ~ (ENUMTYPE a) { return ENUMTYPE(~((int)a)); } \
 inline ENUMTYPE operator ^ (ENUMTYPE a, ENUMTYPE b) { return ENUMTYPE(((int)a) ^ ((int)b)); } \
 inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((int &)a) ^= ((int)b)); } \
-} 
-
-//
-// Engine features
-//
-namespace EngineProperties
-{
-	extern StringCVar LoadedProject;
-	extern BoolCVar Raytracing;
-	extern BoolCVar Renderdoc;
-
-	extern StringCVar ServerHostname;
-	extern StringCVar ServerPassword;
-	extern IntCVar ServerPort;
-	extern IntCVar ServerMaxPlayers;
-};
+}
 
 //
 // Engine properties

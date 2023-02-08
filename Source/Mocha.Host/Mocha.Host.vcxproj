@@ -187,7 +187,9 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="clientroot.cpp" />
     <ClCompile Include="cvarmanager.cpp" />
+    <ClCompile Include="globalvars.cpp" />
     <ClCompile Include="hostmanager.cpp" />
     <ClCompile Include="inputmanager.cpp" />
     <ClCompile Include="logmanager.cpp" />
@@ -201,6 +203,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="rendermanager.cpp" />
     <ClCompile Include="baserendercontext.cpp" />
     <ClCompile Include="root.cpp" />
+    <ClCompile Include="serverroot.cpp" />
     <ClCompile Include="shadercompiler.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
@@ -346,6 +349,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="baseentity.h" />
+    <ClInclude Include="client.h" />
+    <ClInclude Include="clientroot.h" />
     <ClInclude Include="consolesystem.h" />
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
@@ -365,6 +370,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="projectmanager.h" />
     <ClInclude Include="projectmanifest.h" />
     <ClInclude Include="rendering.h" />
+    <ClInclude Include="serverroot.h" />
     <ClInclude Include="shadercompiler.h" />
     <ClInclude Include="util.h" />
     <ClInclude Include="utilarray.h" />

@@ -531,6 +531,15 @@
     <ClCompile Include="projectmanager.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="clientroot.cpp">
+      <Filter>Root</Filter>
+    </ClCompile>
+    <ClCompile Include="globalvars.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="serverroot.cpp">
+      <Filter>Root</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modelentity.h">
@@ -1456,6 +1465,15 @@
     </ClInclude>
     <ClInclude Include="nullrendercontext.h">
       <Filter>Rendering\Platform\Null</Filter>
+    </ClInclude>
+    <ClInclude Include="client.h">
+      <Filter>Managed\Bindings</Filter>
+    </ClInclude>
+    <ClInclude Include="clientroot.h">
+      <Filter>Root</Filter>
+    </ClInclude>
+    <ClInclude Include="serverroot.h">
+      <Filter>Root</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

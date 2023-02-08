@@ -3,13 +3,13 @@
 #include <globalvars.h>
 #include <projectmanager.h>
 #include <projectmanifest.h>
-#include <root.h>
+#include <clientroot.h>
 
 namespace Engine
 {
 	GENERATE_BINDINGS inline void Quit()
 	{
-		auto& root = Root::GetInstance();
+		auto& root = ClientRoot::GetInstance();
 		root.Quit();
 	}
 
