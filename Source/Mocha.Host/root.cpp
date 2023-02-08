@@ -15,46 +15,46 @@
 
 void Root::Startup()
 {
-	g_logManager = new LogManager();
-	g_logManager->Startup();
+	m_logManager = new LogManager();
+	m_logManager->Startup();
 
-	g_cvarManager = new CVarManager();
-	g_cvarManager->Startup();
+	m_cvarManager = new CVarManager();
+	m_cvarManager->Startup();
 
-	g_projectManager = new ProjectManager();
-	g_projectManager->Startup();
+	m_projectManager = new ProjectManager();
+	m_projectManager->Startup();
 
-	g_entityDictionary = new EntityManager();
-	g_entityDictionary->Startup();
+	m_entityManager = new EntityManager();
+	m_entityManager->Startup();
 
-	g_physicsManager = new PhysicsManager();
-	g_physicsManager->Startup();
+	m_physicsManager = new PhysicsManager();
+	m_physicsManager->Startup();
 
-	g_renderdocManager = new RenderdocManager();
-	g_renderdocManager->Startup();
+	m_renderdocManager = new RenderdocManager();
+	m_renderdocManager->Startup();
 
-	g_inputManager = new InputManager();
-	g_inputManager->Startup();
+	m_inputManager = new InputManager();
+	m_inputManager->Startup();
 
-	g_renderManager = new RenderManager();
-	g_renderManager->Startup();
+	m_renderManager = new RenderManager();
+	m_renderManager->Startup();
 
-	g_hostManager = new HostManager();
-	g_hostManager->Startup();
+	m_hostManager = new HostManager();
+	m_hostManager->Startup();
 }
 
 void Root::Shutdown()
 {
-	g_hostManager->Shutdown();
+	m_hostManager->Shutdown();
 
-	g_renderManager->Shutdown();
-	g_inputManager->Shutdown();
-	g_renderdocManager->Shutdown();
-	g_physicsManager->Shutdown();
-	g_entityDictionary->Shutdown();
-	g_projectManager->Shutdown();
-	g_cvarManager->Shutdown();
-	g_logManager->Shutdown();
+	m_renderManager->Shutdown();
+	m_inputManager->Shutdown();
+	m_renderdocManager->Shutdown();
+	m_physicsManager->Shutdown();
+	m_entityManager->Shutdown();
+	m_projectManager->Shutdown();
+	m_cvarManager->Shutdown();
+	m_logManager->Shutdown();
 }
 
 double HiresTimeInSeconds()
@@ -66,9 +66,9 @@ double HiresTimeInSeconds()
 
 void Root::Run()
 {
-	g_hostManager->FireEvent( "Event.Game.Load" );
+	m_hostManager->FireEvent( "Event.Game.Load" );
 
-	double logicDelta = 1.0 / g_projectManager->GetProject().properties.tickRate;
+	double logicDelta = 1.0 / m_projectManager->GetProject().properties.tickRate;
 
 	double currentTime = HiresTimeInSeconds();
 	double accumulator = 0.0;
@@ -103,21 +103,21 @@ void Root::Run()
 		while ( accumulator >= logicDelta )
 		{
 			// Assign previous transforms to all entities
-			g_entityDictionary->ForEach(
+			m_entityManager->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
 
-			g_tickDeltaTime = ( float )logicDelta;
+			m_tickDeltaTime = ( float )logicDelta;
 
 			// Update physics
-			g_physicsManager->Update();
+			m_physicsManager->Update();
 
 			// Update game
-			g_hostManager->Update();
+			m_hostManager->Update();
 
 			// TODO: Server / client
 			// #ifndef DEDICATED_SERVER
 			// Update window
-			g_renderContext->UpdateWindow();
+			m_renderContext->UpdateWindow();
 			// #endif
 
 			if ( GetQuitRequested() )
@@ -127,15 +127,15 @@ void Root::Run()
 			}
 
 			// Assign current transforms to all entities
-			g_entityDictionary->ForEach(
+			m_entityManager->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
 
-			g_curTime += logicDelta;
+			m_curTime += logicDelta;
 			accumulator -= logicDelta;
-			g_curTick++;
+			m_curTick++;
 		}
 
-		g_frameDeltaTime = ( float )loopDeltaTime;
+		m_frameDeltaTime = ( float )loopDeltaTime;
 
 		// TODO: Server / client
 		// #ifndef DEDICATED_SERVER
@@ -144,18 +144,18 @@ void Root::Run()
 			const double alpha = accumulator / logicDelta;
 
 			// Assign interpolated transforms to all entities
-			g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+			m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 				// If this entity was spawned in just now, don't interpolate
-				if ( entity->m_spawnTime == g_curTick )
+				if ( entity->m_spawnTime == m_curTick )
 					return;
 
 				entity->m_transform =
 				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
 			} );
 
-			g_renderManager->DrawOverlaysAndEditor();
+			m_renderManager->DrawOverlaysAndEditor();
 
-			g_renderManager->DrawGame();
+			m_renderManager->DrawGame();
 		}
 		// #endif
 	}

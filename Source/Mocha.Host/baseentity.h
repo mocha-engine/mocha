@@ -22,7 +22,7 @@ class BaseEntity
 {
 public:
 	BaseEntity()
-	    : m_spawnTime( ClientRoot::GetInstance().g_curTick ){};
+	    : m_spawnTime( ClientRoot::GetInstance().m_curTick ){};
 	virtual ~BaseEntity() {}
 
 	int m_spawnTime;

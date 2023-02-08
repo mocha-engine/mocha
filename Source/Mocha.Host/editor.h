@@ -30,7 +30,7 @@ namespace Editor
 	{
 		auto& root = ClientRoot::GetInstance();
 		
-		ImGui::PushFont( root.g_renderContext->m_boldFont );
+		ImGui::PushFont( root.m_renderContext->m_boldFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
@@ -39,7 +39,7 @@ namespace Editor
 	{
 		auto& root = ClientRoot::GetInstance();
 		
-		ImGui::PushFont( root.g_renderContext->m_subheadingFont );
+		ImGui::PushFont( root.m_renderContext->m_subheadingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -49,7 +49,7 @@ namespace Editor
 	{
 		auto& root = ClientRoot::GetInstance();
 		
-		ImGui::PushFont( root.g_renderContext->m_headingFont );
+		ImGui::PushFont( root.m_renderContext->m_headingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -59,7 +59,7 @@ namespace Editor
 	{
 		auto& root = ClientRoot::GetInstance();
 		
-		ImGui::PushFont( root.g_renderContext->m_monospaceFont );
+		ImGui::PushFont( root.m_renderContext->m_monospaceFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
@@ -75,7 +75,7 @@ namespace Editor
 	{
 		auto& root = ClientRoot::GetInstance();
 
-		return root.g_renderManager->GetGPUName();
+		return root.m_renderManager->GetGPUName();
 	}
 
 	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )
@@ -92,25 +92,25 @@ namespace Editor
 		if ( ImGui::BeginMenu( "Debug View" ) )
 		{
 			if ( ImGui::MenuItem( "None" ) )
-				root.g_debugView = RenderDebugViews::NONE;
+				root.m_debugView = RenderDebugViews::NONE;
 
 			if ( ImGui::MenuItem( "Diffuse" ) )
-				root.g_debugView = RenderDebugViews::DIFFUSE;
+				root.m_debugView = RenderDebugViews::DIFFUSE;
 
 			if ( ImGui::MenuItem( "Normal" ) )
-				root.g_debugView = RenderDebugViews::NORMAL;
+				root.m_debugView = RenderDebugViews::NORMAL;
 
 			if ( ImGui::MenuItem( "Ambient Occlusion" ) )
-				root.g_debugView = RenderDebugViews::AMBIENTOCCLUSION;
+				root.m_debugView = RenderDebugViews::AMBIENTOCCLUSION;
 
 			if ( ImGui::MenuItem( "Metalness" ) )
-				root.g_debugView = RenderDebugViews::METALNESS;
+				root.m_debugView = RenderDebugViews::METALNESS;
 
 			if ( ImGui::MenuItem( "Roughness" ) )
-				root.g_debugView = RenderDebugViews::ROUGHNESS;
+				root.m_debugView = RenderDebugViews::ROUGHNESS;
 
 			if ( ImGui::MenuItem( "Other" ) )
-				root.g_debugView = RenderDebugViews::OTHER;
+				root.m_debugView = RenderDebugViews::OTHER;
 
 			ImGui::EndMenu();
 		}
@@ -121,7 +121,7 @@ namespace Editor
 		auto& root = ClientRoot::GetInstance();
 		
 		Size2D size;
-		root.g_renderContext->GetWindowSize( &size );
+		root.m_renderContext->GetWindowSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
@@ -130,7 +130,7 @@ namespace Editor
 		auto& root = ClientRoot::GetInstance();
 		
 		Size2D size;
-		root.g_renderContext->GetRenderSize( &size );
+		root.m_renderContext->GetRenderSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
@@ -144,7 +144,7 @@ namespace Editor
 		auto& root = ClientRoot::GetInstance();
 		
 		void* imguiTextureID;
-		root.g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+		root.m_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
 
 		// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
 		// This is done because the C++ side isn't aware of any padding applied in order to get

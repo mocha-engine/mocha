@@ -45,8 +45,8 @@ public:
 		auto root = ClientRoot::GetInstance();
 
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( root.g_logManager->m_logHistory.size() );
-		logHistory.items = root.g_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( root.m_logManager->m_logHistory.size() );
+		logHistory.items = root.m_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -109,12 +109,12 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		root.g_logManager->m_logHistory.emplace_back( logEntry );
+		root.m_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
-		if ( root.g_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		if ( root.m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
 		{
-			root.g_logManager->m_logHistory.erase( root.g_logManager->m_logHistory.begin() );
+			root.m_logManager->m_logHistory.erase( root.m_logManager->m_logHistory.begin() );
 		}
 	}
 

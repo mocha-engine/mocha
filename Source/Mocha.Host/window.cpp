@@ -62,7 +62,7 @@ void Window::Update()
 	SDL_Event e;
 
 	auto& root = ClientRoot::GetInstance();
-	InputState inputState = root.g_inputManager->GetState();
+	InputState inputState = root.m_inputManager->GetState();
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
@@ -174,5 +174,5 @@ void Window::Update()
 #endif
 	}
 
-	root.g_inputManager->SetState( inputState );
+	root.m_inputManager->SetState( inputState );
 }

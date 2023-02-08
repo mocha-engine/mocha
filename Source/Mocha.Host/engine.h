@@ -16,31 +16,31 @@ namespace Engine
 	GENERATE_BINDINGS inline int GetCurrentTick()
 	{
 		auto& root = ClientRoot::GetInstance();
-		return root.g_curTick;
+		return root.m_curTick;
 	}
 
 	GENERATE_BINDINGS inline float GetFrameDeltaTime()
 	{
 		auto& root = ClientRoot::GetInstance();
-		return root.g_frameDeltaTime;
+		return root.m_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTickDeltaTime()
 	{
 		auto& root = ClientRoot::GetInstance();
-		return root.g_tickDeltaTime;
+		return root.m_tickDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetFramesPerSecond()
 	{
 		auto& root = ClientRoot::GetInstance();
-		return 1.0f / root.g_frameDeltaTime;
+		return 1.0f / root.m_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTime()
 	{
 	    auto& root = ClientRoot::GetInstance();
-		return root.g_curTime;
+		return root.m_curTime;
 	}
 
 	GENERATE_BINDINGS inline const char* GetProjectPath()

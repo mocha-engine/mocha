@@ -21,30 +21,30 @@ protected:
 	virtual bool GetQuitRequested() = 0;
 
 public:
-	RenderManager* g_renderManager;
-	LogManager* g_logManager;
-	HostManager* g_hostManager;
-	RenderdocManager* g_renderdocManager;
-	EntityManager* g_entityDictionary;
-	PhysicsManager* g_physicsManager;
-	InputManager* g_inputManager;
-	BaseRenderContext* g_renderContext;
-	CVarManager* g_cvarManager;
-	ProjectManager* g_projectManager;
+	RenderManager* m_renderManager;
+	LogManager* m_logManager;
+	HostManager* m_hostManager;
+	RenderdocManager* m_renderdocManager;
+	EntityManager* m_entityManager;
+	PhysicsManager* m_physicsManager;
+	InputManager* m_inputManager;
+	BaseRenderContext* m_renderContext;
+	CVarManager* m_cvarManager;
+	ProjectManager* m_projectManager;
 
-	float g_curTime;
-	float g_frameDeltaTime;
-	float g_tickDeltaTime;
-	int g_curTick;
+	float m_curTime;
+	float m_frameDeltaTime;
+	float m_tickDeltaTime;
+	int m_curTick;
 
-	Vector3 g_cameraPos;
-	Quaternion g_cameraRot;
-	float g_cameraFov;
-	float g_cameraZNear;
-	float g_cameraZFar;
+	Vector3 m_cameraPos;
+	Quaternion m_cameraRot;
+	float m_cameraFov;
+	float m_cameraZNear;
+	float m_cameraZFar;
 
-	RenderDebugViews g_debugView;
-	Realm g_executingRealm;
+	RenderDebugViews m_debugView;
+	Realm m_executingRealm;
 
 	void Startup();
 	void Run();

@@ -54,10 +54,10 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 //
 #define ENGINE_NAME						"Mocha"
 #define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define WINDOW_TITLE					std::string( ClientRoot::GetInstance().g_projectManager->GetProject().name + " [" + ClientRoot::GetInstance().g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
+#define WINDOW_TITLE					std::string( ClientRoot::GetInstance().m_projectManager->GetProject().name + " [" + ClientRoot::GetInstance().m_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
 
-#define IS_SERVER						(ClientRoot::GetInstance().g_executingRealm == REALM_SERVER)
-#define IS_CLIENT						(ClientRoot::GetInstance().g_executingRealm == REALM_CLIENT)
+#define IS_SERVER						(ClientRoot::GetInstance().m_executingRealm == REALM_SERVER)
+#define IS_CLIENT						(ClientRoot::GetInstance().m_executingRealm == REALM_CLIENT)
 
 //
 // Types

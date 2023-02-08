@@ -72,7 +72,7 @@ void PhysicsManager::Update()
 	const int integrationSubSteps = 1;
 
 	// Retrieve properties that were saved off last frame
-	root.g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	root.m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -100,9 +100,9 @@ void PhysicsManager::Update()
 
 	// Step the world
 	m_physicsInstance->m_physicsSystem.Update(
-	    root.g_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
+	    root.m_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
-	root.g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	root.m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -273,7 +273,7 @@ uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
 	// Step 2: find entity handle
 	//
 	uint32_t entityHandle = UINT32_MAX;
-	root.g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
+	root.m_entityManager->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
 		if ( modelEntity == nullptr )

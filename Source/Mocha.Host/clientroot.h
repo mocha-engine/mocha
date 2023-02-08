@@ -4,7 +4,7 @@
 class ClientRoot : public Root
 {
 private:
-	ClientRoot() { g_executingRealm = REALM_CLIENT; }
+	ClientRoot() { m_executingRealm = REALM_CLIENT; }
 
 protected:
 	bool GetQuitRequested() override;
