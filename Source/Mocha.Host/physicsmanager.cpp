@@ -5,6 +5,7 @@
 #include <globalvars.h>
 #include <iostream>
 #include <thread>
+#include <clientroot.h>
 
 // Callback for traces
 static void TraceImpl( const char* inFMT, ... )
@@ -63,6 +64,7 @@ void PhysicsManager::Shutdown()
 
 void PhysicsManager::Update()
 {
+	auto& root = ClientRoot::GetInstance();
 	auto& bodyInterface = m_physicsInstance->m_physicsSystem.GetBodyInterface();
 
 	// We will default to 4 but this should be 1 collision step per 1 / 60th of a second (round up).
@@ -70,7 +72,7 @@ void PhysicsManager::Update()
 	const int integrationSubSteps = 1;
 
 	// Retrieve properties that were saved off last frame
-	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	root.g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -98,9 +100,9 @@ void PhysicsManager::Update()
 
 	// Step the world
 	m_physicsInstance->m_physicsSystem.Update(
-	    g_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
+	    root.g_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
-	g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	root.g_entityDictionary->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -247,6 +249,7 @@ bool PhysicsManager::IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId )
 
 uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
 {
+	auto& root = ClientRoot::GetInstance();
 	//
 	// We need to do the following steps:
 	// 1: JPH body -> physicsmanager handle
@@ -270,7 +273,7 @@ uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
 	// Step 2: find entity handle
 	//
 	uint32_t entityHandle = UINT32_MAX;
-	g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
+	root.g_entityDictionary->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
 		if ( modelEntity == nullptr )

@@ -3,6 +3,7 @@
 #include <mathtypes.h>
 #include <stdint.h>
 #include <string>
+#include <clientroot.h>
 
 enum EntityFlags : int
 {
@@ -21,7 +22,7 @@ class BaseEntity
 {
 public:
 	BaseEntity()
-	    : m_spawnTime( g_curTick ){};
+	    : m_spawnTime( ClientRoot::GetInstance().g_curTick ){};
 	virtual ~BaseEntity() {}
 
 	int m_spawnTime;

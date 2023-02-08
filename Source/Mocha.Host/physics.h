@@ -1,11 +1,12 @@
 #pragma once
-#include <globalvars.h>
+#include <clientroot.h>
 #include <physicsmanager.h>
 
 namespace Physics
 {
 	GENERATE_BINDINGS inline TraceResult Trace( TraceInfo traceInfo )
 	{
-		return g_physicsManager->Trace( traceInfo );
+		auto& root = ClientRoot::GetInstance();
+		return root.g_physicsManager->Trace( traceInfo );
 	}
 }; // namespace Physics

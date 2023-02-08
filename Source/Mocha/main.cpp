@@ -5,8 +5,6 @@
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 {
-	g_executingRealm = REALM_CLIENT;
-
 	auto& root = ClientRoot::GetInstance();
 
 	root.Startup();

@@ -15,27 +15,32 @@ namespace Engine
 
 	GENERATE_BINDINGS inline int GetCurrentTick()
 	{
-		return g_curTick;
+		auto& root = ClientRoot::GetInstance();
+		return root.g_curTick;
 	}
 
 	GENERATE_BINDINGS inline float GetFrameDeltaTime()
 	{
-		return g_frameDeltaTime;
+		auto& root = ClientRoot::GetInstance();
+		return root.g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTickDeltaTime()
 	{
-		return g_tickDeltaTime;
+		auto& root = ClientRoot::GetInstance();
+		return root.g_tickDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetFramesPerSecond()
 	{
-		return 1.0f / g_frameDeltaTime;
+		auto& root = ClientRoot::GetInstance();
+		return 1.0f / root.g_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTime()
 	{
-		return g_curTime;
+	    auto& root = ClientRoot::GetInstance();
+		return root.g_curTime;
 	}
 
 	GENERATE_BINDINGS inline const char* GetProjectPath()
@@ -50,12 +55,12 @@ namespace Engine
 	};
 
 	GENERATE_BINDINGS inline bool IsServer()
-	{
+    {
 		return IS_SERVER;
 	}
 
 	GENERATE_BINDINGS inline bool IsClient()
-	{
+    {
 		return IS_CLIENT;
 	}
 }; // namespace Engine

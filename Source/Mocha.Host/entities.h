@@ -9,26 +9,36 @@ namespace Entities
 {
 	GENERATE_BINDINGS inline uint32_t CreateBaseEntity()
 	{
+		// TODO: Derive root based on current context / realm
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
 		BaseEntity baseEntity = {};
 		baseEntity.AddFlag( ENTITY_MANAGED );
 		baseEntity.m_type = "BaseEntity";
 
-		return g_entityDictionary->AddEntity<BaseEntity>( baseEntity );
+		return entityDictionary->AddEntity<BaseEntity>( baseEntity );
 	}
 
 	GENERATE_BINDINGS inline uint32_t CreateModelEntity()
 	{
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
 		ModelEntity modelEntity = {};
 		modelEntity.AddFlag( ENTITY_MANAGED );
 		modelEntity.AddFlag( ENTITY_RENDERABLE );
 		modelEntity.m_type = "ModelEntity";
 
-		return g_entityDictionary->AddEntity<ModelEntity>( modelEntity );
+		return entityDictionary->AddEntity<ModelEntity>( modelEntity );
 	}
 
 	GENERATE_BINDINGS inline void SetViewmodel( uint32_t handle, bool isViewmodel )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		if ( isViewmodel )
@@ -39,7 +49,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetUI( uint32_t handle, bool isUI )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		if ( isUI )
@@ -50,7 +63,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetPosition( uint32_t handle, Vector3 position )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		transform.position = position;
@@ -60,7 +76,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetRotation( uint32_t handle, Quaternion rotation )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		transform.rotation = rotation;
@@ -70,7 +89,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetScale( uint32_t handle, Vector3 scale )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		transform.scale = scale;
@@ -80,14 +102,20 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetName( uint32_t handle, const char* name )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 
 		entity->m_name = name;
 	}
 
 	GENERATE_BINDINGS inline Vector3 GetPosition( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		return transform.position;
@@ -95,7 +123,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline Quaternion GetRotation( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		return transform.rotation;
@@ -103,7 +134,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline Vector3 GetScale( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		auto transform = entity->m_transform;
 
 		return transform.scale;
@@ -111,13 +145,19 @@ namespace Entities
 
 	GENERATE_BINDINGS inline const char* GetName( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<BaseEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<BaseEntity>( handle );
 		return entity->m_name.c_str();
 	}
 
 	GENERATE_BINDINGS inline void SetModel( uint32_t handle, Model model )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -129,57 +169,80 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetCameraPosition( Vector3 position )
 	{
-		g_cameraPos = position;
+		auto& root = ClientRoot::GetInstance();
+
+		root.g_cameraPos = position;
 	}
 
 	GENERATE_BINDINGS inline Vector3 GetCameraPosition()
 	{
-		return g_cameraPos;
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_cameraPos;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraRotation( Quaternion rotation )
 	{
-		g_cameraRot = rotation;
+		auto& root = ClientRoot::GetInstance();
+
+		root.g_cameraRot = rotation;
 	}
 
 	GENERATE_BINDINGS inline Quaternion GetCameraRotation()
 	{
-		return g_cameraRot;
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_cameraRot;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraFieldOfView( float fov )
 	{
-		g_cameraFov = fov;
+		auto& root = ClientRoot::GetInstance();
+
+		root.g_cameraFov = fov;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraFieldOfView()
 	{
-		return g_cameraFov;
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_cameraFov;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraZNear( float znear )
 	{
-		g_cameraZNear = znear;
+		auto& root = ClientRoot::GetInstance();
+
+		root.g_cameraZNear = znear;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraZNear()
 	{
-		return g_cameraZNear;
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_cameraZNear;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraZFar( float zfar )
 	{
-		g_cameraZFar = zfar;
+		auto& root = ClientRoot::GetInstance();
+
+		root.g_cameraZFar = zfar;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraZFar()
 	{
-		return g_cameraZFar;
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_cameraZFar;
 	}
 
 	GENERATE_BINDINGS inline void SetCubePhysics( uint32_t handle, Vector3 bounds, bool isStatic )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -191,7 +254,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetSpherePhysics( uint32_t handle, float radius, bool isStatic )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -203,7 +269,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetMeshPhysics( uint32_t handle, int vertexSize, void* vertexData )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -223,7 +292,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetVelocity( uint32_t handle, Vector3 velocity )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -235,7 +307,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline Vector3 GetVelocity( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -247,7 +322,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline float GetMass( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -259,7 +337,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline float GetFriction( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -271,7 +352,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline float GetRestitution( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -283,7 +367,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetMass( uint32_t handle, float mass )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -295,7 +382,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetFriction( uint32_t handle, float friction )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -307,7 +397,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetRestitution( uint32_t handle, float restitution )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -319,7 +412,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline bool GetIgnoreRigidbodyPosition( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -331,7 +427,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline bool GetIgnoreRigidbodyRotation( uint32_t handle )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -343,7 +442,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetIgnoreRigidbodyPosition( uint32_t handle, bool ignore )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );
@@ -355,7 +457,10 @@ namespace Entities
 
 	GENERATE_BINDINGS inline void SetIgnoreRigidbodyRotation( uint32_t handle, bool ignore )
 	{
-		auto entity = g_entityDictionary->GetEntity<ModelEntity>( handle );
+		auto& root = ClientRoot::GetInstance();
+		auto* entityDictionary = root.g_entityDictionary;
+		
+		auto entity = entityDictionary->GetEntity<ModelEntity>( handle );
 		if ( entity == nullptr )
 		{
 			spdlog::error( "Couldn't cast {} to ModelEntity", handle );

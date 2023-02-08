@@ -1,7 +1,7 @@
 #include "modelentity.h"
 
-#include <globalvars.h>
 #include <physicsmanager.h>
+#include <clientroot.h>
 
 void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 {
@@ -18,7 +18,8 @@ void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 	body.shape.shapeData.radius = radius;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_SPHERE;
 
-	m_physicsHandle = g_physicsManager->AddBody( this, body );
+	auto& root = ClientRoot::GetInstance();
+	m_physicsHandle = root.g_physicsManager->AddBody( this, body );
 }
 
 void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
@@ -36,7 +37,8 @@ void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
 	body.shape.shapeData.extents = bounds;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_BOX;
 
-	m_physicsHandle = g_physicsManager->AddBody( this, body );
+	auto& root = ClientRoot::GetInstance();
+	m_physicsHandle = root.g_physicsManager->AddBody( this, body );
 }
 
 void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
@@ -54,5 +56,6 @@ void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
 	body.shape.shapeData.vertices = vertices;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_MESH;
 
-	m_physicsHandle = g_physicsManager->AddBody( this, body );
+	auto& root = ClientRoot::GetInstance();
+	m_physicsHandle = root.g_physicsManager->AddBody( this, body );
 }

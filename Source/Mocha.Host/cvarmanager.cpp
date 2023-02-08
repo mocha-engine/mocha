@@ -463,6 +463,7 @@ void CVarSystem::Remove( std::string name )
 void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 {
 	assert( IsCommand() );
+	auto& root = ClientRoot::GetInstance();
 
 	if ( IsManaged() )
 	{
@@ -473,7 +474,7 @@ void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 
 		CVarManagedCmdDispatchInfo info{ m_name.c_str(), managedArguments.data(), managedArguments.size() };
 
-		g_hostManager->DispatchCommand( info );
+		root.g_hostManager->DispatchCommand( info );
 	}
 	else
 	{
@@ -538,6 +539,7 @@ inline void CVarEntry::SetValue( T value )
 
 	T oldValue = std::any_cast<T>( m_value );
 	m_value = value;
+	auto& root = ClientRoot::GetInstance();
 
 	if ( IsManaged() )
 	{
@@ -547,25 +549,25 @@ inline void CVarEntry::SetValue( T value )
 		{
 			CVarManagedVarDispatchInfo<const char*> stringInfo{ m_name.c_str(), oldValue.c_str(), value.c_str() };
 
-			g_hostManager->DispatchStringCVarCallback( stringInfo );
+			root.g_hostManager->DispatchStringCVarCallback( stringInfo );
 		}
 		else if constexpr ( std::is_same<T, float>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			g_hostManager->DispatchFloatCVarCallback( primitiveInfo );
+			root.g_hostManager->DispatchFloatCVarCallback( primitiveInfo );
 		}
 		else if constexpr ( std::is_same<T, bool>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			g_hostManager->DispatchBoolCVarCallback( primitiveInfo );
+			root.g_hostManager->DispatchBoolCVarCallback( primitiveInfo );
 		}
 		else if constexpr ( std::is_same<T, int>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			g_hostManager->DispatchIntCVarCallback( primitiveInfo );
+			root.g_hostManager->DispatchIntCVarCallback( primitiveInfo );
 		}
 	}
 	else

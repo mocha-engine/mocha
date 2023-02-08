@@ -8,7 +8,7 @@
 #include <defs.h>
 #include <entitymanager.h>
 #include <fontawesome.h>
-#include <globalvars.h>
+#include <clientroot.h>
 #include <hostmanager.h>
 #include <modelentity.h>
 #include <physicsmanager.h>
@@ -87,7 +87,8 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 
 void RenderManager::Startup()
 {
-	g_renderManager = this;
+	auto& root = ClientRoot::GetInstance();
+	root.g_renderManager = this;
 
 	if ( IS_CLIENT )
 	{
@@ -100,7 +101,7 @@ void RenderManager::Startup()
 		m_renderContext = std::make_unique<NullRenderContext>();
 	}
 
-	g_renderContext = m_renderContext.get();
+	root.g_renderContext = m_renderContext.get();
 
 	m_renderContext->Startup();
 }
@@ -112,13 +113,15 @@ void RenderManager::Shutdown()
 
 void RenderManager::RenderEntity( ModelEntity* entity )
 {
+	auto& root = ClientRoot::GetInstance();
+	
 	// Create and bind constants
 	RenderPushConstants constants = {};
 	constants.modelMatrix = entity->m_transform.GetModelMatrix();
 	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
-	constants.cameraPos = g_cameraPos.ToGLM();
-	constants.time = g_curTime;
-	constants.data.x = ( int )g_debugView;
+	constants.cameraPos = root.g_cameraPos.ToGLM();
+	constants.time = root.g_curTime;
+	constants.data.x = ( int )root.g_debugView;
 
 	std::vector<Vector3> lightPositions = {};
 	lightPositions.push_back( { 0, 4, 4 } );
@@ -148,13 +151,15 @@ void RenderManager::DrawOverlaysAndEditor()
 	// Server is headless - no overlays or editor
 	if ( IS_SERVER )
 		return;
+
+	auto& root = ClientRoot::GetInstance();
 	
 	m_renderContext->BeginImGui();
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 
-	g_hostManager->Render();
-	g_hostManager->DrawEditor();
+	root.g_hostManager->Render();
+	root.g_hostManager->DrawEditor();
 
 	m_renderContext->EndImGui();
 }
@@ -165,6 +170,7 @@ void RenderManager::DrawGame()
 	if ( IS_SERVER )
 		return;
 
+	auto& root = ClientRoot::GetInstance();
 	RenderStatus res = m_renderContext->BeginRendering();
 
 	if ( res == RENDER_STATUS_WINDOW_SIZE_INVALID )
@@ -173,7 +179,7 @@ void RenderManager::DrawGame()
 	auto viewProjMatrix = CalculateViewProjMatrix();
 	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
 
-	g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	root.g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( !entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) && !entity->HasFlag( EntityFlags::ENTITY_UI ) )
 			RenderEntity( entity.get() );
 	} );
@@ -181,7 +187,7 @@ void RenderManager::DrawGame()
 	//
 	// Render viewmodels
 	//
-	g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	root.g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) )
 			RenderEntity( entity.get() );
 	} );
@@ -189,7 +195,7 @@ void RenderManager::DrawGame()
 	//
 	// Render UI last
 	//
-	g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	root.g_entityDictionary->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( entity->HasFlag( EntityFlags::ENTITY_UI ) )
 			RenderEntity( entity.get() );
 	} );
@@ -199,34 +205,36 @@ void RenderManager::DrawGame()
 
 glm::mat4 RenderManager::CalculateViewmodelViewProjMatrix()
 {
+	auto& root = ClientRoot::GetInstance();
 	glm::mat4 viewMatrix, projMatrix;
 
 	auto extent = GetWindowExtent();
 	float aspect = ( float )extent.x / ( float )extent.y;
 
 	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = g_cameraPos.ToGLM();
+	glm::vec3 direction = glm::normalize( glm::rotate( root.g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = root.g_cameraPos.ToGLM();
 
 	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, g_cameraZNear, g_cameraZFar );
+	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, root.g_cameraZNear, root.g_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }
 
 glm::mat4 RenderManager::CalculateViewProjMatrix()
 {
+	auto& root = ClientRoot::GetInstance();
 	glm::mat4 viewMatrix, projMatrix;
 
 	auto extent = GetWindowExtent();
 	float aspect = ( float )extent.x / ( float )extent.y;
 
 	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = g_cameraPos.ToGLM();
+	glm::vec3 direction = glm::normalize( glm::rotate( root.g_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = root.g_cameraPos.ToGLM();
 
 	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix = glm::perspective( glm::radians( g_cameraFov ), aspect, g_cameraZNear, g_cameraZFar );
+	projMatrix = glm::perspective( glm::radians( root.g_cameraFov ), aspect, root.g_cameraZNear, root.g_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }

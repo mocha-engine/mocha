@@ -3,6 +3,9 @@
 
 class ServerRoot : public Root
 {
+private:
+	ServerRoot() { g_executingRealm = REALM_SERVER; }
+
 protected:
 	bool GetQuitRequested() override;
 

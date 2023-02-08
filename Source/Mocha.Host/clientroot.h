@@ -3,6 +3,9 @@
 
 class ClientRoot : public Root
 {
+private:
+	ClientRoot() { g_executingRealm = REALM_CLIENT; }
+
 protected:
 	bool GetQuitRequested() override;
 

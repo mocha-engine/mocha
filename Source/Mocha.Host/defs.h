@@ -54,15 +54,48 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 //
 #define ENGINE_NAME						"Mocha"
 #define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define WINDOW_TITLE					std::string( g_projectManager->GetProject().name + " [" + g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
+#define WINDOW_TITLE					std::string( ClientRoot::GetInstance().g_projectManager->GetProject().name + " [" + ClientRoot::GetInstance().g_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
 
-#define IS_SERVER						g_executingRealm == REALM_SERVER
-#define IS_CLIENT						g_executingRealm == REALM_CLIENT
+#define IS_SERVER						(ClientRoot::GetInstance().g_executingRealm == REALM_SERVER)
+#define IS_CLIENT						(ClientRoot::GetInstance().g_executingRealm == REALM_CLIENT)
 
 //
 // Types
 //
 typedef uint32_t Handle;
 #define HANDLE_INVALID					UINT32_MAX
+
+// TODO: Remove
+enum RenderDebugViews
+{
+	NONE = 0,
+	DIFFUSE = 1,
+	NORMAL = 2,
+	AMBIENTOCCLUSION = 3,
+	METALNESS = 4,
+	ROUGHNESS = 5,
+
+	OTHER = 63
+};
+
+enum Realm
+{
+	REALM_SERVER,
+	REALM_CLIENT
+};
+
+inline const char* RealmToString( const Realm& realm )
+{
+	switch ( realm )
+	{
+	case REALM_SERVER:
+		return "Server";
+	case REALM_CLIENT:
+		return "Client";
+	}
+
+	__debugbreak();
+	return "Unknown";
+}
 
 // clang-format on

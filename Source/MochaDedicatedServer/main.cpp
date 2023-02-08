@@ -5,8 +5,6 @@
 
 int main()
 {
-	g_executingRealm = REALM_SERVER;
-
 	auto& root = ServerRoot::GetInstance();
 
 	root.Startup();

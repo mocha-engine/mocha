@@ -1,5 +1,8 @@
-#include <defs.h>
 #include "inputmanager.h"
+
+#include <defs.h>
+#include <globalvars.h>
+#include <clientroot.h>
 
 #if _IMGUI
 

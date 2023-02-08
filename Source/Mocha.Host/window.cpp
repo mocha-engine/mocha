@@ -15,6 +15,7 @@
 #include <SDL_syswm.h>
 #include <Windows.h>
 #endif
+#include <clientroot.h>
 
 Window::Window( uint32_t width, uint32_t height )
 {
@@ -60,7 +61,8 @@ void Window::Update()
 {
 	SDL_Event e;
 
-	InputState inputState = g_inputManager->GetState();
+	auto& root = ClientRoot::GetInstance();
+	InputState inputState = root.g_inputManager->GetState();
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
@@ -172,5 +174,5 @@ void Window::Update()
 #endif
 	}
 
-	g_inputManager->SetState( inputState );
+	root.g_inputManager->SetState( inputState );
 }

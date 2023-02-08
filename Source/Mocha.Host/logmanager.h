@@ -9,6 +9,7 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <subsystem.h>
+#include <clientroot.h>
 
 #define MAX_LOG_MESSAGES 50
 
@@ -41,9 +42,11 @@ public:
 
 	GENERATE_BINDINGS inline static LogHistory GetLogHistory()
 	{
+		auto root = ClientRoot::GetInstance();
+
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( g_logManager->m_logHistory.size() );
-		logHistory.items = g_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( root.g_logManager->m_logHistory.size() );
+		logHistory.items = root.g_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -81,6 +84,7 @@ protected:
 	{
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
+		auto root = ClientRoot::GetInstance();
 
 		if ( IS_CLIENT )
 		{
@@ -105,12 +109,12 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		g_logManager->m_logHistory.emplace_back( logEntry );
+		root.g_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
-		if ( g_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		if ( root.g_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
 		{
-			g_logManager->m_logHistory.erase( g_logManager->m_logHistory.begin() );
+			root.g_logManager->m_logHistory.erase( root.g_logManager->m_logHistory.begin() );
 		}
 	}
 

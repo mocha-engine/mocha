@@ -28,14 +28,18 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextBold( const char* text )
 	{
-		ImGui::PushFont( g_renderContext->m_boldFont );
+		auto& root = ClientRoot::GetInstance();
+		
+		ImGui::PushFont( root.g_renderContext->m_boldFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextSubheading( const char* text )
 	{
-		ImGui::PushFont( g_renderContext->m_subheadingFont );
+		auto& root = ClientRoot::GetInstance();
+		
+		ImGui::PushFont( root.g_renderContext->m_subheadingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -43,7 +47,9 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextHeading( const char* text )
 	{
-		ImGui::PushFont( g_renderContext->m_headingFont );
+		auto& root = ClientRoot::GetInstance();
+		
+		ImGui::PushFont( root.g_renderContext->m_headingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -51,7 +57,9 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextMonospace( const char* text )
 	{
-		ImGui::PushFont( g_renderContext->m_monospaceFont );
+		auto& root = ClientRoot::GetInstance();
+		
+		ImGui::PushFont( root.g_renderContext->m_monospaceFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
@@ -65,7 +73,9 @@ namespace Editor
 
 	GENERATE_BINDINGS inline const char* GetGPUName()
 	{
-		return g_renderManager->GetGPUName();
+		auto& root = ClientRoot::GetInstance();
+
+		return root.g_renderManager->GetGPUName();
 	}
 
 	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )
@@ -77,28 +87,30 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void RenderViewDropdown()
 	{
+		auto& root = ClientRoot::GetInstance();
+		
 		if ( ImGui::BeginMenu( "Debug View" ) )
 		{
 			if ( ImGui::MenuItem( "None" ) )
-				g_debugView = RenderDebugViews::NONE;
+				root.g_debugView = RenderDebugViews::NONE;
 
 			if ( ImGui::MenuItem( "Diffuse" ) )
-				g_debugView = RenderDebugViews::DIFFUSE;
+				root.g_debugView = RenderDebugViews::DIFFUSE;
 
 			if ( ImGui::MenuItem( "Normal" ) )
-				g_debugView = RenderDebugViews::NORMAL;
+				root.g_debugView = RenderDebugViews::NORMAL;
 
 			if ( ImGui::MenuItem( "Ambient Occlusion" ) )
-				g_debugView = RenderDebugViews::AMBIENTOCCLUSION;
+				root.g_debugView = RenderDebugViews::AMBIENTOCCLUSION;
 
 			if ( ImGui::MenuItem( "Metalness" ) )
-				g_debugView = RenderDebugViews::METALNESS;
+				root.g_debugView = RenderDebugViews::METALNESS;
 
 			if ( ImGui::MenuItem( "Roughness" ) )
-				g_debugView = RenderDebugViews::ROUGHNESS;
+				root.g_debugView = RenderDebugViews::ROUGHNESS;
 
 			if ( ImGui::MenuItem( "Other" ) )
-				g_debugView = RenderDebugViews::OTHER;
+				root.g_debugView = RenderDebugViews::OTHER;
 
 			ImGui::EndMenu();
 		}
@@ -106,15 +118,19 @@ namespace Editor
 
 	GENERATE_BINDINGS inline Vector2 GetWindowSize()
 	{
+		auto& root = ClientRoot::GetInstance();
+		
 		Size2D size;
-		g_renderContext->GetWindowSize( &size );
+		root.g_renderContext->GetWindowSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
 	GENERATE_BINDINGS inline Vector2 GetRenderSize()
 	{
+		auto& root = ClientRoot::GetInstance();
+		
 		Size2D size;
-		g_renderContext->GetRenderSize( &size );
+		root.g_renderContext->GetRenderSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
@@ -125,8 +141,10 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 	{
+		auto& root = ClientRoot::GetInstance();
+		
 		void* imguiTextureID;
-		g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+		root.g_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
 
 		// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
 		// This is done because the C++ side isn't aware of any padding applied in order to get
