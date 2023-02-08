@@ -104,6 +104,11 @@ public:
 class CVarManager : ISubSystem
 {
 public:
+	CVarManager( Root* parent )
+	    : ISubSystem( parent )
+	{
+	}
+	
 	void Startup() override;
 	void Shutdown() override;
 };

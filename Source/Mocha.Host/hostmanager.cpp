@@ -80,7 +80,8 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 	return ( load_assembly_and_get_function_pointer_fn )load_assembly_and_get_function_pointer;
 }
 
-HostManager::HostManager()
+HostManager::HostManager( Root* parent )
+    : ISubSystem( parent )
 {
 	// TODO: Hardcoding these might be a bad idea?
 	std::wstring basePath = L".\\build\\Mocha.Hotload";

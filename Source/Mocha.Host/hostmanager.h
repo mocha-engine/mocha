@@ -48,7 +48,7 @@ private:
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
 
 public:
-	HostManager();
+	HostManager( Root* parent );
 
 	void Startup();
 	void Shutdown();

@@ -30,6 +30,11 @@ struct LogHistory
 class LogManager : ISubSystem
 {
 public:
+	LogManager( Root* parent )
+	    : ISubSystem( parent )
+	{
+	}
+	
 	void Startup();
 	void Shutdown(){};
 

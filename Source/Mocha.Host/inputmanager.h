@@ -21,6 +21,11 @@ private:
 	InputState m_inputState;
 
 public:
+	InputManager( Root* parent )
+	    : ISubSystem( parent )
+	{
+	}
+	
 	void Startup() override{};
 	void Shutdown() override{};
 

@@ -14,7 +14,7 @@ class BaseRenderContext;
 class CVarManager;
 class ProjectManager;
 
-class Root : ISubSystem
+class Root
 {
 protected:
 	bool m_shouldQuit = false;

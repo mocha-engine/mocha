@@ -27,6 +27,11 @@ private:
 	void RenderMesh( RenderPushConstants constants, Mesh* mesh );
 
 public:
+	RenderManager( Root* parent )
+	    : ISubSystem( parent )
+	{
+	}
+	
 	void Startup();
 	void Shutdown();
 

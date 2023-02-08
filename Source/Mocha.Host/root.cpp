@@ -15,31 +15,31 @@
 
 void Root::Startup()
 {
-	m_logManager = new LogManager();
+	m_logManager = new LogManager( this );
 	m_logManager->Startup();
 
-	m_cvarManager = new CVarManager();
+	m_cvarManager = new CVarManager( this );
 	m_cvarManager->Startup();
 
-	m_projectManager = new ProjectManager();
+	m_projectManager = new ProjectManager( this );
 	m_projectManager->Startup();
 
-	m_entityManager = new EntityManager();
+	m_entityManager = new EntityManager( this );
 	m_entityManager->Startup();
 
-	m_physicsManager = new PhysicsManager();
+	m_physicsManager = new PhysicsManager( this );
 	m_physicsManager->Startup();
 
-	m_renderdocManager = new RenderdocManager();
+	m_renderdocManager = new RenderdocManager( this );
 	m_renderdocManager->Startup();
 
-	m_inputManager = new InputManager();
+	m_inputManager = new InputManager( this );
 	m_inputManager->Startup();
 
-	m_renderManager = new RenderManager();
+	m_renderManager = new RenderManager( this );
 	m_renderManager->Startup();
 
-	m_hostManager = new HostManager();
+	m_hostManager = new HostManager( this );
 	m_hostManager->Startup();
 }
 

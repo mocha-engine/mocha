@@ -252,7 +252,7 @@ private:
 	bool IsBodyIgnored( TraceInfo& traceInfo, JPH::BodyID bodyId );
 
 public:
-	PhysicsManager();
+	PhysicsManager( Root* parent );
 
 	void Startup() override;
 	void Shutdown() override;

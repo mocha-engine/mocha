@@ -1,11 +1,11 @@
 #include "physicsmanager.h"
 
+#include <clientroot.h>
 #include <cstdarg>
 #include <entitymanager.h>
 #include <globalvars.h>
 #include <iostream>
 #include <thread>
-#include <clientroot.h>
 
 // Callback for traces
 static void TraceImpl( const char* inFMT, ... )
@@ -20,7 +20,8 @@ static void TraceImpl( const char* inFMT, ... )
 	spdlog::info( "{}", buffer );
 }
 
-PhysicsManager::PhysicsManager()
+PhysicsManager::PhysicsManager( Root* parent )
+    : ISubSystem( parent )
 {
 	JPH::RegisterDefaultAllocator();
 	JPH::Trace = TraceImpl;
@@ -99,8 +100,8 @@ void PhysicsManager::Update()
 	} );
 
 	// Step the world
-	m_physicsInstance->m_physicsSystem.Update(
-	    root.m_tickDeltaTime, collisionSteps, integrationSubSteps, m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
+	m_physicsInstance->m_physicsSystem.Update( root.m_tickDeltaTime, collisionSteps, integrationSubSteps,
+	    m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
 	root.m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 		// Is this a valid entity to do physics stuff on?
