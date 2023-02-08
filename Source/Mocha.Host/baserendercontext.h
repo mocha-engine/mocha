@@ -4,9 +4,10 @@
 #include <defs.h>
 #include <string>
 #include <util.h>
+#include <cvarmanager.h>
+
 
 // ----------------------------------------------------------------------------------------------------
-
 extern FloatCVar renderScale;
 extern float lastRenderScale;
 

@@ -1,9 +1,10 @@
 #pragma once
+#include <cvarmanager.h>
+#include <clientroot.h>
 #include <defs.h>
 #include <globalvars.h>
 #include <projectmanager.h>
 #include <projectmanifest.h>
-#include <clientroot.h>
 
 namespace Engine
 {
@@ -39,7 +40,7 @@ namespace Engine
 
 	GENERATE_BINDINGS inline float GetTime()
 	{
-	    auto& root = ClientRoot::GetInstance();
+		auto& root = ClientRoot::GetInstance();
 		return root.m_curTime;
 	}
 
@@ -55,12 +56,17 @@ namespace Engine
 	};
 
 	GENERATE_BINDINGS inline bool IsServer()
-    {
+	{
 		return IS_SERVER;
 	}
 
 	GENERATE_BINDINGS inline bool IsClient()
-    {
+	{
 		return IS_CLIENT;
+	}
+
+	GENERATE_BINDINGS inline Root GetRoot()
+	{
+		return ClientRoot::GetInstance();
 	}
 }; // namespace Engine

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <defs.h>
 #include <mathtypes.h>
 #include <memory.h>
 #include <subsystem.h>
@@ -25,15 +26,15 @@ public:
 	    : ISubSystem( parent )
 	{
 	}
-	
+
 	void Startup() override{};
 	void Shutdown() override{};
 
 	InputState GetState();
 	void SetState( InputState newState );
 
-	bool IsButtonDown( int button );
-	bool IsKeyDown( int key );
-	Vector2 GetMousePosition();
-	Vector2 GetMouseDelta();
+	GENERATE_BINDINGS bool IsButtonDown( int button );
+	GENERATE_BINDINGS bool IsKeyDown( int key );
+	GENERATE_BINDINGS Vector2 GetMousePosition();
+	GENERATE_BINDINGS Vector2 GetMouseDelta();
 };

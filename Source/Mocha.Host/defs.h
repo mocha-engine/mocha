@@ -1,6 +1,7 @@
 #pragma once
-#include <cvarmanager.h>
+#include <stdint.h>
 #include <gitdefs.h>
+#include <string>
 
 // clang-format off
 

@@ -1,9 +1,9 @@
 #pragma once
+#include <clientroot.h>
 #include <defs.h>
 #include <mathtypes.h>
 #include <stdint.h>
 #include <string>
-#include <clientroot.h>
 
 enum EntityFlags : int
 {
@@ -40,4 +40,22 @@ public:
 	inline void AddFlag( EntityFlags flags ) { m_flags = m_flags | flags; }
 	inline void RemoveFlag( EntityFlags flags ) { m_flags = m_flags & ~flags; }
 	inline bool HasFlag( EntityFlags flag ) { return ( m_flags & flag ) != 0; }
+
+	//
+	// Managed bindings
+	//
+	GENERATE_BINDINGS inline void SetName( const char* name ) { m_name = name; }
+	GENERATE_BINDINGS inline const char* GetName() { return m_name.c_str(); }
+
+	GENERATE_BINDINGS inline void SetType( const char* type ) { m_type = type; }
+	GENERATE_BINDINGS inline const char* GetType() { return m_type.c_str(); }
+
+	GENERATE_BINDINGS inline void SetPosition( const Vector3& pos ) { m_transform.position = pos; }
+	GENERATE_BINDINGS inline Vector3 GetPosition() { return m_transform.position; }
+
+	GENERATE_BINDINGS inline void SetRotation( const Quaternion& rot ) { m_transform.rotation = rot; }
+	GENERATE_BINDINGS inline Quaternion GetRotation() { return m_transform.rotation; }
+	
+	GENERATE_BINDINGS inline void SetScale( const Vector3& scale ) { m_transform.scale = scale; }
+	GENERATE_BINDINGS inline Vector3 GetScale() { return m_transform.scale; }
 };

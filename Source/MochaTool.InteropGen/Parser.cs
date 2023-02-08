@@ -177,17 +177,18 @@ public static class Parser
 		//
 		// Post-processing
 		//
-		foreach ( var o in units )
-		{
-			// Create a default constructor if one wasn't already defined
-			if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
-			{
-				o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
-				{
-					IsConstructor = true
-				} );
-			}
-		}
+		//foreach ( var o in units )
+		//{
+		//	// Create a default constructor if one wasn't already defined
+		//	if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
+		//	{
+		//		Console.WriteLine( $"Creating default ctor for {o.Name}" );
+		//		o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
+		//		{
+		//			IsConstructor = true
+		//		} );
+		//	}
+		//}
 
 		return units;
 	}

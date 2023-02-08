@@ -1,7 +1,7 @@
 #pragma once
 #include <defs.h>
-#include <subsystem.h>
 #include <mathtypes.h>
+#include <subsystem.h>
 
 class RenderManager;
 class RenderdocManager;
@@ -18,7 +18,7 @@ class Root
 {
 protected:
 	bool m_shouldQuit = false;
-	virtual bool GetQuitRequested() = 0;
+	virtual bool GetQuitRequested() { return false; }
 
 public:
 	RenderManager* m_renderManager;
@@ -51,4 +51,20 @@ public:
 	void Shutdown();
 
 	void Quit() { m_shouldQuit = true; }
+
+	//
+	// Managed bindings for things we want to access from C#
+	//
+	GENERATE_BINDINGS LogManager* GetLogManager() { return m_logManager; }
+	GENERATE_BINDINGS EntityManager* GetEntityManager() { return m_entityManager; }
+	GENERATE_BINDINGS InputManager* GetInputManager() { return m_inputManager; }
+	GENERATE_BINDINGS CVarManager* GetCVarManager() { return m_cvarManager; }
+
+	// We aren't using these:
+	// GENERATE_BINDINGS ProjectManager* GetProjectManager() { return m_projectManager; }
+	// GENERATE_BINDINGS RenderManager* GetRenderManager() { return m_renderManager; }
+	// GENERATE_BINDINGS RenderdocManager* GetRenderdocManager() { return m_renderdocManager; }
+	// GENERATE_BINDINGS HostManager* GetHostManager() { return m_hostManager; }
+	// GENERATE_BINDINGS PhysicsManager* GetPhysicsManager() { return m_physicsManager; }
+	// GENERATE_BINDINGS BaseRenderContext* GetRenderContext() { return m_renderContext; }
 };

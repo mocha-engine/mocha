@@ -1,8 +1,10 @@
 #include "renderdocmanager.h"
 
+#include <cvarmanager.h>
 #include <defs.h>
 #include <renderdoc_app.h>
 #include <spdlog/spdlog.h>
+#include <globalvars.h>
 
 void RenderdocManager::Startup()
 {

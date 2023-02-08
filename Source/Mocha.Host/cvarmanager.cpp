@@ -815,6 +815,11 @@ void CVarManager::Shutdown()
 	CVarSystem::Instance().Shutdown();
 }
 
+void CVarManager::Run( const char* input )
+{
+	CVarSystem::Instance().Run( input );
+}
+
 // ----------------------------------------
 // Built-in CVars
 // ----------------------------------------

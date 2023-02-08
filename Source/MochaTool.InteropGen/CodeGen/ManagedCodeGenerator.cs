@@ -73,18 +73,21 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine();
 
 		// Ctor
-		var ctor = sel.Methods.First( x => x.IsConstructor );
-		var managedCtorArgs = string.Join( ", ", ctor.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
+		if ( sel.Methods.Any( x => x.IsConstructor ) )
+		{
+			var ctor = sel.Methods.First( x => x.IsConstructor );
+			var managedCtorArgs = string.Join( ", ", ctor.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 
-		writer.WriteLine( $"public {sel.Name}( {managedCtorArgs} )" );
-		writer.WriteLine( "{" );
-		writer.Indent++;
+			writer.WriteLine( $"public {sel.Name}( {managedCtorArgs} )" );
+			writer.WriteLine( "{" );
+			writer.Indent++;
 
-		var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
-		writer.WriteLine( $"this.instance = this.Ctor( {ctorCallArgs} );" );
+			var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
+			writer.WriteLine( $"this.instance = this.Ctor( {ctorCallArgs} );" );
 
-		writer.Indent--;
-		writer.WriteLine( "}" );
+			writer.Indent--;
+			writer.WriteLine( "}" );
+		}
 
 		// Methods
 		foreach ( var method in sel.Methods )

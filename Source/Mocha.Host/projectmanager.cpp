@@ -1,4 +1,6 @@
 #include "ProjectManager.h"
+#include <globalvars.h>
+#include <cvarmanager.h>
 
 void ProjectManager::Startup()
 {

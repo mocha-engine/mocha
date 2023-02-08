@@ -24,7 +24,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="$(TargetDir)$(TargetName).exe $(SolutionDir)" />
+	  <Exec Command="$(TargetDir)$(TargetName).exe $(SolutionDir)" />
 	</Target>
 
 </Project>

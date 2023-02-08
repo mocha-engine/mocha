@@ -1,6 +1,7 @@
 #pragma once
 #include <any>
 #include <cstdint>
+#include <defs.h>
 #include <fstream>
 #include <globalvars.h>
 #include <memory>
@@ -108,9 +109,11 @@ public:
 	    : ISubSystem( parent )
 	{
 	}
-	
+
 	void Startup() override;
 	void Shutdown() override;
+
+	GENERATE_BINDINGS void Run( const char* input );
 };
 
 class CVarSystem

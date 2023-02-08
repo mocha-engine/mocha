@@ -15,7 +15,7 @@ public:
 	    : ISubSystem( parent )
 	{
 	}
-	
+
 	template <typename T>
 	Handle AddEntity( T entity );
 
@@ -32,6 +32,8 @@ public:
 	void Startup() override{};
 
 	void Shutdown() override{};
+	
+	GENERATE_BINDINGS BaseEntity* GetBaseEntity( uint32_t entityHandle ) { return GetEntity<BaseEntity>( entityHandle ).get(); }
 };
 
 template <typename T>
