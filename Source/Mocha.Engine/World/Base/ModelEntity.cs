@@ -1,56 +1,57 @@
-﻿using System.Runtime.InteropServices;
-
-namespace Mocha;
+﻿namespace Mocha;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
+	[HideInInspector]
+	private Glue.ModelEntity NativeModelEntity => Glue.Engine.GetRoot().GetEntityManager().GetModelEntity( NativeHandle );
+
 	[Category( "Physics" )]
 	public Vector3 Velocity
 	{
-		get => Glue.Entities.GetVelocity( NativeHandle );
-		set => Glue.Entities.SetVelocity( NativeHandle, value );
+		get => NativeModelEntity.GetVelocity();
+		set => NativeModelEntity.SetVelocity( value );
 	}
 
 	[Category( "Physics" )]
 	public float Mass
 	{
-		get => Glue.Entities.GetMass( NativeHandle );
-		set => Glue.Entities.SetMass( NativeHandle, value );
+		get => NativeModelEntity.GetMass();
+		set => NativeModelEntity.SetMass( value );
 	}
 
 	[Category( "Physics" )]
 	public float Friction
 	{
-		get => Glue.Entities.GetFriction( NativeHandle );
-		set => Glue.Entities.SetFriction( NativeHandle, value );
+		get => NativeModelEntity.GetFriction();
+		set => NativeModelEntity.SetFriction( value );
 	}
 
 	[Category( "Physics" )]
 	public float Restitution
 	{
-		get => Glue.Entities.GetRestitution( NativeHandle );
-		set => Glue.Entities.SetRestitution( NativeHandle, value );
+		get => NativeModelEntity.GetRestitution();
+		set => NativeModelEntity.SetRestitution( value );
 	}
 
 	[Category( "Physics" )]
 	public bool IgnoreRigidbodyRotation
 	{
-		get => Glue.Entities.GetIgnoreRigidbodyRotation( NativeHandle );
-		set => Glue.Entities.SetIgnoreRigidbodyRotation( NativeHandle, value );
+		get => NativeModelEntity.GetIgnoreRigidbodyRotation();
+		set => NativeModelEntity.SetIgnoreRigidbodyRotation( value );
 	}
 
 	[Category( "Physics" )]
 	public bool IgnoreRigidbodyPosition
 	{
-		get => Glue.Entities.GetIgnoreRigidbodyPosition( NativeHandle );
-		set => Glue.Entities.SetIgnoreRigidbodyPosition( NativeHandle, value );
+		get => NativeModelEntity.GetIgnoreRigidbodyPosition();
+		set => NativeModelEntity.SetIgnoreRigidbodyPosition( value );
 	}
 
 	[Category( "Rendering" )]
 	public IModel Model
 	{
-		set => Glue.Entities.SetModel( NativeHandle, value.NativeModel );
+		set => NativeModelEntity.SetModel( value.NativeModel );
 	}
 
 	public ModelEntity()
@@ -64,17 +65,17 @@ public partial class ModelEntity : BaseEntity
 
 	protected override void CreateNativeEntity()
 	{
-		NativeHandle = Glue.Entities.CreateModelEntity();
+		NativeHandle = Glue.Engine.CreateModelEntity();
 	}
 
 	public void SetCubePhysics( Vector3 bounds, bool isStatic )
 	{
-		Glue.Entities.SetCubePhysics( NativeHandle, bounds, isStatic );
+		NativeModelEntity.SetCubePhysics( bounds, isStatic );
 	}
 
 	public void SetSpherePhysics( float radius, bool isStatic )
 	{
-		Glue.Entities.SetSpherePhysics( NativeHandle, radius, isStatic );
+		NativeModelEntity.SetSpherePhysics( radius, isStatic );
 	}
 
 	// TODO: Replace...
@@ -157,16 +158,6 @@ public partial class ModelEntity : BaseEntity
 		// Reverse winding order
 		//
 		// vertexList.Reverse();
-
-		unsafe
-		{
-			int vertexStride = Marshal.SizeOf( typeof( Vector3 ) );
-			int vertexSize = vertexStride * vertexList.Count;
-
-			fixed ( void* vertexData = vertexList.ToArray() )
-			{
-				Glue.Entities.SetMeshPhysics( NativeHandle, vertexSize, (IntPtr)vertexData );
-			}
-		}
+		NativeModelEntity.SetMeshPhysics( vertexList.ToInterop() );
 	}
 }

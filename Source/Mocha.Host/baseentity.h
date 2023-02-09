@@ -55,7 +55,23 @@ public:
 
 	GENERATE_BINDINGS inline void SetRotation( const Quaternion& rot ) { m_transform.rotation = rot; }
 	GENERATE_BINDINGS inline Quaternion GetRotation() { return m_transform.rotation; }
-	
+
 	GENERATE_BINDINGS inline void SetScale( const Vector3& scale ) { m_transform.scale = scale; }
 	GENERATE_BINDINGS inline Vector3 GetScale() { return m_transform.scale; }
+
+	GENERATE_BINDINGS inline void SetViewmodel( bool isViewmodel )
+	{
+		if ( isViewmodel )
+			AddFlag( ENTITY_VIEWMODEL );
+		else
+			RemoveFlag( ENTITY_VIEWMODEL );
+	}
+
+	GENERATE_BINDINGS inline void SetUI( bool isUI )
+	{
+		if ( isUI )
+			AddFlag( ENTITY_UI );
+		else
+			RemoveFlag( ENTITY_UI );
+	}
 };

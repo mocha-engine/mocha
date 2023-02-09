@@ -1,6 +1,7 @@
 #pragma once
 
 #include <baseentity.h>
+#include <modelentity.h>
 #include <functional>
 #include <handlemap.h>
 #include <mathtypes.h>
@@ -32,8 +33,12 @@ public:
 	void Startup() override{};
 
 	void Shutdown() override{};
-	
+
 	GENERATE_BINDINGS BaseEntity* GetBaseEntity( uint32_t entityHandle ) { return GetEntity<BaseEntity>( entityHandle ).get(); }
+	GENERATE_BINDINGS ModelEntity* GetModelEntity( uint32_t entityHandle )
+	{
+		return GetEntity<ModelEntity>( entityHandle ).get();
+	}
 };
 
 template <typename T>

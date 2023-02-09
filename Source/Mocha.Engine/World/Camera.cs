@@ -4,31 +4,31 @@ public static class Camera
 {
 	public static Vector3 Position
 	{
-		get => Glue.Entities.GetCameraPosition();
-		set => Glue.Entities.SetCameraPosition( value );
+		get => Glue.Engine.GetCameraPosition();
+		set => Glue.Engine.SetCameraPosition( value );
 	}
 
 	public static Rotation Rotation
 	{
-		get => Glue.Entities.GetCameraRotation();
-		set => Glue.Entities.SetCameraRotation( value );
+		get => Glue.Engine.GetCameraRotation();
+		set => Glue.Engine.SetCameraRotation( value );
 	}
 
 	public static float FieldOfView
 	{
-		get => Glue.Entities.GetCameraFieldOfView();
-		set => Glue.Entities.SetCameraFieldOfView( value );
+		get => Glue.Engine.GetCameraFieldOfView();
+		set => Glue.Engine.SetCameraFieldOfView( value );
 	}
 
 	public static float ZNear
 	{
-		get => Glue.Entities.GetCameraZNear();
-		set => Glue.Entities.SetCameraZNear( value );
+		get => Glue.Engine.GetCameraZNear();
+		set => Glue.Engine.SetCameraZNear( value );
 	}
 
 	public static float ZFar
 	{
-		get => Glue.Entities.GetCameraZFar();
-		set => Glue.Entities.SetCameraZFar( value );
+		get => Glue.Engine.GetCameraZFar();
+		set => Glue.Engine.SetCameraZFar( value );
 	}
 }

@@ -17,9 +17,8 @@ void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 	body.shape.shapeData = {};
 	body.shape.shapeData.radius = radius;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_SPHERE;
-
-	auto& root = ClientRoot::GetInstance();
-	m_physicsHandle = root.m_physicsManager->AddBody( this, body );
+	
+	m_physicsHandle = FindInstance()->m_physicsManager->AddBody( this, body );
 }
 
 void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
@@ -36,13 +35,14 @@ void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
 	body.shape.shapeData = {};
 	body.shape.shapeData.extents = bounds;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_BOX;
-
-	auto& root = ClientRoot::GetInstance();
-	m_physicsHandle = root.m_physicsManager->AddBody( this, body );
+	
+	m_physicsHandle = FindInstance()->m_physicsManager->AddBody( this, body );
 }
 
-void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
+void ModelEntity::SetMeshPhysics( UtilArray interopVertices )
 {
+	std::vector<Vector3> vertices = interopVertices.GetData<Vector3>();
+
 	PhysicsBody body = {};
 
 	body.friction = 1.0f;
@@ -55,7 +55,6 @@ void ModelEntity::SetMeshPhysics( std::vector<Vector3> vertices )
 	body.shape.shapeData = {};
 	body.shape.shapeData.vertices = vertices;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_MESH;
-
-	auto& root = ClientRoot::GetInstance();
-	m_physicsHandle = root.m_physicsManager->AddBody( this, body );
+	
+	m_physicsHandle = FindInstance()->m_physicsManager->AddBody( this, body );
 }
