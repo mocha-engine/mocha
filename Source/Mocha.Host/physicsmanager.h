@@ -260,5 +260,5 @@ public:
 	void Update();
 
 	uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
-	TraceResult Trace( TraceInfo traceInfo );
+	GENERATE_BINDINGS TraceResult Trace( TraceInfo traceInfo );
 };
