@@ -51,17 +51,17 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 }
 
 class Root;
-extern Root* FindInstance();
+extern Root& FindInstance();
 
 //
 // Engine properties
 //
 #define ENGINE_NAME						"Mocha"
 #define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
-#define WINDOW_TITLE					std::string( FindInstance()->m_projectManager->GetProject().name + " [" + FindInstance()->m_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
+#define WINDOW_TITLE					std::string( FindInstance().m_projectManager->GetProject().name + " [" + FindInstance().m_projectManager->GetProject().version + "] - " GAME_VERSION ).c_str()
 
-#define IS_SERVER						(FindInstance()->m_executingRealm == REALM_SERVER)
-#define IS_CLIENT						(FindInstance()->m_executingRealm == REALM_CLIENT)
+#define IS_SERVER						(FindInstance().m_executingRealm == REALM_SERVER)
+#define IS_CLIENT						(FindInstance().m_executingRealm == REALM_CLIENT)
 
 //
 // Types

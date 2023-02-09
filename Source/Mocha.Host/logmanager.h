@@ -48,8 +48,8 @@ public:
 	GENERATE_BINDINGS inline static LogHistory GetLogHistory()
 	{
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( FindInstance()->m_logManager->m_logHistory.size() );
-		logHistory.items = FindInstance()->m_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( FindInstance().m_logManager->m_logHistory.size() );
+		logHistory.items = FindInstance().m_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -111,12 +111,12 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		FindInstance()->m_logManager->m_logHistory.emplace_back( logEntry );
+		FindInstance().m_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
-		if ( FindInstance()->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		if ( FindInstance().m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
 		{
-			FindInstance()->m_logManager->m_logHistory.erase( FindInstance()->m_logManager->m_logHistory.begin() );
+			FindInstance().m_logManager->m_logHistory.erase( FindInstance().m_logManager->m_logHistory.begin() );
 		}
 	}
 

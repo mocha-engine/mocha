@@ -5,10 +5,10 @@
 #include <mathtypes.h>
 #include <root.h>
 
-inline Root* FindInstance()
+inline Root& FindInstance()
 {
-	// TODO
-	return &ClientRoot::GetInstance();
+	static Root& instance = ClientRoot::GetInstance();
+	return instance;
 }
 
 //

@@ -473,7 +473,7 @@ void CVarEntry::InvokeCommand( std::vector<std::string> arguments )
 
 		CVarManagedCmdDispatchInfo info{ m_name.c_str(), managedArguments.data(), managedArguments.size() };
 
-		FindInstance()->m_hostManager->DispatchCommand( info );
+		FindInstance().m_hostManager->DispatchCommand( info );
 	}
 	else
 	{
@@ -547,25 +547,25 @@ inline void CVarEntry::SetValue( T value )
 		{
 			CVarManagedVarDispatchInfo<const char*> stringInfo{ m_name.c_str(), oldValue.c_str(), value.c_str() };
 
-			FindInstance()->m_hostManager->DispatchStringCVarCallback( stringInfo );
+			FindInstance().m_hostManager->DispatchStringCVarCallback( stringInfo );
 		}
 		else if constexpr ( std::is_same<T, float>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			FindInstance()->m_hostManager->DispatchFloatCVarCallback( primitiveInfo );
+			FindInstance().m_hostManager->DispatchFloatCVarCallback( primitiveInfo );
 		}
 		else if constexpr ( std::is_same<T, bool>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			FindInstance()->m_hostManager->DispatchBoolCVarCallback( primitiveInfo );
+			FindInstance().m_hostManager->DispatchBoolCVarCallback( primitiveInfo );
 		}
 		else if constexpr ( std::is_same<T, int>::value )
 		{
 			CVarManagedVarDispatchInfo<T> primitiveInfo{ m_name.c_str(), oldValue, value };
 
-			FindInstance()->m_hostManager->DispatchIntCVarCallback( primitiveInfo );
+			FindInstance().m_hostManager->DispatchIntCVarCallback( primitiveInfo );
 		}
 	}
 	else

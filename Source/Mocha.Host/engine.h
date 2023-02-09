@@ -12,32 +12,32 @@ namespace Engine
 {
 	GENERATE_BINDINGS inline void Quit()
 	{
-		FindInstance()->Quit();
+		FindInstance().Quit();
 	}
 
 	GENERATE_BINDINGS inline int GetCurrentTick()
 	{
-		return FindInstance()->m_curTick;
+		return FindInstance().m_curTick;
 	}
 
 	GENERATE_BINDINGS inline float GetFrameDeltaTime()
 	{
-		return FindInstance()->m_frameDeltaTime;
+		return FindInstance().m_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTickDeltaTime()
 	{
-		return FindInstance()->m_tickDeltaTime;
+		return FindInstance().m_tickDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetFramesPerSecond()
 	{
-		return 1.0f / FindInstance()->m_frameDeltaTime;
+		return 1.0f / FindInstance().m_frameDeltaTime;
 	}
 
 	GENERATE_BINDINGS inline float GetTime()
 	{
-		return FindInstance()->m_curTime;
+		return FindInstance().m_curTime;
 	}
 
 	GENERATE_BINDINGS inline const char* GetProjectPath()
@@ -63,13 +63,13 @@ namespace Engine
 
 	GENERATE_BINDINGS inline Root GetRoot()
 	{
-		return *FindInstance();
+		return FindInstance();
 	}
 
 	GENERATE_BINDINGS inline uint32_t CreateBaseEntity()
 	{
 		// TODO: Derive root based on current context / realm
-		auto* entityDictionary = FindInstance()->m_entityManager;
+		auto* entityDictionary = FindInstance().m_entityManager;
 
 		BaseEntity baseEntity = {};
 		baseEntity.AddFlag( ENTITY_MANAGED );
@@ -80,7 +80,7 @@ namespace Engine
 
 	GENERATE_BINDINGS inline uint32_t CreateModelEntity()
 	{
-		auto* entityDictionary = FindInstance()->m_entityManager;
+		auto* entityDictionary = FindInstance().m_entityManager;
 
 		ModelEntity modelEntity = {};
 		modelEntity.AddFlag( ENTITY_MANAGED );
@@ -92,52 +92,52 @@ namespace Engine
 
 	GENERATE_BINDINGS inline void SetCameraPosition( Vector3 position )
 	{
-		FindInstance()->m_cameraPos = position;
+		FindInstance().m_cameraPos = position;
 	}
 
 	GENERATE_BINDINGS inline Vector3 GetCameraPosition()
 	{
-		return FindInstance()->m_cameraPos;
+		return FindInstance().m_cameraPos;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraRotation( Quaternion rotation )
 	{
-		FindInstance()->m_cameraRot = rotation;
+		FindInstance().m_cameraRot = rotation;
 	}
 
 	GENERATE_BINDINGS inline Quaternion GetCameraRotation()
 	{
-		return FindInstance()->m_cameraRot;
+		return FindInstance().m_cameraRot;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraFieldOfView( float fov )
 	{
-		FindInstance()->m_cameraFov = fov;
+		FindInstance().m_cameraFov = fov;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraFieldOfView()
 	{
-		return FindInstance()->m_cameraFov;
+		return FindInstance().m_cameraFov;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraZNear( float znear )
 	{
-		FindInstance()->m_cameraZNear = znear;
+		FindInstance().m_cameraZNear = znear;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraZNear()
 	{
-		return FindInstance()->m_cameraZNear;
+		return FindInstance().m_cameraZNear;
 	}
 
 	GENERATE_BINDINGS inline void SetCameraZFar( float zfar )
 	{
-		FindInstance()->m_cameraZFar = zfar;
+		FindInstance().m_cameraZFar = zfar;
 	}
 
 	GENERATE_BINDINGS inline float GetCameraZFar()
 	{
-		return FindInstance()->m_cameraZFar;
+		return FindInstance().m_cameraZFar;
 	}
 
 }; // namespace Engine

@@ -61,7 +61,7 @@ void Window::Update()
 {
 	SDL_Event e;
 
-	InputState inputState = FindInstance()->m_inputManager->GetState();
+	InputState inputState = FindInstance().m_inputManager->GetState();
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
@@ -173,5 +173,5 @@ void Window::Update()
 #endif
 	}
 
-	FindInstance()->m_inputManager->SetState( inputState );
+	FindInstance().m_inputManager->SetState( inputState );
 }
