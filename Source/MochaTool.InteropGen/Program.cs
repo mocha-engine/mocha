@@ -124,7 +124,7 @@ public static class Program
 		nativeStructWriter.WriteLine( $"{{" );
 		nativeStructWriter.Indent++;
 
-		nativeStructWriter.WriteLine( "(void*)&FindInstance()," );
+		nativeStructWriter.WriteLine( "(void*)0xCDCDCDCD," );
 
 		nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}" ) );
 		nativeStructWriter.Write( nativeStructBody );

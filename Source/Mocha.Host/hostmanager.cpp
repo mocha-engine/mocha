@@ -106,6 +106,9 @@ void HostManager::Render()
 
 void HostManager::Startup()
 {
+	// Set root parent so that this instance can be passed to the host
+	args.__Root = m_parent;
+
 	Invoke( "Run", ( void* )&args );
 }
 

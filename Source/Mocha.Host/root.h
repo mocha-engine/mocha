@@ -74,13 +74,13 @@ public:
 	GENERATE_BINDINGS inline float GetFramesPerSecond() { return 1.0f / m_frameDeltaTime; }
 	GENERATE_BINDINGS inline float GetTime() { return m_curTime; }
 
-	GENERATE_BINDINGS inline const char* GetProjectPath();
-
 	GENERATE_BINDINGS inline bool IsServer() { return m_executingRealm == REALM_SERVER; }
 	GENERATE_BINDINGS inline bool IsClient() { return m_executingRealm == REALM_CLIENT; }
 
-	GENERATE_BINDINGS inline uint32_t CreateBaseEntity();
-	GENERATE_BINDINGS inline uint32_t CreateModelEntity();
+	GENERATE_BINDINGS const char* GetProjectPath();
+
+	GENERATE_BINDINGS uint32_t CreateBaseEntity();
+	GENERATE_BINDINGS uint32_t CreateModelEntity();
 
 	GENERATE_BINDINGS inline void SetCameraPosition( Vector3 position ) { m_cameraPos = position; }
 	GENERATE_BINDINGS inline Vector3 GetCameraPosition() { return m_cameraPos; }

@@ -57,7 +57,7 @@ void Root::Shutdown()
 	m_logManager->Shutdown();
 }
 
-inline const char* Root::GetProjectPath()
+const char* Root::GetProjectPath()
 {
 	std::string str = EngineProperties::LoadedProject.GetValue();
 
@@ -68,22 +68,22 @@ inline const char* Root::GetProjectPath()
 	return cstr;
 }
 
-inline uint32_t Root::CreateBaseEntity()
+uint32_t Root::CreateBaseEntity()
 {
 	auto* entityDictionary = m_entityManager;
 
-	BaseEntity baseEntity( &FindInstance() ); // TODO?
+	BaseEntity baseEntity( this );
 	baseEntity.AddFlag( ENTITY_MANAGED );
 	baseEntity.m_type = "BaseEntity";
 
 	return entityDictionary->AddEntity<BaseEntity>( baseEntity );
 }
 
-inline uint32_t Root::CreateModelEntity()
+uint32_t Root::CreateModelEntity()
 {
 	auto* entityDictionary = m_entityManager;
 
-	ModelEntity modelEntity( &FindInstance() ); // TODO?
+	ModelEntity modelEntity( this );
 	modelEntity.AddFlag( ENTITY_MANAGED );
 	modelEntity.AddFlag( ENTITY_RENDERABLE );
 	modelEntity.m_type = "ModelEntity";
