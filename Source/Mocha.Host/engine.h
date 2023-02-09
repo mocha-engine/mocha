@@ -73,7 +73,7 @@ namespace Engine
 		// TODO: Derive root based on current context / realm
 		auto* entityDictionary = FindInstance().m_entityManager;
 
-		BaseEntity baseEntity = {};
+		BaseEntity baseEntity( &FindInstance() ); // TODO?
 		baseEntity.AddFlag( ENTITY_MANAGED );
 		baseEntity.m_type = "BaseEntity";
 
@@ -84,7 +84,7 @@ namespace Engine
 	{
 		auto* entityDictionary = FindInstance().m_entityManager;
 
-		ModelEntity modelEntity = {};
+		ModelEntity modelEntity( &FindInstance() ); // TODO?
 		modelEntity.AddFlag( ENTITY_MANAGED );
 		modelEntity.AddFlag( ENTITY_RENDERABLE );
 		modelEntity.m_type = "ModelEntity";

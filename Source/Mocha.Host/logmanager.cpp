@@ -8,6 +8,8 @@ void LogManager::Startup()
 {
 	// Setup spdlog
 	auto mochaSink = std::make_shared<MochaSinkMT>();
+	mochaSink->m_parent = m_parent; // TODO: Move to ctor
+
 	auto managed = std::make_shared<spdlog::logger>( "managed", mochaSink );
 	auto main = std::make_shared<spdlog::logger>( "main", mochaSink );
 	auto renderer = std::make_shared<spdlog::logger>( "renderer", mochaSink );

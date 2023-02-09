@@ -25,6 +25,9 @@ private:
 	bool m_ignoreRigidbodyPosition;
 
 public:
+	ModelEntity( Root* parent )
+	    : BaseEntity( parent ){};
+
 	// If this model has no physics, this function will return UINT32_MAX.
 	uint32_t GetPhysicsHandle() { return m_physicsHandle; };
 
@@ -37,7 +40,7 @@ public:
 	GENERATE_BINDINGS void SetSpherePhysics( float radius, bool isStatic );
 	GENERATE_BINDINGS void SetCubePhysics( Vector3 bounds, bool isStatic );
 	GENERATE_BINDINGS void SetMeshPhysics( UtilArray vertices );
-	
+
 	GENERATE_BINDINGS Vector3 GetVelocity() { return m_velocity; }
 	GENERATE_BINDINGS void SetVelocity( Vector3 velocity ) { m_velocity = velocity; }
 

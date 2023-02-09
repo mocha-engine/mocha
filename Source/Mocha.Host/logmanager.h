@@ -1,4 +1,5 @@
 #pragma once
+#include <clientroot.h>
 #include <defs.h>
 #include <globalvars.h>
 #include <iostream>
@@ -9,7 +10,6 @@
 #include <spdlog/spdlog.h>
 #include <string>
 #include <subsystem.h>
-#include <clientroot.h>
 
 #define MAX_LOG_MESSAGES 50
 
@@ -34,7 +34,7 @@ public:
 	    : ISubSystem( parent )
 	{
 	}
-	
+
 	void Startup();
 	void Shutdown(){};
 
@@ -45,11 +45,11 @@ public:
 	GENERATE_BINDINGS static void ManagedError( std::string str );
 	GENERATE_BINDINGS static void ManagedTrace( std::string str );
 
-	GENERATE_BINDINGS inline static LogHistory GetLogHistory()
+	GENERATE_BINDINGS inline LogHistory GetLogHistory()
 	{
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( FindInstance().m_logManager->m_logHistory.size() );
-		logHistory.items = FindInstance().m_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( m_parent->m_logManager->m_logHistory.size() );
+		logHistory.items = m_parent->m_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -88,7 +88,7 @@ protected:
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
 
-		if ( FindInstance().m_executingRealm == REALM_CLIENT )
+		if ( m_parent->m_executingRealm == REALM_CLIENT )
 		{
 			// In client, use visual studio's output window
 			OutputDebugStringA( fmt::to_string( formatted ).c_str() );
@@ -111,16 +111,19 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		FindInstance().m_logManager->m_logHistory.emplace_back( logEntry );
+		m_parent->m_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
-		if ( FindInstance().m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		if ( m_parent->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
 		{
-			FindInstance().m_logManager->m_logHistory.erase( FindInstance().m_logManager->m_logHistory.begin() );
+			m_parent->m_logManager->m_logHistory.erase( m_parent->m_logManager->m_logHistory.begin() );
 		}
 	}
 
 	void flush_() override { std::cout << std::flush; }
+
+public:
+	Root* m_parent;
 };
 
 using MochaSinkMT = MochaSink<std::mutex>;
