@@ -4,31 +4,31 @@ public static class Camera
 {
 	public static Vector3 Position
 	{
-		get => Engine.GetCameraPosition();
-		set => Engine.SetCameraPosition( value );
+		get => NativeEngine.GetCameraPosition();
+		set => NativeEngine.SetCameraPosition( value );
 	}
 
 	public static Rotation Rotation
 	{
-		get => Engine.GetCameraRotation();
-		set => Engine.SetCameraRotation( value );
+		get => NativeEngine.GetCameraRotation();
+		set => NativeEngine.SetCameraRotation( value );
 	}
 
 	public static float FieldOfView
 	{
-		get => Engine.GetCameraFieldOfView();
-		set => Engine.SetCameraFieldOfView( value );
+		get => NativeEngine.GetCameraFieldOfView();
+		set => NativeEngine.SetCameraFieldOfView( value );
 	}
 
 	public static float ZNear
 	{
-		get => Engine.GetCameraZNear();
-		set => Engine.SetCameraZNear( value );
+		get => NativeEngine.GetCameraZNear();
+		set => NativeEngine.SetCameraZNear( value );
 	}
 
 	public static float ZFar
 	{
-		get => Engine.GetCameraZFar();
-		set => Engine.SetCameraZFar( value );
+		get => NativeEngine.GetCameraZFar();
+		set => NativeEngine.SetCameraZFar( value );
 	}
 }

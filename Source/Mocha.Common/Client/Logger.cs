@@ -60,7 +60,7 @@ public class NativeLogger : ILogger
 
 	public List<LogEntry> GetHistory()
 	{
-		var logManager = Engine.GetLogManager();
+		var logManager = NativeEngine.GetLogManager();
 		var logHistory = logManager.GetLogHistory();
 
 		LogEntry[] logEntries = new LogEntry[logHistory.count];

@@ -13,9 +13,9 @@ public static class Time
 	public static void UpdateFrom( float deltaTime )
 	{
 		Delta = deltaTime;
-		Now = Engine.GetTime();
+		Now = NativeEngine.GetTime();
 
-		FPS = Engine.GetFramesPerSecond().CeilToInt();
+		FPS = NativeEngine.GetFramesPerSecond().CeilToInt();
 		FPSHistory.Add( FPS );
 
 		if ( FPSHistory.Count > TimeScale / Delta )

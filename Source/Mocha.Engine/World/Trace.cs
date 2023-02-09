@@ -66,7 +66,7 @@ public class Cast
 			{
 				traceInfo.ignoredEntityHandles = (IntPtr)data;
 
-				var physicsManager = Engine.GetPhysicsManager();
+				var physicsManager = NativeEngine.GetPhysicsManager();
 				var result = physicsManager.Trace( traceInfo );
 				return TraceResult.From( result );
 			}

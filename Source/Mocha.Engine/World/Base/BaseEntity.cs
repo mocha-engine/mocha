@@ -11,7 +11,7 @@ public class BaseEntity : IEntity
 	public uint NativeHandle { get; protected set; }
 
 	[HideInInspector]
-	private Glue.BaseEntity NativeEntity => Engine.GetEntityManager().GetBaseEntity( NativeHandle );
+	private Glue.BaseEntity NativeEntity => NativeEngine.GetEntityManager().GetBaseEntity( NativeHandle );
 
 	public bool IsValid()
 	{
@@ -80,7 +80,7 @@ public class BaseEntity : IEntity
 
 	protected virtual void CreateNativeEntity()
 	{
-		NativeHandle = Engine.CreateBaseEntity();
+		NativeHandle = NativeEngine.CreateBaseEntity();
 	}
 
 	public virtual void Update() { }

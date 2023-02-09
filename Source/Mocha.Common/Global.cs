@@ -11,5 +11,5 @@ public static class Global
 {
 	public static ILogger Log { get; set; }
 	public static UnmanagedArgs UnmanagedArgs { get; set; }
-	public static Glue.Root Engine { get; set; }
+	public static Glue.Root NativeEngine { get; set; }
 }

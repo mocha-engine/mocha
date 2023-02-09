@@ -24,8 +24,8 @@ public static class Main
 		// Convert args to structure so we can use the function pointers.
 		// This MUST be done before calling any native functions
 		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
-		Global.Engine = new Glue.Root();
-		Global.Engine.NativePtr = Global.UnmanagedArgs.__Root;
+		Global.NativeEngine = new Glue.Root();
+		Global.NativeEngine.NativePtr = Global.UnmanagedArgs.__Root;
 
 		// Initialize the logger
 		Log = new NativeLogger();
@@ -41,7 +41,7 @@ public static class Main
 		Upgrader.Init();
 
 		// Get the current loaded project from native
-		var manifestPath = Engine.GetProjectPath();
+		var manifestPath = NativeEngine.GetProjectPath();
 		var csprojPath = ReloadProjectManifest( manifestPath );
 
 		// Setup a watcher for the project manifest.
@@ -99,7 +99,7 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Update()
 	{
-		Time.UpdateFrom( Engine.GetTickDeltaTime() );
+		Time.UpdateFrom( NativeEngine.GetTickDeltaTime() );
 
 		s_game.EntryPoint.Update();
 	}
@@ -107,7 +107,7 @@ public static class Main
 	[UnmanagedCallersOnly]
 	public static void Render()
 	{
-		Time.UpdateFrom( Engine.GetFrameDeltaTime() );
+		Time.UpdateFrom( NativeEngine.GetFrameDeltaTime() );
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 

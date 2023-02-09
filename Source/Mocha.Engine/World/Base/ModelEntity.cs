@@ -4,7 +4,7 @@
 public partial class ModelEntity : BaseEntity
 {
 	[HideInInspector]
-	private Glue.ModelEntity NativeModelEntity => Engine.GetEntityManager().GetModelEntity( NativeHandle );
+	private Glue.ModelEntity NativeModelEntity => NativeEngine.GetEntityManager().GetModelEntity( NativeHandle );
 
 	[Category( "Physics" )]
 	public Vector3 Velocity
@@ -65,7 +65,7 @@ public partial class ModelEntity : BaseEntity
 
 	protected override void CreateNativeEntity()
 	{
-		NativeHandle = Engine.CreateModelEntity();
+		NativeHandle = NativeEngine.CreateModelEntity();
 	}
 
 	public void SetCubePhysics( Vector3 bounds, bool isStatic )
