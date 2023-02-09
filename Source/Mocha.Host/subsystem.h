@@ -4,7 +4,7 @@ class Root;
 
 class ISubSystem
 {
-private:
+protected:
 	Root* m_parent;
 
 public:

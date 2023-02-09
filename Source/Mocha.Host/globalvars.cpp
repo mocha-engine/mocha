@@ -1,7 +1,15 @@
 #include "globalvars.h"
 
+#include <clientroot.h>
 #include <cvarmanager.h>
 #include <mathtypes.h>
+#include <root.h>
+
+inline Root* FindInstance()
+{
+	// TODO
+	return &ClientRoot::GetInstance();
+}
 
 //
 // Engine features

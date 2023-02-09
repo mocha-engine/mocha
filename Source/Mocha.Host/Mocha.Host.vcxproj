@@ -357,13 +357,11 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="engine.h" />
     <ClInclude Include="entitymanager.h" />
     <ClInclude Include="editor.h" />
-    <ClInclude Include="entities.h" />
     <ClInclude Include="fontawesome.h" />
     <ClInclude Include="mathtypes.h" />
     <ClInclude Include="gitdefs.h" />
     <ClInclude Include="handlemap.h" />
     <ClInclude Include="hostmanager.h" />
-    <ClInclude Include="input.h" />
     <ClInclude Include="inputmanager.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="nullrendercontext.h" />

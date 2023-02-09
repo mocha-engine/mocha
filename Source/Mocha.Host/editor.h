@@ -28,18 +28,14 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextBold( const char* text )
 	{
-		auto& root = ClientRoot::GetInstance();
-		
-		ImGui::PushFont( root.m_renderContext->m_boldFont );
+		ImGui::PushFont( FindInstance()->m_renderContext->m_boldFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
 
 	GENERATE_BINDINGS inline void TextSubheading( const char* text )
 	{
-		auto& root = ClientRoot::GetInstance();
-		
-		ImGui::PushFont( root.m_renderContext->m_subheadingFont );
+		ImGui::PushFont( FindInstance()->m_renderContext->m_subheadingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -47,9 +43,7 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextHeading( const char* text )
 	{
-		auto& root = ClientRoot::GetInstance();
-		
-		ImGui::PushFont( root.m_renderContext->m_headingFont );
+		ImGui::PushFont( FindInstance()->m_renderContext->m_headingFont );
 		ImGui::Text( "%s", text );
 		ImGui::Dummy( ImVec2( 0, 2 ) );
 		ImGui::PopFont();
@@ -57,9 +51,7 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void TextMonospace( const char* text )
 	{
-		auto& root = ClientRoot::GetInstance();
-		
-		ImGui::PushFont( root.m_renderContext->m_monospaceFont );
+		ImGui::PushFont( FindInstance()->m_renderContext->m_monospaceFont );
 		ImGui::Text( "%s", text );
 		ImGui::PopFont();
 	};
@@ -73,9 +65,7 @@ namespace Editor
 
 	GENERATE_BINDINGS inline const char* GetGPUName()
 	{
-		auto& root = ClientRoot::GetInstance();
-
-		return root.m_renderManager->GetGPUName();
+		return FindInstance()->m_renderManager->GetGPUName();
 	}
 
 	GENERATE_BINDINGS inline char* InputText( const char* name, char* inputBuf, int inputLength )
@@ -87,30 +77,28 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void RenderViewDropdown()
 	{
-		auto& root = ClientRoot::GetInstance();
-		
 		if ( ImGui::BeginMenu( "Debug View" ) )
 		{
 			if ( ImGui::MenuItem( "None" ) )
-				root.m_debugView = RenderDebugViews::NONE;
+				FindInstance()->m_debugView = RenderDebugViews::NONE;
 
 			if ( ImGui::MenuItem( "Diffuse" ) )
-				root.m_debugView = RenderDebugViews::DIFFUSE;
+				FindInstance()->m_debugView = RenderDebugViews::DIFFUSE;
 
 			if ( ImGui::MenuItem( "Normal" ) )
-				root.m_debugView = RenderDebugViews::NORMAL;
+				FindInstance()->m_debugView = RenderDebugViews::NORMAL;
 
 			if ( ImGui::MenuItem( "Ambient Occlusion" ) )
-				root.m_debugView = RenderDebugViews::AMBIENTOCCLUSION;
+				FindInstance()->m_debugView = RenderDebugViews::AMBIENTOCCLUSION;
 
 			if ( ImGui::MenuItem( "Metalness" ) )
-				root.m_debugView = RenderDebugViews::METALNESS;
+				FindInstance()->m_debugView = RenderDebugViews::METALNESS;
 
 			if ( ImGui::MenuItem( "Roughness" ) )
-				root.m_debugView = RenderDebugViews::ROUGHNESS;
+				FindInstance()->m_debugView = RenderDebugViews::ROUGHNESS;
 
 			if ( ImGui::MenuItem( "Other" ) )
-				root.m_debugView = RenderDebugViews::OTHER;
+				FindInstance()->m_debugView = RenderDebugViews::OTHER;
 
 			ImGui::EndMenu();
 		}
@@ -118,19 +106,15 @@ namespace Editor
 
 	GENERATE_BINDINGS inline Vector2 GetWindowSize()
 	{
-		auto& root = ClientRoot::GetInstance();
-		
 		Size2D size;
-		root.m_renderContext->GetWindowSize( &size );
+		FindInstance()->m_renderContext->GetWindowSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
 	GENERATE_BINDINGS inline Vector2 GetRenderSize()
 	{
-		auto& root = ClientRoot::GetInstance();
-		
 		Size2D size;
-		root.m_renderContext->GetRenderSize( &size );
+		FindInstance()->m_renderContext->GetRenderSize( &size );
 		return { ( float )size.x, ( float )size.y };
 	}
 
@@ -141,10 +125,8 @@ namespace Editor
 
 	GENERATE_BINDINGS inline void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 	{
-		auto& root = ClientRoot::GetInstance();
-		
 		void* imguiTextureID;
-		root.m_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+		FindInstance()->m_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
 
 		// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
 		// This is done because the C++ side isn't aware of any padding applied in order to get

@@ -6,7 +6,6 @@ namespace Physics
 {
 	GENERATE_BINDINGS inline TraceResult Trace( TraceInfo traceInfo )
 	{
-		auto& root = ClientRoot::GetInstance();
-		return root.m_physicsManager->Trace( traceInfo );
+		return FindInstance()->m_physicsManager->Trace( traceInfo );
 	}
 }; // namespace Physics

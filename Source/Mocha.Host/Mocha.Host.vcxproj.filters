@@ -1442,12 +1442,6 @@
     <ClInclude Include="editor.h">
       <Filter>Managed\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="entities.h">
-      <Filter>Managed\Bindings</Filter>
-    </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Managed\Bindings</Filter>
-    </ClInclude>
     <ClInclude Include="physics.h">
       <Filter>Managed\Bindings</Filter>
     </ClInclude>

@@ -47,11 +47,9 @@ public:
 
 	GENERATE_BINDINGS inline static LogHistory GetLogHistory()
 	{
-		auto root = ClientRoot::GetInstance();
-
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( root.m_logManager->m_logHistory.size() );
-		logHistory.items = root.m_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( FindInstance()->m_logManager->m_logHistory.size() );
+		logHistory.items = FindInstance()->m_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -89,7 +87,6 @@ protected:
 	{
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
-		auto root = ClientRoot::GetInstance();
 
 		if ( IS_CLIENT )
 		{
@@ -114,12 +111,12 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		root.m_logManager->m_logHistory.emplace_back( logEntry );
+		FindInstance()->m_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
-		if ( root.m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		if ( FindInstance()->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
 		{
-			root.m_logManager->m_logHistory.erase( root.m_logManager->m_logHistory.begin() );
+			FindInstance()->m_logManager->m_logHistory.erase( FindInstance()->m_logManager->m_logHistory.begin() );
 		}
 	}
 
