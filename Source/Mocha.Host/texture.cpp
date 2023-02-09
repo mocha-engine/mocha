@@ -2,17 +2,20 @@
 
 #include <globalvars.h>
 #include <rendermanager.h>
+#include <root.h>
 #include <vkinit.h>
 
-Texture::Texture( const char* name, uint32_t width, uint32_t height )
+Texture::Texture( Root* root, const char* name, uint32_t width, uint32_t height )
 {
+	m_parent = root;
+	
 	ImageTextureInfo_t info = {};
 	info.name = std::string( name );
 	info.width = width;
 	info.height = height;
 
 	m_size = { width, height };
-	m_image = ImageTexture( info );
+	m_image = ImageTexture( m_parent, info );
 }
 
 void Texture::SetData( uint32_t width, uint32_t height, uint32_t mipCount, UtilArray mipData, int _imageFormat )

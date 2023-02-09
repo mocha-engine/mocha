@@ -848,6 +848,7 @@ void VulkanRenderContext::CreateRenderTargets()
 	vkImageTexture.format = m_colorTarget.format;
 
 	m_fullScreenTri.imageTexture = {};
+	m_fullScreenTri.imageTexture.m_parent = m_parent;
 	m_fullScreenTri.imageTexture.m_handle = m_imageTextures.Add( vkImageTexture );
 }
 
@@ -1065,7 +1066,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		bufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 
-		m_fullScreenTri.vertexBuffer = VertexBuffer( bufferInfo );
+		m_fullScreenTri.vertexBuffer = VertexBuffer( m_parent, bufferInfo );
 
 		BufferUploadInfo_t uploadInfo = {};
 		uploadInfo.data = {};
@@ -1087,7 +1088,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		bufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		bufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
 
-		m_fullScreenTri.indexBuffer = IndexBuffer( bufferInfo );
+		m_fullScreenTri.indexBuffer = IndexBuffer( m_parent, bufferInfo );
 
 		BufferUploadInfo_t uploadInfo = {};
 		uploadInfo.data = {};
@@ -1118,7 +1119,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 	descriptorInfo.name = "Fullscreen triangle descriptor";
 	descriptorInfo.bindings = std::vector<DescriptorBindingInfo_t>{ colorTextureBinding };
 
-	m_fullScreenTri.descriptor = Descriptor( descriptorInfo );
+	m_fullScreenTri.descriptor = Descriptor( m_parent, descriptorInfo );
 
 	VertexAttributeInfo_t positionAttribute = {};
 	positionAttribute.format = VERTEX_ATTRIBUTE_FORMAT_FLOAT3;
@@ -1162,7 +1163,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 		pipelineInfo.shaderInfo.fragmentShaderData = fragmentShaderBits;
 	}
 
-	m_fullScreenTri.pipeline = Pipeline( pipelineInfo );
+	m_fullScreenTri.pipeline = Pipeline( m_parent, pipelineInfo );
 }
 
 void VulkanRenderContext::CreateAllocator()

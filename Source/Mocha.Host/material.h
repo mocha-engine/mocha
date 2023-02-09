@@ -4,6 +4,8 @@
 #include <texture.h>
 #include <vector>
 
+class Root;
+
 struct InteropVertexAttributeInfo
 {
 	const char* name;
@@ -26,6 +28,8 @@ private:
 	std::vector<uint32_t> m_vertexShaderData;
 	std::vector<uint32_t> m_fragmentShaderData;
 	std::string m_name;
+	
+	Root* m_parent;
 
 public:
 	std::vector<Texture> m_textures;
@@ -42,7 +46,7 @@ public:
 	bool m_ignoreDepth;
 	bool IsDirty() { return m_isDirty.load( std::memory_order_relaxed ); }
 
-	GENERATE_BINDINGS Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes,
+	GENERATE_BINDINGS Material( Root* parent, const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes,
 	    UtilArray textures, SamplerType samplerType, bool ignoreDepth );
 
 	Material( const Material& other ) noexcept

@@ -11,17 +11,27 @@
 #include <texture.h>
 #include <vector>
 
+class Root;
+
 class Model
 {
 private:
 	void UploadMesh( Mesh& mesh );
+
+	Root* m_parent;
 
 public:
 	std::vector<Mesh> m_meshes;
 	bool m_hasIndexBuffer;
 	bool m_isInitialized;
 
-	GENERATE_BINDINGS Model() {}
+	Model() {}
+
+	GENERATE_BINDINGS Model( Root* parent )
+	    : m_parent( parent )
+	{
+	}
+
 	GENERATE_BINDINGS void AddMesh( const char* name, UtilArray vertices, UtilArray indices, Material* material );
 
 	const std::vector<Mesh> GetMeshes() { return m_meshes; }

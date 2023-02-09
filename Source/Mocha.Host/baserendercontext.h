@@ -208,6 +208,13 @@ struct GPUInfo
 class RenderObject
 {
 public:
+	Root* m_parent;
+	
+	RenderObject( Root* parent )
+	    : m_parent( parent )
+	{
+	}
+
 	Handle m_handle = HANDLE_INVALID;
 
 	inline bool IsValid() { return m_handle != HANDLE_INVALID; }
@@ -216,8 +223,11 @@ public:
 class ImageTexture : public RenderObject
 {
 public:
-	ImageTexture() {}
-	ImageTexture( ImageTextureInfo_t info );
+	ImageTexture()
+	    : RenderObject( nullptr )
+	{
+	}
+	ImageTexture( Root* parent, ImageTextureInfo_t info );
 
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
@@ -226,8 +236,11 @@ public:
 class RenderTexture : public RenderObject
 {
 public:
-	RenderTexture() {}
-	RenderTexture( RenderTextureInfo_t info );
+	RenderTexture()
+	    : RenderObject( nullptr )
+	{
+	}
+	RenderTexture( Root* parent, RenderTextureInfo_t info );
 };
 
 // ----------------------------------------
@@ -235,9 +248,11 @@ public:
 class BaseBuffer : public RenderObject
 {
 public:
-	BaseBuffer() {}
-
-	BaseBuffer( BufferInfo_t info );
+	BaseBuffer()
+	    : RenderObject( nullptr )
+	{
+	}
+	BaseBuffer( Root* parent, BufferInfo_t info );
 	void Upload( BufferUploadInfo_t uploadInfo );
 };
 
@@ -245,14 +260,14 @@ class VertexBuffer : public BaseBuffer
 {
 public:
 	VertexBuffer() {}
-	VertexBuffer( BufferInfo_t info );
+	VertexBuffer( Root* parent, BufferInfo_t info );
 };
 
 class IndexBuffer : public BaseBuffer
 {
 public:
 	IndexBuffer() {}
-	IndexBuffer( BufferInfo_t info );
+	IndexBuffer( Root* parent, BufferInfo_t info );
 };
 
 // ----------------------------------------
@@ -260,22 +275,31 @@ public:
 class Pipeline : public RenderObject
 {
 public:
-	Pipeline() {}
-	Pipeline( PipelineInfo_t info );
+	Pipeline()
+	    : RenderObject( nullptr )
+	{
+	}
+	Pipeline( Root* parent, PipelineInfo_t info );
 };
 
 class Descriptor : public RenderObject
 {
 public:
-	Descriptor() {}
-	Descriptor( DescriptorInfo_t info );
+	Descriptor()
+	    : RenderObject( nullptr )
+	{
+	}
+	Descriptor( Root* parent, DescriptorInfo_t info );
 };
 
 class Shader : public RenderObject
 {
 public:
-	Shader() {}
-	Shader( ShaderInfo_t info );
+	Shader()
+	    : RenderObject( nullptr )
+	{
+	}
+	Shader( Root* parent, ShaderInfo_t info );
 };
 
 // ----------------------------------------------------------------------------------------------------

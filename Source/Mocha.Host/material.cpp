@@ -4,14 +4,17 @@
 #include <model.h>
 #include <rendering.h>
 #include <rendermanager.h>
+#include <root.h>
 #include <vkinit.h>
 
-Material::Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes, UtilArray textures,
-    SamplerType samplerType, bool ignoreDepth )
+Material::Material( Root* parent, const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
+    UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth )
 {
-	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();	
+	m_parent = parent;
+
+	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();
 	m_fragmentShaderData = fragmentShaderData.GetData<uint32_t>();
-	
+
 	m_isDirty.store( true );
 
 	auto texturePtrs = textures.GetData<Texture*>();
@@ -63,10 +66,10 @@ void Material::CreateResources()
 		descriptorInfo.bindings.push_back( bindingInfo );
 	}
 
-	m_descriptor = Descriptor( descriptorInfo );
+	m_descriptor = Descriptor( m_parent, descriptorInfo );
 	pipelineInfo.descriptors.push_back( &m_descriptor );
 
-	m_pipeline = Pipeline( pipelineInfo );
+	m_pipeline = Pipeline( m_parent, pipelineInfo );
 
 	m_isDirty.store( false );
 }

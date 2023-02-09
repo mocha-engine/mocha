@@ -10,71 +10,79 @@ FloatCVar renderScale( "render.scale", 1.0f, CVarFlags::Archive, "Multiplier for
 
 // ----------------------------------------------------------------------------------------------------
 
-ImageTexture::ImageTexture( ImageTextureInfo_t info )
+ImageTexture::ImageTexture( Root* parent, ImageTextureInfo_t info )
+    : RenderObject( parent )
 {
-	FindInstance().m_renderContext->CreateImageTexture( info, &m_handle );
+	m_parent->m_renderContext->CreateImageTexture( info, &m_handle );
 }
 
 void ImageTexture::SetData( TextureData_t textureData )
 {
-	FindInstance().m_renderContext->SetImageTextureData( m_handle, textureData );
+	m_parent->m_renderContext->SetImageTextureData( m_handle, textureData );
 }
 
 void ImageTexture::Copy( TextureCopyData_t copyData )
 {
-	FindInstance().m_renderContext->CopyImageTexture( m_handle, copyData );
+	m_parent->m_renderContext->CopyImageTexture( m_handle, copyData );
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-BaseBuffer::BaseBuffer( BufferInfo_t info )
+BaseBuffer::BaseBuffer( Root* parent, BufferInfo_t info )
+    : RenderObject( parent )
 {
-	FindInstance().m_renderContext->CreateBuffer( info, &m_handle );
+	m_parent->m_renderContext->CreateBuffer( info, &m_handle );
 }
 
 void BaseBuffer::Upload( BufferUploadInfo_t uploadInfo )
 {
-	FindInstance().m_renderContext->UploadBuffer( m_handle, uploadInfo );
+	m_parent->m_renderContext->UploadBuffer( m_handle, uploadInfo );
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-VertexBuffer::VertexBuffer( BufferInfo_t info )
+VertexBuffer::VertexBuffer( Root* parent, BufferInfo_t info )
 {
-	FindInstance().m_renderContext->CreateVertexBuffer( info, &m_handle );
+	m_parent = parent;
+	m_parent->m_renderContext->CreateVertexBuffer( info, &m_handle );
 }
 
-IndexBuffer::IndexBuffer( BufferInfo_t info )
+IndexBuffer::IndexBuffer( Root* parent, BufferInfo_t info )
 {
-	FindInstance().m_renderContext->CreateIndexBuffer( info, &m_handle );
-}
-
-// ----------------------------------------------------------------------------------------------------
-
-RenderTexture::RenderTexture( RenderTextureInfo_t info )
-{
-	FindInstance().m_renderContext->CreateRenderTexture( info, &m_handle );
+	m_parent = parent;
+	m_parent->m_renderContext->CreateIndexBuffer( info, &m_handle );
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-Descriptor::Descriptor( DescriptorInfo_t info )
+RenderTexture::RenderTexture( Root* parent, RenderTextureInfo_t info )
+    : RenderObject( parent )
 {
-	FindInstance().m_renderContext->CreateDescriptor( info, &m_handle );
+	m_parent->m_renderContext->CreateRenderTexture( info, &m_handle );
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-Pipeline::Pipeline( PipelineInfo_t info )
+Descriptor::Descriptor( Root* parent, DescriptorInfo_t info )
+    : RenderObject( parent )
 {
-	FindInstance().m_renderContext->CreatePipeline( info, &m_handle );
+	m_parent->m_renderContext->CreateDescriptor( info, &m_handle );
 }
 
 // ----------------------------------------------------------------------------------------------------
 
-Shader::Shader( ShaderInfo_t info )
+Pipeline::Pipeline( Root* parent, PipelineInfo_t info )
+    : RenderObject( parent )
 {
-	FindInstance().m_renderContext->CreateShader( info, &m_handle );
+	m_parent->m_renderContext->CreatePipeline( info, &m_handle );
+}
+
+// ----------------------------------------------------------------------------------------------------
+
+Shader::Shader( Root* parent, ShaderInfo_t info )
+    : RenderObject( parent )
+{
+	m_parent->m_renderContext->CreateShader( info, &m_handle );
 }
 
 // ----------------------------------------------------------------------------------------------------

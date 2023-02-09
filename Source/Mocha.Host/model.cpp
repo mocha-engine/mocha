@@ -4,6 +4,7 @@
 #include <rendering.h>
 #include <rendermanager.h>
 #include <util.h>
+#include <root.h>
 
 void Model::UploadMesh( Mesh& mesh )
 {
@@ -16,7 +17,7 @@ void Model::UploadMesh( Mesh& mesh )
 		vertexBufferInfo.size = mesh.vertices.size;
 		vertexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		vertexBufferInfo.usage = BUFFER_USAGE_FLAG_VERTEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
-		VertexBuffer vertexBuffer( vertexBufferInfo );
+		VertexBuffer vertexBuffer( m_parent, vertexBufferInfo );
 
 		BufferUploadInfo_t vertexUploadInfo = {};
 		vertexUploadInfo.data = mesh.vertices;
@@ -35,7 +36,7 @@ void Model::UploadMesh( Mesh& mesh )
 		indexBufferInfo.size = mesh.indices.size;
 		indexBufferInfo.type = BUFFER_TYPE_VERTEX_INDEX_DATA;
 		indexBufferInfo.usage = BUFFER_USAGE_FLAG_INDEX_BUFFER | BUFFER_USAGE_FLAG_TRANSFER_DST;
-		IndexBuffer indexBuffer( indexBufferInfo );
+		IndexBuffer indexBuffer( m_parent, indexBufferInfo );
 
 		BufferUploadInfo_t indexUploadInfo = {};
 		indexUploadInfo.data = mesh.indices;
