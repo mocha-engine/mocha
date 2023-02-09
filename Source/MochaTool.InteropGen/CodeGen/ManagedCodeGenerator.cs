@@ -10,7 +10,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 	private List<string> GetUsings()
 	{
-		return new() { "System.Runtime.InteropServices", "Mocha.Common" };
+		return new() { "System.Runtime.InteropServices", "System.Runtime.Serialization", "Mocha.Common" };
 	}
 
 	private string GetNamespace()
@@ -143,7 +143,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			{
 				// If we want to return a pointer:
 				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
-				writer.WriteLine( $"var obj = new {returnType}();" );
+				writer.WriteLine( $"var obj = FormatterServices.GetUninitializedObject( typeof( {returnType} ) ) as {returnType};" );
 				writer.WriteLine( $"obj.NativePtr = ptr;" );
 				writer.WriteLine( $"return obj;" );
 			}
@@ -262,7 +262,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			{
 				// If we want to return a pointer:
 				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
-				writer.WriteLine( $"var obj = new {returnType}();" );
+				writer.WriteLine( $"var obj = FormatterServices.GetUninitializedObject( typeof( {returnType} ) ) as {returnType};" );
 				writer.WriteLine( $"obj.instance = ptr;" );
 				writer.WriteLine( $"return obj;" );
 			}
