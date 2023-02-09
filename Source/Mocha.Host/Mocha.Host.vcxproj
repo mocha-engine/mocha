@@ -354,7 +354,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="consolesystem.h" />
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
-    <ClInclude Include="engine.h" />
     <ClInclude Include="entitymanager.h" />
     <ClInclude Include="editor.h" />
     <ClInclude Include="fontawesome.h" />

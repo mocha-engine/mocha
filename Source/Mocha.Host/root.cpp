@@ -57,6 +57,40 @@ void Root::Shutdown()
 	m_logManager->Shutdown();
 }
 
+inline const char* Root::GetProjectPath()
+{
+	std::string str = EngineProperties::LoadedProject.GetValue();
+
+	// Copy string so we can use it out-of-scope
+	char* cstr = new char[str.length() + 1];
+	strcpy_s( cstr, str.length() + 1, str.c_str() );
+
+	return cstr;
+}
+
+inline uint32_t Root::CreateBaseEntity()
+{
+	auto* entityDictionary = m_entityManager;
+
+	BaseEntity baseEntity( &FindInstance() ); // TODO?
+	baseEntity.AddFlag( ENTITY_MANAGED );
+	baseEntity.m_type = "BaseEntity";
+
+	return entityDictionary->AddEntity<BaseEntity>( baseEntity );
+}
+
+inline uint32_t Root::CreateModelEntity()
+{
+	auto* entityDictionary = m_entityManager;
+
+	ModelEntity modelEntity( &FindInstance() ); // TODO?
+	modelEntity.AddFlag( ENTITY_MANAGED );
+	modelEntity.AddFlag( ENTITY_RENDERABLE );
+	modelEntity.m_type = "ModelEntity";
+
+	return entityDictionary->AddEntity<ModelEntity>( modelEntity );
+}
+
 double HiresTimeInSeconds()
 {
 	return std::chrono::duration_cast<std::chrono::duration<double>>(
