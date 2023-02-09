@@ -1,6 +1,13 @@
-steps:
-  - name: Send Notification
-    uses: Retr0-01/better-discord-notification@main
-    with:
-      webhook-url: ${{ secrets.CI_DISCORD_WEBHOOK_PUBLIC }} # It is recommended to store your webhooks using actions secrets
-      embed-color: 'a77267'
+on:
+  push:
+    branches:
+      - '*'
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Notification
+        uses: Retr0-01/better-discord-notification@main
+        with:
+          webhook-url: ${{ secrets.CI_DISCORD_WEBHOOK_PUBLIC }} # It is recommended to store your webhooks using actions secrets
+          embed-color: 'a77267'
