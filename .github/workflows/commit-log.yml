@@ -11,5 +11,6 @@ jobs:
       - name: Send Notification
         uses: Retr0-01/better-discord-notification@main
         with:
-          webhook-url: ${{ secrets.CI_DISCORD_WEBHOOK_PUBLIC }} # It is recommended to store your webhooks using actions secrets
-          embed-color: 'a77267'
+          webhook-url: ${{ secrets.CI_DISCORD_WEBHOOK_PUBLIC }}
+          embed-color: '10973799'
+          footer-icon: 'https://cdn.discordapp.com/attachments/1065470708773298237/1073333438884630619/Mocha.png'
