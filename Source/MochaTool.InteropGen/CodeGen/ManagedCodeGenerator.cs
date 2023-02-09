@@ -66,8 +66,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine( "{" );
 		writer.Indent++;
 
-		writer.WriteLine( "internal IntPtr instance;" );
-		writer.WriteLine( "public IntPtr NativePtr => instance;" );
+		writer.WriteLine( "public IntPtr NativePtr { get; set; }" );
 
 		// Decls
 		writer.WriteLine();
@@ -88,7 +87,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			writer.Indent++;
 
 			var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
-			writer.WriteLine( $"this.instance = this.Ctor( {ctorCallArgs} );" );
+			writer.WriteLine( $"this.NativePtr = this.Ctor( {ctorCallArgs} );" );
 
 			writer.Indent--;
 			writer.WriteLine( "}" );
@@ -132,7 +131,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 			// We need to pass the instance in if this is not a static method
 			if ( !method.IsStatic )
-				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "instance", "IntPtr" ) ).ToList();
+				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "NativePtr", "IntPtr" ) ).ToList();
 
 			// Gather function call arguments. Make sure that we're passing in a pointer for everything
 			var paramNames = paramsAndInstance.Select( x => "ctx.GetPtr( " + x.Name + " )" );
@@ -145,7 +144,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 				// If we want to return a pointer:
 				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
 				writer.WriteLine( $"var obj = new {returnType}();" );
-				writer.WriteLine( $"obj.instance = ptr;" );
+				writer.WriteLine( $"obj.NativePtr = ptr;" );
 				writer.WriteLine( $"return obj;" );
 			}
 			else

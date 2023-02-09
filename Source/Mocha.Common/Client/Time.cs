@@ -13,9 +13,9 @@ public static class Time
 	public static void UpdateFrom( float deltaTime )
 	{
 		Delta = deltaTime;
-		Now = Glue.Engine.GetTime();
+		Now = Engine.GetTime();
 
-		FPS = Glue.Engine.GetFramesPerSecond().CeilToInt();
+		FPS = Engine.GetFramesPerSecond().CeilToInt();
 		FPSHistory.Add( FPS );
 
 		if ( FPSHistory.Count > TimeScale / Delta )

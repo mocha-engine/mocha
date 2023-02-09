@@ -84,6 +84,8 @@ public static class Program
 
 		managedStructWriter.Indent++;
 
+		managedStructWriter.WriteLine( "public IntPtr __Root;" );
+
 		var managedStructBody = string.Join( "\r\n\t", methods.Select( x => $"public IntPtr __{x.Name}_{x.method.Name}MethodPtr;" ) );
 		managedStructWriter.Write( managedStructBody );
 		managedStructWriter.WriteLine();
@@ -108,6 +110,8 @@ public static class Program
 		nativeStructWriter.WriteLine( $"{{" );
 		nativeStructWriter.Indent++;
 
+		nativeStructWriter.WriteLine( "void* __Root;" );
+
 		var nativeStructBody = string.Join( "\r\n\t", methods.Select( x => $"void* __{x.Name}_{x.method.Name}MethodPtr;" ) );
 		nativeStructWriter.Write( nativeStructBody );
 		nativeStructWriter.WriteLine();
@@ -119,6 +123,8 @@ public static class Program
 		nativeStructWriter.WriteLine( "inline UnmanagedArgs args" );
 		nativeStructWriter.WriteLine( $"{{" );
 		nativeStructWriter.Indent++;
+
+		nativeStructWriter.WriteLine( "(void*)&FindInstance()," );
 
 		nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Name}" ) );
 		nativeStructWriter.Write( nativeStructBody );

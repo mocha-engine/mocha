@@ -60,7 +60,7 @@ public class NativeLogger : ILogger
 
 	public List<LogEntry> GetHistory()
 	{
-		var logManager = Glue.Engine.GetRoot().GetLogManager();
+		var logManager = Engine.GetLogManager();
 		var logHistory = logManager.GetLogHistory();
 
 		LogEntry[] logEntries = new LogEntry[logHistory.count];

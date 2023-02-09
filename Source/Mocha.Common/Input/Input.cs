@@ -2,7 +2,7 @@
 
 public static partial class Input
 {
-	private static Glue.InputManager NativeInput => Glue.Engine.GetRoot().GetInputManager();
+	private static Glue.InputManager NativeInput => Engine.GetInputManager();
 
 	public static bool Left => NativeInput.IsButtonDown( 1 );
 	public static bool Middle => NativeInput.IsButtonDown( 2 );

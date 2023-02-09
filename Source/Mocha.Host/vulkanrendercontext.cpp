@@ -3,9 +3,10 @@
 #include <hostmanager.h>
 #include <mesh.h>
 #include <pipeline.h>
+#include <projectmanager.h>
+#include <root.h>
 #include <shadercompiler.h>
 #include <volk.h>
-#include <root.h>
 
 #define VMA_DEBUG_LOG( format, ... )                     \
 	{                                                    \
