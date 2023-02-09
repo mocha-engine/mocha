@@ -5,6 +5,7 @@
 #include <pipeline.h>
 #include <shadercompiler.h>
 #include <volk.h>
+#include <root.h>
 
 #define VMA_DEBUG_LOG( format, ... )                     \
 	{                                                    \
@@ -149,7 +150,7 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 	allocInfo.requiredFlags = VkMemoryPropertyFlags( VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT );
-	
+
 	vmaCreateImage( m_parent->m_allocator, &imageInfo, &allocInfo, &image, &allocation, nullptr );
 
 	VkImageViewCreateInfo viewInfo = VKInit::ImageViewCreateInfo( format, image, GetAspectFlags( textureInfo.type ), 1 );
@@ -178,7 +179,7 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 {
 	// Destroy old image
 	Delete();
-	
+
 	VkFormat imageFormat = ( VkFormat )textureData.imageFormat;
 	uint32_t imageSize = 0;
 
@@ -215,7 +216,7 @@ void VulkanImageTexture::SetData( TextureData_t textureData )
 
 	VmaAllocationCreateInfo allocInfo = {};
 	allocInfo.usage = VMA_MEMORY_USAGE_AUTO;
-	
+
 	vmaCreateImage( m_parent->m_allocator, &imageCreateInfo, &allocInfo, &image, &allocation, nullptr );
 	vmaSetAllocationName( m_parent->m_allocator, allocation, textureInfo.name.c_str() );
 
@@ -604,7 +605,8 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 	vkb::InstanceBuilder builder;
 	vkb::Instance vkbInstance;
 
-	auto ret = builder.set_app_name( ClientRoot::GetInstance().m_projectManager->GetProject().name.c_str() ) // Fuck this
+	auto ret = builder
+	               .set_app_name( ClientRoot::GetInstance().m_projectManager->GetProject().name.c_str() ) // Fuck this
 	               .set_engine_name( ENGINE_NAME )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
@@ -620,7 +622,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 
 	volkLoadInstance( m_instance );
 
-	m_window = std::make_unique<Window>( 1280, 720 );
+	m_window = std::make_unique<Window>( m_parent, 1280, 720 );
 	m_surface = m_window->CreateSurface( m_instance );
 
 	return vkbInstance;

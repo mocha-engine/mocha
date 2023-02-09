@@ -5,6 +5,7 @@
 #include <globalvars.h>
 #include <inputmanager.h>
 #include <projectmanager.h>
+#include <root.h>
 
 #ifdef _IMGUI
 #include <backends/imgui_impl_sdl.h>
@@ -15,16 +16,20 @@
 #include <SDL_syswm.h>
 #include <Windows.h>
 #endif
-#include <clientroot.h>
 
-Window::Window( uint32_t width, uint32_t height )
+Window::Window( Root* parent, uint32_t width, uint32_t height )
 {
+	m_parent = parent;
+
 	SDL_Init( SDL_INIT_VIDEO );
 
 	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN );
 	m_visible = false;
 
-	m_window = SDL_CreateWindow( WINDOW_TITLE, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
+	std::string windowTitle = std::string( m_parent->m_projectManager->GetProject().name + " [" +
+	                                       m_parent->m_projectManager->GetProject().version + "] - " GAME_VERSION );
+	m_window =
+	    SDL_CreateWindow( windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 
 	// Check for any window creation errors and display them to the user. This can be things like, "we failed to create a
 	// window because you don't have a Vulkan-capable GPU", so it's good to catch this early on.
@@ -61,7 +66,7 @@ void Window::Update()
 {
 	SDL_Event e;
 
-	InputState inputState = FindInstance().m_inputManager->GetState();
+	InputState inputState = m_parent->m_inputManager->GetState();
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
@@ -173,5 +178,5 @@ void Window::Update()
 #endif
 	}
 
-	FindInstance().m_inputManager->SetState( inputState );
+	m_parent->m_inputManager->SetState( inputState );
 }

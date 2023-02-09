@@ -5,6 +5,8 @@
 #include <mathtypes.h>
 #include <spdlog/spdlog.h>
 
+class Root;
+
 class Window
 {
 private:
@@ -12,9 +14,10 @@ private:
 	bool m_visible = false;
 	bool m_closeRequested = false;
 	bool m_captureMouse = true;
+	Root* m_parent;
 
 public:
-	Window( uint32_t width, uint32_t height );
+	Window( Root* root, uint32_t width, uint32_t height );
 
 	std::function<void( Size2D newSize )> m_onWindowResized;
 

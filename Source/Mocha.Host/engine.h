@@ -53,12 +53,14 @@ namespace Engine
 
 	GENERATE_BINDINGS inline bool IsServer()
 	{
-		return IS_SERVER;
+		// TODO
+		return false;
 	}
 
 	GENERATE_BINDINGS inline bool IsClient()
 	{
-		return IS_CLIENT;
+		// TODO
+		return true;
 	}
 
 	GENERATE_BINDINGS inline Root* GetRoot()

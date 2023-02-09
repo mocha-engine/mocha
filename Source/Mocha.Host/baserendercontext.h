@@ -1,11 +1,10 @@
 #pragma once
 #include <baseentity.h>
 #include <cstdint>
+#include <cvarmanager.h>
 #include <defs.h>
 #include <string>
 #include <util.h>
-#include <cvarmanager.h>
-
 
 // ----------------------------------------------------------------------------------------------------
 extern FloatCVar renderScale;
@@ -29,6 +28,7 @@ struct Mesh;
 class BaseRenderContext;
 class ImageTexture;
 class Descriptor;
+class Root;
 
 // ----------------------------------------------------------------------------------------------------
 
@@ -333,6 +333,8 @@ inline void ErrorIf( bool condition, RenderStatus status )
 class BaseRenderContext
 {
 protected:
+	Root* m_parent;
+
 	// ----------------------------------------
 	// Internal state
 	// ----------------------------------------
@@ -348,7 +350,6 @@ protected:
 
 	// The current vertex buffer
 	VertexBuffer* m_currentVertexBuffer;
-
 
 	// ----------------------------------------
 	// Objects
@@ -384,9 +385,13 @@ public:
 	// Startup / shutdown
 	// ----------------------------------------
 
+	BaseRenderContext( Root* parent )
+	    : m_parent( parent )
+	{
+	}
+
 	virtual RenderStatus Startup() = 0;
 	virtual RenderStatus Shutdown() = 0;
-
 
 	// ----------------------------------------
 	// Rendering commands
@@ -420,7 +425,6 @@ public:
 	/// </para>
 	/// </returns>
 	virtual RenderStatus EndRendering() = 0;
-
 
 	// ----------------------------------------
 	// Low-level rendering
@@ -486,7 +490,6 @@ public:
 	/// <returns><b>RENDER_STATUS_OK</b> if successful, otherwise an error code</returns>
 	virtual RenderStatus GetGPUInfo( GPUInfo* outInfo ) = 0;
 
-
 	// ----------------------------------------
 	// High-level rendering
 	// ----------------------------------------
@@ -532,7 +535,6 @@ public:
 	/// Did the user try to close the game window?
 	/// </summary>
 	virtual bool GetWindowCloseRequested() = 0;
-
 
 	// ----------------------------------------
 	// ImGui

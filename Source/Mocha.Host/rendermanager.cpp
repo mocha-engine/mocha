@@ -87,20 +87,20 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 
 void RenderManager::Startup()
 {
-	FindInstance().m_renderManager = this;
+	m_parent->m_renderManager = this;
 
-	if ( IS_CLIENT )
+	if ( m_parent->m_executingRealm == REALM_CLIENT )
 	{
 		// Client uses Vulkan for rendering
-		m_renderContext = std::make_unique<VulkanRenderContext>();
+		m_renderContext = std::make_unique<VulkanRenderContext>( m_parent );
 	}
 	else
 	{
 		// Server is headless - use a null render context
-		m_renderContext = std::make_unique<NullRenderContext>();
+		m_renderContext = std::make_unique<NullRenderContext>( m_parent );
 	}
-
-	FindInstance().m_renderContext = m_renderContext.get();
+	
+	m_parent->m_renderContext = m_renderContext.get();
 
 	m_renderContext->Startup();
 }
@@ -111,14 +111,14 @@ void RenderManager::Shutdown()
 }
 
 void RenderManager::RenderEntity( ModelEntity* entity )
-{	
+{
 	// Create and bind constants
 	RenderPushConstants constants = {};
 	constants.modelMatrix = entity->m_transform.GetModelMatrix();
 	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
-	constants.cameraPos = FindInstance().m_cameraPos.ToGLM();
-	constants.time = FindInstance().m_curTime;
-	constants.data.x = ( int )FindInstance().m_debugView;
+	constants.cameraPos = m_parent->m_cameraPos.ToGLM();
+	constants.time = m_parent->m_curTime;
+	constants.data.x = ( int )m_parent->m_debugView;
 
 	std::vector<Vector3> lightPositions = {};
 	lightPositions.push_back( { 0, 4, 4 } );
@@ -146,15 +146,15 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 void RenderManager::DrawOverlaysAndEditor()
 {
 	// Server is headless - no overlays or editor
-	if ( IS_SERVER )
+	if ( m_parent->m_executingRealm == REALM_SERVER )
 		return;
 
 	m_renderContext->BeginImGui();
 	ImGui::NewFrame();
 	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 
-	FindInstance().m_hostManager->Render();
-	FindInstance().m_hostManager->DrawEditor();
+	m_parent->m_hostManager->Render();
+	m_parent->m_hostManager->DrawEditor();
 
 	m_renderContext->EndImGui();
 }
@@ -162,9 +162,9 @@ void RenderManager::DrawOverlaysAndEditor()
 void RenderManager::DrawGame()
 {
 	// Server is headless - don't render
-	if ( IS_SERVER )
+	if ( m_parent->m_executingRealm == REALM_SERVER )
 		return;
-	
+
 	RenderStatus res = m_renderContext->BeginRendering();
 
 	if ( res == RENDER_STATUS_WINDOW_SIZE_INVALID )
@@ -173,7 +173,7 @@ void RenderManager::DrawGame()
 	auto viewProjMatrix = CalculateViewProjMatrix();
 	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
 
-	FindInstance().m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	m_parent->m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( !entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) && !entity->HasFlag( EntityFlags::ENTITY_UI ) )
 			RenderEntity( entity.get() );
 	} );
@@ -181,7 +181,7 @@ void RenderManager::DrawGame()
 	//
 	// Render viewmodels
 	//
-	FindInstance().m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	m_parent->m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) )
 			RenderEntity( entity.get() );
 	} );
@@ -189,7 +189,7 @@ void RenderManager::DrawGame()
 	//
 	// Render UI last
 	//
-	FindInstance().m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
+	m_parent->m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
 		if ( entity->HasFlag( EntityFlags::ENTITY_UI ) )
 			RenderEntity( entity.get() );
 	} );
@@ -205,11 +205,11 @@ glm::mat4 RenderManager::CalculateViewmodelViewProjMatrix()
 	float aspect = ( float )extent.x / ( float )extent.y;
 
 	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( FindInstance().m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = FindInstance().m_cameraPos.ToGLM();
+	glm::vec3 direction = glm::normalize( glm::rotate( m_parent->m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = m_parent->m_cameraPos.ToGLM();
 
 	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, FindInstance().m_cameraZNear, FindInstance().m_cameraZFar );
+	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, m_parent->m_cameraZNear, m_parent->m_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }
@@ -222,12 +222,12 @@ glm::mat4 RenderManager::CalculateViewProjMatrix()
 	float aspect = ( float )extent.x / ( float )extent.y;
 
 	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( FindInstance().m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = FindInstance().m_cameraPos.ToGLM();
+	glm::vec3 direction = glm::normalize( glm::rotate( m_parent->m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = m_parent->m_cameraPos.ToGLM();
 
 	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix = glm::perspective(
-	    glm::radians( FindInstance().m_cameraFov ), aspect, FindInstance().m_cameraZNear, FindInstance().m_cameraZFar );
+	projMatrix =
+	    glm::perspective( glm::radians( m_parent->m_cameraFov ), aspect, m_parent->m_cameraZNear, m_parent->m_cameraZFar );
 
 	return projMatrix * viewMatrix;
 }
