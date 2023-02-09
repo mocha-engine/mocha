@@ -61,9 +61,9 @@ namespace Engine
 		return IS_CLIENT;
 	}
 
-	GENERATE_BINDINGS inline Root GetRoot()
+	GENERATE_BINDINGS inline Root* GetRoot()
 	{
-		return FindInstance();
+		return &FindInstance();
 	}
 
 	GENERATE_BINDINGS inline uint32_t CreateBaseEntity()

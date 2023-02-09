@@ -30,6 +30,11 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
+			var returnsPointer = Utils.IsPointer( method.ReturnType ) && !method.IsConstructor && !method.IsDestructor;
+
+			if ( returnsPointer )
+				returnType = "IntPtr";
+
 			if ( returnType == "string" )
 				returnType = "IntPtr"; // Strings are handled specially - they go from pointer to string using InteropUtils.GetString
 
@@ -61,7 +66,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine( "{" );
 		writer.Indent++;
 
-		writer.WriteLine( "private IntPtr instance;" );
+		writer.WriteLine( "internal IntPtr instance;" );
 		writer.WriteLine( "public IntPtr NativePtr => instance;" );
 
 		// Decls
@@ -104,6 +109,8 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			// We return a pointer to the created object if it's a ctor/dtor, but otherwise we'll do auto-conversions to our managed types
 			var returnType = (method.IsConstructor || method.IsDestructor) ? "IntPtr" : Utils.GetManagedType( method.ReturnType );
 
+			var returnsPointer = Utils.IsPointer( method.ReturnType ) && !method.IsConstructor && !method.IsDestructor;
+
 			// If this is a ctor or dtor, we don't want to be able to call the method manually
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
 
@@ -133,22 +140,33 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			// Function call arguments as comma-separated string
 			var functionCallArgs = string.Join( ", ", paramNames );
 
-			// If we want to return a value:
-			if ( returnType != "void" )
-				writer.Write( "return " );
+			if ( returnsPointer )
+			{
+				// If we want to return a pointer:
+				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
+				writer.WriteLine( $"var obj = new {returnType}();" );
+				writer.WriteLine( $"obj.instance = ptr;" );
+				writer.WriteLine( $"return obj;" );
+			}
+			else
+			{
+				// If we want to return a value:
+				if ( returnType != "void" )
+					writer.Write( "return " );
 
-			// This is a pretty dumb and HACKy way of handling strings
-			if ( returnType == "string" )
-				writer.Write( "ctx.GetString( " );
+				// This is a pretty dumb and HACKy way of handling strings
+				if ( returnType == "string" )
+					writer.Write( "ctx.GetString( " );
 
-			// Call the function..
-			writer.Write( $"_{name}( {functionCallArgs} )" );
+				// Call the function..
+				writer.Write( $"_{name}( {functionCallArgs} )" );
 
-			// Finish string
-			if ( returnType == "string" )
-				writer.Write( ")" );
+				// Finish string
+				if ( returnType == "string" )
+					writer.Write( ")" );
 
-			writer.WriteLine( ";" );
+				writer.WriteLine( ";" );
+			}
 
 			writer.Indent--;
 			writer.WriteLine( "}" );
@@ -186,7 +204,9 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
-			if ( returnType == "string" )
+			var returnsPointer = Utils.IsPointer( method.ReturnType ) && !method.IsConstructor && !method.IsDestructor;
+
+			if ( returnType == "string" || returnsPointer )
 				returnType = "IntPtr"; // Strings are handled specially - they go from pointer to string using InteropUtils.GetString
 
 			var parameterTypes = method.Parameters.Select( x => "IntPtr" ); // Everything gets passed as a pointer
@@ -226,6 +246,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var name = method.Name;
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var accessLevel = (method.IsConstructor || method.IsDestructor) ? "private" : "public";
+			var returnsPointer = Utils.IsPointer( method.ReturnType ) && !method.IsConstructor && !method.IsDestructor;
 
 			writer.WriteLine( $"{accessLevel} static {returnType} {name}( {managedCallParams} ) " );
 			writer.WriteLine( "{" );
@@ -238,18 +259,33 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 			var paramNames = @params.Select( x => "ctx.GetPtr( " + x.Name + " )" );
 			var functionCallArgs = string.Join( ", ", paramNames );
 
-			if ( returnType != "void" )
-				writer.Write( "return " );
+			if ( returnsPointer )
+			{
+				// If we want to return a pointer:
+				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
+				writer.WriteLine( $"var obj = new {returnType}();" );
+				writer.WriteLine( $"obj.instance = ptr;" );
+				writer.WriteLine( $"return obj;" );
+			}
+			else
+			{
+				// If we want to return a value:
+				if ( returnType != "void" )
+					writer.Write( "return " );
 
-			if ( returnType == "string" )
-				writer.Write( "ctx.GetString( " );
+				// This is a pretty dumb and HACKy way of handling strings
+				if ( returnType == "string" )
+					writer.Write( "ctx.GetString( " );
 
-			writer.Write( $"_{name}( {functionCallArgs} )" );
+				// Call the function..
+				writer.Write( $"_{name}( {functionCallArgs} )" );
 
-			if ( returnType == "string" )
-				writer.Write( " )" );
+				// Finish string
+				if ( returnType == "string" )
+					writer.Write( ")" );
 
-			writer.WriteLine( ";" );
+				writer.WriteLine( ";" );
+			}
 
 			writer.Indent--;
 			writer.WriteLine( "}" );

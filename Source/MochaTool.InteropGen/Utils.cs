@@ -4,6 +4,12 @@ namespace MochaTool.InteropGen;
 
 static class Utils
 {
+	public static bool IsPointer( string nativeType )
+	{
+		var managedType = GetManagedType( nativeType );
+		return nativeType.Trim().EndsWith( "*" ) && managedType != "string" && managedType != "IntPtr";
+	}
+
 	public static string GetManagedType( string nativeType )
 	{
 		// Trim whitespace from beginning / end (if it exists)
