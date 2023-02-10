@@ -19,20 +19,9 @@ int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cm
 {
 	auto& clientRoot = ClientRoot::GetInstance();
 	clientRoot.Startup();
-	
-	auto& serverRoot = ServerRoot::GetInstance();
-	serverRoot.Startup();
-	
-	// Run the client and server in separate threads
-	std::thread clientThread( [&]() {
-		clientRoot.Run();
-		clientRoot.Shutdown();
-	} );
 
-	std::thread serverThread( [&]() {
-		serverRoot.Run();
-		serverRoot.Shutdown();
-	} );
-	
+	clientRoot.Run();
+	clientRoot.Shutdown();
+
 	return 0;
 }

@@ -19,28 +19,28 @@ public class NativeLogger : ILogger
 	{
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedTrace( str );
+		NativeEngine.GetLogManager().ManagedTrace( str );
 	}
 
 	public void Info( object? obj )
 	{
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedInfo( str );
+		NativeEngine.GetLogManager().ManagedInfo( str );
 	}
 
 	public void Warning( object? obj )
 	{
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedWarning( str );
+		NativeEngine.GetLogManager().ManagedWarning( str );
 	}
 
 	public void Error( object? obj )
 	{
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedError( str );
+		NativeEngine.GetLogManager().ManagedError( str );
 	}
 
 	public struct LogEntry

@@ -19,7 +19,8 @@ public static class Main
 	public static void Run( IntPtr args )
 	{
 		// This MUST be done before everything
-		Microsoft.Build.Locator.MSBuildLocator.RegisterDefaults();
+		if ( !Microsoft.Build.Locator.MSBuildLocator.IsRegistered )
+			Microsoft.Build.Locator.MSBuildLocator.RegisterDefaults();
 
 		// Convert args to structure so we can use the function pointers.
 		// This MUST be done before calling any native functions
@@ -77,7 +78,8 @@ public static class Main
 			SourceRoot = "source\\Mocha.Editor",
 		};
 
-		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
+		if ( Core.IsServer )
+			s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 
 		if ( Core.IsClient )
 			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
@@ -93,7 +95,7 @@ public static class Main
 		if ( Core.IsClient )
 			s_editor.EntryPoint.Startup();
 
-		s_game.EntryPoint.Startup();
+		s_game?.EntryPoint.Startup();
 	}
 
 	[UnmanagedCallersOnly]
@@ -101,7 +103,7 @@ public static class Main
 	{
 		Time.UpdateFrom( NativeEngine.GetTickDeltaTime() );
 
-		s_game.EntryPoint.Update();
+		s_game?.EntryPoint.Update();
 	}
 
 	[UnmanagedCallersOnly]
@@ -111,7 +113,7 @@ public static class Main
 		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
 		Input.Update();
 
-		s_game.EntryPoint.FrameUpdate();
+		s_game?.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]

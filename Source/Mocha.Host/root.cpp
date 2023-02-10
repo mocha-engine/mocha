@@ -11,6 +11,7 @@
 #include <projectmanager.h>
 #include <renderdocmanager.h>
 #include <rendermanager.h>
+#include <serverroot.h>
 #include <stdlib.h>
 
 void Root::Startup()
@@ -193,4 +194,19 @@ void Root::Run()
 		}
 		// #endif
 	}
+}
+
+void Root::CreateListenServer()
+{
+	// Run the server in separate thread
+	std::thread serverThread( [&]() {
+		spdlog::info( "Creating listen server..." );
+	
+		auto& serverRoot = ServerRoot::GetInstance();
+		serverRoot.Startup();
+		serverRoot.Run();
+		serverRoot.Shutdown();
+	} );
+
+	serverThread.detach();
 }

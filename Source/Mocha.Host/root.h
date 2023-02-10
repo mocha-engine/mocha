@@ -96,4 +96,6 @@ public:
 
 	GENERATE_BINDINGS inline void SetCameraZFar( float zfar ) { m_cameraZFar = zfar; }
 	GENERATE_BINDINGS inline float GetCameraZFar() { return m_cameraZFar; }
+
+	GENERATE_BINDINGS void CreateListenServer();
 };

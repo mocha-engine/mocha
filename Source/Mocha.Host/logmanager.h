@@ -43,10 +43,10 @@ public:
 
 	std::vector<LogEntryInterop> m_logHistory;
 
-	GENERATE_BINDINGS static void ManagedInfo( std::string str );
-	GENERATE_BINDINGS static void ManagedWarning( std::string str );
-	GENERATE_BINDINGS static void ManagedError( std::string str );
-	GENERATE_BINDINGS static void ManagedTrace( std::string str );
+	GENERATE_BINDINGS void ManagedInfo( std::string str );
+	GENERATE_BINDINGS void ManagedWarning( std::string str );
+	GENERATE_BINDINGS void ManagedError( std::string str );
+	GENERATE_BINDINGS void ManagedTrace( std::string str );
 
 	GENERATE_BINDINGS inline LogHistory GetLogHistory()
 	{

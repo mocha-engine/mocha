@@ -83,18 +83,17 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 HostManager::HostManager( Root* parent )
     : ISubSystem( parent )
 {
+	// TODO: Hardcoding these might be a bad idea?
+	std::wstring basePath = L".\\build\\Mocha.Hotload";
+	std::wstring signature = L"Mocha.Hotload.Main, Mocha.Hotload";
+
+	m_dllPath = basePath + L".dll";
+	m_configPath = basePath + L".runtimeconfig.json";
+	m_signature = signature;
+	
 	if ( !IsAssemblyLoaded.load() )
 	{
 		IsAssemblyLoaded.store( true );
-
-		// TODO: Hardcoding these might be a bad idea?
-		std::wstring basePath = L".\\build\\Mocha.Hotload";
-		std::wstring signature = L"Mocha.Hotload.Main, Mocha.Hotload";
-
-		m_dllPath = basePath + L".dll";
-		m_configPath = basePath + L".runtimeconfig.json";
-		m_signature = signature;
-
 		LoadFnPtr.store( HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() ) );
 	}
 }

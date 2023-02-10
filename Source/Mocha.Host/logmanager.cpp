@@ -17,10 +17,16 @@ void LogManager::Startup()
 	auto mochaSink = std::make_shared<MochaSinkMT>();
 
 	// Register loggers if they don't exist
-	if ( !spdlog::get( "managed" ) )
+	if ( !spdlog::get( "managed-cl" ) )
 	{
-		auto managed = std::make_shared<spdlog::logger>( "managed", mochaSink );
-		spdlog::register_logger( managed );
+		auto logger = std::make_shared<spdlog::logger>( "managed-cl", mochaSink );
+		spdlog::register_logger( logger );
+	}
+
+	if ( !spdlog::get( "managed-sv" ) )
+	{
+		auto logger = std::make_shared<spdlog::logger>( "managed-sv", mochaSink );
+		spdlog::register_logger( logger );
 	}
 
 	if ( !spdlog::get( "main" ) )
@@ -38,20 +44,36 @@ void LogManager::Startup()
 
 void LogManager::ManagedInfo( std::string str )
 {
-	spdlog::get( "managed" )->info( str );
+	if ( m_parent->m_executingRealm == REALM_CLIENT )
+		spdlog::get( "managed-cl" )->info( str );
+
+	if ( m_parent->m_executingRealm == REALM_SERVER )
+		spdlog::get( "managed-sv" )->info( str );
 }
 
 void LogManager::ManagedWarning( std::string str )
 {
-	spdlog::get( "managed" )->warn( str );
+	if ( m_parent->m_executingRealm == REALM_CLIENT )
+		spdlog::get( "managed-cl" )->warn( str );
+
+	if ( m_parent->m_executingRealm == REALM_SERVER )
+		spdlog::get( "managed-sv" )->warn( str );
 }
 
 void LogManager::ManagedError( std::string str )
 {
-	spdlog::get( "managed" )->error( str );
+	if ( m_parent->m_executingRealm == REALM_CLIENT )
+		spdlog::get( "managed-cl" )->error( str );
+
+	if ( m_parent->m_executingRealm == REALM_SERVER )
+		spdlog::get( "managed-sv" )->error( str );
 }
 
 void LogManager::ManagedTrace( std::string str )
 {
-	spdlog::get( "managed" )->trace( str );
+	if ( m_parent->m_executingRealm == REALM_CLIENT )
+		spdlog::get( "managed-cl" )->trace( str );
+
+	if ( m_parent->m_executingRealm == REALM_SERVER )
+		spdlog::get( "managed-sv" )->trace( str );
 }

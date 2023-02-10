@@ -21,7 +21,7 @@ public static partial class ConsoleOverlay
 
 			var logEntries = Log.GetHistory().TakeLast( Count ).ToArray();
 
-			for ( int i = 0; i < Count; ++i )
+			for ( int i = 0; i < logEntries.Length; ++i )
 			{
 				var logEntry = logEntries[i];
 				var alpha = i / (float)Count;
