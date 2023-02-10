@@ -1,15 +1,38 @@
+#include <Windows.h>
+#include <clientroot.h>
 #include <globalvars.h>
 #include <iostream>
-#include <clientroot.h>
-#include <Windows.h>
+#include <serverroot.h>
+#include <thread>
+
+void ClientThread( Root& root )
+{
+	root.Run();
+}
+
+void ListenServerThread( Root& root )
+{
+	root.Run();
+}
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 {
-	auto& root = ClientRoot::GetInstance();
+	auto& clientRoot = ClientRoot::GetInstance();
+	clientRoot.Startup();
+	
+	auto& serverRoot = ServerRoot::GetInstance();
+	serverRoot.Startup();
+	
+	// Run the client and server in separate threads
+	std::thread clientThread( [&]() {
+		clientRoot.Run();
+		clientRoot.Shutdown();
+	} );
 
-	root.Startup();
-	root.Run();
-	root.Shutdown();
-
+	std::thread serverThread( [&]() {
+		serverRoot.Run();
+		serverRoot.Shutdown();
+	} );
+	
 	return 0;
 }
