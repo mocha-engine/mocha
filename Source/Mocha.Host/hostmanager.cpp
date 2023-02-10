@@ -83,15 +83,20 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 HostManager::HostManager( Root* parent )
     : ISubSystem( parent )
 {
-	// TODO: Hardcoding these might be a bad idea?
-	std::wstring basePath = L".\\build\\Mocha.Hotload";
-	std::wstring signature = L"Mocha.Hotload.Main, Mocha.Hotload";
+	if ( !IsAssemblyLoaded.load() )
+	{
+		IsAssemblyLoaded.store( true );
 
-	m_dllPath = basePath + L".dll";
-	m_configPath = basePath + L".runtimeconfig.json";
-	m_signature = signature;
+		// TODO: Hardcoding these might be a bad idea?
+		std::wstring basePath = L".\\build\\Mocha.Hotload";
+		std::wstring signature = L"Mocha.Hotload.Main, Mocha.Hotload";
 
-	m_lagfp = HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() );
+		m_dllPath = basePath + L".dll";
+		m_configPath = basePath + L".runtimeconfig.json";
+		m_signature = signature;
+
+		LoadFnPtr.store( HostGlobals::GetDotnetLoadAssembly( m_configPath.c_str() ) );
+	}
 }
 
 void HostManager::Update()
@@ -156,8 +161,8 @@ inline void HostManager::Invoke( std::string _method, void* params, const char_t
 
 	// Function pointer to managed delegate
 	void* fnPtr = nullptr;
-
-	int rc = m_lagfp( m_dllPath.c_str(), m_signature.c_str(), method.c_str(), delegateTypeName, nullptr, ( void** )&fnPtr );
+	
+	int rc = LoadFnPtr.load()( m_dllPath.c_str(), m_signature.c_str(), method.c_str(), delegateTypeName, nullptr, ( void** )&fnPtr );
 
 	if ( fnPtr == nullptr )
 	{

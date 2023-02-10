@@ -11,6 +11,7 @@
 #include <string>
 #include <subsystem.h>
 #include <tuple>
+#include <atomic>
 
 using string_t = std::basic_string<char_t>;
 
@@ -35,6 +36,9 @@ namespace HostGlobals
 	load_assembly_and_get_function_pointer_fn GetDotnetLoadAssembly( const char_t* configPath );
 
 }; // namespace HostGlobals
+
+inline static std::atomic<bool> IsAssemblyLoaded = false;
+inline static std::atomic<load_assembly_and_get_function_pointer_fn> LoadFnPtr;
 
 class HostManager : ISubSystem
 {

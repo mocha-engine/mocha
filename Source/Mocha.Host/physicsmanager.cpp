@@ -23,10 +23,14 @@ static void TraceImpl( const char* inFMT, ... )
 PhysicsManager::PhysicsManager( Root* parent )
     : ISubSystem( parent )
 {
-	JPH::RegisterDefaultAllocator();
-	JPH::Trace = TraceImpl;
-	JPH::Factory::sInstance = new JPH::Factory();
-	JPH::RegisterTypes();
+	if ( !AreTypesRegistered.load() )
+	{
+		AreTypesRegistered.store( true );
+		JPH::RegisterDefaultAllocator();
+		JPH::Trace = TraceImpl;
+		JPH::Factory::sInstance = new JPH::Factory();
+		JPH::RegisterTypes();
+	}
 
 	m_physicsInstance = std::make_shared<PhysicsInstance>();
 

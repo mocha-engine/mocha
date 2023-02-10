@@ -1,4 +1,5 @@
 #pragma once
+#include <atomic>
 #include <clientroot.h>
 #include <defs.h>
 #include <globalvars.h>
@@ -26,6 +27,8 @@ struct LogHistory
 	int count;
 	LogEntryInterop* items;
 };
+
+inline std::atomic<bool> IsInitialized = false;
 
 class LogManager : ISubSystem
 {
@@ -88,16 +91,11 @@ protected:
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
 
-		if ( m_parent->m_executingRealm == REALM_CLIENT )
-		{
-			// In client, use visual studio's output window
-			OutputDebugStringA( fmt::to_string( formatted ).c_str() );
-		}
-		else
-		{
-			// Servers use the console
-			std::cout << fmt::to_string( formatted );
-		}
+		// In client, use visual studio's output window
+		OutputDebugStringA( fmt::to_string( formatted ).c_str() );
+
+		// Servers use the console
+		std::cout << fmt::to_string( formatted );
 
 		// Format everything to std::string
 		std::string time = TimePointToString( msg.time );
@@ -111,19 +109,17 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		m_parent->m_logManager->m_logHistory.emplace_back( logEntry );
+		// TODO: I have no idea how we're going to replace this
+		// m_parent->m_logManager->m_logHistory.emplace_back( logEntry );
 
-		// If we have more than 128 messages in the log history, start getting rid
-		if ( m_parent->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
-		{
-			m_parent->m_logManager->m_logHistory.erase( m_parent->m_logManager->m_logHistory.begin() );
-		}
+		//// If we have more than 128 messages in the log history, start getting rid
+		// if ( m_parent->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		//{
+		//	m_parent->m_logManager->m_logHistory.erase( m_parent->m_logManager->m_logHistory.begin() );
+		// }
 	}
 
 	void flush_() override { std::cout << std::flush; }
-
-public:
-	Root* m_parent;
 };
 
 using MochaSinkMT = MochaSink<std::mutex>;

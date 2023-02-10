@@ -1,5 +1,6 @@
 #pragma once
 #include <Jolt/Jolt.h>
+#include <atomic>
 #include <handlemap.h>
 #include <mathtypes.h>
 #include <memory>
@@ -231,6 +232,8 @@ namespace JoltConversions
 		return q.Normalized();
 	}
 }; // namespace JoltConversions
+
+inline static std::atomic<bool> AreTypesRegistered = false;
 
 class PhysicsManager : HandleMap<PhysicsBody>, ISubSystem
 {

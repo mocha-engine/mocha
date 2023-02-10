@@ -6,19 +6,30 @@
 
 void LogManager::Startup()
 {
+	// Only do this once per-app - loggers are shared between
+	// roots, so we don't want to create multiple loggers
+	if ( IsInitialized.load() )
+		return;
+
+	IsInitialized.store( true );
+
 	// Setup spdlog
 	auto mochaSink = std::make_shared<MochaSinkMT>();
-	mochaSink->m_parent = m_parent; // TODO: Move to ctor
 
-	auto managed = std::make_shared<spdlog::logger>( "managed", mochaSink );
-	auto main = std::make_shared<spdlog::logger>( "main", mochaSink );
-	auto renderer = std::make_shared<spdlog::logger>( "renderer", mochaSink );
+	// Register loggers if they don't exist
+	if ( !spdlog::get( "managed" ) )
+	{
+		auto managed = std::make_shared<spdlog::logger>( "managed", mochaSink );
+		spdlog::register_logger( managed );
+	}
 
-	spdlog::register_logger( managed );
-	spdlog::register_logger( main );
-	spdlog::register_logger( renderer );
+	if ( !spdlog::get( "main" ) )
+	{
+		auto main = std::make_shared<spdlog::logger>( "main", mochaSink );
+		spdlog::register_logger( main );
+		spdlog::set_default_logger( main );
+	}
 
-	spdlog::set_default_logger( main );
 	spdlog::set_level( spdlog::level::trace );
 
 	// Set pattern "time logger,8 type,8 message"
