@@ -5,7 +5,7 @@
 
 int main()
 {
-	auto& root = ServerRoot::GetInstance();
+	ServerRoot root = ServerRoot();
 
 	root.Startup();
 	root.Run();

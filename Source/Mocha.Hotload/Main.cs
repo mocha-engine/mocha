@@ -78,8 +78,7 @@ public static class Main
 			SourceRoot = "source\\Mocha.Editor",
 		};
 
-		if ( Core.IsServer )
-			s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
+		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
 
 		if ( Core.IsClient )
 			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );

@@ -607,7 +607,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 	vkb::Instance vkbInstance;
 
 	auto ret = builder
-	               .set_app_name( ClientRoot::GetInstance().m_projectManager->GetProject().name.c_str() ) // Fuck this
+	               .set_app_name( m_parent->m_projectManager->GetProject().name.c_str() ) // Fuck this
 	               .set_engine_name( ENGINE_NAME )
 	               .request_validation_layers( true )
 	               .require_api_version( 1, 3, 0 )
@@ -749,7 +749,7 @@ void VulkanRenderContext::CreateSwapchain()
 	m_window->m_onWindowResized = [&]( Size2D newSize ) {
 		m_swapchain.Update( newSize );
 		CreateRenderTargets();
-		ClientRoot::GetInstance().m_hostManager->FireEvent( "Event.Window.Resized" );
+		m_parent->m_hostManager->FireEvent( "Event.Window.Resized" );
 	};
 }
 

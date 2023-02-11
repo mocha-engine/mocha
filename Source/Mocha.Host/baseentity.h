@@ -26,7 +26,7 @@ protected:
 public:
 	BaseEntity( Root* parent )
 	    : m_parent( parent )
-	    , m_spawnTime( ClientRoot::GetInstance().m_curTick ){};
+	    , m_spawnTime( parent->m_curTick ){};
 
 	virtual ~BaseEntity() {}
 

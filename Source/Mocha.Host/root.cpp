@@ -206,7 +206,7 @@ void Root::CreateListenServer()
 	std::thread serverThread( [&]() {
 		spdlog::info( "Creating listen server..." );
 	
-		auto& serverRoot = ServerRoot::GetInstance();
+		ServerRoot serverRoot = ServerRoot();
 		serverRoot.Startup();
 		serverRoot.Run();
 		serverRoot.Shutdown();

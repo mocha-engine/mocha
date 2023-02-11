@@ -17,7 +17,7 @@ void ListenServerThread( Root& root )
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 {
-	auto& clientRoot = ClientRoot::GetInstance();
+	ClientRoot clientRoot = ClientRoot();
 	clientRoot.Startup();
 
 	clientRoot.Run();
