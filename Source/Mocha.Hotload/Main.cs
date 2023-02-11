@@ -110,7 +110,7 @@ public static class Main
 	public static void Render()
 	{
 		Time.UpdateFrom( NativeEngine.GetFrameDeltaTime() );
-		Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
+		Screen.UpdateFrom( NativeEngine.GetRenderSize() );
 		Input.Update();
 
 		s_game?.EntryPoint.FrameUpdate();

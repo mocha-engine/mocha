@@ -17,7 +17,7 @@ public class Game : IGame
 
 	public void Startup()
 	{
-		ImGuiNative.igSetCurrentContext( Glue.Editor.GetContextPointer() );
+		ImGuiNative.igSetCurrentContext( NativeEngine.GetEditorManager().GetContextPointer() );
 	}
 
 	public void Update()

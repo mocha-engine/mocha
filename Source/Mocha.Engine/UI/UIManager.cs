@@ -41,7 +41,7 @@ public partial class UIManager
 
 		if ( shouldLoad )
 		{
-			Screen.UpdateFrom( Glue.Editor.GetRenderSize() );
+			Screen.UpdateFrom( NativeEngine.GetRenderSize() );
 			RootPanel = Template.FromFile( _renderer, _templatePath );
 			_isDirty = true;
 		}

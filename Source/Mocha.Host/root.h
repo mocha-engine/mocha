@@ -13,6 +13,7 @@ class InputManager;
 class BaseRenderContext;
 class CVarManager;
 class ProjectManager;
+class EditorManager;
 
 class Root
 {
@@ -27,6 +28,7 @@ public:
 	RenderdocManager* m_renderdocManager;
 	EntityManager* m_entityManager;
 	PhysicsManager* m_physicsManager;
+	EditorManager* m_editorManager;
 	InputManager* m_inputManager;
 	BaseRenderContext* m_renderContext;
 	CVarManager* m_cvarManager;
@@ -58,6 +60,7 @@ public:
 	GENERATE_BINDINGS InputManager* GetInputManager() { return m_inputManager; }
 	GENERATE_BINDINGS CVarManager* GetCVarManager() { return m_cvarManager; }
 	GENERATE_BINDINGS PhysicsManager* GetPhysicsManager() { return m_physicsManager; }
+	GENERATE_BINDINGS EditorManager* GetEditorManager() { return m_editorManager; }
 
 	// We aren't using these:
 	// GENERATE_BINDINGS ProjectManager* GetProjectManager() { return m_projectManager; }
@@ -98,4 +101,7 @@ public:
 	GENERATE_BINDINGS inline float GetCameraZFar() { return m_cameraZFar; }
 
 	GENERATE_BINDINGS void CreateListenServer();
+
+	GENERATE_BINDINGS Vector2 GetWindowSize();
+	GENERATE_BINDINGS Vector2 GetRenderSize();
 };

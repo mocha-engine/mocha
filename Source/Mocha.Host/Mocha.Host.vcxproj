@@ -189,6 +189,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
   <ItemGroup>
     <ClCompile Include="clientroot.cpp" />
     <ClCompile Include="cvarmanager.cpp" />
+    <ClCompile Include="editormanager.cpp" />
     <ClCompile Include="globalvars.cpp" />
     <ClCompile Include="hostmanager.cpp" />
     <ClCompile Include="inputmanager.cpp" />
@@ -354,8 +355,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="consolesystem.h" />
     <ClInclude Include="cvarmanager.h" />
     <ClInclude Include="defs.h" />
+    <ClInclude Include="editormanager.h" />
     <ClInclude Include="entitymanager.h" />
-    <ClInclude Include="editor.h" />
     <ClInclude Include="fontawesome.h" />
     <ClInclude Include="mathtypes.h" />
     <ClInclude Include="gitdefs.h" />

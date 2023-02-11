@@ -540,6 +540,9 @@
     <ClCompile Include="serverroot.cpp">
       <Filter>Root</Filter>
     </ClCompile>
+    <ClCompile Include="editormanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="modelentity.h">
@@ -1439,9 +1442,6 @@
     <ClInclude Include="consolesystem.h">
       <Filter>Managed\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="editor.h">
-      <Filter>Managed\Bindings</Filter>
-    </ClInclude>
     <ClInclude Include="shadercompiler.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -1462,6 +1462,9 @@
     </ClInclude>
     <ClInclude Include="serverroot.h">
       <Filter>Root</Filter>
+    </ClInclude>
+    <ClInclude Include="editormanager.h">
+      <Filter>Misc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

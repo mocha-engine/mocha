@@ -9,6 +9,7 @@
 #include <logmanager.h>
 #include <physicsmanager.h>
 #include <projectmanager.h>
+#include <editormanager.h>
 #include <renderdocmanager.h>
 #include <rendermanager.h>
 #include <serverroot.h>
@@ -40,6 +41,9 @@ void Root::Startup()
 	m_renderManager = new RenderManager( this );
 	m_renderManager->Startup();
 
+	m_editorManager = new EditorManager( this );
+	m_editorManager->Startup();
+
 	m_hostManager = new HostManager( this );
 	m_hostManager->Startup();
 }
@@ -47,7 +51,7 @@ void Root::Startup()
 void Root::Shutdown()
 {
 	m_hostManager->Shutdown();
-
+	m_editorManager->Shutdown();
 	m_renderManager->Shutdown();
 	m_inputManager->Shutdown();
 	m_renderdocManager->Shutdown();
@@ -209,4 +213,18 @@ void Root::CreateListenServer()
 	} );
 
 	serverThread.detach();
+}
+
+Vector2 Root::GetWindowSize()
+{
+	Size2D size;
+	m_renderContext->GetWindowSize( &size );
+	return { ( float )size.x, ( float )size.y };
+}
+
+Vector2 Root::GetRenderSize()
+{
+	Size2D size;
+	m_renderContext->GetRenderSize( &size );
+	return { ( float )size.x, ( float )size.y };
 }
