@@ -419,7 +419,7 @@ inline void CVarSystem::RegisterVariable(
 	// This *must not* have the command flag
 	flags = ( CVarFlags )( flags & ~( CVarFlags::Command ) );
 
-	CVarEntry entry = {};
+	CVarEntry entry( m_parent );
 	entry.m_name = name;
 	entry.m_description = ( description != "" ) ? description : "(no description)";
 	entry.m_flags = flags;
