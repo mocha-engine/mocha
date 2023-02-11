@@ -50,9 +50,6 @@ inline ENUMTYPE operator ^ (ENUMTYPE a, ENUMTYPE b) { return ENUMTYPE(((int)a) ^
 inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((int &)a) ^= ((int)b)); } \
 }
 
-class Root;
-extern Root& FindInstance();
-
 //
 // Engine properties
 //

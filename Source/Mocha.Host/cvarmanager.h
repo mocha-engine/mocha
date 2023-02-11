@@ -70,7 +70,14 @@ private:
 	template <typename T>
 	void SetValue( T value );
 
+	Root* m_parent;
+
 public:
+	CVarEntry( Root* parent )
+	    : m_parent( parent )
+	{
+	}
+
 	std::string m_name;
 	std::string m_description;
 
@@ -124,6 +131,8 @@ private:
 
 	template <typename T>
 	void RegisterVariable( std::string name, T value, CVarFlags flags, std::string description, CVarCallback<T> callback );
+	
+	Root* m_parent;
 
 public:
 	//

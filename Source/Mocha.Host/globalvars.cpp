@@ -5,12 +5,6 @@
 #include <mathtypes.h>
 #include <root.h>
 
-inline Root& FindInstance()
-{
-	static Root& instance = ClientRoot::GetInstance();
-	return instance;
-}
-
 //
 // Engine features
 //
