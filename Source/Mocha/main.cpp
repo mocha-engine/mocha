@@ -1,8 +1,8 @@
+#include <Misc/globalvars.h>
+#include <Root/clientroot.h>
+#include <Root/serverroot.h>
 #include <Windows.h>
-#include <clientroot.h>
-#include <globalvars.h>
 #include <iostream>
-#include <serverroot.h>
 #include <thread>
 
 void ClientThread( Root& root )

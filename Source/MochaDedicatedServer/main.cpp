@@ -1,7 +1,7 @@
-#include <globalvars.h>
+#include <Misc/globalvars.h>
+#include <Root/root.h>
+#include <Root/serverroot.h>
 #include <iostream>
-#include <root.h>
-#include <serverroot.h>
 
 int main()
 {
