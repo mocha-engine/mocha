@@ -15,33 +15,19 @@ public class NativeLogger : ILogger
 		return logStr;
 	}
 
-	public void Trace( object? obj )
+	private void Log( object? obj, Action<string, string> logAction )
 	{
+		var loggerName = Core.IsClient ? "cl" : "sv";
+
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		NativeEngine.GetLogManager().ManagedTrace( str );
+		logAction( loggerName, str );
 	}
 
-	public void Info( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		NativeEngine.GetLogManager().ManagedInfo( str );
-	}
-
-	public void Warning( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		NativeEngine.GetLogManager().ManagedWarning( str );
-	}
-
-	public void Error( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		NativeEngine.GetLogManager().ManagedError( str );
-	}
+	public void Trace( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedTrace );
+	public void Info( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedInfo );
+	public void Warning( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedWarning );
+	public void Error( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedError );
 
 	public struct LogEntry
 	{

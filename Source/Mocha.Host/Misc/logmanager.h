@@ -30,18 +30,42 @@ struct LogHistory
 
 inline std::atomic<bool> IsInitialized = false;
 
+template <typename Mutex>
+class MochaSink;
+
+using MochaSinkMT = MochaSink<std::mutex>;
+using MochaSinkST = MochaSink<spdlog::details::null_mutex>;
+
 class LogManager : ISubSystem
 {
+private:
+	std::shared_ptr<MochaSinkMT> m_sink;
+
+	inline std::shared_ptr<spdlog::logger> GetLogger( std::string loggerName )
+	{
+		std::shared_ptr<spdlog::logger> existingLogger = spdlog::get( loggerName );
+
+		if ( !existingLogger )
+		{
+			auto logger = std::make_shared<spdlog::logger>( loggerName, m_sink );
+			spdlog::register_logger( logger );
+
+			return logger;
+		}
+
+		return existingLogger;
+	}
+
 public:
 	void Startup();
 	void Shutdown(){};
 
 	std::vector<LogEntryInterop> m_logHistory;
 
-	GENERATE_BINDINGS void ManagedInfo( std::string str );
-	GENERATE_BINDINGS void ManagedWarning( std::string str );
-	GENERATE_BINDINGS void ManagedError( std::string str );
-	GENERATE_BINDINGS void ManagedTrace( std::string str );
+	GENERATE_BINDINGS void ManagedInfo( std::string loggerName, std::string str );
+	GENERATE_BINDINGS void ManagedWarning( std::string loggerName, std::string str );
+	GENERATE_BINDINGS void ManagedError( std::string loggerName, std::string str );
+	GENERATE_BINDINGS void ManagedTrace( std::string loggerName, std::string str );
 
 	GENERATE_BINDINGS inline LogHistory GetLogHistory()
 	{
@@ -86,13 +110,16 @@ protected:
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
 
-#if DEDICATED_SERVER
-		// Servers use the console
-		std::cout << fmt::to_string( formatted );
-#else
-		// In client, use visual studio's output window
-		OutputDebugStringA( fmt::to_string( formatted ).c_str() );
-#endif
+		if ( Globals::m_isDedicatedServer )
+		{
+			// Servers use the console
+			std::cout << fmt::to_string( formatted );
+		}
+		else
+		{
+			// In client, use visual studio's output window
+			OutputDebugStringA( fmt::to_string( formatted ).c_str() );
+		}
 
 		// Format everything to std::string
 		std::string time = TimePointToString( msg.time );
@@ -106,7 +133,6 @@ protected:
 		CopyString( &logEntry.level, level );
 		CopyString( &logEntry.message, message );
 
-		// TODO: I have no idea how we're going to replace this
 		Globals::m_logManager->m_logHistory.emplace_back( logEntry );
 
 		// If we have more than 128 messages in the log history, start getting rid
@@ -118,6 +144,3 @@ protected:
 
 	void flush_() override { std::cout << std::flush; }
 };
-
-using MochaSinkMT = MochaSink<std::mutex>;
-using MochaSinkST = MochaSink<spdlog::details::null_mutex>;
