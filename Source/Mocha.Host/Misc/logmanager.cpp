@@ -44,36 +44,38 @@ void LogManager::Startup()
 
 void LogManager::ManagedInfo( std::string str )
 {
-	if ( m_parent->m_executingRealm == REALM_CLIENT )
+	// TODO: executingRealm should probably be specific to the host, and we should probably specify the name of the logger from
+	// within managed code
+	if ( Globals::m_executingRealm == REALM_CLIENT )
 		spdlog::get( "managed-cl" )->info( str );
 
-	if ( m_parent->m_executingRealm == REALM_SERVER )
+	if ( Globals::m_executingRealm == REALM_SERVER )
 		spdlog::get( "managed-sv" )->info( str );
 }
 
 void LogManager::ManagedWarning( std::string str )
 {
-	if ( m_parent->m_executingRealm == REALM_CLIENT )
+	if ( Globals::m_executingRealm == REALM_CLIENT )
 		spdlog::get( "managed-cl" )->warn( str );
 
-	if ( m_parent->m_executingRealm == REALM_SERVER )
+	if ( Globals::m_executingRealm == REALM_SERVER )
 		spdlog::get( "managed-sv" )->warn( str );
 }
 
 void LogManager::ManagedError( std::string str )
 {
-	if ( m_parent->m_executingRealm == REALM_CLIENT )
+	if ( Globals::m_executingRealm == REALM_CLIENT )
 		spdlog::get( "managed-cl" )->error( str );
 
-	if ( m_parent->m_executingRealm == REALM_SERVER )
+	if ( Globals::m_executingRealm == REALM_SERVER )
 		spdlog::get( "managed-sv" )->error( str );
 }
 
 void LogManager::ManagedTrace( std::string str )
 {
-	if ( m_parent->m_executingRealm == REALM_CLIENT )
+	if ( Globals::m_executingRealm == REALM_CLIENT )
 		spdlog::get( "managed-cl" )->trace( str );
 
-	if ( m_parent->m_executingRealm == REALM_SERVER )
+	if ( Globals::m_executingRealm == REALM_SERVER )
 		spdlog::get( "managed-sv" )->trace( str );
 }

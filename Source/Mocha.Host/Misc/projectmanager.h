@@ -10,11 +10,6 @@ private:
 	Project m_project;
 
 public:
-	ProjectManager( Root* parent )
-	    : ISubSystem( parent )
-	{
-	}
-
 	virtual void Startup() override;
 	virtual void Shutdown() override;
 

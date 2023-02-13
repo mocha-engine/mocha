@@ -29,8 +29,6 @@ private:
 	std::vector<uint32_t> m_fragmentShaderData;
 	std::string m_name;
 
-	Root* m_parent;
-
 public:
 	std::vector<Texture> m_textures;
 	std::string m_shaderPath;
@@ -46,7 +44,7 @@ public:
 	bool m_ignoreDepth;
 	bool IsDirty() { return m_isDirty.load( std::memory_order_relaxed ); }
 
-	GENERATE_BINDINGS Material( Root* parent, const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
+	GENERATE_BINDINGS Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
 	    UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth );
 
 	Material( const Material& other ) noexcept

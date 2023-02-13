@@ -80,8 +80,7 @@ load_assembly_and_get_function_pointer_fn HostGlobals::GetDotnetLoadAssembly( co
 	return ( load_assembly_and_get_function_pointer_fn )load_assembly_and_get_function_pointer;
 }
 
-HostManager::HostManager( Root* parent )
-    : ISubSystem( parent )
+HostManager::HostManager()
 {
 	// TODO: Hardcoding these might be a bad idea?
 	std::wstring basePath = L".\\build\\Mocha.Hotload";
@@ -111,7 +110,7 @@ void HostManager::Render()
 void HostManager::Startup()
 {
 	// Set root parent so that this instance can be passed to the host
-	args.__Root = m_parent;
+	// TODO args.__Root = m_parent;
 
 	Invoke( "Run", ( void* )&args );
 }

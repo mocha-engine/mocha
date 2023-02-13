@@ -7,11 +7,9 @@
 #include <Rendering/rendermanager.h>
 #include <Root/root.h>
 
-Material::Material( Root* parent, const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
+Material::Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
     UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth )
 {
-	m_parent = parent;
-
 	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();
 	m_fragmentShaderData = fragmentShaderData.GetData<uint32_t>();
 
@@ -66,10 +64,10 @@ void Material::CreateResources()
 		descriptorInfo.bindings.push_back( bindingInfo );
 	}
 
-	m_descriptor = Descriptor( m_parent, descriptorInfo );
+	m_descriptor = Descriptor( descriptorInfo );
 	pipelineInfo.descriptors.push_back( &m_descriptor );
 
-	m_pipeline = Pipeline( m_parent, pipelineInfo );
+	m_pipeline = Pipeline( pipelineInfo );
 
 	m_isDirty.store( false );
 }

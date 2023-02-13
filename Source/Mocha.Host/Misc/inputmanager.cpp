@@ -8,7 +8,7 @@
 
 #include <imgui.h>
 #define WANTS_CAPTURE \
-	m_parent->m_executingRealm == REALM_CLIENT && ( ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse )
+	Globals::m_executingRealm == REALM_CLIENT && ( ImGui::GetIO().WantCaptureKeyboard || ImGui::GetIO().WantCaptureMouse )
 
 #else
 

@@ -16,14 +16,14 @@ void* EditorManager::GetContextPointer()
 
 void EditorManager::TextBold( const char* text )
 {
-	ImGui::PushFont( m_parent->m_renderContext->m_boldFont );
+	ImGui::PushFont( Globals::m_renderContext->m_boldFont );
 	ImGui::Text( "%s", text );
 	ImGui::PopFont();
 }
 
 void EditorManager::TextSubheading( const char* text )
 {
-	ImGui::PushFont( m_parent->m_renderContext->m_subheadingFont );
+	ImGui::PushFont( Globals::m_renderContext->m_subheadingFont );
 	ImGui::Text( "%s", text );
 	ImGui::Dummy( ImVec2( 0, 2 ) );
 	ImGui::PopFont();
@@ -31,7 +31,7 @@ void EditorManager::TextSubheading( const char* text )
 
 void EditorManager::TextHeading( const char* text )
 {
-	ImGui::PushFont( m_parent->m_renderContext->m_headingFont );
+	ImGui::PushFont( Globals::m_renderContext->m_headingFont );
 	ImGui::Text( "%s", text );
 	ImGui::Dummy( ImVec2( 0, 2 ) );
 	ImGui::PopFont();
@@ -39,7 +39,7 @@ void EditorManager::TextHeading( const char* text )
 
 void EditorManager::TextMonospace( const char* text )
 {
-	ImGui::PushFont( m_parent->m_renderContext->m_monospaceFont );
+	ImGui::PushFont( Globals::m_renderContext->m_monospaceFont );
 	ImGui::Text( "%s", text );
 	ImGui::PopFont();
 }
@@ -53,7 +53,7 @@ void EditorManager::TextLight( const char* text )
 
 const char* EditorManager::GetGPUName()
 {
-	return m_parent->m_renderManager->GetGPUName();
+	return Globals::m_renderManager->GetGPUName();
 }
 
 char* EditorManager::InputText( const char* name, char* inputBuf, int inputLength )
@@ -68,25 +68,25 @@ void EditorManager::RenderViewDropdown()
 	if ( ImGui::BeginMenu( "Debug View" ) )
 	{
 		if ( ImGui::MenuItem( "None" ) )
-			m_parent->m_debugView = RenderDebugViews::NONE;
+			Globals::m_debugView = RenderDebugViews::NONE;
 
 		if ( ImGui::MenuItem( "Diffuse" ) )
-			m_parent->m_debugView = RenderDebugViews::DIFFUSE;
+			Globals::m_debugView = RenderDebugViews::DIFFUSE;
 
 		if ( ImGui::MenuItem( "Normal" ) )
-			m_parent->m_debugView = RenderDebugViews::NORMAL;
+			Globals::m_debugView = RenderDebugViews::NORMAL;
 
 		if ( ImGui::MenuItem( "Ambient Occlusion" ) )
-			m_parent->m_debugView = RenderDebugViews::AMBIENTOCCLUSION;
+			Globals::m_debugView = RenderDebugViews::AMBIENTOCCLUSION;
 
 		if ( ImGui::MenuItem( "Metalness" ) )
-			m_parent->m_debugView = RenderDebugViews::METALNESS;
+			Globals::m_debugView = RenderDebugViews::METALNESS;
 
 		if ( ImGui::MenuItem( "Roughness" ) )
-			m_parent->m_debugView = RenderDebugViews::ROUGHNESS;
+			Globals::m_debugView = RenderDebugViews::ROUGHNESS;
 
 		if ( ImGui::MenuItem( "Other" ) )
-			m_parent->m_debugView = RenderDebugViews::OTHER;
+			Globals::m_debugView = RenderDebugViews::OTHER;
 
 		ImGui::EndMenu();
 	}
@@ -100,7 +100,7 @@ const char* EditorManager::GetVersionName()
 void EditorManager::Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 {
 	void* imguiTextureID;
-	m_parent->m_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
+	Globals::m_renderContext->GetImGuiTextureID( &texture->m_image, &imguiTextureID );
 
 	// Calculate new UVs based on reported textureWidth, textureHeight vs texture->m_size
 	// This is done because the C++ side isn't aware of any padding applied in order to get

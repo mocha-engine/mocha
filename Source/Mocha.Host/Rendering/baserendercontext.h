@@ -208,13 +208,6 @@ struct GPUInfo
 class RenderObject
 {
 public:
-	Root* m_parent;
-
-	RenderObject( Root* parent )
-	    : m_parent( parent )
-	{
-	}
-
 	Handle m_handle = HANDLE_INVALID;
 
 	inline bool IsValid() { return m_handle != HANDLE_INVALID; }
@@ -223,11 +216,8 @@ public:
 class ImageTexture : public RenderObject
 {
 public:
-	ImageTexture()
-	    : RenderObject( nullptr )
-	{
-	}
-	ImageTexture( Root* parent, ImageTextureInfo_t info );
+	ImageTexture() {}
+	ImageTexture( ImageTextureInfo_t info );
 
 	void SetData( TextureData_t textureData );
 	void Copy( TextureCopyData_t copyData );
@@ -236,11 +226,8 @@ public:
 class RenderTexture : public RenderObject
 {
 public:
-	RenderTexture()
-	    : RenderObject( nullptr )
-	{
-	}
-	RenderTexture( Root* parent, RenderTextureInfo_t info );
+	RenderTexture() {}
+	RenderTexture( RenderTextureInfo_t info );
 };
 
 // ----------------------------------------
@@ -248,11 +235,8 @@ public:
 class BaseBuffer : public RenderObject
 {
 public:
-	BaseBuffer()
-	    : RenderObject( nullptr )
-	{
-	}
-	BaseBuffer( Root* parent, BufferInfo_t info );
+	BaseBuffer() {}
+	BaseBuffer( BufferInfo_t info );
 	void Upload( BufferUploadInfo_t uploadInfo );
 };
 
@@ -260,14 +244,14 @@ class VertexBuffer : public BaseBuffer
 {
 public:
 	VertexBuffer() {}
-	VertexBuffer( Root* parent, BufferInfo_t info );
+	VertexBuffer( BufferInfo_t info );
 };
 
 class IndexBuffer : public BaseBuffer
 {
 public:
 	IndexBuffer() {}
-	IndexBuffer( Root* parent, BufferInfo_t info );
+	IndexBuffer( BufferInfo_t info );
 };
 
 // ----------------------------------------
@@ -275,31 +259,22 @@ public:
 class Pipeline : public RenderObject
 {
 public:
-	Pipeline()
-	    : RenderObject( nullptr )
-	{
-	}
-	Pipeline( Root* parent, PipelineInfo_t info );
+	Pipeline() {}
+	Pipeline( PipelineInfo_t info );
 };
 
 class Descriptor : public RenderObject
 {
 public:
-	Descriptor()
-	    : RenderObject( nullptr )
-	{
-	}
-	Descriptor( Root* parent, DescriptorInfo_t info );
+	Descriptor() {}
+	Descriptor( DescriptorInfo_t info );
 };
 
 class Shader : public RenderObject
 {
 public:
-	Shader()
-	    : RenderObject( nullptr )
-	{
-	}
-	Shader( Root* parent, ShaderInfo_t info );
+	Shader() {}
+	Shader( ShaderInfo_t info );
 };
 
 // ----------------------------------------------------------------------------------------------------
@@ -357,8 +332,6 @@ inline void ErrorIf( bool condition, RenderStatus status )
 class BaseRenderContext
 {
 protected:
-	Root* m_parent;
-
 	// ----------------------------------------
 	// Internal state
 	// ----------------------------------------
@@ -408,11 +381,6 @@ public:
 	// ----------------------------------------
 	// Startup / shutdown
 	// ----------------------------------------
-
-	BaseRenderContext( Root* parent )
-	    : m_parent( parent )
-	{
-	}
 
 	virtual RenderStatus Startup() = 0;
 	virtual RenderStatus Shutdown() = 0;

@@ -17,17 +17,15 @@
 #include <Windows.h>
 #endif
 
-Window::Window( Root* parent, uint32_t width, uint32_t height )
+Window::Window( uint32_t width, uint32_t height )
 {
-	m_parent = parent;
-
 	SDL_Init( SDL_INIT_VIDEO );
 
 	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN );
 	m_visible = false;
 
-	std::string windowTitle = std::string( m_parent->m_projectManager->GetProject().name + " [" +
-	                                       m_parent->m_projectManager->GetProject().version + "] - " GAME_VERSION );
+	std::string windowTitle = std::string( Globals::m_projectManager->GetProject().name + " [" +
+	                                       Globals::m_projectManager->GetProject().version + "] - " GAME_VERSION );
 	m_window =
 	    SDL_CreateWindow( windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 
@@ -66,7 +64,7 @@ void Window::Update()
 {
 	SDL_Event e;
 
-	InputState inputState = m_parent->m_inputManager->GetState();
+	InputState inputState = Globals::m_inputManager->GetState();
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
@@ -178,5 +176,5 @@ void Window::Update()
 #endif
 	}
 
-	m_parent->m_inputManager->SetState( inputState );
+	Globals::m_inputManager->SetState( inputState );
 }

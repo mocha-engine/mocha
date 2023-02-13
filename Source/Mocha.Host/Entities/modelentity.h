@@ -25,9 +25,6 @@ private:
 	bool m_ignoreRigidbodyPosition;
 
 public:
-	ModelEntity( Root* parent )
-	    : BaseEntity( parent ){};
-
 	// If this model has no physics, this function will return UINT32_MAX.
 	uint32_t GetPhysicsHandle() { return m_physicsHandle; };
 

@@ -5,5 +5,5 @@
 
 bool ClientRoot::GetQuitRequested()
 {
-	return m_renderContext->GetWindowCloseRequested();
+	return Globals::m_renderContext->GetWindowCloseRequested();
 }

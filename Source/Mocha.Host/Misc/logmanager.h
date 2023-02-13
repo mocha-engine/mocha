@@ -33,11 +33,6 @@ inline std::atomic<bool> IsInitialized = false;
 class LogManager : ISubSystem
 {
 public:
-	LogManager( Root* parent )
-	    : ISubSystem( parent )
-	{
-	}
-
 	void Startup();
 	void Shutdown(){};
 
@@ -51,8 +46,8 @@ public:
 	GENERATE_BINDINGS inline LogHistory GetLogHistory()
 	{
 		LogHistory logHistory = {};
-		logHistory.count = static_cast<int>( m_parent->m_logManager->m_logHistory.size() );
-		logHistory.items = m_parent->m_logManager->m_logHistory.data();
+		logHistory.count = static_cast<int>( Globals::m_logManager->m_logHistory.size() );
+		logHistory.items = Globals::m_logManager->m_logHistory.data();
 
 		return logHistory;
 	}
@@ -91,11 +86,13 @@ protected:
 		spdlog::memory_buf_t formatted;
 		spdlog::sinks::base_sink<Mutex>::formatter_->format( msg, formatted );
 
-		// In client, use visual studio's output window
-		OutputDebugStringA( fmt::to_string( formatted ).c_str() );
-
+#if DEDICATED_SERVER
 		// Servers use the console
 		std::cout << fmt::to_string( formatted );
+#else
+		// In client, use visual studio's output window
+		OutputDebugStringA( fmt::to_string( formatted ).c_str() );
+#endif
 
 		// Format everything to std::string
 		std::string time = TimePointToString( msg.time );
@@ -110,13 +107,13 @@ protected:
 		CopyString( &logEntry.message, message );
 
 		// TODO: I have no idea how we're going to replace this
-		// m_parent->m_logManager->m_logHistory.emplace_back( logEntry );
+		Globals::m_logManager->m_logHistory.emplace_back( logEntry );
 
-		//// If we have more than 128 messages in the log history, start getting rid
-		// if ( m_parent->m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
-		//{
-		//	m_parent->m_logManager->m_logHistory.erase( m_parent->m_logManager->m_logHistory.begin() );
-		// }
+		// If we have more than 128 messages in the log history, start getting rid
+		if ( Globals::m_logManager->m_logHistory.size() > MAX_LOG_MESSAGES )
+		{
+			Globals::m_logManager->m_logHistory.erase( Globals::m_logManager->m_logHistory.begin() );
+		}
 	}
 
 	void flush_() override { std::cout << std::flush; }

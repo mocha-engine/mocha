@@ -13,11 +13,6 @@
 class EntityManager : HandleMap<BaseEntity>, ISubSystem
 {
 public:
-	EntityManager( Root* parent )
-	    : ISubSystem( parent )
-	{
-	}
-
 	template <typename T>
 	Handle AddEntity( T entity );
 

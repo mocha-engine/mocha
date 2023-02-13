@@ -39,7 +39,7 @@ public partial class Model : Model<Vertex>
 [Icon( FontAwesome.Cube ), Title( "Model" )]
 public partial class Model<T> : Asset, IModel where T : struct
 {
-	public Glue.Model NativeModel { get; } = new( NativeEngine );
+	public Glue.Model NativeModel { get; } = new();
 
 	protected void AddMesh( T[] vertices, Material material )
 	{

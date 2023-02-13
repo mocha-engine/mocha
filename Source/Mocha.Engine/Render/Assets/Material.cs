@@ -61,7 +61,6 @@ public class Material : Asset
 		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
 		NativeMaterial = new(
-			NativeEngine,
 			Path,
 			shaderFormat.Data.VertexShaderData.ToInterop(),
 			shaderFormat.Data.FragmentShaderData.ToInterop(),
@@ -100,7 +99,6 @@ public class Material : Asset
 		};
 
 		NativeMaterial = new(
-			NativeEngine,
 			Path,
 			shaderFormat.Data.VertexShaderData.ToInterop(),
 			shaderFormat.Data.FragmentShaderData.ToInterop(),

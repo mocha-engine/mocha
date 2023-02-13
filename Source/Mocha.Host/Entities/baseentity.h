@@ -20,13 +20,9 @@ class Camera;
 
 class BaseEntity
 {
-protected:
-	Root* m_parent;
-
 public:
-	BaseEntity( Root* parent )
-	    : m_parent( parent )
-	    , m_spawnTime( parent->m_curTick ){};
+	BaseEntity()
+	    : m_spawnTime( Globals::m_curTick ){};
 
 	virtual ~BaseEntity() {}
 

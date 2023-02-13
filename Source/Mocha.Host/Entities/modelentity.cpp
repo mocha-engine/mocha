@@ -18,7 +18,7 @@ void ModelEntity::SetSpherePhysics( float radius, bool isStatic )
 	body.shape.shapeData.radius = radius;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_SPHERE;
 
-	m_physicsHandle = m_parent->m_physicsManager->AddBody( this, body );
+	m_physicsHandle = Globals::m_physicsManager->AddBody( this, body );
 }
 
 void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
@@ -36,7 +36,7 @@ void ModelEntity::SetCubePhysics( Vector3 bounds, bool isStatic )
 	body.shape.shapeData.extents = bounds;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_BOX;
 
-	m_physicsHandle = m_parent->m_physicsManager->AddBody( this, body );
+	m_physicsHandle = Globals::m_physicsManager->AddBody( this, body );
 }
 
 void ModelEntity::SetMeshPhysics( UtilArray interopVertices )
@@ -56,5 +56,5 @@ void ModelEntity::SetMeshPhysics( UtilArray interopVertices )
 	body.shape.shapeData.vertices = vertices;
 	body.shape.shapeType = PhysicsShapeType::PHYSICS_SHAPE_MESH;
 
-	m_physicsHandle = m_parent->m_physicsManager->AddBody( this, body );
+	m_physicsHandle = Globals::m_physicsManager->AddBody( this, body );
 }

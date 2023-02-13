@@ -534,11 +534,6 @@ public:
 
 	// ----------------------------------------
 
-	VulkanRenderContext( Root* m_parent )
-	    : BaseRenderContext( m_parent )
-	{
-	}
-
 	/// <inheritdoc />
 	RenderStatus Startup() override;
 	/// <inheritdoc />

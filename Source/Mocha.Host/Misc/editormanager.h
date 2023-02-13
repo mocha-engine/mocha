@@ -9,11 +9,6 @@
 class EditorManager : ISubSystem
 {
 public:
-	EditorManager( Root* parent )
-	    : ISubSystem( parent )
-	{
-	}
-
 	void Startup() override;
 	void Shutdown() override;
 

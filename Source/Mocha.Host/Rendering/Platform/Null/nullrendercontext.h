@@ -32,11 +32,6 @@ protected:
 public:
 	// ----------------------------------------
 
-	NullRenderContext( Root* m_parent )
-	    : BaseRenderContext( m_parent )
-	{
-	}
-
 	/// <inheritdoc />
 	RenderStatus Startup() override { return RENDER_STATUS_OK; }
 	/// <inheritdoc />

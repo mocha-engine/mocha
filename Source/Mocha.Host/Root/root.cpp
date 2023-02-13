@@ -17,49 +17,49 @@
 
 void Root::Startup()
 {
-	m_logManager = new LogManager( this );
-	m_logManager->Startup();
+	Globals::m_logManager = new LogManager();
+	Globals::m_logManager->Startup();
 
-	m_cvarManager = new CVarManager( this );
-	m_cvarManager->Startup();
+	Globals::m_cvarManager = new CVarManager();
+	Globals::m_cvarManager->Startup();
 
-	m_projectManager = new ProjectManager( this );
-	m_projectManager->Startup();
+	Globals::m_projectManager = new ProjectManager();
+	Globals::m_projectManager->Startup();
 
-	m_entityManager = new EntityManager( this );
-	m_entityManager->Startup();
+	Globals::m_entityManager = new EntityManager();
+	Globals::m_entityManager->Startup();
 
-	m_physicsManager = new PhysicsManager( this );
-	m_physicsManager->Startup();
+	Globals::m_physicsManager = new PhysicsManager();
+	Globals::m_physicsManager->Startup();
 
-	m_renderdocManager = new RenderdocManager( this );
-	m_renderdocManager->Startup();
+	Globals::m_renderdocManager = new RenderdocManager();
+	Globals::m_renderdocManager->Startup();
 
-	m_inputManager = new InputManager( this );
-	m_inputManager->Startup();
+	Globals::m_inputManager = new InputManager();
+	Globals::m_inputManager->Startup();
 
-	m_renderManager = new RenderManager( this );
-	m_renderManager->Startup();
+	Globals::m_renderManager = new RenderManager();
+	Globals::m_renderManager->Startup();
 
-	m_editorManager = new EditorManager( this );
-	m_editorManager->Startup();
+	Globals::m_editorManager = new EditorManager();
+	Globals::m_editorManager->Startup();
 
-	m_hostManager = new HostManager( this );
-	m_hostManager->Startup();
+	Globals::m_hostManager = new HostManager();
+	Globals::m_hostManager->Startup();
 }
 
 void Root::Shutdown()
 {
-	m_hostManager->Shutdown();
-	m_editorManager->Shutdown();
-	m_renderManager->Shutdown();
-	m_inputManager->Shutdown();
-	m_renderdocManager->Shutdown();
-	m_physicsManager->Shutdown();
-	m_entityManager->Shutdown();
-	m_projectManager->Shutdown();
-	m_cvarManager->Shutdown();
-	m_logManager->Shutdown();
+	Globals::m_hostManager->Shutdown();
+	Globals::m_editorManager->Shutdown();
+	Globals::m_renderManager->Shutdown();
+	Globals::m_inputManager->Shutdown();
+	Globals::m_renderdocManager->Shutdown();
+	Globals::m_physicsManager->Shutdown();
+	Globals::m_entityManager->Shutdown();
+	Globals::m_projectManager->Shutdown();
+	Globals::m_cvarManager->Shutdown();
+	Globals::m_logManager->Shutdown();
 }
 
 const char* Root::GetProjectPath()
@@ -75,9 +75,9 @@ const char* Root::GetProjectPath()
 
 uint32_t Root::CreateBaseEntity()
 {
-	auto* entityDictionary = m_entityManager;
+	auto* entityDictionary = Globals::m_entityManager;
 
-	BaseEntity baseEntity( this );
+	BaseEntity baseEntity = {};
 	baseEntity.AddFlag( ENTITY_MANAGED );
 	baseEntity.m_type = "BaseEntity";
 
@@ -86,9 +86,9 @@ uint32_t Root::CreateBaseEntity()
 
 uint32_t Root::CreateModelEntity()
 {
-	auto* entityDictionary = m_entityManager;
+	auto* entityDictionary = Globals::m_entityManager;
 
-	ModelEntity modelEntity( this );
+	ModelEntity modelEntity = {};
 	modelEntity.AddFlag( ENTITY_MANAGED );
 	modelEntity.AddFlag( ENTITY_RENDERABLE );
 	modelEntity.m_type = "ModelEntity";
@@ -105,9 +105,9 @@ double HiresTimeInSeconds()
 
 void Root::Run()
 {
-	m_hostManager->FireEvent( "Event.Game.Load" );
+	Globals::m_hostManager->FireEvent( "Event.Game.Load" );
 
-	double logicDelta = 1.0 / m_projectManager->GetProject().properties.tickRate;
+	double logicDelta = 1.0 / Globals::m_projectManager->GetProject().properties.tickRate;
 
 	double currentTime = HiresTimeInSeconds();
 	double accumulator = 0.0;
@@ -142,21 +142,21 @@ void Root::Run()
 		while ( accumulator >= logicDelta )
 		{
 			// Assign previous transforms to all entities
-			m_entityManager->ForEach(
+			Globals::m_entityManager->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
 
-			m_tickDeltaTime = ( float )logicDelta;
+			Globals::m_tickDeltaTime = ( float )logicDelta;
 
 			// Update physics
-			m_physicsManager->Update();
+			Globals::m_physicsManager->Update();
 
 			// Update game
-			m_hostManager->Update();
+			Globals::m_hostManager->Update();
 
 			// TODO: Server / client
 			// #ifndef DEDICATED_SERVER
 			// Update window
-			m_renderContext->UpdateWindow();
+			Globals::m_renderContext->UpdateWindow();
 			// #endif
 
 			if ( GetQuitRequested() )
@@ -166,15 +166,15 @@ void Root::Run()
 			}
 
 			// Assign current transforms to all entities
-			m_entityManager->ForEach(
+			Globals::m_entityManager->ForEach(
 			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
 
-			m_curTime += logicDelta;
+			Globals::m_curTime += logicDelta;
 			accumulator -= logicDelta;
-			m_curTick++;
+			Globals::m_curTick++;
 		}
 
-		m_frameDeltaTime = ( float )loopDeltaTime;
+		Globals::m_frameDeltaTime = ( float )loopDeltaTime;
 
 		// TODO: Server / client
 		// #ifndef DEDICATED_SERVER
@@ -183,18 +183,18 @@ void Root::Run()
 			const double alpha = accumulator / logicDelta;
 
 			// Assign interpolated transforms to all entities
-			m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+			Globals::m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 				// If this entity was spawned in just now, don't interpolate
-				if ( entity->m_spawnTime == m_curTick )
+				if ( entity->m_spawnTime == Globals::m_curTick )
 					return;
 
 				entity->m_transform =
 				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
 			} );
 
-			m_renderManager->DrawOverlaysAndEditor();
+			Globals::m_renderManager->DrawOverlaysAndEditor();
 
-			m_renderManager->DrawGame();
+			Globals::m_renderManager->DrawGame();
 		}
 		// #endif
 	}
@@ -218,13 +218,13 @@ void Root::CreateListenServer()
 Vector2 Root::GetWindowSize()
 {
 	Size2D size;
-	m_renderContext->GetWindowSize( &size );
+	Globals::m_renderContext->GetWindowSize( &size );
 	return { ( float )size.x, ( float )size.y };
 }
 
 Vector2 Root::GetRenderSize()
 {
 	Size2D size;
-	m_renderContext->GetRenderSize( &size );
+	Globals::m_renderContext->GetRenderSize( &size );
 	return { ( float )size.x, ( float )size.y };
 }
