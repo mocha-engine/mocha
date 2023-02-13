@@ -68,4 +68,6 @@ namespace Globals
 
 	extern RenderDebugViews m_debugView;
 	extern Realm m_executingRealm;
+
+	extern bool m_isDedicatedServer;
 } // namespace Globals

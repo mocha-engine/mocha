@@ -7,11 +7,13 @@
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
 {
-	ClientRoot clientRoot = ClientRoot();
-	clientRoot.Startup();
+	Globals::m_isDedicatedServer = false;
 
-	clientRoot.Run();
-	clientRoot.Shutdown();
+	ClientRoot root = ClientRoot();
+
+	root.Startup();
+	root.Run();
+	root.Shutdown();
 
 	return 0;
 }

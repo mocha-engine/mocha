@@ -5,6 +5,8 @@
 
 int main()
 {
+	Globals::m_isDedicatedServer = true;
+	
 	ServerRoot root = ServerRoot();
 
 	root.Startup();
