@@ -21,4 +21,16 @@ public class Game : BaseGame
 		// Spawn a player
 		var player = new Player();
 	}
+
+	[Event.Tick, ServerOnly]
+	public void Server()
+	{
+		Log.Info( "Hello I am running on the server" );
+	}
+
+	[Event.Tick, ClientOnly]
+	public void Client()
+	{
+		Log.Info( "Hello I am running on the client" );
+	}
 }
