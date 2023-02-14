@@ -110,7 +110,10 @@ public static class Main
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Start.
+		SetServerContext( true );
 		s_server?.EntryPoint.Startup();
+
+		SetServerContext( false );
 		s_editor?.EntryPoint.Startup();
 		s_client?.EntryPoint.Startup();
 	}
