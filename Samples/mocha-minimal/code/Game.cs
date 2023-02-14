@@ -8,7 +8,7 @@ public class Game : BaseGame
 	[HotloadSkip]
 	private UIManager Hud { get; set; }
 
-	public override void Startup()
+	public override void OnStartup()
 	{
 		// Set up UI
 		Hud = new UIManager();

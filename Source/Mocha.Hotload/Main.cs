@@ -8,8 +8,10 @@ namespace Mocha.Hotload;
 
 public static class Main
 {
-	private static ProjectAssembly<IGame> s_game = null!;
 	private static ProjectAssembly<IGame> s_editor = null!;
+
+	private static ProjectAssembly<IGame> s_client = null!;
+	private static ProjectAssembly<IGame> s_server = null!;
 
 	private static ProjectManifest s_manifest;
 	private static FileSystemWatcher s_manifestWatcher = null!;
@@ -24,18 +26,24 @@ public static class Main
 
 		// Convert args to structure so we can use the function pointers.
 		// This MUST be done before calling any native functions
-		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
-		Global.NativeEngine = new Glue.Root();
-		Global.NativeEngine.NativePtr = Global.UnmanagedArgs.__Root;
+		Common.Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
+		NativeEngine = new Glue.Root();
+		NativeEngine.NativePtr = Common.Global.UnmanagedArgs.__Root;
 
 		// Initialize the logger
 		Log = new NativeLogger();
 
+		// We change some behaviour if we're on a dedicated server:
+		// - We don't compile for the client
+		// - We don't run the game in a "client" context
+		// - We don't render or draw anything
+		bool isDedicatedServer = NativeEngine.IsDedicatedServer();
+
 		// TODO: Is there a better way to register these cvars?
 		// Register cvars for assemblies that will never hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Hotload.Main ).Assembly );   // Hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Common.IGame ).Assembly );   // Common
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.BaseGame ).Assembly );       // Engine
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Hotload.Main ).Assembly );  // Hotload
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.Common.IGame ).Assembly );  // Common
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Mocha.BaseGame ).Assembly );      // Engine
 
 		// Initialize upgrader, we do this as early as possible to prevent
 		// slowdowns while the engine is running.
@@ -64,7 +72,15 @@ public static class Main
 		s_manifestWatcher.EnableRaisingEvents = true;
 
 		// Setup project assemblies.
-		var gameAssemblyInfo = new ProjectAssemblyInfo()
+		var serverAssemblyInfo = new ProjectAssemblyInfo()
+		{
+			AssemblyName = s_manifest.Name,
+			ProjectPath = csprojPath,
+			SourceRoot = s_manifest.Resources.Code,
+			IsServer = true
+		};
+
+		var clientAssemblyInfo = new ProjectAssemblyInfo()
 		{
 			AssemblyName = s_manifest.Name,
 			ProjectPath = csprojPath,
@@ -78,10 +94,13 @@ public static class Main
 			SourceRoot = "source\\Mocha.Editor",
 		};
 
-		s_game = new ProjectAssembly<IGame>( gameAssemblyInfo );
+		s_server = new ProjectAssembly<IGame>( serverAssemblyInfo );
 
-		if ( Core.IsClient )
+		if ( !isDedicatedServer )
+		{
+			s_client = new ProjectAssembly<IGame>( clientAssemblyInfo );
 			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
+		}
 
 		// Setup file system.
 		FileSystem.Mounted = new FileSystem(
@@ -91,10 +110,17 @@ public static class Main
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Start.
-		if ( Core.IsClient )
-			s_editor.EntryPoint.Startup();
+		// Bit hacky, but we tell each loaded game whether they're client
+		// or server here.
+		s_server?.EntryPoint.Startup();
+		s_editor?.EntryPoint.Startup();
+		s_client?.EntryPoint.Startup();
+	}
 
-		s_game?.EntryPoint.Startup();
+	private static void SetServerContext( bool isServer )
+	{
+		Core.IsServer = isServer;
+		Core.IsClient = !isServer;
 	}
 
 	[UnmanagedCallersOnly]
@@ -102,7 +128,21 @@ public static class Main
 	{
 		Time.UpdateFrom( NativeEngine.GetTickDeltaTime() );
 
-		s_game?.EntryPoint.Update();
+		if ( s_client != null )
+		{
+			SetServerContext( false );
+			s_client?.EntryPoint.Update();
+
+			Event.Run( s_client.Assembly, Event.TickAttribute.Name );
+		}
+
+		if ( s_server != null )
+		{
+			SetServerContext( true );
+			s_server?.EntryPoint.Update();
+
+			Event.Run( s_server.Assembly, Event.TickAttribute.Name );
+		}
 	}
 
 	[UnmanagedCallersOnly]
@@ -112,16 +152,15 @@ public static class Main
 		Screen.UpdateFrom( NativeEngine.GetRenderSize() );
 		Input.Update();
 
-		s_game?.EntryPoint.FrameUpdate();
+		SetServerContext( false );
+		s_client?.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]
 	public static void DrawEditor()
 	{
-		if ( !Core.IsClient )
-			return;
-
-		s_editor.EntryPoint.FrameUpdate();
+		SetServerContext( false );
+		s_editor?.EntryPoint.FrameUpdate();
 	}
 
 	[UnmanagedCallersOnly]

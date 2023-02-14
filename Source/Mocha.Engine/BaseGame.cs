@@ -53,7 +53,7 @@ public class BaseGame : IGame
 		TryCallMethodOnEntity( "FrameUpdate" );
 	}
 
-	public void Update()
+	public virtual void Update()
 	{
 		if ( Core.IsClient )
 		{
@@ -64,16 +64,16 @@ public class BaseGame : IGame
 			DebugOverlay.screenTextList.Clear();
 			DebugOverlay.currentLine = 0;
 		}
-
-		Event.Run( Event.TickAttribute.Name );
 	}
 
 	public virtual void Shutdown()
 	{
 	}
 
-	public virtual void Startup()
+	public virtual void Startup( bool isServer )
 	{
+		Core.IsServer = isServer;
+		Core.IsClient = !isServer;
 	}
 
 	[Event.Game.Hotload]

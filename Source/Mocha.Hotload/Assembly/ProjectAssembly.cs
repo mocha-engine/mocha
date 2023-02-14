@@ -67,7 +67,10 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 	/// <returns>A task that represents the asynchronous operation.</returns>
 	private async Task Build()
 	{
-		Notify.AddNotification( $"Building...", $"Compiling '{_projectAssemblyInfo.AssemblyName}'", FontAwesome.Spinner );
+		var realmString = _projectAssemblyInfo.IsServer ? "Server" : "Client";
+		var assemblyName = $"'{_projectAssemblyInfo.AssemblyName}' ({realmString})";
+
+		Notify.AddNotification( $"Building...", $"Compiling {assemblyName}", FontAwesome.Spinner );
 		var compileResult = await Compiler.Compile( _projectAssemblyInfo );
 
 		if ( !compileResult.WasSuccessful )
@@ -77,7 +80,7 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 			foreach ( var error in compileResult.Errors! )
 				Log.Error( error );
 
-			Notify.AddError( $"Build failed", $"Failed to compile '{_projectAssemblyInfo.AssemblyName}'\n{errorStr}", FontAwesome.FaceSadTear );
+			Notify.AddError( $"Build failed", $"Failed to compile {assemblyName}\n{errorStr}", FontAwesome.FaceSadTear );
 			return;
 		}
 
@@ -108,7 +111,7 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 		// and assembly in
 		Swap( newAssembly, newInterface );
 
-		Notify.AddNotification( $"Build successful!", $"Compiled '{_projectAssemblyInfo.AssemblyName}'!", FontAwesome.FaceGrinStars );
+		Notify.AddNotification( $"Build successful!", $"Compiled {assemblyName}!", FontAwesome.FaceGrinStars );
 
 		ConsoleSystem.Internal.RegisterAssembly( newAssembly, extraFlags: CVarFlags.Game );
 

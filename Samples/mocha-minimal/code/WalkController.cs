@@ -31,8 +31,11 @@ public class WalkController
 		Event.Register( this );
 	}
 
+	[Event.Tick]
 	public void PredictedUpdate()
 	{
+		DebugOverlay.ScreenText( $"--------------------------------------------------------------------------------" );
+		DebugOverlay.ScreenText( $"{(Core.IsClient ? "Client" : "Server")}" );
 		DebugOverlay.ScreenText( $"Velocity: {Velocity}" );
 		DebugOverlay.ScreenText( $"GroundEntity: {GroundEntity?.Name ?? "None"}" );
 		DebugOverlay.ScreenText( $"IsGrounded: {IsGrounded}" );
@@ -66,6 +69,8 @@ public class WalkController
 		Player.Position = Player.Position + Velocity * Time.Delta;
 
 		CategorizePosition();
+
+		DebugOverlay.ScreenText( $"--------------------------------------------------------------------------------" );
 	}
 
 	private Vector3 GetWishDir()

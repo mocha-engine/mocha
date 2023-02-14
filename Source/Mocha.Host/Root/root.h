@@ -19,6 +19,8 @@ class EditorManager;
 class Root
 {
 protected:
+	inline static Root* m_instance;
+
 	bool m_shouldQuit = false;
 	virtual bool GetQuitRequested() { return false; }
 
@@ -26,6 +28,8 @@ public:
 	void Startup();
 	void Run();
 	void Shutdown();
+
+	static Root* GetInstance() { return m_instance; }
 
 	//
 	// Managed bindings for things we want to access from C#
@@ -51,9 +55,7 @@ public:
 	GENERATE_BINDINGS inline float GetTickDeltaTime() { return Globals::m_tickDeltaTime; }
 	GENERATE_BINDINGS inline float GetFramesPerSecond() { return 1.0f / Globals::m_frameDeltaTime; }
 	GENERATE_BINDINGS inline float GetTime() { return Globals::m_curTime; }
-
-	GENERATE_BINDINGS inline bool IsServer() { return Globals::m_executingRealm == REALM_SERVER; }
-	GENERATE_BINDINGS inline bool IsClient() { return Globals::m_executingRealm == REALM_CLIENT; }
+	GENERATE_BINDINGS inline bool IsDedicatedServer() { return Globals::m_isDedicatedServer; }
 
 	GENERATE_BINDINGS const char* GetProjectPath();
 

@@ -33,13 +33,10 @@ public class Player : Mocha.Player
 		Position = new Vector3( 0.0f, 4.0f, 0.9f );
 	}
 
-	[Event.Tick]
 	public void PredictedUpdate()
 	{
 		UpdateEyeTransform();
 		WalkController.PredictedUpdate();
-
-		DebugOverlay.ScreenText( $"Assembly Hash: {GetType().Assembly.GetHashCode()}" );
 	}
 
 	public override void FrameUpdate()

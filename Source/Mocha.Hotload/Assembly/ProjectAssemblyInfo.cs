@@ -19,4 +19,10 @@ internal readonly struct ProjectAssemblyInfo
 	/// The relative path to the projects csproj file.
 	/// </summary>
 	internal string ProjectPath { get; init; }
+
+	/// <summary>
+	/// Are we building this assembly for the server?
+	/// If not, we can safely assume that it's for the client.
+	/// </summary>
+	internal bool IsServer { get; init; }
 }

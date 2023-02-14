@@ -7,5 +7,9 @@ protected:
 	bool GetQuitRequested() override;
 
 public:
-	ClientRoot() { Globals::m_executingRealm = REALM_CLIENT; }
+	ClientRoot()
+	{
+		m_instance = this;
+		Globals::m_executingRealm = REALM_CLIENT;
+	}
 };
