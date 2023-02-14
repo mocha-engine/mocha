@@ -46,14 +46,14 @@ public class BaseGame : IGame
 		} );
 	}
 
-	public virtual void FrameUpdate()
+	public void FrameUpdate()
 	{
 		UIManager.Instance.Render();
 
 		TryCallMethodOnEntity( "FrameUpdate" );
 	}
 
-	public virtual void Update()
+	public void Update()
 	{
 		if ( Core.IsClient )
 		{
@@ -66,15 +66,27 @@ public class BaseGame : IGame
 		}
 	}
 
-	public virtual void Shutdown()
+	public void Shutdown()
 	{
+		OnShutdown();
 	}
 
-	public virtual void Startup( bool isServer )
+	public void Startup()
 	{
-		Core.IsServer = isServer;
-		Core.IsClient = !isServer;
+		OnStartup();
 	}
+
+	#region "Public API"
+	public virtual void OnStartup()
+	{
+
+	}
+
+	public virtual void OnShutdown()
+	{
+
+	}
+	#endregion
 
 	[Event.Game.Hotload]
 	public void OnHotload()
