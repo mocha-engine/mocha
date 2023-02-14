@@ -15,11 +15,9 @@ public class Game : IGame
 		// Stub
 	}
 
-	public void Startup( bool isServer )
+	public void Startup()
 	{
 		ImGuiNative.igSetCurrentContext( NativeEngine.GetEditorManager().GetContextPointer() );
-		Core.IsServer = isServer;
-		Core.IsClient = !isServer;
 	}
 
 	public void Update()

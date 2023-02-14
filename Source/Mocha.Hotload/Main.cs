@@ -110,8 +110,6 @@ public static class Main
 		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Start.
-		// Bit hacky, but we tell each loaded game whether they're client
-		// or server here.
 		s_server?.EntryPoint.Startup();
 		s_editor?.EntryPoint.Startup();
 		s_client?.EntryPoint.Startup();
@@ -133,7 +131,7 @@ public static class Main
 			SetServerContext( false );
 			s_client?.EntryPoint.Update();
 
-			Event.Run( s_client.Assembly, Event.TickAttribute.Name );
+			Event.Run( s_client!.Assembly, Event.TickAttribute.Name );
 		}
 
 		if ( s_server != null )
@@ -141,7 +139,7 @@ public static class Main
 			SetServerContext( true );
 			s_server?.EntryPoint.Update();
 
-			Event.Run( s_server.Assembly, Event.TickAttribute.Name );
+			Event.Run( s_server!.Assembly, Event.TickAttribute.Name );
 		}
 	}
 
