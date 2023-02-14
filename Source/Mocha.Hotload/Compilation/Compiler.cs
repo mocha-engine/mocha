@@ -135,25 +135,25 @@ internal static class Compiler
 		foreach ( var tree in syntaxTrees )
 		{
 			var root = tree.GetRoot();
-			var methodsToRemove = new List<MethodDeclarationSyntax>();
+			var methodsToStrip = new List<MethodDeclarationSyntax>();
 
 			foreach ( var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>() )
 			{
 				// Which attribute do we want to remove (or, in other words, which realm are we not in)
 				var targetAttribute = assemblyInfo.IsServer ? "ClientOnly" : "ServerOnly";
 
-				var obsoleteAttribute = method.AttributeLists
-					.SelectMany( al => al.Attributes )
-					.Where( a => a.Name.ToString() == targetAttribute )
+				var attributes = method.AttributeLists
+					.SelectMany( x => x.Attributes )
+					.Where( x => x.Name.ToString() == targetAttribute )
 					.FirstOrDefault();
 
-				if ( obsoleteAttribute != null )
+				if ( attributes != null )
 				{
-					methodsToRemove.Add( method );
+					methodsToStrip.Add( method );
 				}
 			}
 
-			root = root.RemoveNodes( methodsToRemove, SyntaxRemoveOptions.KeepNoTrivia );
+			root = root.RemoveNodes( methodsToStrip, SyntaxRemoveOptions.KeepNoTrivia );
 			newSyntaxTrees.Add( root.SyntaxTree );
 		}
 
