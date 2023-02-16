@@ -9,7 +9,7 @@ namespace Mocha.Common;
 
 public static class Global
 {
-	public static ILogger Log { get; set; }
 	public static UnmanagedArgs UnmanagedArgs { get; set; }
-	public static Glue.Root NativeEngine { get; set; }
+	public static Glue.Root NativeEngine { get; set; } = null!;
+	public static ILogger Log { get; set; } = null!;
 }
