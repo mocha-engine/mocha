@@ -32,8 +32,14 @@ public class Server
 
 	public Server( ushort port = 10570 )
 	{
-		_nativeServer = new Glue.ValveSocketServer( "0.0.0.0", port );
+		_nativeServer = new Glue.ValveSocketServer( port );
 		_nativeServer.SetConnectedCallback( CallbackDispatcher.RegisterCallback( Test ) );
+	}
+
+	[Event.Tick]
+	public void OnTick()
+	{
+		_nativeServer.PumpEvents();
 	}
 
 	public void Test()
