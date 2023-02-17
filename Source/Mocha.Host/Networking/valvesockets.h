@@ -3,6 +3,8 @@
 #include <GameNetworkingSockets/steam/steamnetworkingsockets.h>
 #include <GameNetworkingSockets/steam/steamnetworkingtypes.h>
 #include <Misc/defs.h>
+#include <Misc/handlemap.h>
+#include <Util/util.h>
 #include <spdlog/spdlog.h>
 
 inline static bool g_bNetworkingSocketsInitialized = false;
@@ -13,15 +15,15 @@ inline static void InitValveSockets()
 		return;
 
 	g_bNetworkingSocketsInitialized = true;
-	
+
 	SteamDatagramErrMsg errMsg;
-	
+
 	if ( !GameNetworkingSockets_Init( nullptr, errMsg ) )
 	{
 		std::stringstream ss;
 		ss << "GameNetworkingSockets_Init failed.\n";
 		ss << errMsg;
-		
+
 		ErrorMessage( ss.str() );
 	}
 }
@@ -35,6 +37,7 @@ class ValveSocketServer
 private:
 	HSteamListenSocket m_socket = {};
 	ISteamNetworkingSockets* m_interface;
+	HandleMap<HSteamNetConnection> m_connections;
 
 public:
 	GENERATE_BINDINGS ValveSocketServer( const char* ip, int port )
@@ -50,6 +53,16 @@ public:
 		m_socket = m_interface->CreateListenSocketIP( localAddress, 0, nullptr );
 
 		spdlog::info( "Created ValveSocketServer on port {}", port );
+	}
+
+	GENERATE_BINDINGS void SendData( Handle clientHandle, UtilArray interopMessage )
+	{
+		std::shared_ptr<HSteamNetConnection> destination = m_connections.Get( clientHandle );
+
+		std::vector<int32_t> message = interopMessage.GetData<int32_t>();
+
+		m_interface->SendMessageToConnection(
+		    *destination.get(), message.data(), sizeof( int32_t ) * 2, k_nSteamNetworkingSend_Reliable, nullptr );
 	}
 
 	~ValveSocketServer() { m_interface->CloseListenSocket( m_socket ); }

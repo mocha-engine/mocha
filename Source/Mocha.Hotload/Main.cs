@@ -26,9 +26,9 @@ public static class Main
 
 		// Convert args to structure so we can use the function pointers.
 		// This MUST be done before calling any native functions
-		Common.Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
+		Global.UnmanagedArgs = Marshal.PtrToStructure<UnmanagedArgs>( args );
 		NativeEngine = new Glue.Root();
-		NativeEngine.NativePtr = Common.Global.UnmanagedArgs.__Root;
+		NativeEngine.NativePtr = Global.UnmanagedArgs.__Root;
 
 		// Initialize the logger
 		Log = new NativeLogger();
