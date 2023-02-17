@@ -33,6 +33,12 @@ public class Server
 	public Server( ushort port = 10570 )
 	{
 		_nativeServer = new Glue.ValveSocketServer( "0.0.0.0", port );
+		_nativeServer.SetConnectedCallback( CallbackDispatcher.RegisterCallback( Test ) );
+	}
+
+	public void Test()
+	{
+		Log.Trace( "!!!! Test !!!!" );
 	}
 
 	public void OnClientConnected( ConnectedClient client )
