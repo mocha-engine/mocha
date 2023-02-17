@@ -2,6 +2,8 @@
 
 void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t* info )
 {
+	spdlog::info( "ValveSocketClient::OnConnectionStatusChanged, new state: {}", info->m_info.m_eState );
+
 	if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connected )
 	{
 		SteamNetConnectionInfo_t connectionInfo;
