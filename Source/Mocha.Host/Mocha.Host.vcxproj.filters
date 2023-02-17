@@ -1468,6 +1468,7 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Networking\valvesockets.h" />
+    <ClInclude Include="Managed\managedcallback.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

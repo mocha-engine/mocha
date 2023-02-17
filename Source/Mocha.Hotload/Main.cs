@@ -253,6 +253,13 @@ public static class Main
 		ConsoleSystem.Internal.DispatchConVarCallback( name, info.oldValue, info.newValue );
 	}
 
+	[UnmanagedCallersOnly]
+	public static void InvokeCallback( IntPtr handlePtr )
+	{
+		uint handle = (uint)handlePtr.ToInt64();
+		CallbackDispatcher.Invoke( handle );
+	}
+
 	/// <summary>
 	/// Invoked when the game project manifest has changed.
 	/// </summary>

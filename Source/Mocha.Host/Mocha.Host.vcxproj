@@ -360,6 +360,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="Entities\entitymanager.h" />
     <ClInclude Include="Entities\modelentity.h" />
     <ClInclude Include="fontawesome.h" />
+    <ClInclude Include="Managed\managedcallback.h" />
     <ClInclude Include="Managed\Bindings\client.h" />
     <ClInclude Include="Managed\Bindings\consolesystem.h" />
     <ClInclude Include="Managed\hostmanager.h" />

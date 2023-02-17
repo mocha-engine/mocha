@@ -62,9 +62,16 @@ public:
 	void DrawEditor();
 	void FireEvent( std::string eventName );
 
+	// TODO: Remove
 	void DispatchCommand( CVarManagedCmdDispatchInfo info );
+	// TODO: Remove
 	void DispatchStringCVarCallback( CVarManagedVarDispatchInfo<const char*> info );
+	// TODO: Remove
 	void DispatchFloatCVarCallback( CVarManagedVarDispatchInfo<float> info );
+	// TODO: Remove
 	void DispatchBoolCVarCallback( CVarManagedVarDispatchInfo<bool> info );
+	// TODO: Remove
 	void DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info );
+
+	void InvokeCallback( Handle callbackHandle );
 };
