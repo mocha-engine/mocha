@@ -1,4 +1,6 @@
-﻿namespace Mocha;
+﻿using Mocha.Networking;
+
+namespace Mocha;
 
 public class BaseGame : IGame
 {
@@ -73,6 +75,17 @@ public class BaseGame : IGame
 
 	public void Startup()
 	{
+		if ( Core.IsClient )
+		{
+			// Connect to server
+			var client = new Client( "127.0.0.1" );
+		}
+		else
+		{
+			// Host server
+			var server = new Server();
+		}
+
 		OnStartup();
 	}
 

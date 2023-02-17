@@ -543,6 +543,7 @@
     <ClCompile Include="Root\clientroot.cpp">
       <Filter>Root</Filter>
     </ClCompile>
+    <ClCompile Include="Networking\valvesockets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="thirdparty\imgui\imgui_internal.h">
@@ -1466,6 +1467,7 @@
     <ClInclude Include="Util\utilarray.h">
       <Filter>Util</Filter>
     </ClInclude>
+    <ClInclude Include="Networking\valvesockets.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

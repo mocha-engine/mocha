@@ -1,9 +1,9 @@
 ﻿using Steamworks;
 using Steamworks.Data;
 
-namespace Mocha.Networking.Client;
+namespace Mocha.Networking;
 
-public class ClientConnection : ConnectionManager
+internal class ClientConnection : ConnectionManager
 {
 	public override void OnConnecting( ConnectionInfo info )
 	{

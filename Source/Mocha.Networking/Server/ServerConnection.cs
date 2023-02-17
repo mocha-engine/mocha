@@ -3,7 +3,7 @@ using Steamworks.Data;
 
 namespace Mocha.Networking;
 
-public class ServerConnection : SocketManager
+internal class ServerConnection : SocketManager
 {
 	public override void OnConnecting( Connection connection, ConnectionInfo data )
 	{
