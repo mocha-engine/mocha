@@ -9,7 +9,7 @@
 void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t* info )
 {
 	spdlog::info( "ValveSocketServer::OnConnectionStatusChanged, new state: {}", info->m_info.m_eState );
-
+	
 	if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connected )
 	{
 		spdlog::info( "New client connected!" );

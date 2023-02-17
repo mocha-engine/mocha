@@ -8,13 +8,14 @@
 #include <Root/root.h>
 #include <volk.h>
 
+#if 0
 #define VMA_DEBUG_LOG( format, ... )                     \
 	{                                                    \
-		/* Use snprintf->spdlog::trace */                \
 		char buffer[1024];                               \
 		snprintf( buffer, 1024, format, ##__VA_ARGS__ ); \
 		spdlog::trace( buffer );                         \
 	}
+#endif
 
 #define VMA_IMPLEMENTATION
 #include <vk_mem_alloc.h>
