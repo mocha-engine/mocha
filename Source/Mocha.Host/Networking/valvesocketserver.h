@@ -14,10 +14,10 @@ private:
 	HandleMap<HSteamNetConnection> m_connections{};
 
 	ManagedCallback m_connectedCallback{};
-
+	
+public:
 	void OnConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t* info );
 
-public:
 	GENERATE_BINDINGS ValveSocketServer( int port );
 	GENERATE_BINDINGS void SetConnectedCallback( Handle callbackHandle );
 	GENERATE_BINDINGS void SendData( Handle clientHandle, UtilArray interopMessage );

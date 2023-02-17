@@ -19,6 +19,12 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 	}
 }
 
+static ValveSocketServer* s_server;
+static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusChangedCallback_t* pInfo )
+{
+	s_server->OnConnectionStatusChanged( pInfo );
+}
+
 ValveSocketServer::ValveSocketServer( int port )
 {
 	m_interface = SteamNetworkingSockets();
@@ -28,8 +34,7 @@ ValveSocketServer::ValveSocketServer( int port )
 	localAddress.m_port = port;
 
 	SteamNetworkingConfigValue_t options;
-	auto callback = [this]( SteamNetConnectionStatusChangedCallback_t* info ) { OnConnectionStatusChanged( info ); };
-	options.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, static_cast<void*>( &callback ) );
+	options.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, &SteamNetConnectionStatusChangedCallback );
 
 	m_socket = m_interface->CreateListenSocketIP( localAddress, 1, &options );
 

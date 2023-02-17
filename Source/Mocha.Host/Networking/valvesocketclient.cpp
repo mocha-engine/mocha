@@ -28,6 +28,12 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 	}	
 }
 
+static ValveSocketClient* s_client;
+static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusChangedCallback_t* pInfo )
+{
+	s_client->OnConnectionStatusChanged( pInfo );
+}
+
 ValveSocketClient::ValveSocketClient( const char* ip, int port )
 {
 	m_interface = SteamNetworkingSockets();
@@ -38,8 +44,7 @@ ValveSocketClient::ValveSocketClient( const char* ip, int port )
 	remoteAddress.m_port = port;
 
 	SteamNetworkingConfigValue_t options;
-	auto callback = [this]( SteamNetConnectionStatusChangedCallback_t* info ) { OnConnectionStatusChanged( info ); };
-	options.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, static_cast<void*>( &callback ) );
+	options.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, &SteamNetConnectionStatusChangedCallback );
 
 	m_connection = m_interface->ConnectByIPAddress( remoteAddress, 1, &options );
 	spdlog::info( "Client: attempting to connect to {} on port {}", ip, port );
