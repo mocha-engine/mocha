@@ -26,6 +26,7 @@ static class Utils
 			//-------------------------------
 			{ "void",           "void" },
 			{ "uint32_t",       "uint" },
+			{ "int32_t",        "int" },
 			{ "size_t",         "uint" },
 
 			{ "char**",         "ref string" },
@@ -47,6 +48,7 @@ static class Utils
 			// Custom
 			{ "Quaternion",     "Rotation" },
 			{ "InteropStruct",  "IInteropArray" },
+			{ "Handle",         "uint" }
 		};
 
 		// Check if the native type is a reference
