@@ -35,6 +35,7 @@ class InputManager;
 class BaseRenderContext;
 class CVarManager;
 class ProjectManager;
+class NetworkingManager;
 
 struct Vector3;
 struct Quaternion;
@@ -54,6 +55,7 @@ namespace Globals
 	extern BaseRenderContext* m_renderContext;
 	extern CVarManager* m_cvarManager;
 	extern ProjectManager* m_projectManager;
+	extern NetworkingManager* m_networkingManager;
 
 	extern float m_curTime;
 	extern float m_frameDeltaTime;

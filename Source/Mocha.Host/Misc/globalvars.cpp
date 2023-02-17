@@ -35,6 +35,7 @@ namespace Globals
 	BaseRenderContext* m_renderContext;
 	CVarManager* m_cvarManager;
 	ProjectManager* m_projectManager;
+	NetworkingManager* m_networkingManager;
 
 	float m_curTime;
 	float m_frameDeltaTime;
