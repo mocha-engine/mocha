@@ -66,7 +66,13 @@ void ValveSocketServer::PumpEvents()
 		return;
 
 	if ( messageCount < 0 )
-		ErrorMessage( "nice one dickhead" );
+	{
+		std::stringstream ss;
+		ss << "Expected message count 0 or 1, got ";
+		ss << messageCount;
+		ss << " instead.";
+		ErrorMessage( ss.str() );
+	}
 
 	char* ptrData = ( char* )incomingMsg->m_pData;
 	UtilArray data{};
