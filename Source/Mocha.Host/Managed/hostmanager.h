@@ -74,8 +74,6 @@ public:
 	// TODO: Remove
 	void DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info );
 
-	template <typename T>
-	void InvokeCallback( Handle callbackHandle, T* arg );
-	
+	void InvokeCallback( Handle callbackHandle, void* args );
 	void InvokeCallback( Handle callbackHandle );
 };

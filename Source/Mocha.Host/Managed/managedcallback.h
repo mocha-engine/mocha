@@ -11,8 +11,7 @@ public:
 	ManagedCallback() {}
 
 	ManagedCallback( Handle handle );
-	void Invoke();
 
-	template <typename T>
-	void Invoke( T arg );
+	void Invoke();
+	void Invoke( void* args );
 };

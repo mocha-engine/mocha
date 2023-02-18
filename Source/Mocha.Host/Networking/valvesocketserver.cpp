@@ -25,7 +25,7 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		spdlog::info( "New client connected!" );
 
 		m_connections.Add( info->m_hConn );
-		m_clientConnectedCallback.Invoke();
+		m_clientConnectedCallback.Invoke( ( void* )info->m_hConn );
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
 	{

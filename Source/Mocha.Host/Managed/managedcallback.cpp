@@ -9,13 +9,11 @@ ManagedCallback::ManagedCallback( Handle handle )
 
 void ManagedCallback::Invoke()
 {
-	if ( m_handle != HANDLE_INVALID )
-		Globals::m_hostManager->InvokeCallback( m_handle );
+	Invoke( nullptr );
 }
 
-template <typename T>
-void ManagedCallback::Invoke( T arg )
+void ManagedCallback::Invoke( void* args )
 {
 	if ( m_handle != HANDLE_INVALID )
-		Globals::m_hostManager->InvokeCallback<T>( m_handle, arg );
+		Globals::m_hostManager->InvokeCallback( m_handle, args );
 }
