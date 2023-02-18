@@ -37,6 +37,7 @@ ValveSocketServer::ValveSocketServer( int port )
 	options.SetPtr( k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged, &SteamNetConnectionStatusChangedCallback );
 
 	m_socket = m_interface->CreateListenSocketIP( localAddress, 1, &options );
+	m_pollGroup = m_interface->CreatePollGroup();
 
 	spdlog::info( "Created ValveSocketServer on port {}", port );
 }
