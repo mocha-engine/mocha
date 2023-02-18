@@ -9,9 +9,9 @@ public readonly struct CallbackInfo
 		Callback = callback;
 	}
 
-	public void Invoke( params object[] args )
+	public void Invoke( IntPtr arg )
 	{
-		Callback.DynamicInvoke( args );
+		Callback.DynamicInvoke( arg );
 	}
 
 	public void Invoke()

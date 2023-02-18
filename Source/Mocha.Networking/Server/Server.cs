@@ -8,7 +8,7 @@ public class Server
 
 	// I don't like the idea of managing two separate lists (one native,
 	// one managed) for this, but I think it might be unavoidable. :(
-	private List<ConnectedClient> _connectedClients;
+	private List<ConnectedClient> _connectedClients = new();
 
 	/// <summary>
 	/// Represents a client that a server has a connection to
@@ -37,7 +37,7 @@ public class Server
 		//
 		// Register all callbacks so that C++ can invoke stuff herre
 		//
-		_nativeServer.SetClientConnectedCallback( CallbackDispatcher.RegisterCallback( ClientConnected ) );
+		_nativeServer.SetClientConnectedCallback( CallbackDispatcher.RegisterCallback( OnClientConnected ) );
 		_nativeServer.SetClientDisconnectedCallback( CallbackDispatcher.RegisterCallback( ClientDisconnected ) );
 		_nativeServer.SetDataReceivedCallback( CallbackDispatcher.RegisterCallback( DataReceived ) );
 	}
@@ -46,11 +46,6 @@ public class Server
 	{
 		_nativeServer.PumpEvents();
 		_nativeServer.RunCallbacks();
-	}
-
-	public void ClientConnected()
-	{
-		Log.Info( "Managed: Client was connected" );
 	}
 
 	public void ClientDisconnected()
@@ -63,9 +58,13 @@ public class Server
 		Log.Info( "Managed: Data was received" );
 	}
 
-	public void OnClientConnected( ConnectedClient client )
+	public void OnClientConnected( IntPtr clientHandlePtr )
 	{
-		// TODO
+		var clientHandle = (uint)clientHandlePtr;
+		var client = new ConnectedClient( this, clientHandle );
+
+		Log.Info( "Managed: Client was connected" );
+
 		_connectedClients.Add( client );
 
 		// Handshake or something

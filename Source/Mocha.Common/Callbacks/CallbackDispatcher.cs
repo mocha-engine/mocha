@@ -24,8 +24,8 @@ public class CallbackDispatcher
 		_callbacks[callbackId].Invoke();
 	}
 
-	public static void Invoke( uint callbackId, params object[] args )
+	public static void Invoke( uint callbackId, IntPtr arg )
 	{
-		_callbacks[callbackId].Invoke( args );
+		_callbacks[callbackId].Invoke( arg );
 	}
 }

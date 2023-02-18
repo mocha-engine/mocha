@@ -258,12 +258,16 @@ public static class Main
 	}
 
 	[UnmanagedCallersOnly]
-	public static void InvokeCallback( IntPtr handlePtr )
+	public static void InvokeCallback( IntPtr infoPtr )
 	{
-		uint handle = (uint)handlePtr.ToInt64();
+		var info = Marshal.PtrToStructure<ManagedCallbackDispatchInfo>( infoPtr );
 
-		Log.Info( $"Invoking callback {handle}" );
-		CallbackDispatcher.Invoke( handle );
+		Log.Info( $"Invoking callback {info.handle}" );
+
+		if ( info.argsSize > 0 )
+			CallbackDispatcher.Invoke( info.handle, info.args );
+		else
+			CallbackDispatcher.Invoke( info.handle );
 	}
 
 	/// <summary>
