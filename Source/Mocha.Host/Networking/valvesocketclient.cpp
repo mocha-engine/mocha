@@ -16,8 +16,7 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		std::string addrString( addrBuf );
 		spdlog::info( "Client: connected to {}", addrString );
 	}
-	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ||
-	          info->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
+	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
 	{
 		ErrorMessage( "A connection has been actively rejected or closed by the remote host." );
 		goto dump;
