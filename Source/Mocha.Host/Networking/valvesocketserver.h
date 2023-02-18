@@ -22,6 +22,7 @@ public:
 	GENERATE_BINDINGS void SetConnectedCallback( Handle callbackHandle );
 	GENERATE_BINDINGS void SendData( Handle clientHandle, UtilArray interopMessage );
 	GENERATE_BINDINGS void PumpEvents();
+	GENERATE_BINDINGS void RunCallbacks();
 
 	~ValveSocketServer();
 };

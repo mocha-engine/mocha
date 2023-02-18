@@ -40,6 +40,7 @@ public class Server
 	public void OnTick()
 	{
 		_nativeServer.PumpEvents();
+		_nativeServer.RunCallbacks();
 	}
 
 	public void Test()

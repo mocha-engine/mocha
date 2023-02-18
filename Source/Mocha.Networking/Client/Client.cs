@@ -15,5 +15,6 @@ public class Client
 	public void OnTick()
 	{
 		_nativeClient.PumpEvents();
+		_nativeClient.RunCallbacks();
 	}
 }

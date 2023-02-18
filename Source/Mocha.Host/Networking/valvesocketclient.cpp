@@ -25,7 +25,7 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 	{
 		spdlog::info( "Client: k_ESteamNetworkingConnectionState_ProblemDetectedLocally" );
 		abort();
-	}	
+	}
 }
 
 static ValveSocketClient* s_client;
@@ -55,10 +55,9 @@ ValveSocketClient::~ValveSocketClient()
 	m_interface->CloseConnection( m_connection, 0, nullptr, true );
 }
 
-void ValveSocketClient::PumpEvents()
+void ValveSocketClient::PumpEvents() {}
+
+void ValveSocketClient::RunCallbacks()
 {
-	//
-	// Run callbacks
-	//
 	m_interface->RunCallbacks();
 }
