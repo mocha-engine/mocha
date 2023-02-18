@@ -27,6 +27,12 @@ public:
 	// Adds the specified object to the map and returns a handle to it.
 	Handle Add( T object );
 
+	// Removes the specified object from the map, based on a handle.
+	void RemoveAt( Handle handle );
+
+	// Removes the first instance of the specified object from the map.
+	void Remove( T object );
+
 	// Returns a pointer to the object associated with the specified handle.
 	std::shared_ptr<T> Get( Handle handle );
 
@@ -64,6 +70,29 @@ inline Handle HandleMap<T>::Add( T object )
 	m_nextIndex++;
 
 	return handle;
+}
+
+template <typename T>
+inline void HandleMap<T>::RemoveAt( Handle handle )
+{
+	std::unique_lock lock( m_mutex );
+
+	m_objects.erase( handle );
+}
+
+template <typename T>
+inline void HandleMap<T>::Remove( T object )
+{
+	std::unique_lock lock( m_mutex );
+
+    for ( const auto& [handle, object] : m_objects )
+	{
+		if ( typeid( *object ) == typeid( T ) )
+		{
+			m_objects.erase( handle );
+			break;
+		}
+	}
 }
 
 // Returns a pointer to the object associated with the specified handle.
