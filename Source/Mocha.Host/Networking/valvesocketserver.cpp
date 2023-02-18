@@ -31,7 +31,7 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 	{
 		spdlog::info( "Client disconnected!" );
 
-		// m_connections.Remove( info->m_hConn );
+		m_connections.Remove( info->m_hConn );
 		m_clientDisconnectedCallback.Invoke();
 	}
 }
