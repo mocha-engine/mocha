@@ -54,3 +54,11 @@ ValveSocketClient::~ValveSocketClient()
 {
 	m_interface->CloseConnection( m_connection, 0, nullptr, true );
 }
+
+void ValveSocketClient::PumpEvents()
+{
+	//
+	// Run callbacks
+	//
+	m_interface->RunCallbacks();
+}

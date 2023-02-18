@@ -18,6 +18,7 @@ public:
 	void OnConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t* info );
 
 	GENERATE_BINDINGS ValveSocketClient( const char* ip, int port );
+	GENERATE_BINDINGS void PumpEvents();
 
 	~ValveSocketClient();
 };

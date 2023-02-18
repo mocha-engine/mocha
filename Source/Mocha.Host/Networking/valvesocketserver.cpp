@@ -75,6 +75,11 @@ void ValveSocketServer::PumpEvents()
 	data.size = data.count * sizeof( char );
 
 	incomingMsg->Release();
+
+	//
+	// Run callbacks
+	//
+	m_interface->RunCallbacks();
 }
 
 ValveSocketServer::~ValveSocketServer()
