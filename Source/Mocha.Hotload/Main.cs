@@ -94,7 +94,11 @@ public static class Main
 			SourceRoot = "source\\Mocha.Editor",
 		};
 
-		s_server = new ProjectAssembly<IGame>( serverAssemblyInfo );
+		if ( isDedicatedServer )
+		{
+			// TODO: Listen server logic
+			s_server = new ProjectAssembly<IGame>( serverAssemblyInfo );
+		}
 
 		if ( !isDedicatedServer )
 		{
