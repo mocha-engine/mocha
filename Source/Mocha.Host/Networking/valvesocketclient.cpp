@@ -16,16 +16,24 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		std::string addrString( addrBuf );
 		spdlog::info( "Client: connected to {}", addrString );
 	}
-	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
+	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ||
+	          info->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
 	{
-		spdlog::info( "Client: k_ESteamNetworkingConnectionState_ClosedByPeer" );
-		abort();
+		ErrorMessage( "A connection has been actively rejected or closed by the remote host." );
+		goto dump;
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
 	{
-		spdlog::info( "Client: k_ESteamNetworkingConnectionState_ProblemDetectedLocally" );
-		abort();
+		ErrorMessage( "A problem was detected with the connection, and it has been closed by the local host." );
+		goto dump;
 	}
+
+	return;
+
+dump:
+	// Dump error info into console
+	spdlog::info( "{}: {}", info->m_info.m_eEndReason, info->m_info.m_szEndDebug );
+	abort();
 }
 
 static ValveSocketClient* s_client;
@@ -59,6 +67,5 @@ void ValveSocketClient::PumpEvents() {}
 
 void ValveSocketClient::RunCallbacks()
 {
-	spdlog::info( "ValveSocketClient::RunCallbacks()" );
 	m_interface->RunCallbacks();
 }
