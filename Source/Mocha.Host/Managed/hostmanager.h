@@ -51,6 +51,7 @@ private:
 	std::wstring m_signature;
 
 	void Invoke( std::string _method, void* params = nullptr, const char_t* delegateTypeName = UNMANAGEDCALLERSONLY_METHOD );
+	void InternalInvokeCallback( Handle callbackHnadle, int argsCount, void* args );
 
 public:
 	HostManager();

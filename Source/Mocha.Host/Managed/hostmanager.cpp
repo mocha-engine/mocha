@@ -151,14 +151,19 @@ void HostManager::DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info 
 
 void HostManager::InvokeCallback( Handle callbackHandle )
 {
-	InvokeCallback( callbackHandle, nullptr );
+	InternalInvokeCallback( callbackHandle, 0, nullptr );
 }
 
 void HostManager::InvokeCallback( Handle callbackHandle, void* args )
 {
+	InternalInvokeCallback( callbackHandle, 1, args );
+}
+
+void HostManager::InternalInvokeCallback( Handle callbackHandle, int argsCount, void* args )
+{
 	ManagedCallbackDispatchInfo dispatchInfo{};
 	dispatchInfo.args = args;
-	dispatchInfo.argsSize = args == nullptr ? 0 : 1;
+	dispatchInfo.argsSize = argsCount;
 	dispatchInfo.handle = callbackHandle;
 
 	Invoke( "InvokeCallback", &dispatchInfo );
