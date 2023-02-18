@@ -1,6 +1,4 @@
-﻿using Mocha.Common;
-
-namespace Mocha.Networking;
+﻿namespace Mocha.Networking;
 
 public class Client
 {
@@ -11,8 +9,7 @@ public class Client
 		_nativeClient = new Glue.ValveSocketClient( ipAddress, port );
 	}
 
-	[Event.Tick]
-	public void OnTick()
+	public void Update()
 	{
 		_nativeClient.PumpEvents();
 		_nativeClient.RunCallbacks();

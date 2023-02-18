@@ -36,8 +36,7 @@ public class Server
 		_nativeServer.SetConnectedCallback( CallbackDispatcher.RegisterCallback( Test ) );
 	}
 
-	[Event.Tick]
-	public void OnTick()
+	public void Update()
 	{
 		_nativeServer.PumpEvents();
 		_nativeServer.RunCallbacks();

@@ -6,6 +6,9 @@ public class BaseGame : IGame
 {
 	public static BaseGame Current { get; set; }
 
+	private Server _server;
+	private Client _client;
+
 	public BaseGame()
 	{
 		Current = this;
@@ -57,6 +60,10 @@ public class BaseGame : IGame
 
 	public void Update()
 	{
+		// TODO: This is garbage and should not be here!!!
+		_server?.Update();
+		_client?.Update();
+
 		if ( Core.IsClient )
 		{
 			// HACK: Clear DebugOverlay here because doing it
@@ -76,15 +83,9 @@ public class BaseGame : IGame
 	public void Startup()
 	{
 		if ( Core.IsClient )
-		{
-			// Connect to server
-			var client = new Client( "127.0.0.1" );
-		}
+			_client = new Client( "127.0.0.1" );
 		else
-		{
-			// Host server
-			var server = new Server();
-		}
+			_server = new Server();
 
 		OnStartup();
 	}

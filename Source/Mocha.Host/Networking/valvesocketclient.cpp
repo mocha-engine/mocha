@@ -59,5 +59,6 @@ void ValveSocketClient::PumpEvents() {}
 
 void ValveSocketClient::RunCallbacks()
 {
+	spdlog::info( "ValveSocketClient::RunCallbacks()" );
 	m_interface->RunCallbacks();
 }
