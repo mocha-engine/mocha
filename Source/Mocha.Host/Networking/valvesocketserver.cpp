@@ -73,6 +73,7 @@ void ValveSocketServer::PumpEvents()
 		ss << messageCount;
 		ss << " instead.";
 		ErrorMessage( ss.str() );
+		abort();
 	}
 
 	char* ptrData = ( char* )incomingMsg->m_pData;

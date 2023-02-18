@@ -16,6 +16,7 @@ void NetworkingManager::Startup()
 		ss << errMsg;
 
 		ErrorMessage( ss.str() );
+		abort();
 	}
 }
 

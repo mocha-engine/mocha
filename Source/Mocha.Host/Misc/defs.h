@@ -31,7 +31,6 @@ inline void ErrorMessage( std::string str, const std::source_location& location 
 {
 	MessageBoxA( nullptr, str.c_str(), "Engine Error", MB_OK | MB_ICONERROR );
 	printf( "Engine Error %s occurred at line %d in file %s", str.c_str(), location.line(), location.file_name() );
-	__debugbreak();
 }
 #endif
 

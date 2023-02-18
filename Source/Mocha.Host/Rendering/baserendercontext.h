@@ -323,6 +323,7 @@ inline void ErrorIf( bool condition, RenderStatus status )
 	{
 		std::string error = "RenderContext Error: " + GetRenderContextStatusString( status );
 		ErrorMessage( error );
+		abort();
 	}
 }
 

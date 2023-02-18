@@ -733,8 +733,6 @@ vkb::PhysicalDevice VulkanRenderContext::CreatePhysicalDevice( vkb::Instance vkb
 
 		std::string errorStr = "Couldn't find valid physical device: " + error.type.message();
 		ErrorMessage( errorStr );
-
-		// Exit
 		exit( error.type.value() );
 	}
 
