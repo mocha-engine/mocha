@@ -90,12 +90,13 @@ void ValveSocketServer::PumpEvents()
 	}
 
 	char* ptrData = ( char* )incomingMsg->m_pData;
-	UtilArray data{};
-	data.count = incomingMsg->m_cbSize;
-	data.data = ptrData;
-	data.size = data.count * sizeof( char );
+
+	// Convert to string
+	const char* data = ( const char* )malloc( incomingMsg->m_cbSize );
+	memcpy_s( ( void* )data, incomingMsg->m_cbSize, ptrData, incomingMsg->m_cbSize );
 
 	incomingMsg->Release();
+	spdlog::info( "Received a message: '{}'", data );
 }
 
 void ValveSocketServer::RunCallbacks()
