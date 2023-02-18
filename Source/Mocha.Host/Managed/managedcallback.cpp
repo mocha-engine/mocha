@@ -9,11 +9,16 @@ ManagedCallback::ManagedCallback( Handle handle )
 
 void ManagedCallback::Invoke()
 {
-	Invoke( nullptr );
+	InternalInvoke( 0, nullptr );
 }
 
 void ManagedCallback::Invoke( void* args )
 {
+	InternalInvoke( 1, args );
+}
+
+void ManagedCallback::InternalInvoke( int argsCount, void* args )
+{
 	if ( m_handle != HANDLE_INVALID )
-		Globals::m_hostManager->InvokeCallback( m_handle, args );
+		Globals::m_hostManager->InvokeCallback( m_handle, argsCount, args );
 }

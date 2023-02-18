@@ -6,7 +6,8 @@ class ManagedCallback
 {
 private:
 	Handle m_handle = HANDLE_INVALID;
-
+	void InternalInvoke( int argsCount, void* args );
+	
 public:
 	ManagedCallback() {}
 
