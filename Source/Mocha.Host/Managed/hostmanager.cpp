@@ -149,9 +149,20 @@ void HostManager::DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info 
 	Invoke( "DispatchIntCVarCallback", &info );
 }
 
-void HostManager::InvokeCallback( Handle handle )
+void HostManager::InvokeCallback( Handle callbackHandle )
 {
-	Invoke( "InvokeCallback", (void*)handle );
+	InvokeCallback<void>( callbackHandle, nullptr );
+}
+
+template <typename T>
+void HostManager::InvokeCallback( Handle callbackHandle, T* arg )
+{
+	ManagedCallbackDispatchInfo dispatchInfo{};
+	dispatchInfo.args = arg;
+	dispatchInfo.argsSize = sizeof( arg );
+	dispatchInfo.handle = callbackHandle;
+
+	Invoke( "InvokeCallback", &dispatchInfo );
 }
 
 inline void HostManager::Invoke( std::string _method, void* params, const char_t* delegateTypeName )

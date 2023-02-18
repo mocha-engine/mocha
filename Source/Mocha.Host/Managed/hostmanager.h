@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Managed/managedcallbackdispatchinfo.h>
 #include <Misc/subsystem.h>
 #include <Windows.h>
 #include <assert.h>
@@ -73,5 +74,8 @@ public:
 	// TODO: Remove
 	void DispatchIntCVarCallback( CVarManagedVarDispatchInfo<int> info );
 
+	template <typename T>
+	void InvokeCallback( Handle callbackHandle, T* arg );
+	
 	void InvokeCallback( Handle callbackHandle );
 };

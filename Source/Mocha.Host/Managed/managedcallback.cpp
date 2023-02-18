@@ -1,4 +1,5 @@
 #include "managedcallback.h"
+
 #include <Managed/hostmanager.h>
 
 ManagedCallback::ManagedCallback( Handle handle )
@@ -10,4 +11,11 @@ void ManagedCallback::Invoke()
 {
 	if ( m_handle != HANDLE_INVALID )
 		Globals::m_hostManager->InvokeCallback( m_handle );
+}
+
+template <typename T>
+void ManagedCallback::Invoke( T arg )
+{
+	if ( m_handle != HANDLE_INVALID )
+		Globals::m_hostManager->InvokeCallback<T>( m_handle, arg );
 }

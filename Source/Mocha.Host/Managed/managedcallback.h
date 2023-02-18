@@ -10,6 +10,9 @@ private:
 public:
 	ManagedCallback() {}
 
-	GENERATE_BINDINGS ManagedCallback( Handle handle );
-	GENERATE_BINDINGS void Invoke();
+	ManagedCallback( Handle handle );
+	void Invoke();
+
+	template <typename T>
+	void Invoke( T arg );
 };

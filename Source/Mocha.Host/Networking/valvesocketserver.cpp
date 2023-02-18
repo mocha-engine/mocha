@@ -19,8 +19,6 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 
 		// Assign poll group
 		m_interface->SetConnectionPollGroup( info->m_hConn, m_pollGroup );
-
-		// We are done (for now) but should probably handshake at this point?
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connected )
 	{
