@@ -14,6 +14,8 @@ public class CallbackDispatcher
 		var callbackId = _nextCallbackId++;
 		_callbacks.Add( callbackId, new CallbackInfo( callback ) );
 
+		Log.Info( $"Registered new callback {callback} as {callbackId}" );
+
 		return callbackId;
 	}
 

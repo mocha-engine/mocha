@@ -33,7 +33,13 @@ public class Server
 	public Server( ushort port = 10570 )
 	{
 		_nativeServer = new Glue.ValveSocketServer( port );
-		_nativeServer.SetConnectedCallback( CallbackDispatcher.RegisterCallback( Test ) );
+
+		//
+		// Register all callbacks so that C++ can invoke stuff herre
+		//
+		_nativeServer.SetClientConnectedCallback( CallbackDispatcher.RegisterCallback( ClientConnected ) );
+		_nativeServer.SetClientDisconnectedCallback( CallbackDispatcher.RegisterCallback( ClientDisconnected ) );
+		_nativeServer.SetDataReceivedCallback( CallbackDispatcher.RegisterCallback( DataReceived ) );
 	}
 
 	public void Update()
@@ -42,9 +48,19 @@ public class Server
 		_nativeServer.RunCallbacks();
 	}
 
-	public void Test()
+	public void ClientConnected()
 	{
-		Log.Trace( "!!!! Test !!!!" );
+		Log.Info( "Managed: Client was connected" );
+	}
+
+	public void ClientDisconnected()
+	{
+		Log.Info( "Managed: Client was disconnected" );
+	}
+
+	public void DataReceived()
+	{
+		Log.Info( "Managed: Data was received" );
 	}
 
 	public void OnClientConnected( ConnectedClient client )

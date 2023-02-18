@@ -261,6 +261,8 @@ public static class Main
 	public static void InvokeCallback( IntPtr handlePtr )
 	{
 		uint handle = (uint)handlePtr.ToInt64();
+
+		Log.Info( $"Invoking callback {handle}" );
 		CallbackDispatcher.Invoke( handle );
 	}
 

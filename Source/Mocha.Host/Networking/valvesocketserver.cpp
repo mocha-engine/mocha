@@ -27,7 +27,14 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		spdlog::info( "New client connected!" );
 
 		m_connections.Add( info->m_hConn );
-		m_connectedCallback.Invoke();
+		m_clientConnectedCallback.Invoke();
+	}
+	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
+	{
+		spdlog::info( "Client disconnected!" );
+
+		// m_connections.Remove( info->m_hConn );
+		m_clientDisconnectedCallback.Invoke();
 	}
 }
 
@@ -55,10 +62,22 @@ ValveSocketServer::ValveSocketServer( int port )
 	spdlog::info( "Created ValveSocketServer on port {}", port );
 }
 
-void ValveSocketServer::SetConnectedCallback( Handle callbackHandle )
+void ValveSocketServer::SetClientConnectedCallback( Handle callbackHandle )
 {
-	spdlog::info( "Registered connected callback" );
-	m_connectedCallback = ManagedCallback( callbackHandle );
+	spdlog::info( "Registered client connected callback" );
+	m_clientConnectedCallback = callbackHandle;
+}
+
+void ValveSocketServer::SetClientDisconnectedCallback( Handle callbackHandle )
+{
+	spdlog::info( "Registered client disconnected callback" );
+	m_clientDisconnectedCallback = callbackHandle;
+}
+
+void ValveSocketServer::SetDataReceivedCallback( Handle callbackHandle )
+{
+	spdlog::info( "Registered data received callback" );
+	m_dataReceivedCallback = callbackHandle;
 }
 
 void ValveSocketServer::SendData( Handle clientHandle, UtilArray interopMessage )
@@ -97,6 +116,7 @@ void ValveSocketServer::PumpEvents()
 
 	incomingMsg->Release();
 	spdlog::info( "Received a message: '{}'", data );
+	m_dataReceivedCallback.Invoke();
 }
 
 void ValveSocketServer::RunCallbacks()
