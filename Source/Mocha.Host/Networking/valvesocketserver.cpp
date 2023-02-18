@@ -10,7 +10,19 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 {
 	spdlog::info( "ValveSocketServer::OnConnectionStatusChanged, new state: {}", info->m_info.m_eState );
 
-	if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connected )
+	if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connecting )
+	{
+		// TODO: Make sure this client isn't already connected
+
+		// Accept connection
+		m_interface->AcceptConnection( info->m_hConn );
+
+		// Assign poll group
+		m_interface->SetConnectionPollGroup( info->m_hConn, m_pollGroup );
+
+		// We are done (for now) but should probably handshake at this point?
+	}
+	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connected )
 	{
 		spdlog::info( "New client connected!" );
 
@@ -28,6 +40,7 @@ static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusCha
 ValveSocketServer::ValveSocketServer( int port )
 {
 	m_interface = SteamNetworkingSockets();
+	s_server = this;
 
 	SteamNetworkingIPAddr localAddress;
 	localAddress.Clear();

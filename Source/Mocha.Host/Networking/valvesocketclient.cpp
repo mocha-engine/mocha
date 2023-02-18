@@ -44,6 +44,7 @@ static void SteamNetConnectionStatusChangedCallback( SteamNetConnectionStatusCha
 ValveSocketClient::ValveSocketClient( const char* ip, int port )
 {
 	m_interface = SteamNetworkingSockets();
+	s_client = this;
 
 	SteamNetworkingIPAddr remoteAddress;
 	remoteAddress.Clear();
