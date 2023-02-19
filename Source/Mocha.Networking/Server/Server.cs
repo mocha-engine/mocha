@@ -19,10 +19,17 @@ public class Server
 	public readonly struct ConnectedClient
 	{
 		public uint NativeHandle { get; init; }
+		private string RemoteAddress { get; init; }
 
 		public ConnectedClient( uint nativeHandle )
 		{
 			NativeHandle = nativeHandle;
+			RemoteAddress = GetAddress();
+		}
+
+		private string GetAddress()
+		{
+			return Instance._nativeServer.GetRemoteAddress( NativeHandle );
 		}
 
 		public static ConnectedClient FromPointer( IntPtr pointer )
@@ -34,6 +41,11 @@ public class Server
 		public void SendData( byte[] data )
 		{
 			Instance._nativeServer.SendData( NativeHandle, data.ToInterop() );
+		}
+
+		public override string ToString()
+		{
+			return RemoteAddress;
 		}
 	}
 

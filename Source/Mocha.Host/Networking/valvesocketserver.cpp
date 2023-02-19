@@ -152,3 +152,15 @@ ValveSocketServer::~ValveSocketServer()
 {
 	m_interface->CloseListenSocket( m_socket );
 }
+
+const char* ValveSocketServer::GetRemoteAddress( Handle clientHandle )
+{
+	SteamNetConnectionInfo_t connectionInfo;
+	m_interface->GetConnectionInfo( *m_connections.Get( clientHandle ).get(), &connectionInfo );
+
+	char* addrBuf;
+	addrBuf = ( char* )malloc( 48 );
+	connectionInfo.m_addrRemote.ToString( addrBuf, 48, true );
+
+	return addrBuf;
+}
