@@ -33,6 +33,9 @@ public:
 	// Removes the first instance of the specified object from the map.
 	void Remove( T object );
 
+	// Finds the first instance of the specified object from the map.
+	Handle Find( T object );
+
 	// Returns a pointer to the object associated with the specified handle.
 	std::shared_ptr<T> Get( Handle handle );
 
@@ -85,14 +88,27 @@ inline void HandleMap<T>::Remove( T object )
 {
 	std::unique_lock lock( m_mutex );
 
-    for ( const auto& [handle, object] : m_objects )
+	Handle targetHandle = Find( object );
+	if ( targetHandle != HANDLE_INVALID )
+	{
+		RemoveAt( targetHandle );
+	}
+}
+
+template <typename T>
+inline Handle HandleMap<T>::Find( T object )
+{
+	std::unique_lock lock( m_mutex );
+
+	for ( const auto& [handle, object] : m_objects )
 	{
 		if ( typeid( *object ) == typeid( T ) )
 		{
-			m_objects.erase( handle );
-			break;
+			return handle;
 		}
 	}
+
+	return HANDLE_INVALID;
 }
 
 // Returns a pointer to the object associated with the specified handle.
