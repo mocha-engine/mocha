@@ -13,6 +13,7 @@ class ValveSocketClient
 private:
 	HSteamNetConnection m_connection = {};
 	ISteamNetworkingSockets* m_interface;
+	bool m_isConnected{ false };
 
 public:
 	void OnConnectionStatusChanged( SteamNetConnectionStatusChangedCallback_t* info );

@@ -21,6 +21,8 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		m_interface->SendMessageToConnection(
 		    info->m_hConn, data, ( uint32_t )strlen( data ) + 1, k_nSteamNetworkingSend_Reliable, nullptr );
 
+		m_isConnected = true;
+
 		free( addrBuf );
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ||
@@ -35,7 +37,15 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
 			ErrorMessage( "A problem was detected with the connection, and it has been closed by the local host." );
 
+		m_isConnected = false;
+
 		abort();
+	}
+	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_None ||
+	          info->m_info.m_eState == k_ESteamNetworkingConnectionState_Dead )
+	{
+		spdlog::info( "Client: disconnected" );
+		m_isConnected = false;
 	}
 }
 
@@ -76,6 +86,9 @@ void ValveSocketClient::RunCallbacks()
 
 void ValveSocketClient::SendData( UtilArray interopData )
 {
+	if ( !m_isConnected )
+		return;
+
 	m_interface->SendMessageToConnection(
 	    m_connection, interopData.data, interopData.size, k_nSteamNetworkingSend_Reliable, nullptr );
 }
