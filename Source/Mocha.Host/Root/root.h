@@ -77,8 +77,6 @@ public:
 	GENERATE_BINDINGS inline void SetCameraZFar( float zfar ) { Globals::m_cameraZFar = zfar; }
 	GENERATE_BINDINGS inline float GetCameraZFar() { return Globals::m_cameraZFar; }
 
-	GENERATE_BINDINGS void CreateListenServer();
-
 	GENERATE_BINDINGS Vector2 GetWindowSize();
 	GENERATE_BINDINGS Vector2 GetRenderSize();
 };

@@ -7,10 +7,7 @@ public class NetworkingWindow : EditorWindow
 	{
 		if ( ImGuiX.BeginWindow( name: $"Networking", ref isVisible ) )
 		{
-			if ( ImGui.Button( "Create Listen Server" ) )
-			{
-				Networking.CreateListenServer();
-			}
+
 		}
 
 		ImGui.End();

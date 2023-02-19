@@ -205,21 +205,6 @@ void Root::Run()
 	}
 }
 
-void Root::CreateListenServer()
-{
-	// Run the server in separate thread
-	std::thread serverThread( [&]() {
-		spdlog::info( "Creating listen server..." );
-
-		ServerRoot serverRoot = ServerRoot();
-		serverRoot.Startup();
-		serverRoot.Run();
-		serverRoot.Shutdown();
-	} );
-
-	serverThread.detach();
-}
-
 Vector2 Root::GetWindowSize()
 {
 	Size2D size;
