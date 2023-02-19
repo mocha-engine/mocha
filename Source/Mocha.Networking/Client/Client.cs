@@ -1,5 +1,4 @@
 ﻿using Mocha.Common;
-using System.Text;
 
 namespace Mocha.Networking;
 
@@ -17,7 +16,27 @@ public class Client
 		_nativeClient.PumpEvents();
 		_nativeClient.RunCallbacks();
 
-		// Let's send a packet every frame to the server...
-		_nativeClient.SendData( Encoding.ASCII.GetBytes( "Boop" ).ToInterop() );
+		var clientInput = new ClientInputMessage()
+		{
+			Buttons = 0,
+			ForwardMove = Input.Direction.X,
+			SideMove = Input.Direction.Y,
+			UpMove = Input.Direction.Z,
+			LerpMsec = 100,
+			Msec = 100,
+			ViewAngles = Input.Rotation.ToEulerAngles()
+		};
+
+		Send( clientInput );
+	}
+
+	public void Send<T>( T message ) where T : BaseNetworkMessage, new()
+	{
+		var networkMessage = new NetworkMessage<T>();
+		networkMessage.Data = message;
+		networkMessage.NetworkMessageType = 0;
+
+		var bytes = Serializer.Serialize( networkMessage );
+		_nativeClient.SendData( bytes.ToInterop() );
 	}
 }
