@@ -4,6 +4,8 @@ namespace Mocha.Networking;
 
 public class Server
 {
+	private static Server Instance { get; private set; }
+
 	private Glue.ValveSocketServer _nativeServer;
 
 	// I don't like the idea of managing two separate lists (one native,
@@ -13,32 +15,53 @@ public class Server
 	/// <summary>
 	/// Represents a client that a server has a connection to
 	/// </summary>
-	public struct ConnectedClient
+	public readonly struct ConnectedClient
 	{
 		public uint NativeHandle { get; init; }
-		private Server Server { get; init; }
 
-		public ConnectedClient( Server server, uint nativeHandle )
+		public ConnectedClient( uint nativeHandle )
 		{
-			Server = server;
 			NativeHandle = nativeHandle;
+		}
+
+		public static ConnectedClient FromPointer( IntPtr pointer )
+		{
+			var clientHandle = (uint)pointer;
+			return new ConnectedClient( clientHandle );
 		}
 
 		public void SendData( byte[] data )
 		{
-			Server._nativeServer.SendData( NativeHandle, data.ToInterop() );
+			Instance._nativeServer.SendData( NativeHandle, data.ToInterop() );
 		}
 	}
 
 	public Server( ushort port = 10570 )
 	{
-		_nativeServer = new Glue.ValveSocketServer( port );
+		Instance = this;
 
-		//
-		// Register all callbacks so that C++ can invoke stuff herre
-		//
-		_nativeServer.SetClientConnectedCallback( CallbackDispatcher.RegisterCallback( OnClientConnected ) );
-		_nativeServer.SetClientDisconnectedCallback( CallbackDispatcher.RegisterCallback( ClientDisconnected ) );
+		_nativeServer = new Glue.ValveSocketServer( port );
+		RegisterNativeCallbacks();
+	}
+
+	private void RegisterNativeCallbacks()
+	{
+		_nativeServer.SetClientConnectedCallback(
+			CallbackDispatcher.RegisterCallback( ( IntPtr clientHandlePtr ) =>
+			{
+				var client = ConnectedClient.FromPointer( clientHandlePtr );
+				OnClientConnected( client );
+			}
+		) );
+
+		_nativeServer.SetClientDisconnectedCallback(
+			CallbackDispatcher.RegisterCallback( ( IntPtr clientHandlePtr ) =>
+			{
+				var client = ConnectedClient.FromPointer( clientHandlePtr );
+				OnClientDisconnected( client );
+			}
+		) );
+
 		_nativeServer.SetDataReceivedCallback( CallbackDispatcher.RegisterCallback( DataReceived ) );
 	}
 
@@ -58,11 +81,8 @@ public class Server
 		Log.Info( "Managed: Data was received" );
 	}
 
-	public void OnClientConnected( IntPtr clientHandlePtr )
+	public void OnClientConnected( ConnectedClient client )
 	{
-		var clientHandle = (uint)clientHandlePtr;
-		var client = new ConnectedClient( this, clientHandle );
-
 		Log.Info( "Managed: Client was connected" );
 
 		_connectedClients.Add( client );
@@ -73,15 +93,15 @@ public class Server
 
 	public void OnClientDisconnected( ConnectedClient client )
 	{
+		Log.Info( "Managed: Client was disconnected" );
+
 		// Etc...
 		_connectedClients.Remove( client );
 	}
 
-	public void OnMessageReceived( ConnectedClient client, byte[] data )
+	public void OnMessageReceived()
 	{
+		Log.Info( "Managed: Received a message" );
 		// Etc...
-
-		// Echo
-		client.SendData( data );
 	}
 }
