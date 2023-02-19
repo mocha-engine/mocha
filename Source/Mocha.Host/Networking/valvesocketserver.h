@@ -5,6 +5,14 @@
 #include <Misc/handlemap.h>
 #include <Util/util.h>
 
+struct ValveSocketReceivedMessage
+{
+	void* connectionHandle;
+	
+	int size;
+	void* data;
+};
+
 class ValveSocketServer
 {
 private:

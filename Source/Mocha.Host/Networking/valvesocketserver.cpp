@@ -134,7 +134,13 @@ void ValveSocketServer::PumpEvents()
 
 	incomingMsg->Release();
 	spdlog::info( "Received a message: '{}'", data );
-	m_dataReceivedCallback.Invoke();
+
+	ValveSocketReceivedMessage receivedMessage{};
+	receivedMessage.connectionHandle = ( void* )m_connections.Find( incomingMsg->m_conn );
+	receivedMessage.size = incomingMsg->m_cbSize;
+	receivedMessage.data = ( void* )data;
+
+	m_dataReceivedCallback.Invoke( ( void* )&receivedMessage );
 }
 
 void ValveSocketServer::RunCallbacks()

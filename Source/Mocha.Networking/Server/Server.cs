@@ -1,6 +1,16 @@
 ﻿using Mocha.Common;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Mocha.Networking;
+
+[StructLayout( LayoutKind.Sequential )]
+struct ValveSocketReceivedMessage
+{
+	public IntPtr connectionHandle;
+	public int size;
+	public IntPtr data;
+};
 
 public class Server
 {
@@ -62,23 +72,23 @@ public class Server
 			}
 		) );
 
-		_nativeServer.SetDataReceivedCallback( CallbackDispatcher.RegisterCallback( DataReceived ) );
+		_nativeServer.SetDataReceivedCallback(
+			CallbackDispatcher.RegisterCallback( ( IntPtr receivedMessagePtr ) =>
+			{
+				var receivedMessage = Marshal.PtrToStructure<ValveSocketReceivedMessage>( receivedMessagePtr );
+				var client = ConnectedClient.FromPointer( receivedMessage.connectionHandle );
+				var data = new byte[receivedMessage.size];
+				Marshal.Copy( receivedMessage.data, data, 0, receivedMessage.size );
+
+				OnMessageReceived( client, data );
+			}
+		) );
 	}
 
 	public void Update()
 	{
 		_nativeServer.PumpEvents();
 		_nativeServer.RunCallbacks();
-	}
-
-	public void ClientDisconnected()
-	{
-		Log.Info( "Managed: Client was disconnected" );
-	}
-
-	public void DataReceived()
-	{
-		Log.Info( "Managed: Data was received" );
 	}
 
 	public void OnClientConnected( ConnectedClient client )
@@ -99,9 +109,11 @@ public class Server
 		_connectedClients.Remove( client );
 	}
 
-	public void OnMessageReceived()
+	public void OnMessageReceived( ConnectedClient client, byte[] data )
 	{
 		Log.Info( "Managed: Received a message" );
+		Log.Info( $"Managed: {Encoding.ASCII.GetString( data )}" );
+
 		// Etc...
 	}
 }
