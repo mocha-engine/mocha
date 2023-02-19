@@ -18,13 +18,17 @@ public class Client
 
 		var clientInput = new ClientInputMessage()
 		{
-			Buttons = 0,
-			ForwardMove = Input.Direction.X,
-			SideMove = Input.Direction.Y,
-			UpMove = Input.Direction.Z,
-			LerpMsec = 100,
-			Msec = 100,
-			ViewAngles = Input.Rotation.ToEulerAngles()
+			ViewAnglesP = Input.Rotation.ToEulerAngles().X,
+			ViewAnglesY = Input.Rotation.ToEulerAngles().Y,
+			ViewAnglesR = Input.Rotation.ToEulerAngles().Z,
+
+			DirectionX = Input.Direction.X,
+			DirectionY = Input.Direction.Y,
+			DirectionZ = Input.Direction.Z,
+
+			Left = Input.Left,
+			Right = Input.Right,
+			Middle = Input.Middle
 		};
 
 		Send( clientInput );
@@ -32,11 +36,11 @@ public class Client
 
 	public void Send<T>( T message ) where T : BaseNetworkMessage, new()
 	{
-		var networkMessage = new NetworkMessage<T>();
-		networkMessage.Data = message;
-		networkMessage.NetworkMessageType = 0;
+		var wrapper = new NetworkMessageWrapper<T>();
+		wrapper.Data = message;
+		wrapper.NetworkMessageType = 0;
 
-		var bytes = Serializer.Serialize( networkMessage );
+		var bytes = wrapper.Serialize();
 		_nativeClient.SendData( bytes.ToInterop() );
 	}
 }

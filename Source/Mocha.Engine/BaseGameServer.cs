@@ -1,5 +1,4 @@
 ﻿using Mocha.Networking;
-using System.Text;
 
 namespace Mocha;
 public class BaseGameServer : Server
@@ -16,30 +15,24 @@ public class BaseGameServer : Server
 
 	public override void OnMessageReceived( ConnectedClient client, byte[] data )
 	{
-		Log.Info( $"BaseGameServer: Received message '{Encoding.ASCII.GetString( data )}' from client {client}" );
+		var message = Serializer.Deserialize<NetworkMessageWrapper<BaseNetworkMessage>>( data )!;
 
-		var message = Serializer.Deserialize<NetworkMessage<BaseNetworkMessage>>( data )!;
-
-		switch ( message.NetworkMessageType )
+		if ( message.NetworkMessageType == 0 )
 		{
-			case 0:
-				// ClientInputMessage
-				var clientInputMessage = Serializer.Deserialize<NetworkMessage<ClientInputMessage>>( data )!;
-				var clientInput = clientInputMessage.Data;
+			// ClientInputMessage
+			var clientInputMessage = Serializer.Deserialize<NetworkMessageWrapper<ClientInputMessage>>( data )!;
+			var clientInput = clientInputMessage.Data;
 
-				Log.Info( $@"BaseGameServer: Client {client} sent input message:
-				LerpMsec: {clientInput.LerpMsec}
-				Msec: {clientInput.Msec}
-				ViewAngles: {clientInput.ViewAngles}
-				ForwardMove: {clientInput.ForwardMove}
-				SideMove: {clientInput.SideMove}
-				UpMove: {clientInput.UpMove}
-				Buttons: {clientInput.Buttons}" );
-				break;
-
-			default:
-				Log.Error( $"BaseGameServer: Unknown message type {message.NetworkMessageType}" );
-				break;
+			Log.Info( $@"BaseGameServer: Client {client} sent input message:
+				ViewAngles: {clientInput.ViewAnglesP}, {clientInput.ViewAnglesY}, {clientInput.ViewAnglesR}
+				Direction: {clientInput.DirectionX}, {clientInput.DirectionY}, {clientInput.DirectionZ}
+				Left: {clientInput.Left}
+				Right: {clientInput.Right}
+				Middle: {clientInput.Middle}" );
+		}
+		else
+		{
+			Log.Error( $"BaseGameServer: Unknown message type '{message.NetworkMessageType}'" );
 		}
 	}
 }

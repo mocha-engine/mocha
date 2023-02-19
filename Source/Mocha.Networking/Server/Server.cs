@@ -43,6 +43,16 @@ public class Server
 			Instance._nativeServer.SendData( NativeHandle, data.ToInterop() );
 		}
 
+		public void Send<T>( T message ) where T : BaseNetworkMessage, new()
+		{
+			var wrapper = new NetworkMessageWrapper<T>();
+			wrapper.Data = message;
+			wrapper.NetworkMessageType = 0;
+
+			var bytes = wrapper.Serialize();
+			SendData( bytes );
+		}
+
 		public override string ToString()
 		{
 			return RemoteAddress;
