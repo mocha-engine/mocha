@@ -53,6 +53,21 @@ public class Server
 			SendData( bytes );
 		}
 
+		public void Disconnect()
+		{
+			Instance._nativeServer.Disconnect( NativeHandle );
+		}
+
+		public void Kick( string? reason = null! )
+		{
+			var kickedMessage = new KickedMessage();
+			if ( reason != null )
+				kickedMessage.Reason = reason;
+
+			Send( kickedMessage );
+			Disconnect();
+		}
+
 		public override string ToString()
 		{
 			return RemoteAddress;

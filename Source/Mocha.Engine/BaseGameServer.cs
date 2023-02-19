@@ -29,6 +29,8 @@ public class BaseGameServer : Server
 				Left: {clientInput.Left}
 				Right: {clientInput.Right}
 				Middle: {clientInput.Middle}" );
+
+			client.Kick( "Kick Test" );
 		}
 		else
 		{

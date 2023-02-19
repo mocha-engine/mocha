@@ -41,6 +41,7 @@ public:
 	GENERATE_BINDINGS void PumpEvents();
 	GENERATE_BINDINGS void RunCallbacks();
 
+	GENERATE_BINDINGS void Disconnect( Handle clientHandle ); 
 	GENERATE_BINDINGS const char* GetRemoteAddress( Handle clientHandle );
 
 	~ValveSocketServer();

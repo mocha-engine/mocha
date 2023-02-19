@@ -163,3 +163,9 @@ const char* ValveSocketServer::GetRemoteAddress( Handle clientHandle )
 
 	return addrBuf;
 }
+
+void ValveSocketServer::Disconnect( Handle clientHandle )
+{
+	HSteamNetConnection connection = *m_connections.Get( clientHandle ).get();
+	m_interface->CloseConnection( connection, k_ESteamNetConnectionEnd_App_Generic, "Disconnecting", true );
+}
