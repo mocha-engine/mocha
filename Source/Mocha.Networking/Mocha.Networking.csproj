@@ -12,10 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Shared\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
   </ItemGroup>
 
