@@ -73,3 +73,9 @@ void ValveSocketClient::RunCallbacks()
 {
 	m_interface->RunCallbacks();
 }
+
+void ValveSocketClient::SendData( UtilArray interopData )
+{
+	m_interface->SendMessageToConnection(
+	    m_connection, interopData.data, interopData.size, k_nSteamNetworkingSend_Reliable, nullptr );
+}

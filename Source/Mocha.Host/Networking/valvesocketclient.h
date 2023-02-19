@@ -20,6 +20,7 @@ public:
 	GENERATE_BINDINGS ValveSocketClient( const char* ip, int port );
 	GENERATE_BINDINGS void PumpEvents();
 	GENERATE_BINDINGS void RunCallbacks();
+	GENERATE_BINDINGS void SendData( UtilArray interopData );
 
 	~ValveSocketClient();
 };

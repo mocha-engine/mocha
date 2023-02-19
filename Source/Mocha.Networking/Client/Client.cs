@@ -1,4 +1,7 @@
-﻿namespace Mocha.Networking;
+﻿using Mocha.Common;
+using System.Text;
+
+namespace Mocha.Networking;
 
 public class Client
 {
@@ -13,5 +16,8 @@ public class Client
 	{
 		_nativeClient.PumpEvents();
 		_nativeClient.RunCallbacks();
+
+		// Let's send a packet every frame to the server...
+		_nativeClient.SendData( Encoding.ASCII.GetBytes( "Boop\0" ).ToInterop() );
 	}
 }
