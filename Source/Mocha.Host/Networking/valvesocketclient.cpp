@@ -20,6 +20,8 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		const char* data = "Hello\0";
 		m_interface->SendMessageToConnection(
 		    info->m_hConn, data, ( uint32_t )strlen( data ) + 1, k_nSteamNetworkingSend_Reliable, nullptr );
+
+		free( addrBuf );
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer ||
 	          info->m_info.m_eState == k_ESteamNetworkingConnectionState_ProblemDetectedLocally )
