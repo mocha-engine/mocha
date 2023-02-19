@@ -16,11 +16,6 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		std::string addrString( addrBuf );
 		spdlog::info( "Client: connected to '{}'", addrString );
 
-		// Send test data
-		const char* data = "Hello\0";
-		m_interface->SendMessageToConnection(
-		    info->m_hConn, data, ( uint32_t )strlen( data ) + 1, k_nSteamNetworkingSend_Reliable, nullptr );
-
 		m_isConnected = true;
 
 		free( addrBuf );
