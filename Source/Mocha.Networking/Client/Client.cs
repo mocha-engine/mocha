@@ -18,6 +18,6 @@ public class Client
 		_nativeClient.RunCallbacks();
 
 		// Let's send a packet every frame to the server...
-		_nativeClient.SendData( Encoding.ASCII.GetBytes( "Boop\0" ).ToInterop() );
+		_nativeClient.SendData( Encoding.ASCII.GetBytes( "Boop" ).ToInterop() );
 	}
 }
