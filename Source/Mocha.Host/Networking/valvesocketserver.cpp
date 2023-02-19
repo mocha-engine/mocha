@@ -13,6 +13,20 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 	if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_Connecting )
 	{
 		// TODO: Make sure this client isn't already connected
+		if ( m_connections.Find( info->m_hConn ) != HANDLE_INVALID )
+		{
+			// Get IP address so we can log it
+			char* addrBuf;
+			addrBuf = ( char* )malloc( 48 );
+			info->m_info.m_addrRemote.ToString( addrBuf, 48, true );
+
+			std::string addrString( addrBuf );
+
+			spdlog::error( "'{}' tried to connect, but we already had them in the list of connected clients?", addrString );
+
+			free( addrBuf );
+			return;
+		}
 
 		// Accept connection
 		m_interface->AcceptConnection( info->m_hConn );
@@ -25,6 +39,8 @@ void ValveSocketServer::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		spdlog::info( "New client connected!" );
 
 		Handle clientHandle = m_connections.Add( info->m_hConn );
+
+		// Do something with the client now that they're connected
 		m_clientConnectedCallback.Invoke( ( void* )clientHandle );
 	}
 	else if ( info->m_info.m_eState == k_ESteamNetworkingConnectionState_ClosedByPeer )
