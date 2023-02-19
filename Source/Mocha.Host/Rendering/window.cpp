@@ -25,7 +25,7 @@ Window::Window( uint32_t width, uint32_t height )
 	m_visible = false;
 
 	std::string windowTitle = std::string( Globals::m_projectManager->GetProject().name + " [" +
-	                                       Globals::m_projectManager->GetProject().version + "] - " GAME_VERSION );
+	                                       Globals::m_projectManager->GetProject().version + "]" );
 	m_window =
 	    SDL_CreateWindow( windowTitle.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, windowFlags );
 

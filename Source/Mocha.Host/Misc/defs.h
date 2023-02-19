@@ -1,5 +1,4 @@
 #pragma once
-#include <Misc/gitdefs.h>
 #include <stdint.h>
 #include <string>
 
@@ -53,7 +52,6 @@ inline ENUMTYPE &operator ^= (ENUMTYPE &a, ENUMTYPE b) { return (ENUMTYPE &)(((i
 // Engine properties
 //
 #define ENGINE_NAME						"Mocha"
-#define GAME_VERSION					ADD_QUOTES( GIT_CUR_COMMIT ) " on " ADD_QUOTES( GIT_BRANCH )
 
 //
 // Types

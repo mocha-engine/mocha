@@ -92,11 +92,6 @@ void EditorManager::RenderViewDropdown()
 	}
 }
 
-const char* EditorManager::GetVersionName()
-{
-	return GAME_VERSION;
-}
-
 void EditorManager::Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y )
 {
 	void* imguiTextureID;

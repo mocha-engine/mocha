@@ -26,7 +26,6 @@ public:
 	GENERATE_BINDINGS const char* GetGPUName();
 	GENERATE_BINDINGS char* InputText( const char* name, char* inputBuf, int inputLength );
 	GENERATE_BINDINGS void RenderViewDropdown();
-	GENERATE_BINDINGS const char* GetVersionName();
 	GENERATE_BINDINGS void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y );
 	GENERATE_BINDINGS bool BeginMainStatusBar();
 	GENERATE_BINDINGS void DrawGraph( const char* name, Vector4 color, UtilArray values );

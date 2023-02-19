@@ -1404,9 +1404,6 @@
     <ClInclude Include="Misc\editormanager.h">
       <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="Misc\gitdefs.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
     <ClInclude Include="Physics\physicsmanager.h">
       <Filter>Physics</Filter>
     </ClInclude>

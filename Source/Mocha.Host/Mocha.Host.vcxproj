@@ -371,7 +371,6 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="Misc\cvarmanager.h" />
     <ClInclude Include="Misc\defs.h" />
     <ClInclude Include="Misc\editormanager.h" />
-    <ClInclude Include="Misc\gitdefs.h" />
     <ClInclude Include="Misc\globalvars.h" />
     <ClInclude Include="Misc\handlemap.h" />
     <ClInclude Include="Misc\inputmanager.h" />
