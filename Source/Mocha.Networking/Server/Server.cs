@@ -1,16 +1,7 @@
 ﻿using Mocha.Common;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Mocha.Networking;
-
-[StructLayout( LayoutKind.Sequential )]
-struct ValveSocketReceivedMessage
-{
-	public IntPtr connectionHandle;
-	public int size;
-	public IntPtr data;
-};
 
 public class Server
 {
@@ -60,6 +51,8 @@ public class Server
 			CallbackDispatcher.RegisterCallback( ( IntPtr clientHandlePtr ) =>
 			{
 				var client = ConnectedClient.FromPointer( clientHandlePtr );
+
+				_connectedClients.Add( client );
 				OnClientConnected( client );
 			}
 		) );
@@ -68,6 +61,8 @@ public class Server
 			CallbackDispatcher.RegisterCallback( ( IntPtr clientHandlePtr ) =>
 			{
 				var client = ConnectedClient.FromPointer( clientHandlePtr );
+
+				_connectedClients.Remove( client );
 				OnClientDisconnected( client );
 			}
 		) );
@@ -91,29 +86,15 @@ public class Server
 		_nativeServer.RunCallbacks();
 	}
 
-	public void OnClientConnected( ConnectedClient client )
+	public virtual void OnClientConnected( ConnectedClient client )
 	{
-		Log.Info( "Managed: Client was connected" );
-
-		_connectedClients.Add( client );
-
-		// Handshake or something
-		client.SendData( new byte[] { 0x20, 0x20, 0x20, 0x20 } );
 	}
 
-	public void OnClientDisconnected( ConnectedClient client )
+	public virtual void OnClientDisconnected( ConnectedClient client )
 	{
-		Log.Info( "Managed: Client was disconnected" );
-
-		// Etc...
-		_connectedClients.Remove( client );
 	}
 
-	public void OnMessageReceived( ConnectedClient client, byte[] data )
+	public virtual void OnMessageReceived( ConnectedClient client, byte[] data )
 	{
-		Log.Info( "Managed: Received a message" );
-		Log.Info( $"Managed: {Encoding.ASCII.GetString( data )}" );
-
-		// Etc...
 	}
 }
