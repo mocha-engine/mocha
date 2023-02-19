@@ -14,7 +14,7 @@ void ValveSocketClient::OnConnectionStatusChanged( SteamNetConnectionStatusChang
 		connectionInfo.m_addrRemote.ToString( addrBuf, 48, true );
 
 		std::string addrString( addrBuf );
-		spdlog::info( "Client: connected to {}", addrString );
+		spdlog::info( "Client: connected to '{}'", addrString );
 
 		// Send test data
 		const char* data = "Hello\0";

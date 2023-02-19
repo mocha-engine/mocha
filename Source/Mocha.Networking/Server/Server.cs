@@ -4,7 +4,7 @@ namespace Mocha.Networking;
 
 public class Server
 {
-	private static Server Instance { get; private set; }
+	private static Server Instance { get; set; }
 
 	private Glue.ValveSocketServer _nativeServer;
 
