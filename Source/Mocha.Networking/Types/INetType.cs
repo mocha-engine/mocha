@@ -4,7 +4,6 @@ public interface INetType<T> where T : notnull
 {
 	T Value { get; set; }
 
-	// TODO: NetWriter/NetReader?
-	byte[] Serialize();
-	void Deserialize( byte[] values );
+	void Serialize( BinaryWriter binaryWriter );
+	void Deserialize( BinaryReader binaryReader );
 }

@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Mocha.Networking;
+﻿namespace Mocha.Networking;
 
 public class NetString : INetType<string>
 {
@@ -15,7 +13,7 @@ public class NetString : INetType<string>
 	}
 
 	//
-	// Implicit conversions to/from string
+	// Implicit conversions
 	//
 	public static implicit operator string( NetString netString )
 	{
@@ -30,13 +28,13 @@ public class NetString : INetType<string>
 	//
 	// Serialization functions
 	//
-	public byte[] Serialize()
+	public void Serialize( BinaryWriter binaryWriter )
 	{
-		return Encoding.UTF8.GetBytes( Value );
+		binaryWriter.Write( Value );
 	}
 
-	public void Deserialize( byte[] values )
+	public void Deserialize( BinaryReader binaryReader )
 	{
-		Value = Encoding.UTF8.GetString( values );
+		Value = binaryReader.ReadString();
 	}
 }
