@@ -8,6 +8,10 @@ public class Game : BaseGame
 	[HotloadSkip]
 	private UIManager Hud { get; set; }
 
+	// TODO: Attributes that convert using HandlesNetworkedType
+	public NetString NetworkedString { get; set; }
+	public MyNetType NetworkedCustomType { get; set; }
+
 	public override void OnStartup()
 	{
 		if ( Core.IsServer )
@@ -31,13 +35,13 @@ public class Game : BaseGame
 	}
 
 	[Event.Tick, ServerOnly]
-	public void Server()
+	public void ServerTick()
 	{
 		DebugOverlay.ScreenText( "Server Tick..." );
 	}
 
 	[Event.Tick, ClientOnly]
-	public void Client()
+	public void ClientTick()
 	{
 		DebugOverlay.ScreenText( "Client Tick..." );
 	}
