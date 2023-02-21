@@ -3,15 +3,8 @@
 #include <Managed/managedcallback.h>
 #include <Misc/defs.h>
 #include <Misc/handlemap.h>
+#include <Networking/valvesocketreceivedmessage.h>
 #include <Util/util.h>
-
-struct ValveSocketReceivedMessage
-{
-	void* connectionHandle;
-	
-	int size;
-	void* data;
-};
 
 class ValveSocketServer
 {
@@ -41,7 +34,7 @@ public:
 	GENERATE_BINDINGS void PumpEvents();
 	GENERATE_BINDINGS void RunCallbacks();
 
-	GENERATE_BINDINGS void Disconnect( Handle clientHandle ); 
+	GENERATE_BINDINGS void Disconnect( Handle clientHandle );
 	GENERATE_BINDINGS const char* GetRemoteAddress( Handle clientHandle );
 
 	~ValveSocketServer();

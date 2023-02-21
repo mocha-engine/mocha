@@ -1472,6 +1472,7 @@
     <ClInclude Include="Networking\valvesocketclient.h" />
     <ClInclude Include="Networking\networkingmanager.h" />
     <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
+    <ClInclude Include="Networking\valvesocketreceivedmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

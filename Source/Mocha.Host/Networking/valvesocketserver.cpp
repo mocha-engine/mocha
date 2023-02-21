@@ -102,10 +102,10 @@ void ValveSocketServer::SendData( Handle clientHandle, UtilArray interopMessage 
 {
 	std::shared_ptr<HSteamNetConnection> destination = m_connections.Get( clientHandle );
 
-	std::vector<int32_t> message = interopMessage.GetData<int32_t>();
+	std::vector<char> message = interopMessage.GetData<char>();
 
 	m_interface->SendMessageToConnection(
-	    *destination.get(), message.data(), sizeof( int32_t ) * 2, k_nSteamNetworkingSend_Reliable, nullptr );
+	    *destination.get(), message.data(), message.size(), k_nSteamNetworkingSend_Reliable, nullptr );
 }
 
 void ValveSocketServer::PumpEvents()

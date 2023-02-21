@@ -670,6 +670,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="Util\utilarray.h" />
     <ClInclude Include="Networking\valvesocketclient.h" />
     <ClInclude Include="Networking\valvesocketserver.h" />
+    <ClInclude Include="Networking\valvesocketreceivedmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.inl" />

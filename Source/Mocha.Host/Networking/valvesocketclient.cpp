@@ -72,7 +72,45 @@ ValveSocketClient::~ValveSocketClient()
 	m_interface->CloseConnection( m_connection, 0, nullptr, true );
 }
 
-void ValveSocketClient::PumpEvents() {}
+void ValveSocketClient::PumpEvents()
+{
+	ISteamNetworkingMessage* incomingMsg{ nullptr };
+	int messageCount = m_interface->ReceiveMessagesOnConnection( m_connection, &incomingMsg, 1 );
+
+	if ( messageCount == 0 )
+		return;
+
+	if ( messageCount < 0 )
+	{
+		std::stringstream ss;
+		ss << "Expected message count 0 or 1, got ";
+		ss << messageCount;
+		ss << " instead.";
+		ErrorMessage( ss.str() );
+		abort();
+	}
+
+	char* ptrData = ( char* )incomingMsg->m_pData;
+
+	// Convert to string
+	const char* data = ( const char* )malloc( incomingMsg->m_cbSize );
+	memcpy_s( ( void* )data, incomingMsg->m_cbSize, ptrData, incomingMsg->m_cbSize );
+
+	incomingMsg->Release();
+
+	ValveSocketReceivedMessage receivedMessage{};
+	receivedMessage.connectionHandle = ( void* )m_connection;
+	receivedMessage.size = incomingMsg->m_cbSize;
+	receivedMessage.data = ( void* )data;
+
+	m_dataReceivedCallback.Invoke( ( void* )&receivedMessage );
+}
+
+void ValveSocketClient::SetDataReceivedCallback( Handle callbackHandle )
+{
+	spdlog::info( "Registered data received callback" );
+	m_dataReceivedCallback = callbackHandle;
+}
 
 void ValveSocketClient::RunCallbacks()
 {
