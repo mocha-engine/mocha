@@ -71,7 +71,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ExternalIncludePath>$(SolutionDir)Mocha.Host\Thirdparty\imgui;$(SolutionDir)Mocha.Host\;$(ExternalIncludePath)</ExternalIncludePath>
+    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath);$(SolutionDir)Mocha.Host\Thirdparty\imgui;$(SolutionDir)Mocha.Host\</ExternalIncludePath>
     <OutDir>$(SolutionDir)..\build</OutDir>
     <LibraryPath>$(SolutionDir)vcpkg_installed\$(Platform)-windows\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
