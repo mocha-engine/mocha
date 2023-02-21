@@ -1,41 +1,37 @@
 ﻿using Mocha.Networking;
-using System.Text.Json;
 
 namespace Mocha;
 public class BaseGameServer : Server
 {
-	public override void OnClientConnected( ConnectedClient client )
+	public BaseGameServer()
+	{
+		RegisterHandler<ClientInputMessage>( OnClientInputMessage );
+	}
+
+	public override void OnClientConnected( IConnection client )
 	{
 		Log.Info( $"BaseGameServer: Client {client} connected" );
 	}
 
-	public override void OnClientDisconnected( ConnectedClient client )
+	public override void OnClientDisconnected( IConnection client )
 	{
 		Log.Info( $"BaseGameServer: Client {client} disconnected" );
 	}
 
-	public override void OnMessageReceived( ConnectedClient client, byte[] data )
+	public override void OnMessageReceived( IConnection client, byte[] data )
 	{
-		var message = JsonSerializer.Deserialize<NetworkMessageWrapper<object>>( data )!;
+		InvokeHandler( client, data );
+	}
 
-		if ( message.NetworkMessageType == 0 )
-		{
-			// ClientInputMessage
-			var clientInputMessage = JsonSerializer.Deserialize<NetworkMessageWrapper<ClientInputMessage>>( data )!;
-			var clientInput = clientInputMessage.Data;
+	public void OnClientInputMessage( IConnection client, ClientInputMessage clientInputMessage )
+	{
+		Log.Info( $@"BaseGameServer: Client {client} sent input message:
+			ViewAngles: {clientInputMessage.ViewAnglesP}, {clientInputMessage.ViewAnglesY}, {clientInputMessage.ViewAnglesR}
+			Direction: {clientInputMessage.DirectionX}, {clientInputMessage.DirectionY}, {clientInputMessage.DirectionZ}
+			Left: {clientInputMessage.Left}
+			Right: {clientInputMessage.Right}
+			Middle: {clientInputMessage.Middle}" );
 
-			Log.Info( $@"BaseGameServer: Client {client} sent input message:
-				ViewAngles: {clientInput.ViewAnglesP}, {clientInput.ViewAnglesY}, {clientInput.ViewAnglesR}
-				Direction: {clientInput.DirectionX}, {clientInput.DirectionY}, {clientInput.DirectionZ}
-				Left: {clientInput.Left}
-				Right: {clientInput.Right}
-				Middle: {clientInput.Middle}" );
-
-			client.Kick( "Kick Test" );
-		}
-		else
-		{
-			Log.Error( $"BaseGameServer: Unknown message type '{message.NetworkMessageType}'" );
-		}
+		client.Disconnect( "Kick Test" );
 	}
 }

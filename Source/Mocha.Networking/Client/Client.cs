@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Mocha.Networking;
 
-public class Client
+public partial class Client : ConnectionManager
 {
 	private Glue.ValveSocketClient _nativeClient;
 
@@ -56,11 +56,11 @@ public class Client
 
 	public void Send<T>( T message ) where T : IBaseNetworkMessage, new()
 	{
-		var wrapper = new NetworkMessageWrapper<T>();
-		wrapper.Data = message;
-		wrapper.NetworkMessageType = 0;
+		var wrapper = new NetworkMessageWrapper();
+		wrapper.Data = NetworkSerializer.Serialize( message );
+		wrapper.NetworkMessageType = (int)typeof( T ).GetProperty( "MessageId" )!.GetValue( null, null )!;
 
-		var bytes = wrapper.Serialize();
+		var bytes = NetworkSerializer.Serialize( wrapper );
 		_nativeClient.SendData( bytes.ToInterop() );
 	}
 }
