@@ -1,6 +1,6 @@
 ﻿namespace Mocha;
 
-internal interface INetType<T> where T : notnull
+public interface INetType<T> where T : notnull
 {
 	T Value { get; set; }
 
