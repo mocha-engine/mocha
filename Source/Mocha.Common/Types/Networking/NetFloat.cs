@@ -1,4 +1,4 @@
-﻿namespace Mocha.Networking;
+﻿namespace Mocha;
 
 [HandlesNetworkedType<float>]
 public class NetFloat : INetType<float>

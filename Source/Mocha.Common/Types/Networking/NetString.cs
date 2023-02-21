@@ -1,4 +1,4 @@
-﻿namespace Mocha.Networking;
+﻿namespace Mocha;
 
 public class NetString : INetType<string>
 {

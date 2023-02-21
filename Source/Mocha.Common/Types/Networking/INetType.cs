@@ -1,6 +1,6 @@
-﻿namespace Mocha.Networking;
+﻿namespace Mocha;
 
-public interface INetType<T> where T : notnull
+internal interface INetType<T> where T : notnull
 {
 	T Value { get; set; }
 
