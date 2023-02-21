@@ -83,7 +83,7 @@ public class BaseGame : IGame
 	public void Startup()
 	{
 		if ( Core.IsClient )
-			_client = new Client( "127.0.0.1" );
+			_client = new BaseGameClient( "127.0.0.1" );
 		else
 			_server = new BaseGameServer();
 

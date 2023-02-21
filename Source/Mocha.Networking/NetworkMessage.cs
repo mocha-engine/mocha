@@ -1,14 +1,14 @@
-﻿using Mocha.Common;
+﻿using System.Text.Json;
 
 namespace Mocha.Networking;
 
-public class NetworkMessageWrapper<T> where T : BaseNetworkMessage
+public class NetworkMessageWrapper<T>
 {
 	public int NetworkMessageType { get; set; } = -1;
-	public T Data { get; set; } = null!;
+	public T Data { get; set; } = default!;
 
 	public virtual byte[] Serialize()
 	{
-		return Serializer.Serialize( this );
+		return JsonSerializer.SerializeToUtf8Bytes( this );
 	}
 }

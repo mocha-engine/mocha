@@ -1,4 +1,5 @@
 ﻿using Mocha.Networking;
+using System.Text.Json;
 
 namespace Mocha;
 public class BaseGameServer : Server
@@ -15,12 +16,12 @@ public class BaseGameServer : Server
 
 	public override void OnMessageReceived( ConnectedClient client, byte[] data )
 	{
-		var message = Serializer.Deserialize<NetworkMessageWrapper<BaseNetworkMessage>>( data )!;
+		var message = JsonSerializer.Deserialize<NetworkMessageWrapper<object>>( data )!;
 
 		if ( message.NetworkMessageType == 0 )
 		{
 			// ClientInputMessage
-			var clientInputMessage = Serializer.Deserialize<NetworkMessageWrapper<ClientInputMessage>>( data )!;
+			var clientInputMessage = JsonSerializer.Deserialize<NetworkMessageWrapper<ClientInputMessage>>( data )!;
 			var clientInput = clientInputMessage.Data;
 
 			Log.Info( $@"BaseGameServer: Client {client} sent input message:
