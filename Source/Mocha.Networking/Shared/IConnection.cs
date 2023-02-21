@@ -5,5 +5,8 @@
 /// </summary>
 public interface IConnection
 {
+	void SendData( byte[] data );
+	void Send<T>( T message ) where T : IBaseNetworkMessage, new();
+
 	void Disconnect( string reason );
 }

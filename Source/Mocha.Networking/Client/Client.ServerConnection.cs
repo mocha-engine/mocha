@@ -8,5 +8,15 @@ public partial class Client
 		{
 			throw new NotImplementedException();
 		}
+
+		public void Send<T>( T message ) where T : IBaseNetworkMessage, new()
+		{
+			throw new NotImplementedException();
+		}
+
+		public void SendData( byte[] data )
+		{
+			throw new NotImplementedException();
+		}
 	}
 }
