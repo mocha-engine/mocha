@@ -1,5 +1,6 @@
 ﻿namespace Mocha.Networking;
 
-public class BaseNetworkMessage
+public interface IBaseNetworkMessage
 {
+	static int MessageId { get => 0; }
 }

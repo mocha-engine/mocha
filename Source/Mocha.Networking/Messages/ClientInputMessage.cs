@@ -1,7 +1,9 @@
 ﻿namespace Mocha.Networking;
 
-public class ClientInputMessage : BaseNetworkMessage
+public class ClientInputMessage : IBaseNetworkMessage
 {
+	public static int MessageId => 1;
+
 	public bool Left { get; set; }
 	public bool Right { get; set; }
 	public bool Middle { get; set; }
