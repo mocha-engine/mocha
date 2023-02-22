@@ -56,11 +56,14 @@ public class BaseEntity : IEntity
 		set => NativeEntity.SetUI( value );
 	}
 
+	public NetworkId NetworkId { get; set; }
+
 	public BaseEntity()
 	{
 		EntityRegistry.Instance.RegisterEntity( this );
 
 		CreateNativeEntity();
+		CreateNetworkId();
 
 		Position = new Vector3( 0, 0, 0 );
 		Rotation = new Rotation( 0, 0, 0, 1 );
@@ -70,8 +73,28 @@ public class BaseEntity : IEntity
 		Name = $"[{displayInfo.Category}] {displayInfo.Name} {NativeHandle}";
 
 		Event.Register( this );
+		Log.Info( $"Spawning entity {Name} on {(Core.IsClient ? "client" : "server")}" );
 
 		Spawn();
+	}
+
+	private void CreateNetworkId()
+	{
+		if ( Core.IsClient )
+		{
+			// On client - we don't want to "upstream" this to the server, so we'll
+			// make this a local entity
+			NetworkId = NetworkId.CreateLocal();
+
+			Log.Info( $"Created local entity {Name} with network id {NetworkId}" );
+		}
+		else
+		{
+			// On server - we'll network this across to clients
+			NetworkId = NetworkId.CreateNetworked();
+
+			Log.Info( $"Created networked entity {Name} with network id {NetworkId}" );
+		}
 	}
 
 	protected virtual void Spawn()
