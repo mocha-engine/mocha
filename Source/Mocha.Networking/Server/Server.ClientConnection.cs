@@ -8,11 +8,15 @@ public partial class Server
 	{
 		public uint NativeHandle { get; init; }
 		private string RemoteAddress { get; init; }
+		public string Nickname { get; init; }
 
 		private ClientConnection( uint nativeHandle )
 		{
 			NativeHandle = nativeHandle;
 			RemoteAddress = GetAddress();
+
+			// Generate a random nickname
+			Nickname = $"Player{new Random().Next( 0, 9999 )}";
 		}
 
 		public static ClientConnection CreateFromPointer( IntPtr pointer )
@@ -53,7 +57,7 @@ public partial class Server
 
 		public override string ToString()
 		{
-			return RemoteAddress;
+			return Nickname;
 		}
 	}
 }
