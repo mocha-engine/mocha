@@ -1,4 +1,6 @@
-﻿namespace Mocha.Networking;
+﻿using Mocha.Common;
+
+namespace Mocha.Networking;
 
 /// <summary>
 /// A snapshot update contains the delta between two snapshots.
@@ -20,8 +22,8 @@ public class SnapshotUpdateMessage : IBaseNetworkMessage
 	/// </summary>
 	public int SequenceNumber { get; set; }
 
-	public readonly record struct EntityFieldChange( string FieldName, object Value );
-	public readonly record struct EntityChange( uint EntityId, IEnumerable<EntityFieldChange> FieldChanges );
+	public record struct EntityFieldChange( string FieldName, object Value );
+	public record struct EntityChange( NetworkId EntityId, List<EntityFieldChange> FieldChanges );
 
 	/// <summary>
 	/// A list of changes to entities since the last snapshot.
