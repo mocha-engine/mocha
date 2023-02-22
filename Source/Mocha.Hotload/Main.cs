@@ -59,13 +59,13 @@ public static class Main
 			Path.GetFileName( manifestPath )! )
 		{
 			NotifyFilter = NotifyFilters.Attributes
-							 | NotifyFilters.CreationTime
-							 | NotifyFilters.DirectoryName
-							 | NotifyFilters.FileName
-							 | NotifyFilters.LastAccess
-							 | NotifyFilters.LastWrite
-							 | NotifyFilters.Security
-							 | NotifyFilters.Size
+						 | NotifyFilters.CreationTime
+						 | NotifyFilters.DirectoryName
+						 | NotifyFilters.FileName
+						 | NotifyFilters.LastAccess
+						 | NotifyFilters.LastWrite
+						 | NotifyFilters.Security
+						 | NotifyFilters.Size
 		};
 
 		s_manifestWatcher.Changed += OnProjectManifestChanged;
