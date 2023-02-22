@@ -117,7 +117,7 @@ internal static class Compiler
 
 			var encoding = System.Text.Encoding.Default;
 
-			var fileText = File.ReadAllText( filePath );
+			var fileText = await File.ReadAllTextAsync( filePath );
 			var sourceText = SourceText.From( fileText, encoding );
 
 			var syntaxTree = CSharpSyntaxTree.ParseText( sourceText, path: filePath );
