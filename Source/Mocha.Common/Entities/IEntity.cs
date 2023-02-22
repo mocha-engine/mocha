@@ -4,7 +4,7 @@ public interface IEntity
 {
 	string Name { get; set; }
 	uint NativeHandle { get; }
-	NetworkId NetworkId { get; }
+	NetworkId NetworkId { get; set; }
 
 	Vector3 Position { get; set; }
 	Rotation Rotation { get; set; }

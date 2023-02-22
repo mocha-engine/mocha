@@ -30,8 +30,9 @@ public class BaseGameServer : Server
 		foreach ( var entity in EntityRegistry.Instance )
 		{
 			var entityChange = new SnapshotUpdateMessage.EntityChange();
-			entityChange.EntityId = entity.NetworkId;
+			entityChange.NetworkId = entity.NetworkId;
 			entityChange.FieldChanges = new List<SnapshotUpdateMessage.EntityFieldChange>();
+			entityChange.TypeName = entity.GetType().FullName!;
 
 			if ( entity.NetworkId.IsLocal() )
 				continue; // Not networked, skip
