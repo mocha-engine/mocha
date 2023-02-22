@@ -131,29 +131,32 @@ internal static class Compiler
 		// Strip out methods marked with [ServerOnly] or [ClientOnly] attribute
 		// based on the current realm
 		var newSyntaxTrees = new List<SyntaxTree>();
+		// Which attribute do we want to remove (or, in other words, which realm are we not in)
+		var targetAttribute = assemblyInfo.IsServer ? "ClientOnly" : "ServerOnly";
 
 		foreach ( var tree in syntaxTrees )
 		{
-			var root = tree.GetRoot();
-			var methodsToStrip = new List<MethodDeclarationSyntax>();
+			var root = await tree.GetRootAsync();
+			var syntaxToStrip = new List<SyntaxNode>();
 
-			foreach ( var method in root.DescendantNodes().OfType<MethodDeclarationSyntax>() )
+			// Walk all delcarations and strip.
+			foreach ( var declaration in root.DescendantNodes().OfType<MemberDeclarationSyntax>() )
 			{
-				// Which attribute do we want to remove (or, in other words, which realm are we not in)
-				var targetAttribute = assemblyInfo.IsServer ? "ClientOnly" : "ServerOnly";
+				if ( declaration is BaseNamespaceDeclarationSyntax )
+					continue;
 
-				var attributes = method.AttributeLists
+				var attribute = declaration.AttributeLists
 					.SelectMany( x => x.Attributes )
-					.Where( x => x.Name.ToString() == targetAttribute )
-					.FirstOrDefault();
+					.FirstOrDefault( x => x.Name.ToString() == targetAttribute );
 
-				if ( attributes != null )
-				{
-					methodsToStrip.Add( method );
-				}
+				if ( attribute is not null )
+					syntaxToStrip.Add( declaration );
 			}
 
-			root = root.RemoveNodes( methodsToStrip, SyntaxRemoveOptions.KeepNoTrivia );
+			root = root.RemoveNodes( syntaxToStrip, SyntaxRemoveOptions.KeepNoTrivia );
+			if ( root is null )
+				continue;
+
 			newSyntaxTrees.Add( root.SyntaxTree );
 		}
 
