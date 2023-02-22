@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-
-namespace Mocha.Networking;
+﻿namespace Mocha.Networking;
 
 public class ConnectionManager
 {
@@ -16,13 +14,13 @@ public class ConnectionManager
 
 	protected void InvokeHandler( IConnection connection, byte[] data )
 	{
-		var message = JsonSerializer.Deserialize<NetworkMessageWrapper>( data )!;
+		var message = NetworkSerializer.Deserialize<NetworkMessageWrapper>( data )!;
 
 		foreach ( var (type, handler) in _messageHandlers )
 		{
 			if ( type == message.Type )
 			{
-				var messageData = JsonSerializer.Deserialize( message.Data, handler.type )!;
+				var messageData = NetworkSerializer.Deserialize( message.Data, handler.type )!;
 				handler.Action?.Invoke( connection, messageData );
 				return;
 			}
