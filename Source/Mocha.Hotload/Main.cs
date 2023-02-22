@@ -262,8 +262,6 @@ public static class Main
 	{
 		var info = Marshal.PtrToStructure<ManagedCallbackDispatchInfo>( infoPtr );
 
-		Log.Info( $"Invoking callback {info.handle}" );
-
 		if ( info.argsSize > 0 )
 			CallbackDispatcher.Invoke( info.handle, info.args );
 		else
