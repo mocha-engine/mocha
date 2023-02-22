@@ -74,10 +74,16 @@
     <ExternalIncludePath>$(VULKAN_SDK)\Include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath);$(SolutionDir)Mocha.Host\Thirdparty\imgui;$(SolutionDir)Mocha.Host\</ExternalIncludePath>
     <OutDir>$(SolutionDir)..\build</OutDir>
     <LibraryPath>$(SolutionDir)vcpkg_installed\$(Platform)-windows\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64)</LibraryPath>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExternalIncludePath>$(SolutionDir)Mocha.Host\Thirdparty\imgui;$(SolutionDir)Mocha.Host\;$(ExternalIncludePath)</ExternalIncludePath>
     <OutDir>$(SolutionDir)..\build</OutDir>
+    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgTriplet>x64-windows</VcpkgTriplet>
