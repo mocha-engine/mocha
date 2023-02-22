@@ -48,7 +48,5 @@ public class BaseGameServer : Server
 			Left: {clientInputMessage.Left}
 			Right: {clientInputMessage.Right}
 			Middle: {clientInputMessage.Middle}" );
-
-		client.Disconnect( "Kick Test" );
 	}
 }
