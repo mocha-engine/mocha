@@ -5,8 +5,6 @@
 /// </summary>
 public class SnapshotUpdateMessage : IBaseNetworkMessage
 {
-	public static int MessageId => 255;
-
 	/// <summary>
 	/// The timestamp of the previous snapshot.
 	/// </summary>

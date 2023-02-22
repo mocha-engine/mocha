@@ -2,6 +2,6 @@
 
 public class NetworkMessageWrapper
 {
-	public int NetworkMessageType { get; set; } = -1;
+	public string? Type { get; set; }
 	public byte[]? Data { get; set; }
 }
