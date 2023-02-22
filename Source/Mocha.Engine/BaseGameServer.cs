@@ -8,9 +8,26 @@ public class BaseGameServer : Server
 		RegisterHandler<ClientInputMessage>( OnClientInputMessage );
 	}
 
-	public override void OnClientConnected( IConnection client )
+	public override void OnClientConnected( IConnection connection )
 	{
+		if ( connection is not ClientConnection client )
+			return;
+
 		Log.Info( $"BaseGameServer: Client {client} connected" );
+
+		// Send initial HandshakeMessage
+		var handshakeMessage = new HandshakeMessage();
+		handshakeMessage.TickRate = Core.TickRate;
+		handshakeMessage.Nickname = client.Nickname;
+		client.Send( handshakeMessage );
+
+		// Send initial SnapshotUpdateMessage
+		var snapshotUpdateMessage = new SnapshotUpdateMessage();
+		snapshotUpdateMessage.PreviousTimestamp = 0;
+		snapshotUpdateMessage.CurrentTimestamp = 0;
+		snapshotUpdateMessage.SequenceNumber = 0;
+		snapshotUpdateMessage.EntityChanges.Add( new SnapshotUpdateMessage.EntityChange( 0, new List<SnapshotUpdateMessage.EntityFieldChange>() ) );
+		client.Send( snapshotUpdateMessage );
 	}
 
 	public override void OnClientDisconnected( IConnection client )
