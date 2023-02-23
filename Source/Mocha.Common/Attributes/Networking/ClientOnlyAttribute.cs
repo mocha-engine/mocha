@@ -1,6 +1,15 @@
 ﻿namespace Mocha.Common;
 
-[AttributeUsage( AttributeTargets.Method, Inherited = false, AllowMultiple = true )]
+[AttributeUsage( AttributeTargets.Class |
+	AttributeTargets.Interface |
+	AttributeTargets.Struct |
+	AttributeTargets.Enum |
+	AttributeTargets.Field |
+	AttributeTargets.Property |
+	AttributeTargets.Constructor |
+	AttributeTargets.Method |
+	AttributeTargets.Delegate |
+	AttributeTargets.Event, Inherited = true, AllowMultiple = false )]
 public sealed class ClientOnlyAttribute : Attribute
 {
 	public ClientOnlyAttribute()

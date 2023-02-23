@@ -1,4 +1,5 @@
 ﻿using Mocha.Common;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Loader;
 using System.Runtime.Serialization;
@@ -44,6 +45,8 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 		 */
 		_buildTask = Build();
 		_buildTask.Wait();
+		Debug.Assert( EntryPoint is not null, $"Initial build of project {assemblyInfo.AssemblyName} failed" );
+
 		CreateFileWatchers();
 	}
 
