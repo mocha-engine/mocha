@@ -1,27 +1,33 @@
 ﻿namespace Mocha.Common;
 
 /// <summary>
-/// A NetworkId is a wrapper around a 64-bit unsigned integer value used to identify an entity.
-/// The first bit of the value is used in order to determine whether the value is networked or local.
-/// 
-/// For example, take an entity with the ID 12345678:
-/// Local
-/// `00000000000000000000000000000000000000000000000000000000010111101`
-/// 
-/// Networked
-/// `10000000000000000000000000000000000000000000000000000000010111101`
-/// 
-/// Note that the first bit is set to 1 in the binary representation of the networked entity.
-/// The IDs used within this should not reflect the native engine handle for the entity - NetworkIds
-/// are unique to a managed context.Note that the same ID (eg. 12345678) can be used twice - once locally, and once networked - to refer to two distinct entities.
+/// A NetworkId is a wrapper around a 64-bit unsigned integer value used to identify an entity.<br />
+/// The first bit of the value is used in order to determine whether the value is networked or local.<br />
+/// The binary representation of the value is used to distinguish between local and networked entities.<br />
+/// Note that the same ID (e.g., 12345678) can be used twice - once locally, and once networked - to<br />
+/// refer to two distinct entities. The IDs used within this class should not reflect the native engine<br />
+/// handle for the entity - NetworkIds are unique to a managed context.
 /// </summary>
+/// <remarks>
+/// For example, take an entity with the ID 12345678:<br />
+/// <br />
+/// <b>Local</b><br />
+/// <code>00000000000000000000000000000000000000000000000000000000010111101</code><br />
+/// <br />
+/// <b>Networked</b><br />
+/// <code>10000000000000000000000000000000000000000000000000000000010111101</code><br />
+/// <br />
+/// Note that the first bit is set to 1 in the binary representation of the networked entity.
+/// </remarks>
 public class NetworkId
 {
 	internal ulong Value { get; private set; }
+
 	internal NetworkId( ulong value )
 	{
 		Value = value;
 	}
+
 	public bool IsNetworked()
 	{
 		// If first bit of the value is set, it's a networked entity
