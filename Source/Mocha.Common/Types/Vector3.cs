@@ -48,8 +48,8 @@ public struct Vector3 : IEquatable<Vector3>
 
 	public readonly float Length => _internalVector.Length();
 	public readonly float LengthSquared => _internalVector.LengthSquared();
-
 	public readonly Vector3 Normal => (Length == 0) ? new( 0 ) : (this / Length);
+
 	public void Normalize()
 	{
 		this = Normal;
