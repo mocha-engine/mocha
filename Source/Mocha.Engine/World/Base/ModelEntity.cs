@@ -3,6 +3,12 @@
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
+	// This is a stop-gap solution until we have a proper physics body implementation
+	public struct Physics
+	{
+		public string PhysicsModelPath { get; set; }
+	}
+
 	[HideInInspector]
 	private Glue.ModelEntity NativeModelEntity => NativeEngine.GetEntityManager().GetModelEntity( NativeHandle );
 
@@ -71,6 +77,9 @@ public partial class ModelEntity : BaseEntity
 		}
 	}
 
+	[HideInInspector, Replicated]
+	public Physics PhysicsSetup { get; set; }
+
 	public ModelEntity()
 	{
 	}
@@ -106,9 +115,12 @@ public partial class ModelEntity : BaseEntity
 	// TODO: Replace...
 	public void SetMeshPhysics( string path )
 	{
-		// TODO: Predicted physics
-		if ( !Core.IsServer )
-			return;
+		PhysicsSetup = new Physics()
+		{
+			PhysicsModelPath = path
+		};
+
+		Log.Info( $"SetMeshPhysics: {path}" );
 
 		using var _ = new Stopwatch( "Mocha phys model generation" );
 		var fileBytes = FileSystem.Mounted.ReadAllBytes( path );

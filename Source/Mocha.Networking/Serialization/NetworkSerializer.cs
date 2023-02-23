@@ -15,6 +15,8 @@ internal static class NetworkSerializer
 		deserializeOptions.Converters.Add( new Vector3Converter() );
 		deserializeOptions.Converters.Add( new Vector2Converter() );
 
+		deserializeOptions.WriteIndented = true;
+
 		return deserializeOptions;
 	}
 
@@ -23,7 +25,10 @@ internal static class NetworkSerializer
 	public static byte[] Serialize( object obj )
 	{
 		var bytes = JsonSerializer.SerializeToUtf8Bytes( obj, SerializerOptions );
-		Log.Info( $"Serialized data as {Encoding.UTF8.GetString( bytes )}" );
+
+		if ( Core.IsServer )
+			Log.Info( $"Serialized data as {Encoding.UTF8.GetString( bytes )}" );
+
 		return bytes;
 	}
 

@@ -1,5 +1,6 @@
 ﻿using Mocha.Networking;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Mocha;
 public class BaseGameClient : Client
@@ -81,20 +82,35 @@ public class BaseGameClient : Client
 
 			foreach ( var memberChange in entityChange.MemberChanges )
 			{
+				if ( memberChange.Value == null )
+					continue;
+
 				var member = entity.GetType().GetMember( memberChange.FieldName ).First()!;
+				// memberChange.Value is a JsonElement, so we need to convert it to the correct type
+				var value = JsonSerializer.Deserialize( ((JsonElement)memberChange.Value).GetRawText(), member.GetMemberType() );
+
 				if ( member.MemberType == MemberTypes.Field )
 				{
 					var field = (FieldInfo)member;
-					field.SetValue( entity, memberChange.Value );
+					field.SetValue( entity, value );
 
 					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {memberChange.Value}" );
 				}
 				else if ( member.MemberType == MemberTypes.Property )
 				{
 					var property = (PropertyInfo)member;
-					property.SetValue( entity, memberChange.Value );
+					property.SetValue( entity, value );
 
 					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {memberChange.Value}" );
+				}
+
+				if ( memberChange.FieldName == "PhysicsSetup" )
+				{
+					// Physics setup changed - let's update the physics setup
+					var physicsSetup = (ModelEntity.Physics)value;
+
+					if ( physicsSetup.PhysicsModelPath != null )
+						((ModelEntity)entity).SetMeshPhysics( physicsSetup.PhysicsModelPath );
 				}
 			}
 		}
