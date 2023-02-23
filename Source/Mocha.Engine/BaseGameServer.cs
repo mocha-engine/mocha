@@ -1,4 +1,5 @@
 ﻿using Mocha.Networking;
+using System.Reflection;
 
 namespace Mocha;
 public class BaseGameServer : Server
@@ -31,18 +32,44 @@ public class BaseGameServer : Server
 		{
 			var entityChange = new SnapshotUpdateMessage.EntityChange();
 			entityChange.NetworkId = entity.NetworkId;
-			entityChange.FieldChanges = new List<SnapshotUpdateMessage.EntityFieldChange>();
+			entityChange.MemberChanges = new List<SnapshotUpdateMessage.EntityMemberChange>();
 			entityChange.TypeName = entity.GetType().FullName!;
 
 			if ( entity.NetworkId.IsLocal() )
 				continue; // Not networked, skip
 
-			foreach ( var field in entity.GetType().GetFields() )
+			foreach ( var member in entity.GetType().GetMembers() )
 			{
-				var fieldChange = new SnapshotUpdateMessage.EntityFieldChange();
-				fieldChange.FieldName = field.Name;
-				fieldChange.Value = field.GetValue( entity );
-				entityChange.FieldChanges.Add( fieldChange );
+				// Only replicate fields and properties that are marked with [Replicated].
+				if ( member.GetCustomAttribute<ReplicatedAttribute>() == null )
+					continue;
+
+				if ( member.MemberType == MemberTypes.Property )
+				{
+					var property = member as PropertyInfo;
+
+					if ( property != null )
+					{
+						var value = property.GetValue( entity );
+						var entityMemberChange = new SnapshotUpdateMessage.EntityMemberChange();
+						entityMemberChange.FieldName = property.Name;
+						entityMemberChange.Value = value;
+						entityChange.MemberChanges.Add( entityMemberChange );
+					}
+				}
+				else if ( member.MemberType == MemberTypes.Field )
+				{
+					var field = member as FieldInfo;
+
+					if ( field != null )
+					{
+						var value = field.GetValue( entity );
+						var entityMemberChange = new SnapshotUpdateMessage.EntityMemberChange();
+						entityMemberChange.FieldName = field.Name;
+						entityMemberChange.Value = value;
+						entityChange.MemberChanges.Add( entityMemberChange );
+					}
+				}
 			}
 
 			snapshotUpdateMessage.EntityChanges.Add( entityChange );

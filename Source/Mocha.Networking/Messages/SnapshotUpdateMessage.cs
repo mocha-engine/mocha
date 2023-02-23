@@ -22,8 +22,8 @@ public class SnapshotUpdateMessage : IBaseNetworkMessage
 	/// </summary>
 	public int SequenceNumber { get; set; }
 
-	public record struct EntityFieldChange( string FieldName, object Value );
-	public record struct EntityChange( NetworkId NetworkId, List<EntityFieldChange> FieldChanges, string TypeName );
+	public record struct EntityMemberChange( string FieldName, object Value );
+	public record struct EntityChange( NetworkId NetworkId, List<EntityMemberChange> MemberChanges, string TypeName );
 
 	/// <summary>
 	/// A list of changes to entities since the last snapshot.

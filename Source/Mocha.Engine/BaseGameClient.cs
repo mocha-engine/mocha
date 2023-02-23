@@ -79,22 +79,22 @@ public class BaseGameClient : Client
 				Log.Info( $"BaseGameClient: Created entity {entity.NetworkId}" );
 			}
 
-			foreach ( var fieldChange in entityChange.FieldChanges )
+			foreach ( var memberChange in entityChange.MemberChanges )
 			{
-				var member = entity.GetType().GetMember( fieldChange.FieldName ).First()!;
+				var member = entity.GetType().GetMember( memberChange.FieldName ).First()!;
 				if ( member.MemberType == MemberTypes.Field )
 				{
 					var field = (FieldInfo)member;
-					field.SetValue( entity, fieldChange.Value );
+					field.SetValue( entity, memberChange.Value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {fieldChange.FieldName} changed to {fieldChange.Value}" );
+					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {memberChange.Value}" );
 				}
 				else if ( member.MemberType == MemberTypes.Property )
 				{
 					var property = (PropertyInfo)member;
-					property.SetValue( entity, fieldChange.Value );
+					property.SetValue( entity, memberChange.Value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {fieldChange.FieldName} changed to {fieldChange.Value}" );
+					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {memberChange.Value}" );
 				}
 			}
 		}
