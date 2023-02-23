@@ -18,28 +18,28 @@ public class BaseEntity : IEntity
 		return true;
 	}
 
-	[Category( "Transform" )]
+	[Category( "Transform" ), Replicated]
 	public Vector3 Scale
 	{
 		get => NativeEntity.GetScale();
 		set => NativeEntity.SetScale( value );
 	}
 
-	[Category( "Transform" )]
+	[Category( "Transform" ), Replicated]
 	public Vector3 Position
 	{
 		get => NativeEntity.GetPosition();
 		set => NativeEntity.SetPosition( value );
 	}
 
-	[Category( "Transform" )]
+	[Category( "Transform" ), Replicated]
 	public Rotation Rotation
 	{
 		get => NativeEntity.GetRotation();
 		set => NativeEntity.SetRotation( value );
 	}
 
-	[HideInInspector]
+	[HideInInspector, Replicated]
 	public string Name
 	{
 		get => NativeEntity.GetName();

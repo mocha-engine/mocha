@@ -6,52 +6,69 @@ public partial class ModelEntity : BaseEntity
 	[HideInInspector]
 	private Glue.ModelEntity NativeModelEntity => NativeEngine.GetEntityManager().GetModelEntity( NativeHandle );
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public Vector3 Velocity
 	{
 		get => NativeModelEntity.GetVelocity();
 		set => NativeModelEntity.SetVelocity( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public float Mass
 	{
 		get => NativeModelEntity.GetMass();
 		set => NativeModelEntity.SetMass( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public float Friction
 	{
 		get => NativeModelEntity.GetFriction();
 		set => NativeModelEntity.SetFriction( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public float Restitution
 	{
 		get => NativeModelEntity.GetRestitution();
 		set => NativeModelEntity.SetRestitution( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public bool IgnoreRigidbodyRotation
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyRotation();
 		set => NativeModelEntity.SetIgnoreRigidbodyRotation( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Replicated]
 	public bool IgnoreRigidbodyPosition
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyPosition();
 		set => NativeModelEntity.SetIgnoreRigidbodyPosition( value );
 	}
 
+	private string _modelPath;
+
 	[Category( "Rendering" )]
 	public IModel Model
 	{
-		set => NativeModelEntity.SetModel( value.NativeModel );
+		set
+		{
+			NativeModelEntity.SetModel( value.NativeModel );
+			_modelPath = value.Path;
+		}
+	}
+
+	[Category( "Rendering" ), Replicated]
+	public string ModelPath
+	{
+		get => _modelPath;
+		set
+		{
+			_modelPath = value;
+			Model = new Model( value );
+		}
 	}
 
 	public ModelEntity()
@@ -70,17 +87,29 @@ public partial class ModelEntity : BaseEntity
 
 	public void SetCubePhysics( Vector3 bounds, bool isStatic )
 	{
+		// TODO: Predicted physics
+		if ( !Core.IsServer )
+			return;
+
 		NativeModelEntity.SetCubePhysics( bounds, isStatic );
 	}
 
 	public void SetSpherePhysics( float radius, bool isStatic )
 	{
+		// TODO: Predicted physics
+		if ( !Core.IsServer )
+			return;
+
 		NativeModelEntity.SetSpherePhysics( radius, isStatic );
 	}
 
 	// TODO: Replace...
 	public void SetMeshPhysics( string path )
 	{
+		// TODO: Predicted physics
+		if ( !Core.IsServer )
+			return;
+
 		using var _ = new Stopwatch( "Mocha phys model generation" );
 		var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
 		var modelFile = Serializer.Deserialize<MochaFile<byte[]>>( fileBytes );
