@@ -54,5 +54,6 @@ public partial class Model<T> : Asset, IModel where T : struct
 
 public interface IModel
 {
+	string Path { get; set; }
 	Glue.Model NativeModel { get; }
 }
