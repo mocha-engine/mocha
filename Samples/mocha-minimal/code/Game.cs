@@ -25,6 +25,7 @@ public class Game : BaseGame
 
 			// Spawn a player
 			var player = new Player();
+			player.Position = new Vector3( 0, 0, 50 );
 		}
 		else
 		{
