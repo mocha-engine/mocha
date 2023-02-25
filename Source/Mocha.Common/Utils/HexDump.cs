@@ -6,7 +6,7 @@ public class HexDump
 {
 	public static string Dump( byte[] bytes, int bytesPerLine )
 	{
-		var sb = new StringBuilder();
+		StringBuilder sb = new StringBuilder();
 		int offset = 0;
 
 		while ( offset < bytes.Length )
@@ -31,13 +31,15 @@ public class HexDump
 			for ( int i = 0; i < lineBytes; i++ )
 			{
 				char c = (char)bytes[offset + i];
-				if ( Char.IsControl( c ) )
+
+				// If char isn't a letter, symbol, or number, replace it with a dot.
+				if ( (int)c > 32 && (int)c < 127 )
 				{
-					sb.Append( "." );
+					sb.Append( c );
 				}
 				else
 				{
-					sb.Append( c );
+					sb.Append( "." );
 				}
 			}
 
