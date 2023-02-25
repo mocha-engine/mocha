@@ -10,7 +10,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestArraySerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var array = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		var data = NetworkSerializer.Serialize( array );
@@ -21,7 +21,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestListSerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 		var data = NetworkSerializer.Serialize( list );
@@ -32,7 +32,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestStringSerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var str = "Hello World!";
 		var data = NetworkSerializer.Serialize( str );
@@ -43,7 +43,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestVector3Serialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var vec = new Vector3( 1, 2, 3 );
 		var data = NetworkSerializer.Serialize( vec );
@@ -54,7 +54,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestRotationSerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var rot = new Rotation( 1, 2, 3, 4 );
 		var data = NetworkSerializer.Serialize( rot );
@@ -65,7 +65,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestNetworkIdSerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var id = NetworkId.CreateNetworked();
 		var data = NetworkSerializer.Serialize( id );
@@ -76,7 +76,7 @@ public class NetworkSerializerTests
 	[TestMethod]
 	public void TestSnapshotUpdateMessageSerialization()
 	{
-		Mocha.Common.Global.Log = new ConsoleLogger();
+		Global.Log = new ConsoleLogger();
 
 		var message = new SnapshotUpdateMessage
 		{
