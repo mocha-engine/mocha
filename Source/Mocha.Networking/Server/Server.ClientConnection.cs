@@ -39,7 +39,7 @@ public partial class Server
 		{
 			var wrapper = new NetworkMessageWrapper();
 			wrapper.Data = NetworkSerializer.Serialize( message );
-			wrapper.Type = message.GetType().FullName;
+			wrapper.Type = message.MessageID;
 
 			var bytes = NetworkSerializer.Serialize( wrapper );
 			SendData( bytes );

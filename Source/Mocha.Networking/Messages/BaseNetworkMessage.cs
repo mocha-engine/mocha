@@ -2,4 +2,5 @@
 
 public interface IBaseNetworkMessage
 {
+	internal MessageID MessageID { get; }
 }

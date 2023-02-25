@@ -58,7 +58,7 @@ public partial class Client : ConnectionManager
 	{
 		var wrapper = new NetworkMessageWrapper();
 		wrapper.Data = NetworkSerializer.Serialize( message );
-		wrapper.Type = message.GetType().FullName;
+		wrapper.Type = message.MessageID;
 
 		var bytes = NetworkSerializer.Serialize( wrapper );
 		_nativeClient.SendData( bytes.ToInterop() );

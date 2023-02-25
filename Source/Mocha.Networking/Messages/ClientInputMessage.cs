@@ -5,6 +5,9 @@ namespace Mocha.Networking;
 [MessagePackObject]
 public class ClientInputMessage : IBaseNetworkMessage
 {
+	[IgnoreMember]
+	public MessageID MessageID => MessageID.ClientInput;
+
 	[Key( 0 )] public bool Left { get; set; }
 	[Key( 1 )] public bool Right { get; set; }
 	[Key( 2 )] public bool Middle { get; set; }

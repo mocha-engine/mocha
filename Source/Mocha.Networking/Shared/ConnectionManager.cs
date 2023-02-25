@@ -3,11 +3,13 @@
 public class ConnectionManager
 {
 	protected readonly record struct MessageHandler( Type type, Action<IConnection, object> Action );
-	protected Dictionary<string, MessageHandler> _messageHandlers = new();
+	private Dictionary<MessageID, MessageHandler> _messageHandlers = new();
 
 	protected void RegisterHandler<T>( Action<IConnection, T> handler ) where T : IBaseNetworkMessage
 	{
-		var messageId = typeof( T ).FullName!;
+		var instance = Activator.CreateInstance<T>() as IBaseNetworkMessage;
+		var messageId = instance.MessageID;
+
 		var messageHandler = new MessageHandler( typeof( T ), ( connection, data ) => handler?.Invoke( connection, (T)data ) );
 		_messageHandlers.Add( messageId, messageHandler );
 	}

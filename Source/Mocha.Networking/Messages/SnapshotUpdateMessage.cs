@@ -9,6 +9,9 @@ namespace Mocha.Networking;
 /// </summary>
 public class SnapshotUpdateMessage : IBaseNetworkMessage
 {
+	[IgnoreMember]
+	public MessageID MessageID => MessageID.SnapshotUpdate;
+
 	/// <summary>
 	/// The timestamp of the previous snapshot.
 	/// </summary>
