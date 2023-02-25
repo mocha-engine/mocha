@@ -7,7 +7,7 @@ namespace Mocha.Tests;
 [TestClass]
 public class NetworkSerializerTests
 {
-	[TestMethod]
+	[TestMethod( "Array Serialization" )]
 	public void TestArraySerialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -18,7 +18,7 @@ public class NetworkSerializerTests
 		Assert.IsTrue( array.SequenceEqual( result ) );
 	}
 
-	[TestMethod]
+	[TestMethod( "List Serialization" )]
 	public void TestListSerialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -29,7 +29,7 @@ public class NetworkSerializerTests
 		Assert.IsTrue( list.SequenceEqual( result ) );
 	}
 
-	[TestMethod]
+	[TestMethod( "String Serialization" )]
 	public void TestStringSerialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -40,7 +40,7 @@ public class NetworkSerializerTests
 		Assert.AreEqual( str, result );
 	}
 
-	[TestMethod]
+	[TestMethod( "Vector3 Serialization" )]
 	public void TestVector3Serialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -51,7 +51,7 @@ public class NetworkSerializerTests
 		Assert.AreEqual( vec, result );
 	}
 
-	[TestMethod]
+	[TestMethod( "Rotation Serialization" )]
 	public void TestRotationSerialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -62,7 +62,7 @@ public class NetworkSerializerTests
 		Assert.AreEqual( rot, result );
 	}
 
-	[TestMethod]
+	[TestMethod( "NetworkId Serialization" )]
 	public void TestNetworkIdSerialization()
 	{
 		Global.Log = new ConsoleLogger();
@@ -73,7 +73,7 @@ public class NetworkSerializerTests
 		Assert.AreEqual( id, result );
 	}
 
-	[TestMethod]
+	[TestMethod( "SnapshotUpdateMessage Serialization" )]
 	public void TestSnapshotUpdateMessageSerialization()
 	{
 		Global.Log = new ConsoleLogger();
