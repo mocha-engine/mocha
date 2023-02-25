@@ -63,6 +63,17 @@ public class NetworkSerializerTests
 	}
 
 	[TestMethod]
+	public void TestNetworkIdSerialization()
+	{
+		Mocha.Common.Global.Log = new ConsoleLogger();
+
+		var id = NetworkId.CreateNetworked();
+		var data = NetworkSerializer.Serialize( id );
+		var result = NetworkSerializer.Deserialize<NetworkId>( data );
+		Assert.AreEqual( id, result );
+	}
+
+	[TestMethod]
 	public void TestSnapshotUpdateMessageSerialization()
 	{
 		Mocha.Common.Global.Log = new ConsoleLogger();

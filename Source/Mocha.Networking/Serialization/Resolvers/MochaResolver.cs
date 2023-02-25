@@ -37,7 +37,8 @@ internal static class SampleCustomResolverGetFormatterHelper
 	// If type is concrete type, use type-formatter map
 	static readonly Dictionary<Type, object> formatterMap = new Dictionary<Type, object>()
 	{
-		{typeof(Vector3), new Vector3Formatter()}
+		{ typeof( Vector3 ), new Vector3Formatter() },
+		{ typeof( NetworkId ), new NetworkIdFormatter() },
         // add more your own custom serializers.
     };
 
