@@ -16,4 +16,11 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM.
 
 [assembly: Guid( "c43b1a2c-60e4-4832-a0ea-066eb190ba74" )]
+
 [assembly: InternalsVisibleTo( "Mocha.Tests" )]
+[assembly: InternalsVisibleTo( "Mocha.Engine" )]
+[assembly: InternalsVisibleTo( "Mocha.UI" )]
+[assembly: InternalsVisibleTo( "Mocha.Hotload" )]
+[assembly: InternalsVisibleTo( "Mocha.Networking" )]
+[assembly: InternalsVisibleTo( "Mocha.CodeGen" )]
+[assembly: InternalsVisibleTo( "Mocha.Editor" )]
