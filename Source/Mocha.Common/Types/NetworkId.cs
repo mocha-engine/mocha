@@ -19,7 +19,7 @@
 /// <br />
 /// Note that the first bit is set to 1 in the binary representation of the networked entity.
 /// </remarks>
-public class NetworkId
+public class NetworkId : IEquatable<NetworkId>
 {
 	internal ulong Value { get; private set; }
 
@@ -67,5 +67,21 @@ public class NetworkId
 	public override string ToString()
 	{
 		return $"{(IsNetworked() ? "Networked" : "Local")}: {GetValue()} ({Value})";
+	}
+
+	public bool Equals( NetworkId? other )
+	{
+		if ( other == null )
+			return false;
+
+		return Value == other.Value;
+	}
+
+	public override bool Equals( object? obj )
+	{
+		if ( obj is NetworkId id )
+			return Equals( id );
+
+		return false;
 	}
 }
