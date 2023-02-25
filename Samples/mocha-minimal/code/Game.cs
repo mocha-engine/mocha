@@ -7,8 +7,7 @@ public class Game : BaseGame
 {
 	[HotloadSkip] private UIManager Hud { get; set; }
 
-	[Replicated] public string NetworkedString { get; set; }
-	[Replicated] public MyNetType NetworkedCustomType { get; set; }
+	[Sync] public string NetworkedString { get; set; }
 
 	public override void OnStartup()
 	{

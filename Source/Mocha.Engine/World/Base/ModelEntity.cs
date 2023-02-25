@@ -17,42 +17,42 @@ public partial class ModelEntity : BaseEntity
 	[HideInInspector]
 	private Glue.ModelEntity NativeModelEntity => NativeEngine.GetEntityManager().GetModelEntity( NativeHandle );
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public Vector3 Velocity
 	{
 		get => NativeModelEntity.GetVelocity();
 		set => NativeModelEntity.SetVelocity( value );
 	}
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public float Mass
 	{
 		get => NativeModelEntity.GetMass();
 		set => NativeModelEntity.SetMass( value );
 	}
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public float Friction
 	{
 		get => NativeModelEntity.GetFriction();
 		set => NativeModelEntity.SetFriction( value );
 	}
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public float Restitution
 	{
 		get => NativeModelEntity.GetRestitution();
 		set => NativeModelEntity.SetRestitution( value );
 	}
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public bool IgnoreRigidbodyRotation
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyRotation();
 		set => NativeModelEntity.SetIgnoreRigidbodyRotation( value );
 	}
 
-	[Category( "Physics" ), Replicated]
+	[Category( "Physics" ), Sync]
 	public bool IgnoreRigidbodyPosition
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyPosition();
@@ -71,7 +71,7 @@ public partial class ModelEntity : BaseEntity
 		}
 	}
 
-	[Category( "Rendering" ), Replicated]
+	[Category( "Rendering" ), Sync]
 	public string ModelPath
 	{
 		get => _modelPath;
@@ -82,7 +82,7 @@ public partial class ModelEntity : BaseEntity
 		}
 	}
 
-	[HideInInspector, Replicated]
+	[HideInInspector, Sync]
 	public Physics PhysicsSetup { get; set; }
 
 	public ModelEntity()

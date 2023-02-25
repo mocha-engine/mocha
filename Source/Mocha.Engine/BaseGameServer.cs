@@ -41,7 +41,7 @@ public class BaseGameServer : Server
 			foreach ( var member in entity.GetType().GetMembers() )
 			{
 				// Only replicate fields and properties that are marked with [Replicated].
-				if ( member.GetCustomAttribute<ReplicatedAttribute>() == null )
+				if ( member.GetCustomAttribute<SyncAttribute>() == null )
 					continue;
 
 				if ( member.MemberType == MemberTypes.Property )
