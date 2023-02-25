@@ -10,23 +10,33 @@ public class SnapshotUpdateMessage : IBaseNetworkMessage
 	/// <summary>
 	/// The timestamp of the previous snapshot.
 	/// </summary>
-	public float PreviousTimestamp { get; set; }
+	[Replicated] public float PreviousTimestamp { get; set; }
 
 	/// <summary>
 	/// The timestamp of the current snapshot.
 	/// </summary>
-	public float CurrentTimestamp { get; set; }
+	[Replicated] public float CurrentTimestamp { get; set; }
 
 	/// <summary>
 	/// The sequence number for this snapshot.
 	/// </summary>
-	public int SequenceNumber { get; set; }
+	[Replicated] public int SequenceNumber { get; set; }
 
-	public record struct EntityMemberChange( string FieldName, object Value );
-	public record struct EntityChange( NetworkId NetworkId, List<EntityMemberChange> MemberChanges, string TypeName );
+	public struct EntityChange
+	{
+		[Replicated] public NetworkId NetworkId;
+		[Replicated] public List<EntityMemberChange> MemberChanges;
+		[Replicated] public string TypeName;
+	}
+
+	public struct EntityMemberChange
+	{
+		[Replicated] public string FieldName;
+		[Replicated] public object Value;
+	}
 
 	/// <summary>
 	/// A list of changes to entities since the last snapshot.
 	/// </summary>
-	public List<EntityChange> EntityChanges { get; set; } = new();
+	[Replicated] public List<EntityChange> EntityChanges { get; set; } = new();
 }

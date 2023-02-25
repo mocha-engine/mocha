@@ -1,5 +1,7 @@
 ﻿namespace Mocha;
 
+[Obsolete]
+[HandlesNetworkedType<string>]
 public class NetString : INetType<string>
 {
 	/// <summary>

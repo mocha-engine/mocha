@@ -2,6 +2,6 @@
 
 public class NetworkMessageWrapper
 {
-	public string? Type { get; set; }
-	public byte[]? Data { get; set; }
+	[Replicated] public string? Type { get; set; }
+	[Replicated] public byte[]? Data { get; set; }
 }

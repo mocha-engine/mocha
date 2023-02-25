@@ -5,12 +5,10 @@ namespace Minimal;
 
 public class Game : BaseGame
 {
-	[HotloadSkip]
-	private UIManager Hud { get; set; }
+	[HotloadSkip] private UIManager Hud { get; set; }
 
-	// TODO: Attributes that convert using HandlesNetworkedType
-	public NetString NetworkedString { get; set; }
-	public MyNetType NetworkedCustomType { get; set; }
+	[Replicated] public string NetworkedString { get; set; }
+	[Replicated] public MyNetType NetworkedCustomType { get; set; }
 
 	public override void OnStartup()
 	{

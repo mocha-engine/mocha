@@ -28,6 +28,8 @@ public class NetworkId
 		Value = value;
 	}
 
+	public NetworkId() { }
+
 	public bool IsNetworked()
 	{
 		// If first bit of the value is set, it's a networked entity

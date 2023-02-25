@@ -2,15 +2,15 @@
 
 public class ClientInputMessage : IBaseNetworkMessage
 {
-	public bool Left { get; set; }
-	public bool Right { get; set; }
-	public bool Middle { get; set; }
+	[Replicated] public bool Left { get; set; }
+	[Replicated] public bool Right { get; set; }
+	[Replicated] public bool Middle { get; set; }
 
-	public float ViewAnglesP { get; set; }
-	public float ViewAnglesY { get; set; }
-	public float ViewAnglesR { get; set; }
+	[Replicated] public float ViewAnglesP { get; set; }
+	[Replicated] public float ViewAnglesY { get; set; }
+	[Replicated] public float ViewAnglesR { get; set; }
 
-	public float DirectionX { get; set; }
-	public float DirectionY { get; set; }
-	public float DirectionZ { get; set; }
+	[Replicated] public float DirectionX { get; set; }
+	[Replicated] public float DirectionY { get; set; }
+	[Replicated] public float DirectionZ { get; set; }
 }

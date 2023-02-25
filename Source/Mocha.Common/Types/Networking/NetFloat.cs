@@ -1,5 +1,6 @@
 ﻿namespace Mocha;
 
+[Obsolete]
 [HandlesNetworkedType<float>]
 public class NetFloat : INetType<float>
 {

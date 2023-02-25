@@ -2,5 +2,5 @@
 
 public class KickedMessage : IBaseNetworkMessage
 {
-	public string Reason { get; set; } = "Kicked";
+	[Replicated] public string Reason { get; set; } = "Kicked";
 }
