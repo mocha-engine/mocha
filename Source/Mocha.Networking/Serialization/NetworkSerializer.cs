@@ -6,7 +6,7 @@ namespace Mocha.Networking;
 
 public static class NetworkSerializer
 {
-	private const bool UseCompression = false;
+	private const bool UseCompression = true;
 
 	private static IFormatterResolver s_resolver = CompositeResolver.Create(
 		MochaResolver.Instance,
