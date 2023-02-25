@@ -1,16 +1,19 @@
-﻿namespace Mocha.Networking;
+﻿using MessagePack;
 
+namespace Mocha.Networking;
+
+[MessagePackObject]
 public class ClientInputMessage : IBaseNetworkMessage
 {
-	[Replicated] public bool Left { get; set; }
-	[Replicated] public bool Right { get; set; }
-	[Replicated] public bool Middle { get; set; }
+	[Key( 0 )] public bool Left { get; set; }
+	[Key( 1 )] public bool Right { get; set; }
+	[Key( 2 )] public bool Middle { get; set; }
 
-	[Replicated] public float ViewAnglesP { get; set; }
-	[Replicated] public float ViewAnglesY { get; set; }
-	[Replicated] public float ViewAnglesR { get; set; }
+	[Key( 3 )] public float ViewAnglesP { get; set; }
+	[Key( 4 )] public float ViewAnglesY { get; set; }
+	[Key( 5 )] public float ViewAnglesR { get; set; }
 
-	[Replicated] public float DirectionX { get; set; }
-	[Replicated] public float DirectionY { get; set; }
-	[Replicated] public float DirectionZ { get; set; }
+	[Key( 6 )] public float DirectionX { get; set; }
+	[Key( 7 )] public float DirectionY { get; set; }
+	[Key( 8 )] public float DirectionZ { get; set; }
 }

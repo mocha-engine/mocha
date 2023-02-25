@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Facepunch.Steamworks" Version="2.3.3" />
+    <PackageReference Include="MessagePack" Version="2.5.64-alpha" />
   </ItemGroup>
 
   <ItemGroup>

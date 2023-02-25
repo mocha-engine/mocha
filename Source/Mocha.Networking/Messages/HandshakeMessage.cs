@@ -1,11 +1,13 @@
-﻿using Mocha.Common;
+﻿using MessagePack;
+using Mocha.Common;
 
 namespace Mocha.Networking;
 
+[MessagePackObject]
 public class HandshakeMessage : IBaseNetworkMessage
 {
-	[Replicated] public int TickRate { get; set; }
-	[Replicated] public string? Nickname { get; set; }
+	[Key( 0 )] public int TickRate { get; set; }
+	[Key( 1 )] public string? Nickname { get; set; }
 
 	public HandshakeMessage()
 	{

@@ -1,6 +1,9 @@
-﻿namespace Mocha.Networking;
+﻿using MessagePack;
 
+namespace Mocha.Networking;
+
+[MessagePackObject]
 public class KickedMessage : IBaseNetworkMessage
 {
-	[Replicated] public string Reason { get; set; } = "Kicked";
+	[Key( 0 )] public string Reason { get; set; } = "Kicked";
 }
