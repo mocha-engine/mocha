@@ -21,8 +21,6 @@ public static class NetworkSerializer
 	{
 		var bytes = MessagePackSerializer.Serialize( obj, s_options );
 
-		Log.Info( "Dump:\n" + HexDump.Dump( bytes, 16 ) );
-
 		return UseCompression ? Serializer.Compress( bytes ) : bytes;
 	}
 
