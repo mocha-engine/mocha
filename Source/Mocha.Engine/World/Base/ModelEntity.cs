@@ -1,11 +1,16 @@
-﻿namespace Mocha;
+﻿using MessagePack;
+
+namespace Mocha;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
 	// This is a stop-gap solution until we have a proper physics body implementation
+
+	[MessagePackObject]
 	public struct Physics
 	{
+		[Key( 0 )]
 		public string PhysicsModelPath { get; set; }
 	}
 

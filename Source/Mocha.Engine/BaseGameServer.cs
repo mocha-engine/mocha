@@ -53,7 +53,7 @@ public class BaseGameServer : Server
 						var value = property.GetValue( entity );
 						var entityMemberChange = new SnapshotUpdateMessage.EntityMemberChange();
 						entityMemberChange.FieldName = property.Name;
-						entityMemberChange.Value = value;
+						entityMemberChange.Data = NetworkSerializer.Serialize( value );
 						entityChange.MemberChanges.Add( entityMemberChange );
 					}
 				}
@@ -66,7 +66,7 @@ public class BaseGameServer : Server
 						var value = field.GetValue( entity );
 						var entityMemberChange = new SnapshotUpdateMessage.EntityMemberChange();
 						entityMemberChange.FieldName = field.Name;
-						entityMemberChange.Value = value;
+						entityMemberChange.Data = NetworkSerializer.Serialize( value );
 						entityChange.MemberChanges.Add( entityMemberChange );
 					}
 				}

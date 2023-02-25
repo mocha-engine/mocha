@@ -20,7 +20,7 @@ internal class RotationFormatter : IMessagePackFormatter<Rotation>
 		var length = reader.ReadArrayHeader();
 		if ( length != 4 )
 		{
-			throw new MessagePackSerializationException( $"Expected array of length 4, got {length}." );
+			throw new MessagePackSerializationException( $"Expected array of length 3, got {length}." );
 		}
 
 		var x = reader.ReadSingle();

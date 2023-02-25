@@ -4,7 +4,7 @@ using Mocha.Common;
 
 namespace Mocha.Networking;
 
-internal static class NetworkSerializer
+public static class NetworkSerializer
 {
 	private const bool UseCompression = false;
 

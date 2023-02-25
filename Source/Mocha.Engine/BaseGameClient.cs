@@ -1,6 +1,5 @@
 ﻿using Mocha.Networking;
 using System.Reflection;
-using System.Text.Json;
 
 namespace Mocha;
 public class BaseGameClient : Client
@@ -82,26 +81,28 @@ public class BaseGameClient : Client
 
 			foreach ( var memberChange in entityChange.MemberChanges )
 			{
-				if ( memberChange.Value == null )
+				if ( memberChange.Data == null )
 					continue;
 
 				var member = entity.GetType().GetMember( memberChange.FieldName ).First()!;
-				// memberChange.Value is a JsonElement, so we need to convert it to the correct type
-				var value = JsonSerializer.Deserialize( ((JsonElement)memberChange.Value).GetRawText(), member.GetMemberType() );
+				var value = NetworkSerializer.Deserialize( memberChange.Data, member.GetMemberType() );
+
+				if ( value == null )
+					continue;
 
 				if ( member.MemberType == MemberTypes.Field )
 				{
 					var field = (FieldInfo)member;
 					field.SetValue( entity, value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {memberChange.Value}" );
+					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {value}" );
 				}
 				else if ( member.MemberType == MemberTypes.Property )
 				{
 					var property = (PropertyInfo)member;
 					property.SetValue( entity, value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {memberChange.Value}" );
+					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {value}" );
 				}
 
 				if ( memberChange.FieldName == "PhysicsSetup" )

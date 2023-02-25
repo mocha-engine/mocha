@@ -36,7 +36,7 @@ public class SnapshotUpdateMessage : IBaseNetworkMessage
 	public struct EntityMemberChange
 	{
 		[Key( 0 )] public string FieldName;
-		[Key( 1 )] public object Value;
+		[Key( 1 )] public byte[] Data;
 	}
 
 	/// <summary>

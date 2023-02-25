@@ -91,7 +91,7 @@ public class NetworkSerializerTests
 						new SnapshotUpdateMessage.EntityMemberChange()
 						{
 							FieldName = "Test",
-							Value = "Hello World!"
+							Data = NetworkSerializer.Serialize( "Hello World!" )
 						}
 					},
 					NetworkId = NetworkId.CreateNetworked(),
@@ -109,7 +109,7 @@ public class NetworkSerializerTests
 		Assert.AreEqual( message.EntityChanges.Count, result.EntityChanges.Count );
 		Assert.AreEqual( message.EntityChanges[0].MemberChanges.Count, result.EntityChanges[0].MemberChanges.Count );
 		Assert.AreEqual( message.EntityChanges[0].MemberChanges[0].FieldName, result.EntityChanges[0].MemberChanges[0].FieldName );
-		Assert.AreEqual( message.EntityChanges[0].MemberChanges[0].Value, result.EntityChanges[0].MemberChanges[0].Value );
+		Assert.IsTrue( message.EntityChanges[0].MemberChanges[0].Data.SequenceEqual( result.EntityChanges[0].MemberChanges[0].Data ) );
 		Assert.AreEqual( message.EntityChanges[0].NetworkId, result.EntityChanges[0].NetworkId );
 		Assert.AreEqual( message.EntityChanges[0].TypeName, result.EntityChanges[0].TypeName );
 		Assert.AreEqual( message.SequenceNumber, result.SequenceNumber );
