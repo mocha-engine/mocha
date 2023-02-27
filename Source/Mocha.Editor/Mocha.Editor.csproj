@@ -9,7 +9,7 @@
 	  <OutputPath>$(SolutionDir)..\build</OutputPath>
 	  <RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 	  <AssemblyName>$(MSBuildProjectName)</AssemblyName>
-	  <Platforms>AnyCPU;x64</Platforms>
+	  <Platforms>x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

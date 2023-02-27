@@ -1,694 +1,639 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
-      <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
-      <Configuration>Release</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
-      <Configuration>Debug</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
-      <Configuration>Release</Configuration>
-      <Platform>x64</Platform>
-    </ProjectConfiguration>
-  </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{e07c31bc-2908-46ec-a186-d27077aa3eba}</ProjectGuid>
-    <RootNamespace>Moccacino</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
-    <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Label="Shared">
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OutDir>$(SolutionDir)..\build</OutDir>
-    <TargetName>Mocha.Host</TargetName>
-    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <SourcePath>$(VC_SourcePath)</SourcePath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OutDir>$(SolutionDir)..\build</OutDir>
-    <TargetName>Mocha.Host</TargetName>
-    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
-    <SourcePath>$(VC_SourcePath)</SourcePath>
-    <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
-    <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg">
-    <VcpkgEnableManifest>true</VcpkgEnableManifest>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <VcpkgTriplet>x64-windows</VcpkgTriplet>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <VcpkgTriplet>x64-windows</VcpkgTriplet>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <VcpkgTriplet>x86-windows</VcpkgTriplet>
-  </PropertyGroup>
-  <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <VcpkgTriplet>x86-windows</VcpkgTriplet>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-    </Link>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_IMGUI;NOMINMAX;VK_USE_PLATFORM_WIN32_KHR;VK_NO_PROTOTYPES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-      <MultiProcessorCompilation>true</MultiProcessorCompilation>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
-git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
+	<ItemGroup Label="ProjectConfigurations">
+		<ProjectConfiguration Include="Debug|x64">
+			<Configuration>Debug</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+		<ProjectConfiguration Include="Release|x64">
+			<Configuration>Release</Configuration>
+			<Platform>x64</Platform>
+		</ProjectConfiguration>
+	</ItemGroup>
+	<PropertyGroup Label="Globals">
+		<VCProjectVersion>16.0</VCProjectVersion>
+		<Keyword>Win32Proj</Keyword>
+		<ProjectGuid>{e07c31bc-2908-46ec-a186-d27077aa3eba}</ProjectGuid>
+		<RootNamespace>Moccacino</RootNamespace>
+		<WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+		<ConfigurationType>StaticLibrary</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v143</PlatformToolset>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+		<ConfigurationType>StaticLibrary</ConfigurationType>
+		<UseDebugLibraries>true</UseDebugLibraries>
+		<PlatformToolset>v143</PlatformToolset>
+	</PropertyGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+	<ImportGroup Label="ExtensionSettings">
+	</ImportGroup>
+	<ImportGroup Label="Shared">
+	</ImportGroup>
+	<ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+		<Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+	</ImportGroup>
+	<PropertyGroup Label="UserMacros" />
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<OutDir>$(SolutionDir)..\build</OutDir>
+		<TargetName>Mocha.Host</TargetName>
+		<ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
+		<LibraryPath>$(LibraryPath)</LibraryPath>
+		<SourcePath>$(VC_SourcePath)</SourcePath>
+		<IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+		<LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
+		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+		<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<OutDir>$(SolutionDir)..\build</OutDir>
+		<TargetName>Mocha.Host</TargetName>
+		<ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
+		<LibraryPath>$(LibraryPath)</LibraryPath>
+		<SourcePath>$(VC_SourcePath)</SourcePath>
+		<IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
+		<LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
+		<DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+		<LocalDebuggerDebuggerType>NativeWithManagedCore</LocalDebuggerDebuggerType>
+	</PropertyGroup>
+	<PropertyGroup Label="Vcpkg">
+		<VcpkgEnableManifest>true</VcpkgEnableManifest>
+	</PropertyGroup>
+	<PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<VcpkgTriplet>x64-windows</VcpkgTriplet>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Vcpkg">
+		<VcpkgTriplet>x64-windows</VcpkgTriplet>
+	</PropertyGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<SDLCheck>true</SDLCheck>
+			<PreprocessorDefinitions>_IMGUI;NOMINMAX;VK_USE_PLATFORM_WIN32_KHR;VK_NO_PROTOTYPES;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<ConformanceMode>true</ConformanceMode>
+			<ExceptionHandling>Sync</ExceptionHandling>
+			<LanguageStandard>stdcpp20</LanguageStandard>
+			<DebugInformationFormat>None</DebugInformationFormat>
+			<LanguageStandard_C>stdc17</LanguageStandard_C>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+		</ClCompile>
+		<Link>
+			<SubSystem>Windows</SubSystem>
+			<EnableCOMDATFolding>true</EnableCOMDATFolding>
+			<OptimizeReferences>true</OptimizeReferences>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<PreBuildEvent>
+			<Command>
+				echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
+				git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
 
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
-git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
-    </PreBuildEvent>
-    <Lib>
-      <AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
-      <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;VK_NO_PROTOTYPES;_IMGUI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ConformanceMode>true</ConformanceMode>
-      <ExceptionHandling>Sync</ExceptionHandling>
-      <LanguageStandard>stdcpp20</LanguageStandard>
-      <DebugInformationFormat>None</DebugInformationFormat>
-      <LanguageStandard_C>stdc17</LanguageStandard_C>
-    </ClCompile>
-    <Link>
-      <SubSystem>Windows</SubSystem>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-    </Link>
-    <PreBuildEvent>
-      <Command>echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
-git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
+				echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
+				git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h
+			</Command>
+		</PreBuildEvent>
+		<Lib>
+			<AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
+		</Lib>
+	</ItemDefinitionGroup>
+	<ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<ClCompile>
+			<WarningLevel>Level3</WarningLevel>
+			<SDLCheck>true</SDLCheck>
+			<PreprocessorDefinitions>_IMGUI;NOMINMAX;VK_USE_PLATFORM_WIN32_KHR;VK_NO_PROTOTYPES;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+			<ConformanceMode>true</ConformanceMode>
+			<ExceptionHandling>Sync</ExceptionHandling>
+			<LanguageStandard>stdcpp20</LanguageStandard>
+			<LanguageStandard_C>stdc17</LanguageStandard_C>
+			<MultiProcessorCompilation>true</MultiProcessorCompilation>
+			<Optimization>MaxSpeed</Optimization>
+			<IntrinsicFunctions>true</IntrinsicFunctions>
+			<WholeProgramOptimization>true</WholeProgramOptimization>
+			<DebugInformationFormat>None</DebugInformationFormat>
+			<BasicRuntimeChecks>Default</BasicRuntimeChecks>
+		</ClCompile>
+		<Link>
+			<SubSystem>Windows</SubSystem>
+			<GenerateDebugInformation>true</GenerateDebugInformation>
+			<AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+		</Link>
+		<PreBuildEvent>
+			<Command>
+				echo | set /p dummyName=#define GIT_CUR_COMMIT &gt; gitdefs.h
+				git rev-parse --verify --short HEAD &gt;&gt; gitdefs.h
 
-echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
-git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
-    </PreBuildEvent>
-    <Lib>
-      <AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
-    </Lib>
-  </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Entities\modelentity.cpp" />
-    <ClCompile Include="Managed\hostmanager.cpp" />
-    <ClCompile Include="Managed\managedcallback.cpp" />
-    <ClCompile Include="Misc\cvarmanager.cpp" />
-    <ClCompile Include="Misc\editormanager.cpp" />
-    <ClCompile Include="Misc\globalvars.cpp" />
-    <ClCompile Include="Misc\inputmanager.cpp" />
-    <ClCompile Include="Misc\logmanager.cpp" />
-    <ClCompile Include="Misc\projectmanager.cpp" />
-    <ClCompile Include="Networking\networkingmanager.cpp" />
-    <ClCompile Include="Physics\physicsmanager.cpp" />
-    <ClCompile Include="Rendering\Assets\material.cpp" />
-    <ClCompile Include="Rendering\Assets\model.cpp" />
-    <ClCompile Include="Rendering\Assets\texture.cpp" />
-    <ClCompile Include="Rendering\baserendercontext.cpp" />
-    <ClCompile Include="Rendering\Platform\Vulkan\pipeline.cpp" />
-    <ClCompile Include="Rendering\Platform\Vulkan\vulkanrendercontext.cpp" />
-    <ClCompile Include="Rendering\renderdocmanager.cpp" />
-    <ClCompile Include="Rendering\rendermanager.cpp" />
-    <ClCompile Include="Rendering\shadercompiler.cpp" />
-    <ClCompile Include="Rendering\window.cpp" />
-    <ClCompile Include="Root\clientroot.cpp" />
-    <ClCompile Include="Root\root.cpp" />
-    <ClCompile Include="Root\serverroot.cpp" />
-    <ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
-    <ClCompile Include="thirdparty\imgui\backends\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
-    <ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="thirdparty\implot\implot.cpp" />
-    <ClCompile Include="thirdparty\implot\implot_demo.cpp" />
-    <ClCompile Include="thirdparty\implot\implot_items.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Color.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Factory.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\IssueReporting.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\JobSystemThreadPool.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\LinearCurve.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Memory.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\RTTI.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\StringTools.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\TickCounter.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder2D.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\Indexify.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\OrientedBox.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStream.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryIn.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryOut.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamIn.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamOut.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextIn.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextOut.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableObject.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\TypeDeclarations.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyAccess.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyCreationSettings.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyInterface.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyManager.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MassProperties.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\Character.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterBase.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterVirtual.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhase.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseBruteForce.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuadTree.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\QuadTree.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastConvexVsTriangles.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastSphereVsTriangles.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideConvexVsTriangles.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideSphereVsTriangles.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionDispatch.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionGroup.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilter.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilterTable.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ManifoldBetweenTwoFaces.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseQuery.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseStats.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterial.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterialSimple.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\BoxShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CapsuleShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexHullShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CylinderShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\DecoratedShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\HeightFieldShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MeshShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MutableCompoundShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\OffsetCenterOfMassShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\RotatedTranslatedShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaledShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\Shape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SphereShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\StaticCompoundShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TaperedCapsuleShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TriangleShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\TransformedShape.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConeConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\Constraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintManager.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ContactConstraintManager.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\DistanceConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\FixedConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\GearConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\HingeConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\MotorSettings.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPath.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPathHermite.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PointConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PulleyConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\RackAndPinionConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SixDOFConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SliderConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SwingTwistConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\TwoBodyConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\DeterminismLog.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\IslandBuilder.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsLock.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsScene.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSystem.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsUpdateContext.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Ragdoll\Ragdoll.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorderImpl.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\TrackedVehicleController.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleAntiRollBar.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleCollisionTester.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleConstraint.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleController.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleDifferential.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleEngine.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTrack.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTransmission.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\Wheel.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\WheeledVehicleController.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\RegisterTypes.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRenderer.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererPlayback.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererRecorder.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletalAnimation.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\Skeleton.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonMapper.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonPose.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperClosestCentroid.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperMorton.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitter.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterBinning.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterFixedLeafSize.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.cpp" />
-    <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.cpp" />
-    <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp" />
-    <ClCompile Include="thirdparty\volk\volk.c" />
-    <ClCompile Include="Networking\valvesocketclient.cpp" />
-    <ClCompile Include="Networking\valvesocketserver.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Entities\baseentity.h" />
-    <ClInclude Include="Entities\entitymanager.h" />
-    <ClInclude Include="Entities\modelentity.h" />
-    <ClInclude Include="fontawesome.h" />
-    <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
-    <ClInclude Include="Managed\managedcallback.h" />
-    <ClInclude Include="Managed\Bindings\client.h" />
-    <ClInclude Include="Managed\Bindings\consolesystem.h" />
-    <ClInclude Include="Managed\hostmanager.h" />
-    <ClInclude Include="Misc\cvarmanager.h" />
-    <ClInclude Include="Misc\defs.h" />
-    <ClInclude Include="Misc\editormanager.h" />
-    <ClInclude Include="Misc\globalvars.h" />
-    <ClInclude Include="Misc\handlemap.h" />
-    <ClInclude Include="Misc\inputmanager.h" />
-    <ClInclude Include="Misc\logmanager.h" />
-    <ClInclude Include="Misc\mathtypes.h" />
-    <ClInclude Include="Misc\projectmanager.h" />
-    <ClInclude Include="Misc\projectmanifest.h" />
-    <ClInclude Include="Misc\subsystem.h" />
-    <ClInclude Include="Networking\networkingmanager.h" />
-    <ClInclude Include="Physics\physicsmanager.h" />
-    <ClInclude Include="Rendering\Assets\material.h" />
-    <ClInclude Include="Rendering\Assets\mesh.h" />
-    <ClInclude Include="Rendering\Assets\model.h" />
-    <ClInclude Include="Rendering\Assets\texture.h" />
-    <ClInclude Include="Rendering\baserendercontext.h" />
-    <ClInclude Include="Rendering\Platform\Null\nullrendercontext.h" />
-    <ClInclude Include="Rendering\Platform\Vulkan\pipeline.h" />
-    <ClInclude Include="Rendering\Platform\Vulkan\vkinit.h" />
-    <ClInclude Include="Rendering\Platform\Vulkan\vkmacros.h" />
-    <ClInclude Include="Rendering\Platform\Vulkan\vulkanrendercontext.h" />
-    <ClInclude Include="Rendering\renderdocmanager.h" />
-    <ClInclude Include="Rendering\rendering.h" />
-    <ClInclude Include="Rendering\rendermanager.h" />
-    <ClInclude Include="Rendering\shadercompiler.h" />
-    <ClInclude Include="Rendering\window.h" />
-    <ClInclude Include="Root\clientroot.h" />
-    <ClInclude Include="Root\root.h" />
-    <ClInclude Include="Root\serverroot.h" />
-    <ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />
-    <ClInclude Include="thirdparty\imgui\backends\imgui_impl_vulkan.h" />
-    <ClInclude Include="thirdparty\imgui\imgui.h" />
-    <ClInclude Include="thirdparty\imgui\imgui_internal.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
-    <ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
-    <ClInclude Include="thirdparty\implot\implot.h" />
-    <ClInclude Include="thirdparty\implot\implot_internal.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeToBuffer.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\NodeCodec\NodeCodecQuadTreeHalfFloat.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\TriangleCodec\TriangleCodecIndexed8BitPackSOA4Flags.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\ARMNeon.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Atomics.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\ByteBuffer.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Color.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Core.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Factory.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPControlWord.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPException.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPFlushDenormals.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\HashCombine.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\InsertionSort.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\IssueReporting.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\JobSystem.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\JobSystemThreadPool.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\LinearCurve.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\LockFreeHashMap.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Memory.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Mutex.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\MutexArray.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\NonCopyable.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\QuickSort.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Reference.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Result.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\RTTI.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StaticArray.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLAlignedAllocator.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLAllocator.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLTempAllocator.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamIn.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamOut.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamWrapper.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StringTools.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\TempAllocator.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\TickCounter.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\UnorderedMap.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\UnorderedSet.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\AABox.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\AABox4.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ClipPoly.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ClosestPoint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder2D.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexSupport.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Ellipse.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\EPAConvexHullBuilder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\EPAPenetrationDepth.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\GJKClosestPoint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\IndexedTriangle.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Indexify.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\MortonCode.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\OrientedBox.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Plane.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayAABox.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayAABox8.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayCapsule.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayCylinder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RaySphere.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayTriangle.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayTriangle8.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Sphere.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Triangle.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Jolt.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DynMatrix.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\EigenValueSymmetric.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\FindRoot.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float2.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float3.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float4.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\GaussianElimination.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\HalfFloat.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Mat44.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Math.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\MathTypes.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Matrix.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Quat.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Swizzle.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Trigonometry.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\UVec8.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec4.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec8.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vector.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\GetPrimitiveTypeOfType.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStream.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryIn.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryOut.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamIn.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamOut.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextIn.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextOut.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTypes.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttribute.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttributeEnum.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttributeTyped.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableObject.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\TypeDeclarations.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyAccess.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyActivationListener.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyCreationSettings.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyFilter.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyID.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyInterface.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLock.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLockInterface.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLockMulti.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyManager.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyPair.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MassProperties.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionQuality.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionType.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\Character.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterBase.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterVirtual.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\AABoxCast.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ActiveEdgeMode.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ActiveEdges.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BackFaceMode.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhase.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseBruteForce.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseLayer.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuadTree.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuery.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\QuadTree.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastConvexVsTriangles.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastResult.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastSphereVsTriangles.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollectFacesMode.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideConvexVsTriangles.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollidePointResult.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideSphereVsTriangles.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionCollector.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionCollectorImpl.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionDispatch.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionGroup.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ContactListener.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilter.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilterTable.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ManifoldBetweenTwoFaces.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseQuery.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseStats.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ObjectLayer.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterial.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterialSimple.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\RayCast.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ShapeCast.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ShapeFilter.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\BoxShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CapsuleShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShapeVisitors.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexHullShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CylinderShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\DecoratedShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\GetTrianglesContext.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\HeightFieldShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MeshShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MutableCompoundShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\OffsetCenterOfMassShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\PolyhedronSubmergedVolumeCalculator.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\RotatedTranslatedShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaledShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaleHelpers.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\Shape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SphereShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\StaticCompoundShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SubShapeID.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SubShapeIDPair.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TaperedCapsuleShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TriangleShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\SortReverseAndStore.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\TransformedShape.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConeConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\Constraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintManager.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\AngleConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\AxisConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\DualAxisConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\GearConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\HingeRotationConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\IndependentAxisConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\PointConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RackAndPinionConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RotationEulerConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RotationQuatConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\SpringPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\SwingTwistConstraintPart.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ContactConstraintManager.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\DistanceConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\FixedConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\GearConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\HingeConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\MotorSettings.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPath.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPathHermite.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PointConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PulleyConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\RackAndPinionConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SixDOFConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SliderConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SwingTwistConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\TwoBodyConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\DeterminismLog.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\EActivation.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\IslandBuilder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsLock.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsScene.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSettings.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsStepListener.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSystem.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsUpdateContext.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Ragdoll\Ragdoll.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorderImpl.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\TrackedVehicleController.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleAntiRollBar.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleCollisionTester.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleConstraint.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleController.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleDifferential.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleEngine.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTrack.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTransmission.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\Wheel.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\WheeledVehicleController.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\RegisterTypes.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRenderer.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererPlayback.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererRecorder.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletalAnimation.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\Skeleton.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonMapper.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonPose.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouper.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperClosestCentroid.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperMorton.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitter.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterBinning.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterFixedLeafSize.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.h" />
-    <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.h" />
-    <ClInclude Include="thirdparty\Renderdoc\renderdoc_app.h" />
-    <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrap.h" />
-    <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
-    <ClInclude Include="thirdparty\volk\volk.h" />
-    <ClInclude Include="Util\util.h" />
-    <ClInclude Include="Util\utilarray.h" />
-    <ClInclude Include="Networking\valvesocketclient.h" />
-    <ClInclude Include="Networking\valvesocketserver.h" />
-    <ClInclude Include="Networking\valvesocketreceivedmessage.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Core\JobSystem.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Core\LockFreeHashMap.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\Mat44.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\Quat.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\UVec8.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\Vec4.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Math\Vec8.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.inl" />
-    <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.inl" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+				echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
+				git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h
+			</Command>
+		</PreBuildEvent>
+		<Lib>
+			<AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
+		</Lib>
+	</ItemDefinitionGroup>
+	<ItemGroup>
+		<ClCompile Include="Entities\modelentity.cpp" />
+		<ClCompile Include="Managed\hostmanager.cpp" />
+		<ClCompile Include="Managed\managedcallback.cpp" />
+		<ClCompile Include="Misc\cvarmanager.cpp" />
+		<ClCompile Include="Misc\editormanager.cpp" />
+		<ClCompile Include="Misc\globalvars.cpp" />
+		<ClCompile Include="Misc\inputmanager.cpp" />
+		<ClCompile Include="Misc\logmanager.cpp" />
+		<ClCompile Include="Misc\projectmanager.cpp" />
+		<ClCompile Include="Networking\networkingmanager.cpp" />
+		<ClCompile Include="Physics\physicsmanager.cpp" />
+		<ClCompile Include="Rendering\Assets\material.cpp" />
+		<ClCompile Include="Rendering\Assets\model.cpp" />
+		<ClCompile Include="Rendering\Assets\texture.cpp" />
+		<ClCompile Include="Rendering\baserendercontext.cpp" />
+		<ClCompile Include="Rendering\Platform\Vulkan\pipeline.cpp" />
+		<ClCompile Include="Rendering\Platform\Vulkan\vulkanrendercontext.cpp" />
+		<ClCompile Include="Rendering\renderdocmanager.cpp" />
+		<ClCompile Include="Rendering\rendermanager.cpp" />
+		<ClCompile Include="Rendering\shadercompiler.cpp" />
+		<ClCompile Include="Rendering\window.cpp" />
+		<ClCompile Include="Root\clientroot.cpp" />
+		<ClCompile Include="Root\root.cpp" />
+		<ClCompile Include="Root\serverroot.cpp" />
+		<ClCompile Include="thirdparty\imgui\backends\imgui_impl_sdl.cpp" />
+		<ClCompile Include="thirdparty\imgui\backends\imgui_impl_vulkan.cpp" />
+		<ClCompile Include="thirdparty\imgui\imgui.cpp" />
+		<ClCompile Include="thirdparty\imgui\imgui_demo.cpp" />
+		<ClCompile Include="thirdparty\imgui\imgui_draw.cpp" />
+		<ClCompile Include="thirdparty\imgui\imgui_tables.cpp" />
+		<ClCompile Include="thirdparty\imgui\imgui_widgets.cpp" />
+		<ClCompile Include="thirdparty\implot\implot.cpp" />
+		<ClCompile Include="thirdparty\implot\implot_demo.cpp" />
+		<ClCompile Include="thirdparty\implot\implot_items.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Color.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Factory.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\IssueReporting.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\JobSystemThreadPool.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\LinearCurve.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Memory.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\RTTI.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\StringTools.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Core\TickCounter.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder2D.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\Indexify.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Geometry\OrientedBox.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStream.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryIn.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryOut.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamIn.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamOut.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextIn.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextOut.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableObject.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\ObjectStream\TypeDeclarations.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyAccess.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyCreationSettings.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyInterface.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyManager.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MassProperties.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\Character.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterBase.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterVirtual.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhase.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseBruteForce.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuadTree.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\QuadTree.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastConvexVsTriangles.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastSphereVsTriangles.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideConvexVsTriangles.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideSphereVsTriangles.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionDispatch.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionGroup.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilter.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilterTable.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ManifoldBetweenTwoFaces.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseQuery.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseStats.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterial.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterialSimple.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\BoxShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CapsuleShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexHullShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CylinderShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\DecoratedShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\HeightFieldShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MeshShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MutableCompoundShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\OffsetCenterOfMassShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\RotatedTranslatedShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaledShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\Shape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SphereShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\StaticCompoundShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TaperedCapsuleShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TriangleShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\TransformedShape.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConeConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\Constraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintManager.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ContactConstraintManager.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\DistanceConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\FixedConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\GearConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\HingeConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\MotorSettings.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPath.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPathHermite.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PointConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PulleyConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\RackAndPinionConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SixDOFConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SliderConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SwingTwistConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\TwoBodyConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\DeterminismLog.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\IslandBuilder.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsLock.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsScene.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSystem.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsUpdateContext.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Ragdoll\Ragdoll.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorderImpl.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\TrackedVehicleController.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleAntiRollBar.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleCollisionTester.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleConstraint.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleController.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleDifferential.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleEngine.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTrack.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTransmission.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\Wheel.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\WheeledVehicleController.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\RegisterTypes.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRenderer.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererPlayback.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererRecorder.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletalAnimation.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\Skeleton.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonMapper.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonPose.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperClosestCentroid.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperMorton.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitter.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterBinning.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterFixedLeafSize.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.cpp" />
+		<ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.cpp" />
+		<ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp" />
+		<ClCompile Include="thirdparty\volk\volk.c" />
+		<ClCompile Include="Networking\valvesocketclient.cpp" />
+		<ClCompile Include="Networking\valvesocketserver.cpp" />
+	</ItemGroup>
+	<ItemGroup>
+		<ClInclude Include="Entities\baseentity.h" />
+		<ClInclude Include="Entities\entitymanager.h" />
+		<ClInclude Include="Entities\modelentity.h" />
+		<ClInclude Include="fontawesome.h" />
+		<ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
+		<ClInclude Include="Managed\managedcallback.h" />
+		<ClInclude Include="Managed\Bindings\client.h" />
+		<ClInclude Include="Managed\Bindings\consolesystem.h" />
+		<ClInclude Include="Managed\hostmanager.h" />
+		<ClInclude Include="Misc\cvarmanager.h" />
+		<ClInclude Include="Misc\defs.h" />
+		<ClInclude Include="Misc\editormanager.h" />
+		<ClInclude Include="Misc\globalvars.h" />
+		<ClInclude Include="Misc\handlemap.h" />
+		<ClInclude Include="Misc\inputmanager.h" />
+		<ClInclude Include="Misc\logmanager.h" />
+		<ClInclude Include="Misc\mathtypes.h" />
+		<ClInclude Include="Misc\projectmanager.h" />
+		<ClInclude Include="Misc\projectmanifest.h" />
+		<ClInclude Include="Misc\subsystem.h" />
+		<ClInclude Include="Networking\networkingmanager.h" />
+		<ClInclude Include="Physics\physicsmanager.h" />
+		<ClInclude Include="Rendering\Assets\material.h" />
+		<ClInclude Include="Rendering\Assets\mesh.h" />
+		<ClInclude Include="Rendering\Assets\model.h" />
+		<ClInclude Include="Rendering\Assets\texture.h" />
+		<ClInclude Include="Rendering\baserendercontext.h" />
+		<ClInclude Include="Rendering\Platform\Null\nullrendercontext.h" />
+		<ClInclude Include="Rendering\Platform\Vulkan\pipeline.h" />
+		<ClInclude Include="Rendering\Platform\Vulkan\vkinit.h" />
+		<ClInclude Include="Rendering\Platform\Vulkan\vkmacros.h" />
+		<ClInclude Include="Rendering\Platform\Vulkan\vulkanrendercontext.h" />
+		<ClInclude Include="Rendering\renderdocmanager.h" />
+		<ClInclude Include="Rendering\rendering.h" />
+		<ClInclude Include="Rendering\rendermanager.h" />
+		<ClInclude Include="Rendering\shadercompiler.h" />
+		<ClInclude Include="Rendering\window.h" />
+		<ClInclude Include="Root\clientroot.h" />
+		<ClInclude Include="Root\root.h" />
+		<ClInclude Include="Root\serverroot.h" />
+		<ClInclude Include="thirdparty\imgui\backends\imgui_impl_sdl.h" />
+		<ClInclude Include="thirdparty\imgui\backends\imgui_impl_vulkan.h" />
+		<ClInclude Include="thirdparty\imgui\imgui.h" />
+		<ClInclude Include="thirdparty\imgui\imgui_internal.h" />
+		<ClInclude Include="thirdparty\imgui\imstb_rectpack.h" />
+		<ClInclude Include="thirdparty\imgui\imstb_textedit.h" />
+		<ClInclude Include="thirdparty\imgui\imstb_truetype.h" />
+		<ClInclude Include="thirdparty\implot\implot.h" />
+		<ClInclude Include="thirdparty\implot\implot_internal.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeBuilder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\AABBTreeToBuffer.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\NodeCodec\NodeCodecQuadTreeHalfFloat.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\AABBTree\TriangleCodec\TriangleCodecIndexed8BitPackSOA4Flags.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\ARMNeon.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Atomics.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\ByteBuffer.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Color.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Core.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Factory.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPControlWord.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPException.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\FPFlushDenormals.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\HashCombine.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\InsertionSort.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\IssueReporting.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\JobSystem.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\JobSystemThreadPool.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\LinearCurve.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\LockFreeHashMap.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Memory.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Mutex.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\MutexArray.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\NonCopyable.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\QuickSort.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Reference.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\Result.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\RTTI.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StaticArray.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLAlignedAllocator.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLAllocator.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\STLTempAllocator.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamIn.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamOut.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StreamWrapper.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\StringTools.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\TempAllocator.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\TickCounter.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\UnorderedMap.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Core\UnorderedSet.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\AABox.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\AABox4.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ClipPoly.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ClosestPoint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexHullBuilder2D.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\ConvexSupport.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Ellipse.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\EPAConvexHullBuilder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\EPAPenetrationDepth.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\GJKClosestPoint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\IndexedTriangle.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Indexify.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\MortonCode.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\OrientedBox.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Plane.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayAABox.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayAABox8.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayCapsule.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayCylinder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RaySphere.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayTriangle.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\RayTriangle8.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Sphere.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Geometry\Triangle.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Jolt.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\DynMatrix.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\EigenValueSymmetric.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\FindRoot.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float2.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float3.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Float4.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\GaussianElimination.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\HalfFloat.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Mat44.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Math.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\MathTypes.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Matrix.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Quat.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Swizzle.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Trigonometry.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\UVec8.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec4.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vec8.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Math\Vector.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\GetPrimitiveTypeOfType.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStream.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryIn.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamBinaryOut.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamIn.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamOut.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextIn.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTextOut.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\ObjectStreamTypes.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttribute.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttributeEnum.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableAttributeTyped.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\SerializableObject.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\ObjectStream\TypeDeclarations.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyAccess.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyActivationListener.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyCreationSettings.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyFilter.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyID.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyInterface.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLock.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLockInterface.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyLockMulti.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyManager.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\BodyPair.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MassProperties.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionQuality.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionType.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\Character.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterBase.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Character\CharacterVirtual.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\AABoxCast.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ActiveEdgeMode.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ActiveEdges.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BackFaceMode.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhase.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseBruteForce.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseLayer.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuadTree.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\BroadPhaseQuery.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\BroadPhase\QuadTree.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastConvexVsTriangles.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastResult.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CastSphereVsTriangles.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollectFacesMode.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideConvexVsTriangles.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollidePointResult.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollideSphereVsTriangles.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionCollector.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionCollectorImpl.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionDispatch.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\CollisionGroup.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ContactListener.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilter.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\GroupFilterTable.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ManifoldBetweenTwoFaces.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseQuery.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\NarrowPhaseStats.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ObjectLayer.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterial.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\PhysicsMaterialSimple.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\RayCast.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ShapeCast.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\ShapeFilter.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\BoxShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CapsuleShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CompoundShapeVisitors.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexHullShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ConvexShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\CylinderShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\DecoratedShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\GetTrianglesContext.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\HeightFieldShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MeshShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\MutableCompoundShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\OffsetCenterOfMassShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\PolyhedronSubmergedVolumeCalculator.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\RotatedTranslatedShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaledShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\ScaleHelpers.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\Shape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SphereShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\StaticCompoundShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SubShapeID.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\SubShapeIDPair.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TaperedCapsuleShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\Shape\TriangleShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\SortReverseAndStore.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Collision\TransformedShape.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConeConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\Constraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintManager.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\AngleConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\AxisConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\DualAxisConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\GearConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\HingeRotationConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\IndependentAxisConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\PointConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RackAndPinionConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RotationEulerConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\RotationQuatConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\SpringPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ConstraintPart\SwingTwistConstraintPart.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\ContactConstraintManager.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\DistanceConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\FixedConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\GearConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\HingeConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\MotorSettings.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPath.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PathConstraintPathHermite.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PointConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\PulleyConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\RackAndPinionConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SixDOFConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SliderConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\SwingTwistConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Constraints\TwoBodyConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\DeterminismLog.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\EActivation.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\IslandBuilder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsLock.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsScene.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSettings.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsStepListener.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsSystem.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\PhysicsUpdateContext.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Ragdoll\Ragdoll.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\StateRecorderImpl.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\TrackedVehicleController.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleAntiRollBar.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleCollisionTester.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleConstraint.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleController.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleDifferential.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleEngine.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTrack.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\VehicleTransmission.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\Wheel.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Physics\Vehicle\WheeledVehicleController.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\RegisterTypes.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRenderer.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererPlayback.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Renderer\DebugRendererRecorder.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletalAnimation.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\Skeleton.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonMapper.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\Skeleton\SkeletonPose.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouper.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperClosestCentroid.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleGrouper\TriangleGrouperMorton.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitter.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterBinning.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterFixedLeafSize.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterLongestAxis.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.h" />
+		<ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.h" />
+		<ClInclude Include="thirdparty\Renderdoc\renderdoc_app.h" />
+		<ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrap.h" />
+		<ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
+		<ClInclude Include="thirdparty\volk\volk.h" />
+		<ClInclude Include="Util\util.h" />
+		<ClInclude Include="Util\utilarray.h" />
+		<ClInclude Include="Networking\valvesocketclient.h" />
+		<ClInclude Include="Networking\valvesocketserver.h" />
+		<ClInclude Include="Networking\valvesocketreceivedmessage.h" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Core\JobSystem.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Core\LockFreeHashMap.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\Mat44.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\Quat.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\UVec4.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\UVec8.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\Vec3.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\Vec4.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Math\Vec8.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.inl" />
+		<None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.inl" />
+	</ItemGroup>
+	<Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+	<ImportGroup Label="ExtensionTargets">
+	</ImportGroup>
 </Project>

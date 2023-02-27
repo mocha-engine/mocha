@@ -7,34 +7,18 @@
 		<Nullable>enable</Nullable>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
-		<Platforms>AnyCPU;x64;x86</Platforms>
+		<Platforms>x64</Platforms>
 		<BaseOutputPath>$(SolutionDir)..\build</BaseOutputPath>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<OutputPath>$(SolutionDir)..\build</OutputPath>
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
-	</PropertyGroup>
-
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
-	</PropertyGroup>
-
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-		<DefineConstants>$(DefineConstants)</DefineConstants>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
 		<DefineConstants>$(DefineConstants)</DefineConstants>
 	</PropertyGroup>
 

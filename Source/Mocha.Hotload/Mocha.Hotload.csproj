@@ -12,7 +12,7 @@
 
 		<!-- Important -->
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-		<Platforms>AnyCPU;x64</Platforms>
+		<Platforms>x64</Platforms>
 		<PreserveCompilationContext>true</PreserveCompilationContext>
 	</PropertyGroup>
 
