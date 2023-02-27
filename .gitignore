@@ -396,3 +396,6 @@ cvars.json
 
 # Server configuration
 server.cfg
+
+# JetBrains IDEs
+Source/.idea
