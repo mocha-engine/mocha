@@ -6,8 +6,8 @@ public class BaseGame : IGame
 {
 	public static BaseGame Current { get; set; }
 
-	private Server _server;
-	private Client _client;
+	private static Server? s_server;
+	private static Client? s_client;
 
 	public BaseGame()
 	{
@@ -61,8 +61,8 @@ public class BaseGame : IGame
 	public void Update()
 	{
 		// TODO: This is garbage and should not be here!!!
-		_server?.Update();
-		_client?.Update();
+		s_server?.Update();
+		s_client?.Update();
 
 		if ( Core.IsClient )
 		{
@@ -83,9 +83,9 @@ public class BaseGame : IGame
 	public void Startup()
 	{
 		if ( Core.IsClient )
-			_client = new BaseGameClient( "127.0.0.1" );
+			s_client = new BaseGameClient( "127.0.0.1" );
 		else
-			_server = new BaseGameServer();
+			s_server = new BaseGameServer();
 
 		OnStartup();
 	}
