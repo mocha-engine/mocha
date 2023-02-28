@@ -2,8 +2,6 @@
 
 public class Player : Mocha.Player
 {
-	private Vector3 PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
-
 	public WalkController WalkController { get; private set; }
 
 	public float Health { get; set; }
@@ -13,12 +11,13 @@ public class Player : Mocha.Player
 		// TODO: This would be better as just a ctor
 		base.Spawn();
 
+		PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
 		SetCubePhysics( PlayerBounds, false );
 	}
 
 	private void UpdateEyeTransform()
 	{
-		EyePosition = Position + Vector3.Up * PlayerHalfExtents.Z;
+		EyePosition = Position + Vector3.Up * PlayerBounds.Z;
 		EyeRotation = Input.Rotation;
 	}
 
@@ -26,11 +25,9 @@ public class Player : Mocha.Player
 	{
 		base.Respawn();
 
-		PlayerHalfExtents = PlayerBounds / 2f;
-
 		WalkController = new( this );
 		Velocity = Vector3.Zero;
-		Position = new Vector3( 0.0f, 4.0f, 0.9f );
+		Position = new Vector3( 0.0f, 4.0f, 5.0f );
 	}
 
 	public void PredictedUpdate()
@@ -47,7 +44,6 @@ public class Player : Mocha.Player
 		Health = MathX.Sin01( Time.Now ) * 100f;
 	}
 
-	float lastHeight = 1.8f;
 	float lastFov = 90f;
 
 	private void UpdateCamera()
@@ -61,10 +57,6 @@ public class Player : Mocha.Player
 		// Position
 		//
 		Camera.Position = Position + LocalEyePosition;
-
-		// Smooth out z-axis so that stairs, crouching are not sudden changes
-		Camera.Position = Camera.Position.WithZ( lastHeight.LerpTo( Camera.Position.Z, 10f * Time.Delta ) );
-		lastHeight = Camera.Position.Z;
 
 		//
 		// Field of view
