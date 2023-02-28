@@ -17,16 +17,21 @@ public class BaseGameServer : Server
 		Log.Info( $"BaseGameServer: Client {client} connected" );
 
 		// Send initial HandshakeMessage
-		var handshakeMessage = new HandshakeMessage();
-		handshakeMessage.TickRate = Core.TickRate;
-		handshakeMessage.Nickname = client.Nickname;
+		var handshakeMessage = new HandshakeMessage
+		{
+			Timestamp = Time.Now,
+			TickRate = Core.TickRate,
+			Nickname = client.Nickname
+		};
 		client.Send( handshakeMessage );
 
 		// Send initial SnapshotUpdateMessage
-		var snapshotUpdateMessage = new SnapshotUpdateMessage();
-		snapshotUpdateMessage.PreviousTimestamp = 0;
-		snapshotUpdateMessage.CurrentTimestamp = 0;
-		snapshotUpdateMessage.SequenceNumber = 0;
+		var snapshotUpdateMessage = new SnapshotUpdateMessage
+		{
+			PreviousTimestamp = -1,
+			CurrentTimestamp = Time.Now,
+			SequenceNumber = 0
+		};
 
 		foreach ( var entity in EntityRegistry.Instance )
 		{

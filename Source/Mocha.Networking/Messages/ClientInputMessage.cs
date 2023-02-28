@@ -2,21 +2,23 @@
 
 namespace Mocha.Networking;
 
-[MessagePackObject]
+[MessagePackObject( true )]
 public class ClientInputMessage : IBaseNetworkMessage
 {
 	[IgnoreMember]
 	public MessageID MessageID => MessageID.ClientInput;
 
-	[Key( 0 )] public bool Left { get; set; }
-	[Key( 1 )] public bool Right { get; set; }
-	[Key( 2 )] public bool Middle { get; set; }
+	public float Timestamp { get; set; }
 
-	[Key( 3 )] public float ViewAnglesP { get; set; }
-	[Key( 4 )] public float ViewAnglesY { get; set; }
-	[Key( 5 )] public float ViewAnglesR { get; set; }
+	public bool Left { get; set; }
+	public bool Right { get; set; }
+	public bool Middle { get; set; }
 
-	[Key( 6 )] public float DirectionX { get; set; }
-	[Key( 7 )] public float DirectionY { get; set; }
-	[Key( 8 )] public float DirectionZ { get; set; }
+	public float ViewAnglesP { get; set; }
+	public float ViewAnglesY { get; set; }
+	public float ViewAnglesR { get; set; }
+
+	public float DirectionX { get; set; }
+	public float DirectionY { get; set; }
+	public float DirectionZ { get; set; }
 }

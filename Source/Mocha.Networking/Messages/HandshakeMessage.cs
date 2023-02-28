@@ -3,14 +3,15 @@ using Mocha.Common;
 
 namespace Mocha.Networking;
 
-[MessagePackObject]
+[MessagePackObject( true )]
 public class HandshakeMessage : IBaseNetworkMessage
 {
 	[IgnoreMember]
 	public MessageID MessageID => MessageID.Handshake;
 
-	[Key( 0 )] public int TickRate { get; set; }
-	[Key( 1 )] public string? Nickname { get; set; }
+	public float Timestamp { get; set; }
+	public int TickRate { get; set; }
+	public string? Nickname { get; set; }
 
 	public HandshakeMessage()
 	{
