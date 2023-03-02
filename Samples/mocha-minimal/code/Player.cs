@@ -33,7 +33,6 @@ public class Player : Mocha.Player
 	public void PredictedUpdate()
 	{
 		UpdateEyeTransform();
-		WalkController.PredictedUpdate();
 	}
 
 	public override void FrameUpdate()
