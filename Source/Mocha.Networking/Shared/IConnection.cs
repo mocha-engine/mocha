@@ -1,4 +1,6 @@
-﻿namespace Mocha.Networking;
+﻿using Mocha.Common;
+
+namespace Mocha.Networking;
 
 /// <summary>
 /// Represents a connection between a client and a server
@@ -9,4 +11,6 @@ public interface IConnection
 	void Send<T>( T message ) where T : IBaseNetworkMessage, new();
 
 	void Disconnect( string reason );
+
+	IClient GetClient();
 }

@@ -35,12 +35,12 @@ public class Game : BaseGame
 	[Event.Tick, ServerOnly]
 	public void ServerTick()
 	{
-		DebugOverlay.ScreenText( "Server Tick..." );
+		DebugOverlay.ScreenText( $"Server Tick... ({GetType().Assembly.GetHashCode()})" );
 	}
 
 	[Event.Tick, ClientOnly]
 	public void ClientTick()
 	{
-		DebugOverlay.ScreenText( "Client Tick..." );
+		DebugOverlay.ScreenText( $"Client Tick... ({GetType().Assembly.GetHashCode()})" );
 	}
 }

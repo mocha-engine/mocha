@@ -11,7 +11,7 @@ public partial class Server : ConnectionManager
 
 	// I don't like the idea of managing two separate lists (one native,
 	// one managed) for this, but I think it might be unavoidable. :(
-	private List<IConnection> _connectedClients = new();
+	protected List<IConnection> _connectedClients = new();
 
 	public Server( ushort port = 10570 )
 	{
@@ -60,6 +60,8 @@ public partial class Server : ConnectionManager
 	{
 		_nativeServer.PumpEvents();
 		_nativeServer.RunCallbacks();
+
+		OnUpdate();
 	}
 
 	public virtual void OnClientConnected( IConnection client )
@@ -71,6 +73,10 @@ public partial class Server : ConnectionManager
 	}
 
 	public virtual void OnMessageReceived( IConnection client, byte[] data )
+	{
+	}
+
+	public virtual void OnUpdate()
 	{
 	}
 }

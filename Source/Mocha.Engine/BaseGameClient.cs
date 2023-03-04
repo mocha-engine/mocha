@@ -55,7 +55,7 @@ public class BaseGameClient : Client
 	{
 		foreach ( var entityChange in snapshotUpdateMessage.EntityChanges )
 		{
-			Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} changed" );
+			// Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} changed" );
 
 			// Does this entity already exist?
 			var entity = EntityRegistry.Instance.FirstOrDefault( x => x.NetworkId == entityChange.NetworkId );
@@ -67,7 +67,7 @@ public class BaseGameClient : Client
 
 				if ( type == null )
 				{
-					Log.Error( $"BaseGameClient: Unable to locate type '{entityChange.TypeName}'" );
+					// Log.Error( $"BaseGameClient: Unable to locate type '{entityChange.TypeName}'" );
 					continue;
 				}
 
@@ -76,7 +76,7 @@ public class BaseGameClient : Client
 				// Set the network ID
 				entity.NetworkId = entityChange.NetworkId;
 
-				Log.Info( $"BaseGameClient: Created entity {entity.NetworkId}" );
+				// Log.Info( $"BaseGameClient: Created entity {entity.NetworkId}" );
 			}
 
 			foreach ( var memberChange in entityChange.MemberChanges )
@@ -95,24 +95,24 @@ public class BaseGameClient : Client
 					var field = (FieldInfo)member;
 					field.SetValue( entity, value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {value}" );
+					// Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} field {memberChange.FieldName} changed to {value}" );
 				}
 				else if ( member.MemberType == MemberTypes.Property )
 				{
 					var property = (PropertyInfo)member;
 					property.SetValue( entity, value );
 
-					Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {value}" );
+					// Log.Info( $"BaseGameClient: Entity {entityChange.NetworkId} property {memberChange.FieldName} changed to {value}" );
 				}
 
-				if ( memberChange.FieldName == "PhysicsSetup" )
-				{
-					// Physics setup changed - let's update the physics setup
-					var physicsSetup = (ModelEntity.Physics)value;
+				//if ( memberChange.FieldName == "PhysicsSetup" )
+				//{
+				//	// Physics setup changed - let's update the physics setup
+				//	var physicsSetup = (ModelEntity.Physics)value;
 
-					if ( physicsSetup.PhysicsModelPath != null )
-						((ModelEntity)entity).SetMeshPhysics( physicsSetup.PhysicsModelPath );
-				}
+				//	if ( physicsSetup.PhysicsModelPath != null )
+				//		((ModelEntity)entity).SetMeshPhysics( physicsSetup.PhysicsModelPath );
+				//}
 			}
 		}
 	}

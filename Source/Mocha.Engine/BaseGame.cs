@@ -73,6 +73,8 @@ public class BaseGame : IGame
 			DebugOverlay.screenTextList.Clear();
 			DebugOverlay.currentLine = 0;
 		}
+
+		DebugOverlay.ScreenText( $"BaseGame.Update assembly {GetType().Assembly.GetHashCode()}" );
 	}
 
 	public void Shutdown()

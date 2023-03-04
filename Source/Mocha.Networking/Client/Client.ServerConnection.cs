@@ -1,10 +1,17 @@
-﻿namespace Mocha.Networking;
+﻿using Mocha.Common;
+
+namespace Mocha.Networking;
 
 public partial class Client
 {
 	public readonly struct ServerConnection : IConnection
 	{
 		public void Disconnect( string reason )
+		{
+			throw new NotImplementedException();
+		}
+
+		public IClient GetClient()
 		{
 			throw new NotImplementedException();
 		}

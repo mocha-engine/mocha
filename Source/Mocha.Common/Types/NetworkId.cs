@@ -71,7 +71,7 @@ public class NetworkId : IEquatable<NetworkId>
 
 	public bool Equals( NetworkId? other )
 	{
-		if ( other == null )
+		if ( other is null )
 			return false;
 
 		return Value == other.Value;
@@ -83,5 +83,15 @@ public class NetworkId : IEquatable<NetworkId>
 			return Equals( id );
 
 		return false;
+	}
+
+	public static bool operator ==( NetworkId? a, NetworkId? b )
+	{
+		return a?.Equals( b ) ?? false;
+	}
+
+	public static bool operator !=( NetworkId? a, NetworkId? b )
+	{
+		return !(a?.Equals( b ) ?? false);
 	}
 }

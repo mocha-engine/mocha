@@ -59,5 +59,13 @@ public partial class Server
 		{
 			return Nickname;
 		}
+
+		public IClient GetClient()
+		{
+			return new ConnectedClient()
+			{
+				Name = Nickname
+			};
+		}
 	}
 }

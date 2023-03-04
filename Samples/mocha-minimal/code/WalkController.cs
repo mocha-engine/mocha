@@ -31,6 +31,8 @@ public class WalkController
 		Player.IgnoreRigidbodyRotation = true;
 
 		Event.Register( this );
+
+		Player.Position = new Vector3( 0, 0, 10 );
 	}
 
 	[Event.Tick]
