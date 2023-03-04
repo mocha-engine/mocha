@@ -387,6 +387,7 @@ vcpkg_installed/
 [Ss]ource/Mocha.Common/Glue/UnmanagedArgs.cs
 cvars.json
 [Ss]amples/mocha-minimal/code/*.csproj
+[Ss]amples/mocha-minimal/code/Properties
 
 # Content meta files
 ![Cc]ontent/**/*.meta
