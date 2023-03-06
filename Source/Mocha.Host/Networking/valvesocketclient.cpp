@@ -96,14 +96,14 @@ void ValveSocketClient::PumpEvents()
 	const char* data = ( const char* )malloc( incomingMsg->m_cbSize );
 	memcpy_s( ( void* )data, incomingMsg->m_cbSize, ptrData, incomingMsg->m_cbSize );
 
-	incomingMsg->Release();
-
 	ValveSocketReceivedMessage receivedMessage{};
 	receivedMessage.connectionHandle = ( void* )m_connection;
 	receivedMessage.size = incomingMsg->m_cbSize;
 	receivedMessage.data = ( void* )data;
 
 	m_dataReceivedCallback.Invoke( ( void* )&receivedMessage );
+	
+	incomingMsg->Release();
 }
 
 void ValveSocketClient::SetDataReceivedCallback( Handle callbackHandle )
