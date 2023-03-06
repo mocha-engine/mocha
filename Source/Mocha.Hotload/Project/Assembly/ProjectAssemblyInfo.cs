@@ -1,4 +1,4 @@
-﻿namespace Mocha.Hotload;
+﻿namespace Mocha.Hotload.Projects;
 
 /// <summary>
 /// Represents the required information for a project assembly.

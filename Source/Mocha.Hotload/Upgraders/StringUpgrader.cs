@@ -1,9 +1,9 @@
 ﻿using System.Reflection;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Upgrading.Upgraders;
 
 /// <summary>
-/// A member upgrader for strings.
+/// A member upgrader for <see cref="string"/>s.
 /// </summary>
 internal sealed class StringUpgrader : IMemberUpgrader
 {
@@ -19,7 +19,7 @@ internal sealed class StringUpgrader : IMemberUpgrader
 	};
 
 	/// <inheritdoc />
-	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
+	public void UpgradeMember( object? oldInstance, UpgradableMember oldMember, object? newInstance, UpgradableMember newMember )
 	{
 		var oldValue = oldMember.GetValue( oldInstance );
 		if ( oldValue is null )

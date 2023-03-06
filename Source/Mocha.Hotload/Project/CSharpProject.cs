@@ -1,8 +1,10 @@
-﻿using NuGet.Versioning;
+﻿using Mocha.Hotload.Compilation;
+using Mocha.Hotload.Util;
+using NuGet.Versioning;
 using System.Collections.Immutable;
 using System.Xml;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Projects;
 
 /// <summary>
 /// A representation of a C# project file (.csproj).
@@ -12,7 +14,7 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// <summary>
 	/// A cache containing <see cref="CSharpProject"/>s that have been loaded from a file.
 	/// </summary>
-	private static readonly Dictionary<string, CSharpProject> s_FileCache = new();
+	private static readonly Dictionary<string, CSharpProject> s_fileCache = new();
 
 	/// <summary>
 	/// Type of output to generate (WinExe, Exe, or Library).
@@ -21,7 +23,7 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// <summary>
 	/// Framework that this project targets. Must be a Target Framework Moniker (e.g. netcoreapp1.0).
 	/// </summary>
-	internal string TargetFramework { get; } = Compiler.GetCSharpProjectMoniker();
+	internal string TargetFramework { get; } = CompilerHelper.GetCSharpProjectMoniker();
 	/// <summary>
 	/// Whether or not to enable implicit global usings for the C# project.
 	/// </summary>
@@ -50,6 +52,10 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// The default namespace of the C# project.
 	/// </summary>
 	internal string RootNamespace { get; } = "Mocha";
+	/// <summary>
+	/// All of the pre-processor symbols defined in the project.
+	/// </summary>
+	internal ImmutableArray<string> PreProcessorSymbols { get; } = ImmutableArray<string>.Empty;
 
 	/// <summary>
 	/// A set of entries for global using statements.
@@ -72,6 +78,10 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// </summary>
 	internal ImmutableArray<string> DllReferences { get; } = ImmutableArray<string>.Empty;
 
+	/// <summary>
+	/// An array of pre-processor symbols defined in a <see cref="ProjectManifest"/>.
+	/// </summary>
+	private ImmutableArray<string> ProjectPreProcessorSymbols { get; set; } = ImmutableArray<string>.Empty;
 	/// <summary>
 	/// Contains Xml meta data from <see cref="PackageReferences"/>.
 	/// </summary>
@@ -102,15 +112,31 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 		var currentMetaDataEntry = string.Empty;
 		var isMetaDataPackage = false;
 
+		var shouldTraverse = true;
+
 		// Walk over every Xml element.
 		while ( reader.Read() )
 		{
 			if ( reader.NodeType != XmlNodeType.Element )
 				continue;
 
+			if ( !shouldTraverse && reader.Name != "ItemGroup" && reader.Name != "PropertyGroup" )
+				continue;
+
 			// Process specific element types.
 			switch ( reader.Name )
 			{
+				case "ItemGroup":
+				case "PropertyGroup":
+					var condition = reader.GetAttribute( "Condition" );
+					if ( condition is null )
+					{
+						shouldTraverse = true;
+						break;
+					}
+
+					shouldTraverse = AnalyzeCondition( condition );
+					break;
 				case "OutputType":
 					OutputType = reader.ReadElementContentAsString();
 					break;
@@ -163,6 +189,11 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 					break;
 				case "Reference":
 					dllReferences.Add( reader.GetAttribute( "Include" )! );
+					break;
+				case "DefineConstants":
+					var preProcessorSymbols = ImmutableArray.CreateBuilder<string>();
+					preProcessorSymbols.AddRange( reader.ReadElementContentAsString().Split( ';' ) );
+					PreProcessorSymbols = preProcessorSymbols.ToImmutableArray();
 					break;
 				case "IncludeAssets":
 					var includeAssets = reader.ReadElementContentAsString();
@@ -228,10 +259,10 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 		DllReferences = dllReferences.ToImmutable();
 
 		// Add to cache.
-		if ( s_FileCache.ContainsKey( filePath ) )
-			s_FileCache[filePath] = this;
+		if ( s_fileCache.ContainsKey( filePath ) )
+			s_fileCache[filePath] = this;
 		else
-			s_FileCache.Add( filePath, this );
+			s_fileCache.Add( filePath, this );
 	}
 
 	/// <summary>
@@ -249,6 +280,8 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 		Nullable = project.Nullable;
 		AssemblyName = manifest.Name;
 		RootNamespace = project.DefaultNamespace ?? "Mocha";
+		if ( project.PreProcessorSymbols is not null )
+			ProjectPreProcessorSymbols = project.PreProcessorSymbols.ToImmutableArray();
 
 		// Usings.
 		{
@@ -351,6 +384,30 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 			basics.CreateElementWithInnerText( "Nullable", Nullable ? "enable" : "disable" );
 			basics.CreateElementWithInnerText( "AssemblyName", AssemblyName );
 			basics.CreateElementWithInnerText( "RootNamespace", RootNamespace );
+			basics.CreateElementWithInnerText( "Configurations", "DebugClient;DebugServer;ReleaseClient;ReleaseServer" );
+		}
+
+		// Constant definitions.
+		{
+			const string debugDefinitions = "DEBUG;TRACE;";
+			const string clientDefinitions = "MOCHA;CLIENT;";
+			const string serverDefinitions = "MOCHA;SERVER;";
+			var customDefinitions = string.Join( ';', ProjectPreProcessorSymbols );
+
+
+			// Mocha client.
+			rootElement.CreateElementWithAttributes( "PropertyGroup", "Condition", "'$(Configuration)'=='DebugClient'" )
+				.CreateElementWithInnerText( "DefineConstants", (debugDefinitions + clientDefinitions + customDefinitions).Trim( ';' ) );
+
+			rootElement.CreateElementWithAttributes( "PropertyGroup", "Condition", "'$(Configuration)'=='ReleaseClient'" )
+				.CreateElementWithInnerText( "DefineConstants", (clientDefinitions + customDefinitions).Trim( ';' ) );
+
+			// Mocha dedicated server.
+			rootElement.CreateElementWithAttributes( "PropertyGroup", "Condition", "'$(Configuration)'=='DebugServer'" )
+				.CreateElementWithInnerText( "DefineConstants", (debugDefinitions + serverDefinitions + customDefinitions).Trim( ';' ) );
+
+			rootElement.CreateElementWithAttributes( "PropertyGroup", "Condition", "'$(Configuration)'=='ReleaseServer'" )
+				.CreateElementWithInnerText( "DefineConstants", (serverDefinitions + customDefinitions).Trim( ';' ) );
 		}
 
 		// Implicit usings.
@@ -551,13 +608,27 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	}
 
 	/// <summary>
+	/// Returns whether or not the condition provided is true.
+	/// </summary>
+	/// <param name="condition">The condition to parse.</param>
+	/// <returns>Whether or not the condition provided is true.</returns>
+	private static bool AnalyzeCondition( string condition )
+	{
+		// TODO: Do we need to flesh this out more?
+		condition = condition.Replace( "$(Configuration)", CompilerHelper.Build + CompilerHelper.Realm ).Replace( "'", "" );
+		var operands = condition.Split( "==" );
+
+		return operands[0] == operands[1];
+	}
+
+	/// <summary>
 	/// Parses a csproj file into a <see cref="CSharpProject"/> to be returned. If the csproj was previously parsed then that cached version will be returned.
 	/// </summary>
 	/// <param name="filePath">The file path to the csproj file.</param>
 	/// <returns>The parsed <see cref="CSharpProject"/>. If previously parsed, the cached version is returned.</returns>
 	internal static CSharpProject FromFile( string filePath )
 	{
-		if ( s_FileCache.TryGetValue( filePath, out var csproj ) )
+		if ( s_fileCache.TryGetValue( filePath, out var csproj ) )
 			return csproj;
 
 		return new( filePath );
@@ -580,7 +651,7 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// <returns>Whether or not an entry was removed.</returns>
 	internal static bool RemoveCachedProject( string filePath )
 	{
-		return s_FileCache.Remove( filePath );
+		return s_fileCache.Remove( filePath );
 	}
 
 	/// <summary>
@@ -588,7 +659,7 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 	/// </summary>
 	internal static void ClearCachedProjects()
 	{
-		s_FileCache.Clear();
+		s_fileCache.Clear();
 	}
 
 	public static bool operator ==( CSharpProject first, CSharpProject second ) => first.Equals( second );
