@@ -52,4 +52,6 @@ namespace Globals
 	Realm m_executingRealm;
 
 	bool m_isDedicatedServer;
+
+	char* m_activeProjectPath;
 } // namespace Globals

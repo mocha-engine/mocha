@@ -72,4 +72,6 @@ namespace Globals
 	extern Realm m_executingRealm;
 
 	extern bool m_isDedicatedServer;
+
+	extern char* m_activeProjectPath;
 } // namespace Globals
