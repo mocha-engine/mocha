@@ -393,7 +393,7 @@ public static class Main
 		if ( !Directory.Exists( propertiesDir ) )
 			Directory.CreateDirectory( propertiesDir );
 
-		File.WriteAllText( propertiesDir + "\\launchSettings.json", LaunchSettingsText );
+		File.WriteAllText( propertiesDir + "\\launchSettings.json", LaunchSettingsText.Replace( "%__CUR_DIR__", Environment.CurrentDirectory ) );
 
 		return csprojPath;
 	}
@@ -414,14 +414,14 @@ public static class Main
 		"profiles": {
 			"Mocha": {
 				"commandName": "Executable",
-				"executablePath": "D:\\GitHub\\mocha\\build\\Mocha.exe",
-				"workingDirectory": "D:\\GitHub\\mocha",
+				"executablePath": "%__CUR_DIR__\\build\\Mocha.exe",
+				"workingDirectory": "%__CUR_DIR__",
 				"nativeDebugging": true
 			},
 			"Mocha Dedicated Server": {
 				"commandName": "Executable",
-				"executablePath": "D:\\GitHub\\mocha\\build\\MochaDedicatedServer.exe",
-				"workingDirectory": "D:\\GitHub\\mocha",
+				"executablePath": "%__CUR_DIR__\\build\\MochaDedicatedServer.exe",
+				"workingDirectory": "%__CUR_DIR__",
 				"nativeDebugging": true
 			}
 		}
