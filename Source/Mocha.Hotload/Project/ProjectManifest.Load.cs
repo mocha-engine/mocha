@@ -1,11 +1,11 @@
 ﻿using System.Text.Json;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Projects;
 
 partial struct ProjectManifest
 {
 	/// <summary>
-	/// Converts a relative path in the project manifest to an absolute path.
+	/// Converts a relative path in the <see cref="ProjectManifest"/> to an absolute path.
 	/// </summary>
 	/// <param name="path">The relative path.</param>
 	/// <param name="baseDir">The path to the directory that contained the manifest.</param>
@@ -16,10 +16,10 @@ partial struct ProjectManifest
 	}
 
 	/// <summary>
-	/// Loads a project manifest.
+	/// Loads a <see cref="ProjectManifest"/> from a file on disk.
 	/// </summary>
 	/// <param name="path">The absolute path to the manifest file.</param>
-	/// <returns>The constructed project manfifest.</returns>
+	/// <returns>The constructed <see cref="ProjectManifest"/>.</returns>
 	/// <exception cref="FileNotFoundException">Thrown when no file exists at the given path.</exception>
 	internal static ProjectManifest Load( string path )
 	{

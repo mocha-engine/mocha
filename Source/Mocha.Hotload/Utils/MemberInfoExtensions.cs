@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Reflection;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Util;
 
 /// <summary>
 /// A collection of extension methods for a <see cref="MemberInfo"/>.

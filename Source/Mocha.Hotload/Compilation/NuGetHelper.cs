@@ -6,7 +6,7 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Compilation;
 
 /// <summary>
 /// A collection of helper methods for the NuGet.Protocol package.
@@ -19,8 +19,8 @@ internal static class NuGetHelper
 	/// <param name="id">The ID of the NuGet package.</param>
 	/// <param name="version">The version of the NuGet package.</param>
 	/// <param name="references">The references to append the NuGet package to.</param>
-	/// <returns>A task that represents the asynchronous operation.</returns>
-	internal static async Task FetchPackage( string id, NuGetVersion version, ICollection<PortableExecutableReference> references )
+	/// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+	internal static async Task FetchPackageAsync( string id, NuGetVersion version, ICollection<PortableExecutableReference> references )
 	{
 		// Setup.
 		var logger = NullLogger.Instance;
@@ -45,7 +45,7 @@ internal static class NuGetHelper
 		var nuspecReader = await packageReader.GetNuspecReaderAsync( cancellationToken );
 
 		// Find the framework target we want.
-		var currentFramework = NuGetFramework.ParseFrameworkName( Compiler.GetTargetFrameworkName(), DefaultFrameworkNameProvider.Instance );
+		var currentFramework = NuGetFramework.ParseFrameworkName( CompilerHelper.GetTargetFrameworkName(), DefaultFrameworkNameProvider.Instance );
 		var targetFrameworkGroup = NuGetFrameworkExtensions.GetNearest( packageReader.GetLibItems(), currentFramework );
 		var dependencies = nuspecReader.GetDependencyGroups().First( group => group.TargetFramework == targetFrameworkGroup.TargetFramework ).Packages.ToArray();
 
@@ -53,7 +53,7 @@ internal static class NuGetHelper
 		if ( dependencies.Length > 0 )
 		{
 			foreach ( var dependency in dependencies )
-				await FetchPackageWithVersionRange( dependency.Id, dependency.VersionRange, references );
+				await FetchPackageWithVersionRangeAsync( dependency.Id, dependency.VersionRange, references );
 		}
 
 		if ( !targetFrameworkGroup.Items.Any() )
@@ -74,8 +74,8 @@ internal static class NuGetHelper
 	/// <param name="id">The ID of the NuGet package.</param>
 	/// <param name="versionRange">The range of versions to look at.</param>
 	/// <param name="references">The references to append the NuGet package to.</param>
-	/// <returns>A task that represents the asynchronous operation.</returns>
-	internal static async Task FetchPackageWithVersionRange( string id, VersionRange versionRange, ICollection<PortableExecutableReference> references )
+	/// <returns>A <see cref="Task"/> that represents the asynchronous operation.</returns>
+	internal static async Task FetchPackageWithVersionRangeAsync( string id, VersionRange versionRange, ICollection<PortableExecutableReference> references )
 	{
 		// Setup.
 		var cache = new SourceCacheContext();
@@ -92,6 +92,6 @@ internal static class NuGetHelper
 
 		// Find the best version and get it.
 		var bestVersion = versionRange.FindBestMatch( versions );
-		await FetchPackage( id, bestVersion, references );
+		await FetchPackageAsync( id, bestVersion, references );
 	}
 }

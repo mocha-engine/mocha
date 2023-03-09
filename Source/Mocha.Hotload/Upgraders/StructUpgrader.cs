@@ -1,7 +1,8 @@
-﻿using System.Reflection;
+﻿using Mocha.Hotload.Util;
+using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Upgrading.Upgraders;
 
 /// <summary>
 /// A member upgrader for structs.
@@ -18,7 +19,7 @@ internal sealed class StructUpgrader : IMemberUpgrader
 	}
 
 	/// <inheritdoc />
-	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
+	public void UpgradeMember( object? oldInstance, UpgradableMember oldMember, object? newInstance, UpgradableMember newMember )
 	{
 		var oldValue = oldMember.GetValue( oldInstance );
 		if ( oldValue is null )

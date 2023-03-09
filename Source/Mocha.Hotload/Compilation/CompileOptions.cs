@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Compilation;
 
 /// <summary>
 /// A container for all options to give to the compiler.

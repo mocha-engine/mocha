@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Util;
 
 /// <summary>
 /// A collection of extension methods for <see cref="XmlElement"/>s.
