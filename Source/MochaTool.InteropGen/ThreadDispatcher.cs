@@ -1,24 +1,31 @@
-﻿namespace MochaTool.InteropGen;
+﻿namespace Mocha.Common;
 
 public class ThreadDispatcher<T>
 {
 	public delegate void ThreadCallback( List<T> threadQueue );
+	public delegate Task AsyncThreadCallback( List<T> threadQueue );
 
-	private int _threadCount = 16;
+	public bool IsComplete => _threadsCompleted >= _threadCount;
+
+	private int _threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
 	private int _threadsCompleted = 0;
-	public bool IsComplete => _threadsCompleted == _threadCount;
 
 	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
 	{
-		var batchSize = queue.Count / _threadCount;
+		Setup( queue, threadQueue => threadStart( threadQueue ) );
+	}
+
+	public ThreadDispatcher( AsyncThreadCallback threadStart, List<T> queue )
+	{
+		Setup( queue, threadQueue => threadStart( threadQueue ).Wait() );
+	}
+
+	private void Setup( List<T> queue, Action<List<T>> threadStart )
+	{
+		var batchSize = queue.Count / _threadCount - 1;
 
 		if ( batchSize == 0 )
 			return; // Bail to avoid division by zero
-
-		var remainder = queue.Count % _threadCount;
-
-		if ( remainder != 0 )
-			batchSize++;
 
 		var batched = queue
 			.Select( ( Value, Index ) => new { Value, Index } )
@@ -26,8 +33,7 @@ public class ThreadDispatcher<T>
 			.Select( g => g.Select( p => p.Value ).ToList() )
 			.ToList();
 
-		if ( batched.Count < _threadCount )
-			_threadCount = batched.Count; // Min. 1 per thread
+		_threadCount = batched.Count;
 
 		for ( int i = 0; i < batched.Count; i++ )
 		{
@@ -35,7 +41,6 @@ public class ThreadDispatcher<T>
 			var thread = new Thread( () =>
 			{
 				threadStart( threadQueue );
-
 				_threadsCompleted++;
 			} );
 
