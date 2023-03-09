@@ -2,7 +2,6 @@
 
 public static class Program
 {
-	internal static List<string> s_generatedPaths { get; set; } = new();
 	internal static List<IUnit> s_units { get; set; } = new();
 	internal static List<string> s_files { get; set; } = new();
 
