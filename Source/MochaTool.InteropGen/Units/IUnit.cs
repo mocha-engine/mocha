@@ -1,8 +1,14 @@
-﻿namespace MochaTool.InteropGen;
+﻿using System.Collections.Immutable;
+
+namespace MochaTool.InteropGen;
 
 public interface IUnit
 {
-	public string Name { get; set; }
-	public List<Variable> Fields { get; set; }
-	public List<Method> Methods { get; set; }
+	string Name { get; }
+
+	ImmutableArray<Variable> Fields { get; }
+	ImmutableArray<Method> Methods { get; }
+
+	IUnit WithFields( in ImmutableArray<Variable> fields );
+	IUnit WithMethods( in ImmutableArray<Method> methods );
 }

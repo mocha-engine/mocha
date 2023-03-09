@@ -2,14 +2,14 @@
 
 public struct Variable
 {
-	public Variable( string name, string type ) : this()
+	public string Name { get; }
+	public string Type { get; }
+
+	public Variable( string name, string type )
 	{
 		Name = name;
 		Type = type;
 	}
-
-	public string Name { get; set; }
-	public string Type { get; set; }
 
 	public override string ToString()
 	{
