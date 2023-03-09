@@ -149,13 +149,15 @@ public static class Parser
 						if ( !HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
-						var oName = cursor.LexicalParent.Spelling.ToString();
-						var s = units.FirstOrDefault( x => x.Name == oName );
+						var ownerName = cursor.LexicalParent.Spelling.ToString();
+						var owner = units.FirstOrDefault( x => x.Name == ownerName );
 
-						if ( s == null )
+						if ( owner is null )
 							break;
 
-						s.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) );
+						var newOwner = owner.WithFields( owner.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) ) );
+						units.Remove( owner );
+						units.Add( newOwner );
 						break;
 					}
 
