@@ -2,7 +2,7 @@
 
 namespace MochaTool.InteropGen;
 
-public struct Structure : IUnit
+public sealed class Structure : IUnit
 {
 	public string Name { get; }
 
