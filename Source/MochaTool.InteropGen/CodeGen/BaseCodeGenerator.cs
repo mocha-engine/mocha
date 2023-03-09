@@ -2,9 +2,9 @@
 
 internal class BaseCodeGenerator
 {
-	protected List<IUnit> Units { get; } = new();
+	protected IEnumerable<IUnit> Units { get; }
 
-	public BaseCodeGenerator( List<IUnit> units )
+	public BaseCodeGenerator( IEnumerable<IUnit> units )
 	{
 		Units = units;
 	}

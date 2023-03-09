@@ -5,7 +5,7 @@ namespace MochaTool.InteropGen;
 
 sealed class ManagedCodeGenerator : BaseCodeGenerator
 {
-	public ManagedCodeGenerator( List<IUnit> units ) : base( units )
+	public ManagedCodeGenerator( IEnumerable<IUnit> units ) : base( units )
 	{
 	}
 
