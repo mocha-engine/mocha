@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
 
@@ -131,7 +132,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 
 			// We need to pass the instance in if this is not a static method
 			if ( !method.IsStatic )
-				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "NativePtr", "IntPtr" ) ).ToList();
+				paramsAndInstance = paramsAndInstance.Prepend( new Variable( "NativePtr", "IntPtr" ) ).ToImmutableArray();
 
 			// Gather function call arguments. Make sure that we're passing in a pointer for everything
 			var paramNames = paramsAndInstance.Select( x => "ctx.GetPtr( " + x.Name + " )" );

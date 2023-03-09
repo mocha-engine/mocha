@@ -1,4 +1,6 @@
 ﻿using ClangSharp.Interop;
+using System.Collections.Immutable;
+
 namespace MochaTool.InteropGen;
 
 public static class Parser
@@ -66,16 +68,13 @@ public static class Parser
 				// Struct / class / namespace
 				//
 				case CXCursorKind.CXCursor_ClassDecl:
-					units.Add( new Class( cursor.Spelling.ToString() ) );
+					units.Add( Class.NewClass( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_StructDecl:
-					units.Add( new Structure( cursor.Spelling.ToString() ) );
+					units.Add( Structure.NewStructure( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_Namespace:
-					units.Add( new Class( cursor.Spelling.ToString() )
-					{
-						IsNamespace = true
-					} );
+					units.Add( Class.NewNamespace( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 
 				//
@@ -88,18 +87,20 @@ public static class Parser
 						if ( !HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
-						var oName = cursor.LexicalParent.Spelling.ToString();
-						var o = units.FirstOrDefault( x => x.Name == oName );
-						var m = new Method( cursor.Spelling.ToString(), cursor.ReturnType.Spelling.ToString() )
-						{
-							IsStatic = cursor.IsStatic
-						};
-
-						if ( o == null )
+						var ownerName = cursor.LexicalParent.Spelling.ToString();
+						var owner = units.FirstOrDefault( x => x.Name == ownerName );
+						if ( owner is null )
 						{
 							Console.WriteLine( "No unit" );
 							break;
 						}
+
+						var name = cursor.Spelling.ToString();
+						var returnType = cursor.ReturnType.Spelling.ToString();
+						var isStatic = cursor.IsStatic;
+						var isConstructor = false;
+
+						var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
 
 						CXCursorVisitor methodChildVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
 						{
@@ -108,9 +109,7 @@ public static class Parser
 								var type = cursor.Type.ToString();
 								var name = cursor.Spelling.ToString();
 
-								var parameter = new Variable( name, type );
-
-								m.Parameters.Add( parameter );
+								parametersBuilder.Add( new Variable( name, type ) );
 							}
 
 							return CXChildVisitResult.CXChildVisit_Recurse;
@@ -121,13 +120,23 @@ public static class Parser
 						if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
 						{
 							// Constructor specific stuff here
-							m.ReturnType = $"{o.Name}*";
-							m.Name = "Ctor";
-							m.IsConstructor = true;
+							name = "Ctor";
+							returnType = $"{owner.Name}*";
+							isConstructor = true;
 						}
 
 						if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic || cursor.Kind == CXCursorKind.CXCursor_FunctionDecl )
-							o.Methods.Add( m );
+						{
+							Method method;
+							if ( isConstructor )
+								method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
+							else
+								method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
+
+							var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
+							units.Remove( owner );
+							units.Add( newOwner );
+						}
 
 						break;
 					}
@@ -164,15 +173,17 @@ public static class Parser
 		//
 		for ( int i = 0; i < units.Count; i++ )
 		{
-			var o = units[i];
-			o.Methods = o.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
-			o.Fields = o.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToList();
+			var item = units[i];
+			item = item.WithFields( item.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() )
+				.WithMethods( item.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() );
+
+			units[i] = item;
 		}
 
 		//
 		// Remove any units that have no methods or fields
 		//
-		units = units.Where( x => x.Methods.Count > 0 || x.Fields.Count > 0 ).ToList();
+		units = units.Where( x => x.Methods.Length > 0 || x.Fields.Length > 0 ).ToList();
 
 		//
 		// Post-processing

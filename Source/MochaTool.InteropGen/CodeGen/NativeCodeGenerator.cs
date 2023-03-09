@@ -1,4 +1,5 @@
 ﻿using System.CodeDom.Compiler;
+using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
 
@@ -83,7 +84,7 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 			var args = method.Parameters;
 
 			if ( !method.IsStatic )
-				args = args.Prepend( new Variable( "instance", $"{c.Name}*" ) ).ToList();
+				args = args.Prepend( new Variable( "instance", $"{c.Name}*" ) ).ToImmutableArray();
 
 			var argStr = string.Join( ", ", args.Select( x =>
 			{
