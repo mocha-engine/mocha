@@ -98,10 +98,11 @@ public static class Parser
 							break;
 						}
 
-						var name = cursor.Spelling.ToString();
-						var returnType = cursor.ReturnType.Spelling.ToString();
-						var isStatic = cursor.IsStatic;
-						var isConstructor = false;
+						string name;
+						string returnType;
+						bool isStatic;
+						bool isConstructor;
+						bool isDestructor;
 
 						var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
 
@@ -109,7 +110,25 @@ public static class Parser
 						{
 							name = "Ctor";
 							returnType = owner.Name + '*';
+							isStatic = false;
 							isConstructor = true;
+							isDestructor = false;
+						}
+						else if ( cursor.Kind == CXCursorKind.CXCursor_Destructor )
+						{
+							name = "DeCtor";
+							returnType = '~' + owner.Name;
+							isStatic = false;
+							isConstructor = false;
+							isDestructor = true;
+						}
+						else
+						{
+							name = cursor.Spelling.ToString();
+							returnType = cursor.ReturnType.Spelling.ToString();
+							isStatic = cursor.IsStatic;
+							isConstructor = false;
+							isDestructor = false;
 						}
 
 						CXChildVisitResult methodChildVisitor( CXCursor cursor, CXCursor parent, void* data )
@@ -127,12 +146,7 @@ public static class Parser
 
 						cursor.VisitChildren( methodChildVisitor, default );
 
-						Method method;
-						if ( isConstructor )
-							method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
-						else
-							method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
-
+						var method = new Method( name, returnType, isConstructor, isDestructor, isStatic, parametersBuilder.ToImmutable() );
 						var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
 						units.Remove( owner );
 						units.Add( newOwner );
