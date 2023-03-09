@@ -105,6 +105,13 @@ public static class Parser
 
 						var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
 
+						if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
+						{
+							name = "Ctor";
+							returnType = owner.Name + '*';
+							isConstructor = true;
+						}
+
 						CXChildVisitResult methodChildVisitor( CXCursor cursor, CXCursor parent, void* data )
 						{
 							if ( cursor.Kind == CXCursorKind.CXCursor_ParmDecl )
@@ -120,13 +127,6 @@ public static class Parser
 
 						cursor.VisitChildren( methodChildVisitor, default );
 
-						if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
-						{
-							// Constructor specific stuff here
-							name = "Ctor";
-							returnType = $"{owner.Name}*";
-							isConstructor = true;
-						}
 						Method method;
 						if ( isConstructor )
 							method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
