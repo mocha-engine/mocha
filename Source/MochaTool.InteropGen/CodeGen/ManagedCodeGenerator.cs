@@ -176,7 +176,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 		writer.WriteLine( "}" );
 	}
 
-	private void GenerateStructCode( ref IndentedTextWriter writer, Structure sel )
+	private void GenerateStructCode( ref IndentedTextWriter writer, Struct sel )
 	{
 		writer.WriteLine( $"[StructLayout( LayoutKind.Sequential )]" );
 		writer.WriteLine( $"public struct {sel.Name}" );
@@ -319,7 +319,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 					GenerateClassCode( ref writer, c );
 			}
 
-			if ( unit is Structure s )
+			if ( unit is Struct s )
 			{
 				GenerateStructCode( ref writer, s );
 			}

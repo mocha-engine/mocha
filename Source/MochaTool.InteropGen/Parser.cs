@@ -71,7 +71,7 @@ public static class Parser
 					units.Add( Class.NewClass( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_StructDecl:
-					units.Add( Structure.NewStructure( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
+					units.Add( Struct.NewStructure( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_Namespace:
 					units.Add( Class.NewNamespace( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
