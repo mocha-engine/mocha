@@ -13,7 +13,7 @@ sealed class NativeCodeGenerator : BaseCodeGenerator
 	{
 		var (baseTextWriter, writer) = Utils.CreateWriter();
 
-		writer.WriteLine( GetHeader() );
+		writer.WriteLine( Header );
 		writer.WriteLine();
 
 		writer.WriteLine( "#pragma once" );

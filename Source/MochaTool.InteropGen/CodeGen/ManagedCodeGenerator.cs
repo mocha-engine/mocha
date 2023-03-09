@@ -299,7 +299,7 @@ sealed class ManagedCodeGenerator : BaseCodeGenerator
 	{
 		var (baseTextWriter, writer) = Utils.CreateWriter();
 
-		writer.WriteLine( GetHeader() );
+		writer.WriteLine( Header );
 		writer.WriteLine();
 
 		foreach ( var usingStatement in GetUsings() )
