@@ -68,7 +68,7 @@ public static class Program
 
 		// Wait for all threads to finish...
 		while ( !dispatcher.IsComplete )
-			Thread.Sleep( 500 );
+			Thread.Sleep( 1 );
 	}
 
 	private static void WriteManagedStruct( string baseDir, ref List<(string Name, Method method)> methods )
