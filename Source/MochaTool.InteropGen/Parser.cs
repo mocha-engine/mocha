@@ -32,12 +32,12 @@ public static class Parser
 
 	public unsafe static List<IUnit> GetUnits( string path )
 	{
-		List<IUnit> units = new();
+		var units = new List<IUnit>();
 
 		using var index = CXIndex.Create();
 		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
 
-		for ( int i = 0; i < unit.NumDiagnostics; ++i )
+		for ( var i = 0; i < unit.NumDiagnostics; ++i )
 		{
 			var diagnostics = unit.GetDiagnostic( (uint)i );
 			Console.WriteLine( $"{diagnostics.Format( CXDiagnostic.DefaultDisplayOptions )}" );
