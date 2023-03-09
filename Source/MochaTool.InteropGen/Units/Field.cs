@@ -1,6 +1,6 @@
 ﻿namespace MochaTool.InteropGen;
 
-public struct Variable
+public sealed class Variable
 {
 	public string Name { get; }
 	public string Type { get; }

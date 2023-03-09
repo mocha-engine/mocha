@@ -2,7 +2,7 @@
 
 namespace MochaTool.InteropGen;
 
-public struct Method
+public sealed class Method
 {
 	public string Name { get; }
 	public string ReturnType { get; }

@@ -2,7 +2,7 @@
 
 namespace MochaTool.InteropGen;
 
-public struct Class : IUnit
+public sealed class Class : IUnit
 {
 	public string Name { get; }
 	public bool IsNamespace { get; }
