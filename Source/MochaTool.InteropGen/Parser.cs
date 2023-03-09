@@ -30,7 +30,7 @@ public static class Parser
 		return args.ToArray();
 	}
 
-	public unsafe static List<IUnit> GetUnits( string path )
+	public unsafe static IEnumerable<IUnit> GetUnits( string path )
 	{
 		var units = new List<IUnit>();
 
