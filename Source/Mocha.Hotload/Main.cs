@@ -393,7 +393,11 @@ public static class Main
 		if ( !Directory.Exists( propertiesDir ) )
 			Directory.CreateDirectory( propertiesDir );
 
-		File.WriteAllText( propertiesDir + "\\launchSettings.json", LaunchSettingsText.Replace( "%__CUR_DIR__", Environment.CurrentDirectory ) );
+		var relativeManifestPath = Path.GetRelativePath( Environment.CurrentDirectory, manifestPath ).Replace( "\\", "\\\\" );
+		var launchSettings = LaunchSettingsText
+			.Replace( "%__CUR_DIR__", Environment.CurrentDirectory )
+			.Replace( "%__REL_MANIFEST_PATH__", relativeManifestPath );
+		File.WriteAllText( propertiesDir + "\\launchSettings.json", launchSettings );
 
 		return csprojPath;
 	}
@@ -415,12 +419,14 @@ public static class Main
 			"Mocha": {
 				"commandName": "Executable",
 				"executablePath": "%__CUR_DIR__\\build\\Mocha.exe",
+				"commandLineArgs": "-project %__REL_MANIFEST_PATH__"
 				"workingDirectory": "%__CUR_DIR__",
 				"nativeDebugging": true
 			},
 			"Mocha Dedicated Server": {
 				"commandName": "Executable",
 				"executablePath": "%__CUR_DIR__\\build\\MochaDedicatedServer.exe",
+				"commandLineArgs": "-project %__REL_MANIFEST_PATH__"
 				"workingDirectory": "%__CUR_DIR__",
 				"nativeDebugging": true
 			}

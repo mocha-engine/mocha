@@ -4,9 +4,17 @@
 #include <Windows.h>
 #include <iostream>
 #include <thread>
+#include <processenv.h>
+#include <shellapi.h>
 
-int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cmdshow )
+/// <summary>
+/// Gets a command line argument option.
+/// </summary>
+char* getCmdOption( char** begin, char** end, const std::string& option );
+
+int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, LPSTR cmdline, int cmdshow )
 {
+	Globals::m_activeProjectPath = getCmdOption( __argv, __argv + __argc, "-project" );
 	Globals::m_isDedicatedServer = false;
 
 	ClientRoot root = ClientRoot();
@@ -15,5 +23,16 @@ int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, PSTR cmdline, int cm
 	root.Run();
 	root.Shutdown();
 
+	return 0;
+}
+
+// From https://stackoverflow.com/a/868894
+char* getCmdOption( char** begin, char** end, const std::string& option )
+{
+	char** itr = std::find( begin, end, option );
+	if ( itr != end && ++itr != end )
+	{
+		return *itr;
+	}
 	return 0;
 }

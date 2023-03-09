@@ -5,6 +5,12 @@
 
 void ProjectManager::Startup()
 {
+	// If the command-line has passed a project, use that instead.
+	if ( Globals::m_activeProjectPath )
+		EngineProperties::LoadedProject.SetValue( Globals::m_activeProjectPath );
+	else
+		Globals::m_activeProjectPath = EngineProperties::LoadedProject.GetValue().data();
+
 	// Load project from json
 	m_project = Project( EngineProperties::LoadedProject );
 
