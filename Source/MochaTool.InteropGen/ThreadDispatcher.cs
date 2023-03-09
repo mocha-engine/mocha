@@ -1,4 +1,4 @@
-﻿namespace Mocha.Common;
+﻿namespace MochaTool.InteropGen;
 
 public class ThreadDispatcher<T>
 {
