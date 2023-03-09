@@ -87,6 +87,9 @@ public static class Parser
 						if ( !HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
+						if ( cursor.CXXAccessSpecifier != CX_CXXAccessSpecifier.CX_CXXPublic && cursor.Kind != CXCursorKind.CXCursor_FunctionDecl )
+							break;
+
 						var ownerName = cursor.LexicalParent.Spelling.ToString();
 						var owner = units.FirstOrDefault( x => x.Name == ownerName );
 						if ( owner is null )
@@ -124,19 +127,15 @@ public static class Parser
 							returnType = $"{owner.Name}*";
 							isConstructor = true;
 						}
+						Method method;
+						if ( isConstructor )
+							method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
+						else
+							method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
 
-						if ( cursor.CXXAccessSpecifier == CX_CXXAccessSpecifier.CX_CXXPublic || cursor.Kind == CXCursorKind.CXCursor_FunctionDecl )
-						{
-							Method method;
-							if ( isConstructor )
-								method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
-							else
-								method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
-
-							var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
-							units.Remove( owner );
-							units.Add( newOwner );
-						}
+						var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
+						units.Remove( owner );
+						units.Add( newOwner );
 
 						break;
 					}
