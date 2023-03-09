@@ -50,18 +50,6 @@ public static class Parser
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
 
-			bool HasGenerateBindingsAttribute()
-			{
-				if ( !cursor.HasAttrs )
-					return false;
-
-				var attr = cursor.GetAttr( 0 );
-				if ( attr.Spelling.CString != "generate_bindings" )
-					return false;
-
-				return true;
-			}
-
 			switch ( cursor.Kind )
 			{
 				//
@@ -84,7 +72,7 @@ public static class Parser
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
 					{
-						if ( !HasGenerateBindingsAttribute() )
+						if ( !cursor.HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
 						if ( cursor.CXXAccessSpecifier != CX_CXXAccessSpecifier.CX_CXXPublic && cursor.Kind != CXCursorKind.CXCursor_FunctionDecl )
@@ -159,7 +147,7 @@ public static class Parser
 				//
 				case CXCursorKind.CXCursor_FieldDecl:
 					{
-						if ( !HasGenerateBindingsAttribute() )
+						if ( !cursor.HasGenerateBindingsAttribute() )
 							return CXChildVisitResult.CXChildVisit_Continue;
 
 						var ownerName = cursor.LexicalParent.Spelling.ToString();
