@@ -45,7 +45,7 @@ public static class Parser
 
 		var cursor = unit.Cursor;
 
-		CXCursorVisitor cursorVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
+		CXChildVisitResult cursorVisitor( CXCursor cursor, CXCursor parent, void* data )
 		{
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
@@ -91,7 +91,7 @@ public static class Parser
 						var owner = units.FirstOrDefault( x => x.Name == ownerName );
 						if ( owner is null )
 						{
-							Console.WriteLine( "No unit" );
+							Console.WriteLine( $"No unit with name \"{ownerName}\"" );
 							break;
 						}
 
@@ -102,7 +102,7 @@ public static class Parser
 
 						var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
 
-						CXCursorVisitor methodChildVisitor = ( CXCursor cursor, CXCursor parent, void* data ) =>
+						CXChildVisitResult methodChildVisitor( CXCursor cursor, CXCursor parent, void* data )
 						{
 							if ( cursor.Kind == CXCursorKind.CXCursor_ParmDecl )
 							{
@@ -113,7 +113,7 @@ public static class Parser
 							}
 
 							return CXChildVisitResult.CXChildVisit_Recurse;
-						};
+						}
 
 						cursor.VisitChildren( methodChildVisitor, default );
 
@@ -166,7 +166,7 @@ public static class Parser
 			}
 
 			return CXChildVisitResult.CXChildVisit_Recurse;
-		};
+		}
 
 		cursor.VisitChildren( cursorVisitor, default );
 
