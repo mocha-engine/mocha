@@ -242,7 +242,7 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 		foreach ( var file in Directory.EnumerateFiles( Path.GetDirectoryName( filePath )!, "*.cs", SearchOption.AllDirectories ) )
 		{
 			// TODO: Filter out any directories that may have cs files we don't want.
-			if ( file.Contains( "\\obj\\" )  )
+			if ( file.Contains( "\\obj\\" ) )
 			{
 				if ( !ImplicitUsings || Path.GetFileName( file ) != "code.GlobalUsings.g.cs" )
 					continue;
@@ -664,4 +664,4 @@ internal sealed class CSharpProject : IEquatable<CSharpProject>
 
 	public static bool operator ==( CSharpProject first, CSharpProject second ) => first.Equals( second );
 	public static bool operator !=( CSharpProject first, CSharpProject second ) => !first.Equals( second );
-} 
+}

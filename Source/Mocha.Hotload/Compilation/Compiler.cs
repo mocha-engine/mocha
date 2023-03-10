@@ -444,7 +444,7 @@ internal static class Compiler
 
 				if ( attribute is null )
 					continue;
-				
+
 				syntaxToStrip.Add( declaration );
 				break;
 			}
@@ -474,7 +474,7 @@ internal static class Compiler
 	{
 		if ( s_referenceCache.TryGetValue( assemblyPath, out var reference ) )
 			return reference;
-		
+
 		var newReference = MetadataReference.CreateFromFile( assemblyPath );
 		s_referenceCache.Add( assemblyPath, newReference );
 		return newReference;

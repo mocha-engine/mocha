@@ -2,7 +2,7 @@
 
 public class ConnectionManager
 {
-	protected readonly record struct MessageHandler( Type type, Action<IConnection, object> Action );
+	protected readonly record struct MessageHandler(Type type, Action<IConnection, object> Action);
 	private Dictionary<MessageID, MessageHandler> _messageHandlers = new();
 
 	protected void RegisterHandler<T>( Action<IConnection, T> handler ) where T : IBaseNetworkMessage

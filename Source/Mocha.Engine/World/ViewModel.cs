@@ -46,7 +46,7 @@ public class ViewModel : ModelEntity
 
 	public Dictionary<string, ViewModelOffset> Offsets = new()
 	{
-		{ "Base", new( new( 0.4f, 0.12f, -0.18f ) )},
+		{ "Base", new( new( 0.4f, 0.12f, -0.18f ) ) },
 		{ "Sprint", new( new( 0.02f, 0.0f, 0.07f ), new( 30.89f, -11.25f, -5.6f ) ) },
 		{ "Avoid", new( new( 0.02f, 0.0f, 0.07f ), new( 30.89f, -11.25f, -5.6f ) ) }
 	};

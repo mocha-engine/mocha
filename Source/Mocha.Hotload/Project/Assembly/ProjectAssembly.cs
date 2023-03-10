@@ -329,7 +329,7 @@ internal sealed class ProjectAssembly<TEntryPoint> where TEntryPoint : IGame
 				{
 					// If a change already exists and is not the file being created then switch to changed.
 					if ( _incrementalBuildChanges.TryGetValue( e.FullPath, out var val ) && val != WatcherChangeTypes.Created )
-							_incrementalBuildChanges[e.FullPath] = WatcherChangeTypes.Changed;
+						_incrementalBuildChanges[e.FullPath] = WatcherChangeTypes.Changed;
 					// Add created event if it does not exist in the changes.
 					else if ( !_incrementalBuildChanges.ContainsKey( e.FullPath ) )
 						_incrementalBuildChanges.Add( e.FullPath, WatcherChangeTypes.Created );
