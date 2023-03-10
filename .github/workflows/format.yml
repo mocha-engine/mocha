@@ -1,0 +1,32 @@
+---
+name: Format .NET code
+
+on:
+  push:
+    branches-ignore: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  check-format:
+    runs-on: windows-latest
+
+    steps:
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1.8.2
+        with:
+          dotnet-version: '5.0.x'
+
+      - name: Install dotnet-format tool
+        run: dotnet tool install -g dotnet-format
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Run dotnet format
+        run: dotnet format '.\Source' --folder
+      
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply formatting fixes
