@@ -12,15 +12,11 @@ public static class Program
 		var units = Parser.GetUnits( path );
 		var fileName = Path.GetFileNameWithoutExtension( path );
 
-		var managedGenerator = new ManagedCodeGenerator( units );
-		var managedCode = managedGenerator.GenerateManagedCode();
+		var managedCode = ManagedCodeGenerator.GenerateCode( units );
 		File.WriteAllText( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
 
-		var nativeGenerator = new NativeCodeGenerator( units );
 		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
-		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
-
-		Console.WriteLine( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h" );
+		var nativeCode = NativeCodeGenerator.GenerateCode( relativePath, units );
 		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
 
 		s_files.Add( fileName );
