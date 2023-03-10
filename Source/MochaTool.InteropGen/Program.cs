@@ -23,7 +23,7 @@ public static class Program
 		s_units.AddRange( units );
 	}
 
-	private static void QueueDirectory( ref List<string> queue, string directory )
+	private static void QueueDirectory( List<string> queue, string directory )
 	{
 		foreach ( var file in Directory.GetFiles( directory ) )
 		{
@@ -34,17 +34,17 @@ public static class Program
 				if ( !fileContents.Contains( "GENERATE_BINDINGS", StringComparison.CurrentCultureIgnoreCase ) )
 					continue; // Fast early bail
 
-				QueueFile( ref queue, file );
+				QueueFile( queue, file );
 			}
 		}
 
 		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
 		{
-			QueueDirectory( ref queue, subDirectory );
+			QueueDirectory( queue, subDirectory );
 		}
 	}
 
-	private static void QueueFile( ref List<string> queue, string path )
+	private static void QueueFile( List<string> queue, string path )
 	{
 		queue.Add( path );
 	}
@@ -52,7 +52,7 @@ public static class Program
 	private static void Parse( string baseDir )
 	{
 		List<string> queue = new();
-		QueueDirectory( ref queue, baseDir );
+		QueueDirectory( queue, baseDir );
 
 		var dispatcher = new ThreadDispatcher<string>( ( files ) =>
 		{
@@ -67,7 +67,7 @@ public static class Program
 			Thread.Sleep( 1 );
 	}
 
-	private static void WriteManagedStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	private static void WriteManagedStruct( string baseDir, List<(string Name, Method method)> methods )
 	{
 		var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
 
@@ -93,7 +93,7 @@ public static class Program
 		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
 	}
 
-	private static void WriteNativeStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	private static void WriteNativeStruct( string baseDir, List<(string Name, Method method)> methods )
 	{
 		var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
 
@@ -190,8 +190,8 @@ public static class Program
 		//
 		// Write files
 		//
-		WriteManagedStruct( baseDir, ref methods );
-		WriteNativeStruct( baseDir, ref methods );
+		WriteManagedStruct( baseDir, methods );
+		WriteNativeStruct( baseDir, methods );
 		WriteNativeIncludes( baseDir );
 
 		// Track time & output total duration
