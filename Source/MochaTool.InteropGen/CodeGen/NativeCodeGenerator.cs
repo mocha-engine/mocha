@@ -31,13 +31,13 @@ internal static class NativeCodeGenerator
 
 		foreach ( var unit in units )
 		{
-			if ( unit is Class c )
-			{
-				if ( c.IsNamespace )
-					GenerateNamespaceCode( writer, c );
-				else
-					GenerateClassCode( writer, c );
-			}
+			if ( unit is not Class c )
+				continue;
+
+			if ( c.IsNamespace )
+				GenerateNamespaceCode( writer, c );
+			else
+				GenerateClassCode( writer, c );
 
 			writer.WriteLine();
 		}
@@ -54,25 +54,23 @@ internal static class NativeCodeGenerator
 			var argStr = string.Join( ", ", args.Select( x =>
 			{
 				if ( x.Type == "std::string" )
-				{
 					return $"const char* {x.Name}";
-				}
 
 				return $"{x.Type} {x.Name}";
 			} ) );
 
 			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
 			var body = "";
-			var @params = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
+			var parameters = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
 
 			var accessor = $"{c.Name}::";
 
 			if ( method.ReturnType == "void" )
-				body += $"{accessor}{method.Name}( {@params} );";
+				body += $"{accessor}{method.Name}( {parameters} );";
 			else if ( method.ReturnType == "std::string" )
-				body += $"std::string text = {accessor}{method.Name}( {@params} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
+				body += $"std::string text = {accessor}{method.Name}( {parameters} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
 			else
-				body += $"return {accessor}{method.Name}( {@params} );";
+				body += $"return {accessor}{method.Name}( {parameters} );";
 
 			writer.WriteLine( signature );
 			writer.WriteLine( "{" );
@@ -97,35 +95,29 @@ internal static class NativeCodeGenerator
 			var argStr = string.Join( ", ", args.Select( x =>
 			{
 				if ( x.Type == "std::string" )
-				{
 					return $"const char* {x.Name}";
-				}
 
 				return $"{x.Type} {x.Name}";
 			} ) );
 
 			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
 			var body = "";
-			var @params = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
+			var parameters = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
 
 			if ( method.IsConstructor )
-			{
-				body += $"return new {c.Name}( {@params} );";
-			}
+				body += $"return new {c.Name}( {parameters} );";
 			else if ( method.IsDestructor )
-			{
-				body += $"instance->~{c.Name}( {@params} );";
-			}
+				body += $"instance->~{c.Name}( {parameters} );";
 			else
 			{
 				var accessor = method.IsStatic ? $"{c.Name}::" : "instance->";
 
 				if ( method.ReturnType == "void" )
-					body += $"{accessor}{method.Name}( {@params} );";
+					body += $"{accessor}{method.Name}( {parameters} );";
 				else if ( method.ReturnType == "std::string" )
-					body += $"std::string text = {accessor}{method.Name}( {@params} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
+					body += $"std::string text = {accessor}{method.Name}( {parameters} );\r\nconst char* cstr = text.c_str();\r\nchar* dup = _strdup(cstr);\r\nreturn dup;";
 				else
-					body += $"return {accessor}{method.Name}( {@params} );";
+					body += $"return {accessor}{method.Name}( {parameters} );";
 			}
 
 			writer.WriteLine( signature );

@@ -41,17 +41,19 @@ internal static class ManagedCodeGenerator
 
 		foreach ( var unit in units )
 		{
-			if ( unit is Class c )
+			switch ( unit )
 			{
-				if ( c.IsNamespace )
+				case Class c when c.IsNamespace:
 					GenerateNamespaceCode( writer, c );
-				else
+					break;
+				case Class c:
 					GenerateClassCode( writer, c );
-			}
-
-			if ( unit is Struct s )
-			{
-				GenerateStructCode( writer, s );
+					break;
+				case Struct s:
+					GenerateStructCode( writer, s );
+					break;
+				default:
+					continue;
 			}
 
 			writer.WriteLine();
@@ -113,9 +115,7 @@ internal static class ManagedCodeGenerator
 		// Decls
 		writer.WriteLine();
 		foreach ( var decl in decls )
-		{
 			writer.WriteLine( decl );
-		}
 		writer.WriteLine();
 
 		// Ctor
@@ -225,9 +225,7 @@ internal static class ManagedCodeGenerator
 		writer.Indent++;
 
 		foreach ( var field in sel.Fields )
-		{
 			writer.WriteLine( $"public {Utils.GetManagedType( field.Type )} {field.Name};" );
-		}
 
 		writer.Indent--;
 		writer.WriteLine( "}" );
@@ -274,9 +272,7 @@ internal static class ManagedCodeGenerator
 
 		writer.WriteLine();
 		foreach ( var decl in decls )
-		{
 			writer.WriteLine( decl );
-		}
 
 		// Methods
 		foreach ( var method in sel.Methods )
