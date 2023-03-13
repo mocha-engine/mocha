@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Framework/array.h>
 #include <Misc/defs.h>
 #include <algorithm>
 #include <atomic>
@@ -11,51 +12,40 @@
 
 namespace Mocha
 {
-	// A class that manages a collection of objects of type T, indexed by a handle.
 	template <typename T>
 	class HandleMap
 	{
 	private:
-		// A map of objects, indexed by their handle index.
-		std::unordered_map<Handle, std::shared_ptr<T>> m_objects;
-
-		// Thread-safe synchronisation
 		std::shared_mutex m_mutex;
 
-		// The current index to use when inserting a new object into the map.
-		std::atomic<Handle> m_nextIndex;
+		std::vector<std::unique_ptr<T>> m_objects;
+		std::unique_ptr<Mocha::IAllocator> m_allocator;
 
 	public:
-		// Adds the specified object to the map and returns a handle to it.
+		HandleMap()
+		{
+			m_allocator = std::make_unique<Mocha::SystemAllocator>();
+			// m_objects.Init( m_allocator.get(), 0, 0 );
+		}
+
+		void Remove( Handle handle );
 		Handle Add( T object );
 
-		// Removes the specified object from the map, based on a handle.
-		void RemoveAt( Handle handle );
+		const std::unique_ptr<T>& Get( Handle handle );
 
-		// Removes the first instance of the specified object from the map.
-		void Remove( T object );
-
-		// Finds the first instance of the specified object from the map.
-		Handle Find( T object );
-
-		// Returns a pointer to the object associated with the specified handle.
-		std::shared_ptr<T> Get( Handle handle );
-
-		// Use this if you want to get a derived type.
 		template <typename T1>
-		std::shared_ptr<T1> GetSpecific( Handle handle );
+		const std::unique_ptr<T1>& GetSpecific( Handle handle );
 
-		// Use this if you want to add a derived type.
 		template <typename T1>
 		Handle AddSpecific( T1 object );
 
-		// Calls the specified function for each object managed by this HandleMap.
-		// The function should take a std::unique_ptr<T> as its argument.
-		void ForEach( std::function<void( std::shared_ptr<T> object )> func );
+		void ForEach( std::function<void( const std::unique_ptr<T>& object )> func );
+		void For( std::function<void( Handle handle, const std::unique_ptr<T>& object )> func );
 
-		// Calls the specified function for each object managed by this HandleMap.
-		// The function should take a Handle and a std::unique_ptr<T> as its arguments.
-		void For( std::function<void( Handle handle, std::shared_ptr<T> object )> func );
+		const std::unique_ptr<T>& operator[]( Handle handle );
+		
+		const std::unique_ptr<T>& Front() const;
+		const std::unique_ptr<T>& Back() const;
 	};
 
 	template <typename T>
@@ -63,80 +53,33 @@ namespace Mocha
 	{
 		std::unique_lock lock( m_mutex );
 
-		Handle handle = m_nextIndex;
+		Handle handle = m_objects.size();
 
-		// Create a shared pointer to the object.
-		auto objectPtr = std::make_shared<T>( object );
-
-		// Add the object to the map.
-		m_objects[handle] = objectPtr;
-
-		// Increment index for next object
-		m_nextIndex++;
-
+		auto objectPtr = std::make_unique<T>( object );
+		m_objects.push_back( std::move( objectPtr ) );
 		return handle;
 	}
 
 	template <typename T>
-	inline void HandleMap<T>::RemoveAt( Handle handle )
-	{
-		std::unique_lock lock( m_mutex );
-
-		m_objects.erase( handle );
-	}
-
-	template <typename T>
-	inline void HandleMap<T>::Remove( T object )
-	{
-		std::unique_lock lock( m_mutex );
-
-		Handle targetHandle = Find( object );
-		if ( targetHandle != HANDLE_INVALID )
-		{
-			RemoveAt( targetHandle );
-		}
-	}
-
-	template <typename T>
-	inline Handle HandleMap<T>::Find( T object )
-	{
-		std::unique_lock lock( m_mutex );
-
-		for ( const auto& [handle, object] : m_objects )
-		{
-			if ( typeid( *object ) == typeid( T ) )
-			{
-				return handle;
-			}
-		}
-
-		return HANDLE_INVALID;
-	}
-
-	// Returns a pointer to the object associated with the specified handle.
-	template <typename T>
-	inline std::shared_ptr<T> HandleMap<T>::Get( Handle handle )
+	inline const std::unique_ptr<T>& HandleMap<T>::Get( Handle handle )
 	{
 		std::shared_lock lock( m_mutex );
-
-		std::shared_ptr<T> object = m_objects[handle];
+		std::unique_ptr<T>& object = m_objects[handle];
 
 		return object;
 	}
 
-	// Use this if you want to get a derived type.
 	template <typename T>
 	template <typename T1>
-	inline std::shared_ptr<T1> HandleMap<T>::GetSpecific( Handle handle )
+	inline const std::unique_ptr<T1>& HandleMap<T>::GetSpecific( Handle handle )
 	{
 		static_assert( std::is_base_of<T, T1>::value, "T1 must be derived from T" );
 
-		std::shared_ptr<T> object = Get( handle );
+		std::unique_ptr<T> object = Get( handle );
 
 		return std::dynamic_pointer_cast<T1>( object );
 	}
 
-	// Use this if you want to add a derived type.
 	template <typename T>
 	template <typename T1>
 	inline Handle HandleMap<T>::AddSpecific( T1 object )
@@ -144,24 +87,15 @@ namespace Mocha
 		static_assert( std::is_base_of<T, T1>::value, "T1 must be derived from T" );
 		std::unique_lock lock( m_mutex );
 
-		Handle handle = m_nextIndex;
+		Handle handle = m_objects.size();
 
-		// Create a shared pointer to the object.
-		auto objectPtr = std::make_shared<T1>( object );
-
-		// Add the object to the map.
-		m_objects[handle] = objectPtr;
-
-		// Increment index for next object
-		m_nextIndex++;
-
+		auto objectPtr = std::make_unique<T1>( object );
+		m_objects.push_back( std::move( objectPtr ) );
 		return handle;
 	}
 
-	// Calls the specified function for each object managed by this HandleMap.
-	// The function should take a std::shared_ptr<T> as its argument.
 	template <typename T>
-	inline void HandleMap<T>::ForEach( std::function<void( std::shared_ptr<T> object )> func )
+	inline void HandleMap<T>::ForEach( std::function<void( const std::unique_ptr<T>& object )> func )
 	{
 		std::shared_lock lock( m_mutex );
 
@@ -171,10 +105,8 @@ namespace Mocha
 		}
 	}
 
-	// Calls the specified function for each object managed by this HandleMap.
-	// The function should take a Handle as its argument.
 	template <typename T>
-	inline void HandleMap<T>::For( std::function<void( Handle handle, std::shared_ptr<T> object )> func )
+	inline void HandleMap<T>::For( std::function<void( Handle handle, const std::unique_ptr<T>& object )> func )
 	{
 		std::shared_lock lock( m_mutex );
 
@@ -182,5 +114,31 @@ namespace Mocha
 		{
 			func( handle, object );
 		}
+	}
+
+	template <typename T>
+	inline void HandleMap<T>::Remove( Handle handle )
+	{
+		std::unique_lock lock( m_mutex );
+
+		m_objects.erase( handle );
+	}
+
+	template <typename T>
+	inline const std::unique_ptr<T>& HandleMap<T>::operator[]( Handle handle )
+	{
+		return Get( handle );
+	}
+
+	template <typename T>
+	inline const std::unique_ptr<T>& HandleMap<T>::Front() const
+	{
+		return m_objects.front();
+	}
+	
+	template <typename T>
+	inline const std::unique_ptr<T>& HandleMap<T>::Back() const
+	{
+		return m_objects.back();
 	}
 } // namespace Mocha
