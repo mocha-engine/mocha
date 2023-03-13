@@ -94,6 +94,7 @@ namespace Mocha
 	template <typename T>
 	inline void Array<T>::Pop()
 	{
+		assert( m_size > 0 );
 		--m_size;
 	}
 
@@ -113,12 +114,14 @@ namespace Mocha
 	template <typename T>
 	inline T& Array<T>::operator[]( size_t index )
 	{
+		assert( index >= 0 && index < m_size );
 		return m_data[index];
 	}
 
 	template <typename T>
 	inline const T& Array<T>::operator[]( size_t index ) const
 	{
+		assert( index >= 0 && index < m_size );
 		return m_data[index];
 	}
 
@@ -155,6 +158,8 @@ namespace Mocha
 	template <typename T>
 	inline void Array<T>::Grow( size_t capacity )
 	{
+		assert( capacity > 0 );
+		
 		if ( capacity < m_capacity * 2 )
 			capacity = capacity * 2;
 		else if ( capacity < 4 )
@@ -175,24 +180,28 @@ namespace Mocha
 	template <typename T>
 	inline T& Array<T>::Back()
 	{
+		assert( m_size > 0 );
 		return m_data[m_size - 1];
 	}
 
 	template <typename T>
 	inline const T& Array<T>::Back() const
 	{
+		assert( m_size > 0 );
 		return m_data[m_size - 1];
 	}
 
 	template <typename T>
 	inline T& Array<T>::Front()
 	{
+		assert( m_size >= 0 );
 		return m_data[0];
 	}
 
 	template <typename T>
 	inline const T& Array<T>::Front() const
 	{
+		assert( m_size >= 0 );
 		return m_data[0];
 	}
 } // namespace Mocha
