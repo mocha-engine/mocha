@@ -18,7 +18,7 @@ namespace Mocha
 	/// <summary>
 	/// Basic linear allocator. Allocates memory in a linear fashion, and can be reset to free all memory.
 	/// </summary>
-	class LinearAllocator : IAllocator
+	class LinearAllocator : public IAllocator
 	{
 	private:
 		char* m_start{ nullptr };
@@ -54,6 +54,8 @@ namespace Mocha
 			m_current += size;
 
 			assert( m_current < m_end );
+
+			return ptr;
 		}
 
 		/// <summary>
@@ -67,6 +69,40 @@ namespace Mocha
 		/// <summary>
 		/// Free all allocated memory and return the allocator to its original initialized state
 		/// </summary>
-		void Reset() { m_current = m_start; }
+		void Reset()
+		{
+			m_current = m_start;
+		}
+	};
+
+	/// <summary>
+	/// Basic passthrough allocator, wraps malloc & free
+	/// </summary>
+	class SystemAllocator : public IAllocator
+	{
+		/// <summary>
+		/// Allocate a block of memory.
+		/// Alignment and offset do not do anything here.
+		/// </summary>
+		inline void* Alloc( const size_t size, const size_t alignment, const size_t offset )
+		{
+			return malloc( size );
+		}
+
+		/// <summary>
+		/// Free a block of memory.
+		/// </summary>
+		inline void Free( void* ptr )
+		{
+			return free( ptr );
+		}
+
+		/// <summary>
+		/// Does nothing
+		/// </summary>
+		inline void Reset()
+		{
+			//
+		}
 	};
 } // namespace Mocha
