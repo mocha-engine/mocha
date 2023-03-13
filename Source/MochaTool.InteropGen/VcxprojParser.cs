@@ -11,19 +11,6 @@ internal static class VcxprojParser
 	private const string ExternalIncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:ExternalIncludePath";
 	private const string IncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:IncludePath";
 
-	private static string GetNodeContents( XmlNode root, string xpath, XmlNamespaceManager namespaceManager )
-	{
-		var nodeList = root.SelectNodes( xpath, namespaceManager );
-		if ( nodeList?.Count == 0 || nodeList?[0] == null )
-			throw new Exception( "Couldn't find IncludePath!" );
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-		var includeStr = nodeList[0].InnerText;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-		return includeStr;
-	}
-
 	/// <summary>
 	/// Parse the include list from a vcxproj file.
 	/// </summary>
@@ -39,7 +26,7 @@ internal static class VcxprojParser
 		XmlNamespaceManager namespaceManager = new XmlNamespaceManager( doc.NameTable );
 		namespaceManager.AddNamespace( "rs", "http://schemas.microsoft.com/developer/msbuild/2003" );
 
-		if ( doc.DocumentElement == null )
+		if ( doc.DocumentElement is null )
 			throw new Exception( "Failed to parse root node!" );
 
 		XmlNode root = doc.DocumentElement;
@@ -86,5 +73,16 @@ internal static class VcxprojParser
 		}
 
 		return parsedIncludes;
+	}
+
+	private static string GetNodeContents( XmlNode root, string xpath, XmlNamespaceManager namespaceManager )
+	{
+		var nodeList = root.SelectNodes( xpath, namespaceManager );
+		if ( nodeList?.Count == 0 || nodeList?[0] is null )
+			throw new Exception( "Couldn't find IncludePath!" );
+
+		var includeStr = nodeList[0]!.InnerText;
+
+		return includeStr;
 	}
 }
