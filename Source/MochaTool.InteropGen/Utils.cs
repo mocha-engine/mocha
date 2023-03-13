@@ -2,15 +2,15 @@
 
 namespace MochaTool.InteropGen;
 
-static class Utils
+internal static class Utils
 {
-	public static bool IsPointer( string nativeType )
+	internal static bool IsPointer( string nativeType )
 	{
 		var managedType = GetManagedType( nativeType );
 		return nativeType.Trim().EndsWith( "*" ) && managedType != "string" && managedType != "IntPtr";
 	}
 
-	public static string GetManagedType( string nativeType )
+	internal static string GetManagedType( string nativeType )
 	{
 		// Trim whitespace from beginning / end (if it exists)
 		nativeType = nativeType.Trim();
@@ -77,7 +77,7 @@ static class Utils
 		return nativeType;
 	}
 
-	public static (StringWriter StringWriter, IndentedTextWriter TextWriter) CreateWriter()
+	internal static (StringWriter StringWriter, IndentedTextWriter TextWriter) CreateWriter()
 	{
 		var baseTextWriter = new StringWriter();
 

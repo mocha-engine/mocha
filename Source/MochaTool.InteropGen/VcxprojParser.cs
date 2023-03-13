@@ -31,7 +31,7 @@ internal static class VcxprojParser
 	/// This currently only supports x64-windows, so any different includes for other platforms
 	/// will not be reflected here.
 	/// </remarks>
-	public static List<string> ParseIncludes( string path )
+	internal static List<string> ParseIncludes( string path )
 	{
 		XmlDocument doc = new XmlDocument();
 		doc.Load( path );

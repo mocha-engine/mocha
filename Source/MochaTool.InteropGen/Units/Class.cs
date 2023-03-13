@@ -2,7 +2,7 @@
 
 namespace MochaTool.InteropGen;
 
-public sealed class Class : IUnit
+internal sealed class Class : IUnit
 {
 	public string Name { get; }
 	public bool IsNamespace { get; }
@@ -10,7 +10,7 @@ public sealed class Class : IUnit
 	public ImmutableArray<Variable> Fields { get; }
 	public ImmutableArray<Method> Methods { get; }
 
-	public Class( string name, bool isNamespace, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	private Class( string name, bool isNamespace, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		Name = name;
 		IsNamespace = isNamespace;
@@ -19,12 +19,12 @@ public sealed class Class : IUnit
 		Methods = methods;
 	}
 
-	public Class WithFields( in ImmutableArray<Variable> fields )
+	internal Class WithFields( in ImmutableArray<Variable> fields )
 	{
 		return new Class( Name, IsNamespace, fields, Methods );
 	}
 
-	public Class WithMethods( in ImmutableArray<Method> methods )
+	internal Class WithMethods( in ImmutableArray<Method> methods )
 	{
 		return new Class( Name, IsNamespace, Fields, methods );
 	}
@@ -37,12 +37,12 @@ public sealed class Class : IUnit
 	IUnit IUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
 	IUnit IUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
 
-	public static Class NewClass( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	internal static Class NewClass( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		return new Class( name, false, fields, methods );
 	}
 
-	public static Class NewNamespace( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	internal static Class NewNamespace( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		return new Class( name, true, fields, methods );
 	}

@@ -2,8 +2,8 @@
 
 public static class Program
 {
-	internal static List<IUnit> s_units { get; set; } = new();
-	internal static List<string> s_files { get; set; } = new();
+	private static List<IUnit> s_units { get; set; } = new();
+	private static List<string> s_files { get; set; } = new();
 
 	public static void Main( string[] args )
 	{

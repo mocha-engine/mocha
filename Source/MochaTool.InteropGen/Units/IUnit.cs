@@ -2,7 +2,7 @@
 
 namespace MochaTool.InteropGen;
 
-public interface IUnit
+internal interface IUnit
 {
 	string Name { get; }
 

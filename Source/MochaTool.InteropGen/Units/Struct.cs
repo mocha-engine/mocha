@@ -2,14 +2,14 @@
 
 namespace MochaTool.InteropGen;
 
-public sealed class Struct : IUnit
+internal sealed class Struct : IUnit
 {
 	public string Name { get; }
 
 	public ImmutableArray<Variable> Fields { get; }
 	public ImmutableArray<Method> Methods { get; }
 
-	public Struct( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	private Struct( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		Name = name;
 
@@ -17,12 +17,12 @@ public sealed class Struct : IUnit
 		Methods = methods;
 	}
 
-	public Struct WithFields( in ImmutableArray<Variable> fields )
+	internal Struct WithFields( in ImmutableArray<Variable> fields )
 	{
 		return new( Name, fields, Methods );
 	}
 
-	public Struct WithMethods( in ImmutableArray<Method> methods )
+	internal Struct WithMethods( in ImmutableArray<Method> methods )
 	{
 		return new( Name, Fields, methods );
 	}
@@ -35,7 +35,7 @@ public sealed class Struct : IUnit
 	IUnit IUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
 	IUnit IUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
 
-	public static Struct NewStructure( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	internal static Struct NewStructure( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		return new( name, fields, methods );
 	}

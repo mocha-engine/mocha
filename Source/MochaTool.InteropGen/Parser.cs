@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
 
-public static class Parser
+internal static class Parser
 {
 	/// <summary>
 	/// Cached launch arguments so that we don't have to regenerate them every time
@@ -30,7 +30,7 @@ public static class Parser
 		return args.ToArray();
 	}
 
-	public unsafe static IEnumerable<IUnit> GetUnits( string path )
+	internal unsafe static IEnumerable<IUnit> GetUnits( string path )
 	{
 		var units = new List<IUnit>();
 
@@ -134,7 +134,14 @@ public static class Parser
 
 						cursor.VisitChildren( methodChildVisitor, default );
 
-						var method = new Method( name, returnType, isConstructor, isDestructor, isStatic, parametersBuilder.ToImmutable() );
+						Method method;
+						if ( isConstructor )
+							method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
+						else if ( isDestructor )
+							method = Method.NewDestructor( name, returnType, parametersBuilder.ToImmutable() );
+						else
+							method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
+
 						var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
 						units.Remove( owner );
 						units.Add( newOwner );

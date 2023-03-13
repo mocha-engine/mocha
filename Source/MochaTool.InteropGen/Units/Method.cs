@@ -2,18 +2,18 @@
 
 namespace MochaTool.InteropGen;
 
-public sealed class Method
+internal sealed class Method
 {
-	public string Name { get; }
-	public string ReturnType { get; }
+	internal string Name { get; }
+	internal string ReturnType { get; }
 
-	public bool IsConstructor { get; } = false;
-	public bool IsDestructor { get; } = false;
-	public bool IsStatic { get; } = false;
+	internal bool IsConstructor { get; } = false;
+	internal bool IsDestructor { get; } = false;
+	internal bool IsStatic { get; } = false;
 
-	public ImmutableArray<Variable> Parameters { get; }
+	internal ImmutableArray<Variable> Parameters { get; }
 
-	public Method( string name, string returnType, bool isConstructor, bool isDestructor, bool isStatic, in ImmutableArray<Variable> parameters )
+	private Method( string name, string returnType, bool isConstructor, bool isDestructor, bool isStatic, in ImmutableArray<Variable> parameters )
 	{
 		Name = name;
 		ReturnType = returnType;
@@ -24,8 +24,7 @@ public sealed class Method
 
 		Parameters = parameters;
 	}
-	
-	public Method WithParameters( in ImmutableArray<Variable> parameters )
+	internal Method WithParameters( in ImmutableArray<Variable> parameters )
 	{
 		return new( Name, ReturnType, IsConstructor, IsDestructor, IsStatic, parameters );
 	}
@@ -36,17 +35,17 @@ public sealed class Method
 		return $"{ReturnType} {Name}( {p} )";
 	}
 
-	public static Method NewConstructor( string name, string returnType, in ImmutableArray<Variable> parameters )
+	internal static Method NewConstructor( string name, string returnType, in ImmutableArray<Variable> parameters )
 	{
 		return new( name, returnType, true, false, false, parameters );
 	}
 
-	public static Method NewDestructor( string name, string returnType, in ImmutableArray<Variable> parameters )
+	internal static Method NewDestructor( string name, string returnType, in ImmutableArray<Variable> parameters )
 	{
 		return new( name, returnType, false, true, false, parameters );
 	}
 
-	public static Method NewMethod( string name, string returnType, bool isStatic, in ImmutableArray<Variable> parameters )
+	internal static Method NewMethod( string name, string returnType, bool isStatic, in ImmutableArray<Variable> parameters )
 	{
 		return new( name, returnType, false, false, isStatic, parameters );
 	}

@@ -1,11 +1,11 @@
 ﻿namespace MochaTool.InteropGen;
 
-public sealed class Variable
+internal sealed class Variable
 {
-	public string Name { get; }
-	public string Type { get; }
+	internal string Name { get; }
+	internal string Type { get; }
 
-	public Variable( string name, string type )
+	internal Variable( string name, string type )
 	{
 		Name = name;
 		Type = type;

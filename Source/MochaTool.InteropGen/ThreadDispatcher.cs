@@ -1,21 +1,21 @@
 ﻿namespace MochaTool.InteropGen;
 
-public class ThreadDispatcher<T>
+internal class ThreadDispatcher<T>
 {
-	public delegate void ThreadCallback( List<T> threadQueue );
-	public delegate Task AsyncThreadCallback( List<T> threadQueue );
+	internal delegate void ThreadCallback( List<T> threadQueue );
+	internal delegate Task AsyncThreadCallback( List<T> threadQueue );
 
-	public bool IsComplete => _threadsCompleted >= _threadCount;
+	internal bool IsComplete => _threadsCompleted >= _threadCount;
 
 	private int _threadCount = (int)Math.Ceiling( Environment.ProcessorCount * 0.75 );
 	private int _threadsCompleted = 0;
 
-	public ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
+	internal ThreadDispatcher( ThreadCallback threadStart, List<T> queue )
 	{
 		Setup( queue, threadQueue => threadStart( threadQueue ) );
 	}
 
-	public ThreadDispatcher( AsyncThreadCallback threadStart, List<T> queue )
+	internal ThreadDispatcher( AsyncThreadCallback threadStart, List<T> queue )
 	{
 		Setup( queue, threadQueue => threadStart( threadQueue ).Wait() );
 	}
