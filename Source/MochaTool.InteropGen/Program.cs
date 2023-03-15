@@ -72,9 +72,9 @@ public static class Program
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void Parse( string baseDir )
 	{
-		QueueDirectory( queue, baseDir );
 		// Find and queue all of the header files to parse.
 		var queue = new List<string>();
+		QueueDirectory( queue, baseDir + "\\Mocha.Host" );
 
 		// Dispatch jobs to parse all files.
 		var dispatcher = new ThreadDispatcher<string>( async ( files ) =>
