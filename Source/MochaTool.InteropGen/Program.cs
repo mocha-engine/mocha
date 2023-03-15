@@ -1,4 +1,6 @@
-﻿namespace MochaTool.InteropGen;
+﻿using Microsoft.Extensions.Logging;
+
+namespace MochaTool.InteropGen;
 
 /// <summary>
 /// The main entry point to the IntropGen program.
@@ -20,16 +22,18 @@ public static class Program
 	/// <param name="args">The command-line arguments given to the program.</param>
 	public static void Main( string[] args )
 	{
-		var baseDir = args[0];
-		var start = DateTime.Now;
+		using var _totalTime = new StopwatchLog( "InteropGen", LogLevel.Information );
 
-		Console.WriteLine( "Generating C# <--> C++ interop code..." );
+		var baseDir = args[0];
+		Log.LogIntro();
 
 		//
 		// Prep
 		//
 		DeleteExistingFiles( baseDir );
-		Parse( baseDir );
+
+		using ( var _parseTime = new StopwatchLog( "Parsing" ) )
+			Parse( baseDir );
 
 		//
 		// Expand methods out into list of (method name, method)
@@ -42,11 +46,6 @@ public static class Program
 		WriteManagedStruct( baseDir, methods );
 		WriteNativeStruct( baseDir, methods );
 		WriteNativeIncludes( baseDir );
-
-		// Track time & output total duration
-		var end = DateTime.Now;
-		var totalTime = end - start;
-		Console.WriteLine( $"-- Took {totalTime.TotalSeconds} seconds." );
 	}
 
 	/// <summary>
@@ -199,7 +198,7 @@ public static class Program
 	/// <returns>A task that represents the asynchronous operation.</returns>
 	private static async Task ProcessHeaderAsync( string baseDir, string path )
 	{
-		Console.WriteLine( $"Processing header {path}..." );
+		Log.ProcessingHeader( path );
 
 		// Parse header.
 		var units = Parser.GetUnits( path );

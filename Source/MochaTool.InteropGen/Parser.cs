@@ -1,4 +1,5 @@
 ﻿using ClangSharp.Interop;
+using Microsoft.Extensions.Logging;
 using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
@@ -25,10 +26,25 @@ internal static class Parser
 		using var index = CXIndex.Create();
 		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
 
-		for ( var i = 0; i < unit.NumDiagnostics; ++i )
+		// Only start walking diagnostics if logging is enabled to the minimum level.
+		if ( Log.IsEnabled( LogLevel.Warning ) )
 		{
-			var diagnostics = unit.GetDiagnostic( (uint)i );
-			Console.WriteLine( $"{diagnostics.Format( CXDiagnostic.DefaultDisplayOptions )}" );
+			for ( var i = 0; i < unit.NumDiagnostics; i++ )
+			{
+				var diagnostics = unit.GetDiagnostic( (uint)i );
+				switch ( diagnostics.Severity )
+				{
+					case CXDiagnosticSeverity.CXDiagnostic_Fatal:
+						Log.FatalDiagnostic( diagnostics.Format( CXDiagnostic.DefaultDisplayOptions ).CString );
+						break;
+					case CXDiagnosticSeverity.CXDiagnostic_Error:
+						Log.ErrorDiagnostic( diagnostics.Format( CXDiagnostic.DefaultDisplayOptions ).CString );
+						break;
+					case CXDiagnosticSeverity.CXDiagnostic_Warning:
+						Log.WarnDiagnostic( diagnostics.Format( CXDiagnostic.DefaultDisplayOptions ).CString );
+						break;
+				}
+			}
 		}
 
 		var cursor = unit.Cursor;
