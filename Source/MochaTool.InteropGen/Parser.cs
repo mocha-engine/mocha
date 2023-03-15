@@ -47,8 +47,6 @@ internal static class Parser
 			}
 		}
 
-		var cursor = unit.Cursor;
-
 		CXChildVisitResult cursorVisitor( CXCursor cursor, CXCursor parent, void* data )
 		{
 			if ( !cursor.Location.IsFromMainFile )
@@ -75,112 +73,19 @@ internal static class Parser
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
-					{
-						if ( !cursor.HasGenerateBindingsAttribute() )
-							return CXChildVisitResult.CXChildVisit_Continue;
-
-						if ( cursor.CXXAccessSpecifier != CX_CXXAccessSpecifier.CX_CXXPublic && cursor.Kind != CXCursorKind.CXCursor_FunctionDecl )
-							break;
-
-						var ownerName = cursor.LexicalParent.Spelling.ToString();
-						var owner = units.FirstOrDefault( x => x.Name == ownerName );
-						if ( owner is null )
-						{
-							Console.WriteLine( $"No unit with name \"{ownerName}\"" );
-							break;
-						}
-
-						string name;
-						string returnType;
-						bool isStatic;
-						bool isConstructor;
-						bool isDestructor;
-
-						var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
-
-						if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
-						{
-							name = "Ctor";
-							returnType = owner.Name + '*';
-							isStatic = false;
-							isConstructor = true;
-							isDestructor = false;
-						}
-						else if ( cursor.Kind == CXCursorKind.CXCursor_Destructor )
-						{
-							name = "DeCtor";
-							returnType = '~' + owner.Name;
-							isStatic = false;
-							isConstructor = false;
-							isDestructor = true;
-						}
-						else
-						{
-							name = cursor.Spelling.ToString();
-							returnType = cursor.ReturnType.Spelling.ToString();
-							isStatic = cursor.IsStatic;
-							isConstructor = false;
-							isDestructor = false;
-						}
-
-						CXChildVisitResult methodChildVisitor( CXCursor cursor, CXCursor parent, void* data )
-						{
-							if ( cursor.Kind == CXCursorKind.CXCursor_ParmDecl )
-							{
-								var type = cursor.Type.ToString();
-								var name = cursor.Spelling.ToString();
-
-								parametersBuilder.Add( new Variable( name, type ) );
-							}
-
-							return CXChildVisitResult.CXChildVisit_Recurse;
-						}
-
-						cursor.VisitChildren( methodChildVisitor, default );
-
-						Method method;
-						if ( isConstructor )
-							method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
-						else if ( isDestructor )
-							method = Method.NewDestructor( name, returnType, parametersBuilder.ToImmutable() );
-						else
-							method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
-
-						var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
-						units.Remove( owner );
-						units.Add( newOwner );
-
-						break;
-					}
+					return VisitMethod( cursor, units );
 
 				//
 				// Field
 				//
 				case CXCursorKind.CXCursor_FieldDecl:
-					{
-						if ( !cursor.HasGenerateBindingsAttribute() )
-							return CXChildVisitResult.CXChildVisit_Continue;
-
-						var ownerName = cursor.LexicalParent.Spelling.ToString();
-						var owner = units.FirstOrDefault( x => x.Name == ownerName );
-
-						if ( owner is null )
-							break;
-
-						var newOwner = owner.WithFields( owner.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) ) );
-						units.Remove( owner );
-						units.Add( newOwner );
-						break;
-					}
-
-				default:
-					break;
+					return VisitField( cursor, units );
 			}
 
 			return CXChildVisitResult.CXChildVisit_Recurse;
 		}
 
-		cursor.VisitChildren( cursorVisitor, default );
+		unit.Cursor.VisitChildren( cursorVisitor, default );
 
 		//
 		// Remove all items with duplicate names
@@ -199,24 +104,123 @@ internal static class Parser
 		//
 		units = units.Where( x => x.Methods.Length > 0 || x.Fields.Length > 0 ).ToList();
 
-		//
-		// Post-processing
-		//
-		//foreach ( var o in units )
-		//{
-		//	// Create a default constructor if one wasn't already defined
-		//	if ( !o.Methods.Any( x => x.IsConstructor ) && o is not Class { IsNamespace: true } )
-		//	{
-		//		Console.WriteLine( $"Creating default ctor for {o.Name}" );
-		//		o.Methods.Add( new Method( "Ctor", $"{o.Name}*" )
-		//		{
-		//			IsConstructor = true
-		//		} );
-		//	}
-		//}
-
 		return units;
 	}
+
+	/// <summary>
+	/// The visitor method for walking a method declaration.
+	/// </summary>
+	/// <param name="cursor">The cursor that is traversing the method.</param>
+	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
+	/// <returns>The next action the cursor should take in traversal.</returns>
+	private static unsafe CXChildVisitResult VisitMethod( in CXCursor cursor, ICollection<IUnit> units )
+	{
+		// Early bails.
+		if ( !cursor.HasGenerateBindingsAttribute() )
+			return CXChildVisitResult.CXChildVisit_Continue;
+		if ( cursor.CXXAccessSpecifier != CX_CXXAccessSpecifier.CX_CXXPublic && cursor.Kind != CXCursorKind.CXCursor_FunctionDecl )
+			return CXChildVisitResult.CXChildVisit_Continue;
+
+		// Verify that the method has an owner.
+		var ownerName = cursor.LexicalParent.Spelling.ToString();
+		var owner = units.FirstOrDefault( x => x.Name == ownerName );
+		if ( owner is null )
+			return CXChildVisitResult.CXChildVisit_Continue;
+
+		string name;
+		string returnType;
+		bool isStatic;
+		bool isConstructor;
+		bool isDestructor;
+
+		var parametersBuilder = ImmutableArray.CreateBuilder<Variable>();
+		// We're traversing a constructor.
+		if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
+		{
+			name = "Ctor";
+			returnType = owner.Name + '*';
+			isStatic = false;
+			isConstructor = true;
+			isDestructor = false;
+		}
+		// We're traversing a destructor.
+		else if ( cursor.Kind == CXCursorKind.CXCursor_Destructor )
+		{
+			name = "DeCtor";
+			returnType = '~' + owner.Name;
+			isStatic = false;
+			isConstructor = false;
+			isDestructor = true;
+		}
+		// We're traversing a standard method.
+		else
+		{
+			name = cursor.Spelling.ToString();
+			returnType = cursor.ReturnType.Spelling.ToString();
+			isStatic = cursor.IsStatic;
+			isConstructor = false;
+			isDestructor = false;
+		}
+
+		// Visitor for parameter delcarations.
+		CXChildVisitResult methodChildVisitor( CXCursor cursor, CXCursor parent, void* data )
+		{
+			if ( cursor.Kind != CXCursorKind.CXCursor_ParmDecl )
+				return CXChildVisitResult.CXChildVisit_Continue;
+
+			var name = cursor.Spelling.ToString();
+			var type = cursor.Type.ToString();
+
+			parametersBuilder.Add( new Variable( name, type ) );
+
+			return CXChildVisitResult.CXChildVisit_Recurse;
+		}
+
+		cursor.VisitChildren( methodChildVisitor, default );
+
+		// Construct the method.
+		Method method;
+		if ( isConstructor )
+			method = Method.NewConstructor( name, returnType, parametersBuilder.ToImmutable() );
+		else if ( isDestructor )
+			method = Method.NewDestructor( name, returnType, parametersBuilder.ToImmutable() );
+		else
+			method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
+
+		// Update owner with new method.
+		var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
+		units.Remove( owner );
+		units.Add( newOwner );
+
+		return CXChildVisitResult.CXChildVisit_Continue;
+	}
+
+	/// <summary>
+	/// The visitor method for walking a field declaration.
+	/// </summary>
+	/// <param name="cursor">The cursor that is traversing the method.</param>
+	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
+	/// <returns>The next action the cursor should take in traversal.</returns>
+	private static CXChildVisitResult VisitField( in CXCursor cursor, ICollection<IUnit> units )
+	{
+		// Early bail.
+		if ( !cursor.HasGenerateBindingsAttribute() )
+			return CXChildVisitResult.CXChildVisit_Continue;
+
+		// Verify that the field has an owner.
+		var ownerName = cursor.LexicalParent.Spelling.ToString();
+		var owner = units.FirstOrDefault( x => x.Name == ownerName );
+		if ( owner is null )
+			return CXChildVisitResult.CXChildVisit_Recurse;
+
+		// Update owner with new field.
+		var newOwner = owner.WithFields( owner.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) ) );
+		units.Remove( owner );
+		units.Add( newOwner );
+
+		return CXChildVisitResult.CXChildVisit_Recurse;
+	}
+
 	/// <summary>
 	/// Returns a compiled array of launch arguments to pass to the C++ parser.
 	/// </summary>

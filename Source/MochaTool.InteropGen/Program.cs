@@ -54,8 +54,8 @@ public static class Program
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void DeleteExistingFiles( string baseDir )
 	{
-		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue\\";
-		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated\\";
+		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue";
+		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated";
 
 		if ( Directory.Exists( destHeaderDir ) )
 			Directory.Delete( destHeaderDir, true );
