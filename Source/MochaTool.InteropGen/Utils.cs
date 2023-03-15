@@ -2,14 +2,27 @@
 
 namespace MochaTool.InteropGen;
 
+/// <summary>
+/// Contains a number of utility methods.
+/// </summary>
 internal static class Utils
 {
+	/// <summary>
+	/// Returns whether or not the string represents a pointer.
+	/// </summary>
+	/// <param name="nativeType">The native type to check.</param>
+	/// <returns>Whether or not the string represents a pointer.</returns>
 	internal static bool IsPointer( string nativeType )
 	{
 		var managedType = GetManagedType( nativeType );
 		return nativeType.Trim().EndsWith( "*" ) && managedType != "string" && managedType != "IntPtr";
 	}
 
+	/// <summary>
+	/// Returns the C# version of a native type.
+	/// </summary>
+	/// <param name="nativeType">The native type to check.</param>
+	/// <returns>The C# verison of a native type.</returns>
 	internal static string GetManagedType( string nativeType )
 	{
 		// Trim whitespace from beginning / end (if it exists)
@@ -77,6 +90,10 @@ internal static class Utils
 		return nativeType;
 	}
 
+	/// <summary>
+	/// Creates and returns the text writer for writing formatted files.
+	/// </summary>
+	/// <returns>The created text writer.</returns>
 	internal static (StringWriter StringWriter, IndentedTextWriter TextWriter) CreateWriter()
 	{
 		var baseTextWriter = new StringWriter();

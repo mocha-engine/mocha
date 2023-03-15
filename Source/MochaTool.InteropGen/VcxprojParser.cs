@@ -2,6 +2,9 @@
 
 namespace MochaTool.InteropGen;
 
+/// <summary>
+/// Contains functionality for parsing vcxproj files.
+/// </summary>
 internal static class VcxprojParser
 {
 	// Note that these paths only work for the windows x64 platforms right now.

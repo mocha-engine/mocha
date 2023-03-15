@@ -3,33 +3,21 @@ using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
 
+/// <summary>
+/// Contains all parsing functionality for C++ header files.
+/// </summary>
 internal static class Parser
 {
 	/// <summary>
 	/// Cached launch arguments so that we don't have to regenerate them every time
 	/// </summary>
-	private static string[] s_launchArgs = GetLaunchArgs();
-	private static string[] GetLaunchArgs()
-	{
-		// Generate includes from vcxproj
-		var includeDirs = VcxprojParser.ParseIncludes( "../Mocha.Host/Mocha.Host.vcxproj" );
+	private static readonly string[] s_launchArgs = GetLaunchArgs();
 
-		var args = new List<string>
-		{
-			"-x",
-			"c++",
-			"-fparse-all-comments",
-			"-std=c++20",
-			"-DVK_NO_PROTOTYPES",
-			"-DNOMINMAX",
-			"-DVK_USE_PLATFORM_WIN32_KHR"
-		};
-
-		args.AddRange( includeDirs.Select( x => "-I" + x ) );
-
-		return args.ToArray();
-	}
-
+	/// <summary>
+	/// Parses a header file and returns all of the <see cref="IUnit"/>s contained inside.
+	/// </summary>
+	/// <param name="path">The absolute path to the header file to parse.</param>
+	/// <returns>All of the <see cref="IUnit"/>s contained inside the header file.</returns>
 	internal unsafe static IEnumerable<IUnit> GetUnits( string path )
 	{
 		var units = new List<IUnit>();
@@ -212,5 +200,29 @@ internal static class Parser
 		//}
 
 		return units;
+	}
+	/// <summary>
+	/// Returns a compiled array of launch arguments to pass to the C++ parser.
+	/// </summary>
+	/// <returns>A compiled array of launch arguments to pass to the C++ parser.</returns>
+	private static string[] GetLaunchArgs()
+	{
+		// Generate includes from vcxproj
+		var includeDirs = VcxprojParser.ParseIncludes( "../Mocha.Host/Mocha.Host.vcxproj" );
+
+		var args = new List<string>
+		{
+			"-x",
+			"c++",
+			"-fparse-all-comments",
+			"-std=c++20",
+			"-DVK_NO_PROTOTYPES",
+			"-DNOMINMAX",
+			"-DVK_USE_PLATFORM_WIN32_KHR"
+		};
+
+		args.AddRange( includeDirs.Select( x => "-I" + x ) );
+
+		return args.ToArray();
 	}
 }
