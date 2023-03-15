@@ -8,6 +8,40 @@ namespace MochaTool.InteropGen;
 internal static class Utils
 {
 	/// <summary>
+	/// Used as a lookup table for mapping native types to managed ones.
+	/// </summary>
+	private static readonly Dictionary<string, string> s_lookupTable = new()
+	{
+		// Native type		Managed type
+		//-------------------------------
+		{ "void",           "void" },
+		{ "uint32_t",       "uint" },
+		{ "int32_t",        "int" },
+		{ "size_t",         "uint" },
+
+		{ "char**",         "ref string" },
+		{ "char **",        "ref string" },
+		{ "char*",          "string" },
+		{ "char *",         "string" },
+		{ "void*",          "IntPtr" },
+		{ "void *",         "IntPtr" },
+
+		// STL
+		{ "std::string",    "/* UNSUPPORTED */ string" },
+
+		// GLM
+		{ "glm::vec2",      "Vector2" },
+		{ "glm::vec3",      "Vector3" },
+		{ "glm::mat4",      "Matrix4x4" },
+		{ "glm::quat",      "Rotation" },
+
+		// Custom
+		{ "Quaternion",     "Rotation" },
+		{ "InteropStruct",  "IInteropArray" },
+		{ "Handle",         "uint" }
+	};
+
+	/// <summary>
 	/// Returns whether or not the string represents a pointer.
 	/// </summary>
 	/// <param name="nativeType">The native type to check.</param>
@@ -31,38 +65,6 @@ internal static class Utils
 		// Remove the "const" keyword
 		if ( nativeType.StartsWith( "const" ) )
 			nativeType = nativeType[5..].Trim();
-
-		// Create a dictionary to hold the mapping between native and managed types
-		var lookupTable = new Dictionary<string, string>()
-		{
-			// Native type		Managed type
-			//-------------------------------
-			{ "void",           "void" },
-			{ "uint32_t",       "uint" },
-			{ "int32_t",        "int" },
-			{ "size_t",         "uint" },
-
-			{ "char**",         "ref string" },
-			{ "char **",        "ref string" },
-			{ "char*",          "string" },
-			{ "char *",         "string" },
-			{ "void*",          "IntPtr" },
-			{ "void *",         "IntPtr" },
-
-			// STL
-			{ "std::string",    "/* UNSUPPORTED */ string" },
-
-			// GLM
-			{ "glm::vec2",      "Vector2" },
-			{ "glm::vec3",      "Vector3" },
-			{ "glm::mat4",      "Matrix4x4" },
-			{ "glm::quat",      "Rotation" },
-
-			// Custom
-			{ "Quaternion",     "Rotation" },
-			{ "InteropStruct",  "IInteropArray" },
-			{ "Handle",         "uint" }
-		};
 
 		// Check if the native type is a reference
 		if ( nativeType.EndsWith( "&" ) )
