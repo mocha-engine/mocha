@@ -227,9 +227,9 @@ public static class Program
 	/// <param name="directory">The absolute path to the directory to search for files.</param>
 	private static void QueueDirectory( ICollection<string> queue, string directory )
 	{
-		foreach ( var file in Directory.GetFiles( directory ) )
+		foreach ( var file in Directory.GetFiles( directory, "*.h" ) )
 		{
-			if ( !file.EndsWith( ".h" ) || file.EndsWith( ".generated.h" ) )
+			if ( file.EndsWith( ".generated.h" ) )
 				continue;
 
 			var fileContents = File.ReadAllText( file );
