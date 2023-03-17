@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using MochaTool.InteropGen.Extensions;
 using System.Diagnostics;
 
 namespace MochaTool.InteropGen;

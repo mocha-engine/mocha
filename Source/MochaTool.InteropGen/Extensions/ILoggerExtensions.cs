@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Extensions;
 
 /// <summary>
 /// Contains extension methods for <see cref="ILogger"/>s.

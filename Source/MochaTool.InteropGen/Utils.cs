@@ -1,4 +1,5 @@
-﻿using System.CodeDom.Compiler;
+﻿using MochaTool.InteropGen.Extensions;
+using System.CodeDom.Compiler;
 
 namespace MochaTool.InteropGen;
 

@@ -1,5 +1,6 @@
 ﻿using ClangSharp.Interop;
 using Microsoft.Extensions.Logging;
+using MochaTool.InteropGen.Extensions;
 using System.Collections.Immutable;
 
 namespace MochaTool.InteropGen;
