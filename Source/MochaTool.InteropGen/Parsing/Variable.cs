@@ -1,4 +1,4 @@
-﻿namespace MochaTool.InteropGen;
+﻿namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
 /// Represents a variable in C++. This can be a field, parameter, etc.

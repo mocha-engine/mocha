@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using MochaTool.InteropGen.Extensions;
 using System.Collections.Immutable;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
 /// Contains all parsing functionality for C++ header files.

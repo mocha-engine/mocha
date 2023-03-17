@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
 /// Contains functionality for parsing vcxproj files.

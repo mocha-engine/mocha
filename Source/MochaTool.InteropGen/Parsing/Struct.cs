@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
 /// Represents a struct in C++.

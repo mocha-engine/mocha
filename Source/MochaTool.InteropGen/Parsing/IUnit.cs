@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
 /// Defines a container for fields and methods defined in C++.
