@@ -1,7 +1,7 @@
 ﻿using System.CodeDom.Compiler;
 using System.Collections.Immutable;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.CodeGen;
 
 /// <summary>
 /// Contains functionality for generating C# code.
