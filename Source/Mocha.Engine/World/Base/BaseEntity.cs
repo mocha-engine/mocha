@@ -18,28 +18,28 @@ public class BaseEntity : IEntity
 		return true;
 	}
 
-	[Category( "Transform" ), Sync]
+	[Category( "Transform" )]
 	public Vector3 Scale
 	{
 		get => NativeEntity.GetScale();
 		set => NativeEntity.SetScale( value );
 	}
 
-	[Category( "Transform" ), Sync]
+	[Category( "Transform" )]
 	public Vector3 Position
 	{
 		get => NativeEntity.GetPosition();
 		set => NativeEntity.SetPosition( value );
 	}
 
-	[Category( "Transform" ), Sync]
+	[Category( "Transform" )]
 	public Rotation Rotation
 	{
 		get => NativeEntity.GetRotation();
 		set => NativeEntity.SetRotation( value );
 	}
 
-	[HideInInspector, Sync]
+	[HideInInspector]
 	public string Name
 	{
 		get => NativeEntity.GetName();
@@ -56,14 +56,11 @@ public class BaseEntity : IEntity
 		set => NativeEntity.SetUI( value );
 	}
 
-	public NetworkId NetworkId { get; set; }
-
 	public BaseEntity()
 	{
 		EntityRegistry.Instance.RegisterEntity( this );
 
 		CreateNativeEntity();
-		CreateNetworkId();
 
 		Position = new Vector3( 0, 0, 0 );
 		Rotation = new Rotation( 0, 0, 0, 1 );
@@ -76,25 +73,6 @@ public class BaseEntity : IEntity
 		Log.Info( $"Spawning entity {Name} on {(Core.IsClient ? "client" : "server")}" );
 
 		Spawn();
-	}
-
-	private void CreateNetworkId()
-	{
-		if ( Core.IsClient )
-		{
-			// On client - we don't want to "upstream" this to the server, so we'll
-			// make this a local entity
-			NetworkId = NetworkId.CreateLocal();
-
-			Log.Info( $"Created local entity {Name} with network id {NetworkId}" );
-		}
-		else
-		{
-			// On server - we'll network this across to clients
-			NetworkId = NetworkId.CreateNetworked();
-
-			Log.Info( $"Created networked entity {Name} with network id {NetworkId}" );
-		}
 	}
 
 	protected virtual void Spawn()

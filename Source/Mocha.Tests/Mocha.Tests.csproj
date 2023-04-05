@@ -19,7 +19,6 @@
     <ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
     <ProjectReference Include="..\Mocha.Engine\Mocha.Engine.csproj" />
     <ProjectReference Include="..\Mocha.Hotload\Mocha.Hotload.csproj" />
-    <ProjectReference Include="..\Mocha.Networking\Mocha.Networking.csproj" />
   </ItemGroup>
 
 </Project>
