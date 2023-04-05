@@ -15,31 +15,31 @@ internal static class Utils
 	{
 		// Native type		Managed type
 		//-------------------------------
-		{ "void",           "void" },
-		{ "uint32_t",       "uint" },
-		{ "int32_t",        "int" },
-		{ "size_t",         "uint" },
+		{ "void", "void" },
+		{ "uint32_t", "uint" },
+		{ "int32_t", "int" },
+		{ "size_t", "uint" },
 
-		{ "char**",         "ref string" },
-		{ "char **",        "ref string" },
-		{ "char*",          "string" },
-		{ "char *",         "string" },
-		{ "void*",          "IntPtr" },
-		{ "void *",         "IntPtr" },
+		{ "char**", "ref string" },
+		{ "char **", "ref string" },
+		{ "char*", "string" },
+		{ "char *", "string" },
+		{ "void*", "IntPtr" },
+		{ "void *", "IntPtr" },
 
 		// STL
-		{ "std::string",    "/* UNSUPPORTED */ string" },
+		{ "std::string", "/* UNSUPPORTED */ string" },
 
 		// GLM
-		{ "glm::vec2",      "Vector2" },
-		{ "glm::vec3",      "Vector3" },
-		{ "glm::mat4",      "Matrix4x4" },
-		{ "glm::quat",      "Rotation" },
+		{ "glm::vec2", "Vector2" },
+		{ "glm::vec3", "Vector3" },
+		{ "glm::mat4", "Matrix4x4" },
+		{ "glm::quat", "Rotation" },
 
 		// Custom
-		{ "Quaternion",     "Rotation" },
-		{ "InteropStruct",  "IInteropArray" },
-		{ "Handle",         "uint" }
+		{ "Quaternion", "Rotation" },
+		{ "InteropStruct", "IInteropArray" },
+		{ "Handle", "uint" }
 	};
 
 	/// <summary>
