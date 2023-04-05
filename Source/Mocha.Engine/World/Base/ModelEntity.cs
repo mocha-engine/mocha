@@ -1,54 +1,58 @@
-﻿namespace Mocha;
+﻿using MessagePack;
+
+namespace Mocha;
 
 [Category( "World" ), Title( "Model Entity" ), Icon( FontAwesome.Cube )]
 public partial class ModelEntity : BaseEntity
 {
 	// This is a stop-gap solution until we have a proper physics body implementation
 
+	[MessagePackObject]
 	public struct Physics
 	{
+		[Key( 0 )]
 		public string PhysicsModelPath { get; set; }
 	}
 
 	[HideInInspector]
 	private Glue.ModelEntity NativeModelEntity => NativeEngine.GetEntityManager().GetModelEntity( NativeHandle );
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public Vector3 Velocity
 	{
 		get => NativeModelEntity.GetVelocity();
 		set => NativeModelEntity.SetVelocity( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public float Mass
 	{
 		get => NativeModelEntity.GetMass();
 		set => NativeModelEntity.SetMass( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public float Friction
 	{
 		get => NativeModelEntity.GetFriction();
 		set => NativeModelEntity.SetFriction( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public float Restitution
 	{
 		get => NativeModelEntity.GetRestitution();
 		set => NativeModelEntity.SetRestitution( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public bool IgnoreRigidbodyRotation
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyRotation();
 		set => NativeModelEntity.SetIgnoreRigidbodyRotation( value );
 	}
 
-	[Category( "Physics" )]
+	[Category( "Physics" ), Sync]
 	public bool IgnoreRigidbodyPosition
 	{
 		get => NativeModelEntity.GetIgnoreRigidbodyPosition();
@@ -67,7 +71,7 @@ public partial class ModelEntity : BaseEntity
 		}
 	}
 
-	[Category( "Rendering" )]
+	[Category( "Rendering" ), Sync]
 	public string ModelPath
 	{
 		get => _modelPath;
@@ -78,7 +82,7 @@ public partial class ModelEntity : BaseEntity
 		}
 	}
 
-	[HideInInspector]
+	[HideInInspector, Sync]
 	public Physics PhysicsSetup { get; set; }
 
 	public ModelEntity()
