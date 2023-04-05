@@ -202,6 +202,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="Misc\inputmanager.cpp" />
     <ClCompile Include="Misc\logmanager.cpp" />
     <ClCompile Include="Misc\projectmanager.cpp" />
+    <ClCompile Include="Networking\networkingmanager.cpp" />
     <ClCompile Include="Physics\physicsmanager.cpp" />
     <ClCompile Include="Rendering\Assets\material.cpp" />
     <ClCompile Include="Rendering\Assets\model.cpp" />
@@ -354,6 +355,8 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClCompile Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.cpp" />
     <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp" />
     <ClCompile Include="thirdparty\volk\volk.c" />
+    <ClCompile Include="Networking\valvesocketclient.cpp" />
+    <ClCompile Include="Networking\valvesocketserver.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Entities\baseentity.h" />
@@ -376,6 +379,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="Misc\projectmanager.h" />
     <ClInclude Include="Misc\projectmanifest.h" />
     <ClInclude Include="Misc\subsystem.h" />
+    <ClInclude Include="Networking\networkingmanager.h" />
     <ClInclude Include="Physics\physicsmanager.h" />
     <ClInclude Include="Rendering\Assets\material.h" />
     <ClInclude Include="Rendering\Assets\mesh.h" />
@@ -664,6 +668,9 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="thirdparty\volk\volk.h" />
     <ClInclude Include="Util\util.h" />
     <ClInclude Include="Util\utilarray.h" />
+    <ClInclude Include="Networking\valvesocketclient.h" />
+    <ClInclude Include="Networking\valvesocketserver.h" />
+    <ClInclude Include="Networking\valvesocketreceivedmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Core\FixedSizeFreeList.inl" />

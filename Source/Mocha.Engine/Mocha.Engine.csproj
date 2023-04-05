@@ -51,6 +51,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Mocha.Networking\Mocha.Networking.csproj" />
 		<ProjectReference Include="..\MochaTool.AssetCompiler\MochaTool.AssetCompiler.csproj" />
 		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj">
 			<Private></Private>
