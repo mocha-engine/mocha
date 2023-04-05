@@ -7,7 +7,7 @@ public class Game : BaseGame
 {
 	[HotloadSkip] private UIManager Hud { get; set; }
 
-	[Sync] public string NetworkedString { get; set; }
+	public string NetworkedString { get; set; }
 
 	public override void OnStartup()
 	{
@@ -32,15 +32,9 @@ public class Game : BaseGame
 		}
 	}
 
-	[Event.Tick, ServerOnly]
-	public void ServerTick()
+	[Event.Tick]
+	public void Tick()
 	{
-		DebugOverlay.ScreenText( $"Server Tick... ({GetType().Assembly.GetHashCode()})" );
-	}
-
-	[Event.Tick, ClientOnly]
-	public void ClientTick()
-	{
-		DebugOverlay.ScreenText( $"Client Tick... ({GetType().Assembly.GetHashCode()})" );
+		DebugOverlay.ScreenText( $"Tick... ({GetType().Assembly.GetHashCode()})" );
 	}
 }
