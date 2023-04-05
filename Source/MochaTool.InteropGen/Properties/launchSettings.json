@@ -3,7 +3,7 @@
     "Run InteropGen": {
       "commandName": "Project",
       "commandLineArgs": "$(SolutionDir)",
-      "workingDirectory": "F:\\Projects\\mocha-native\\Source\\MochaTool.InteropGen"
+      "workingDirectory": "$(ProjectDir)"
     }
   }
 }
