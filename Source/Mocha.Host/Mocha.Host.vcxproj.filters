@@ -58,32 +58,11 @@
     <Filter Include="Managed\Bindings">
       <UniqueIdentifier>{adff9618-14a2-4b36-b617-c90e0464d6a3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Rendering\Platform\Null">
+      <UniqueIdentifier>{a6ab7305-4387-4823-9506-9137221613fd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="modelentity.cpp">
-      <Filter>Entities</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="physicsmanager.cpp">
-      <Filter>Physics</Filter>
-    </ClCompile>
-    <ClCompile Include="logmanager.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="renderdocmanager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="cvarmanager.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="root.cpp">
-      <Filter>Root</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>Root</Filter>
-    </ClCompile>
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp">
       <Filter>Thirdparty\ImGUI</Filter>
     </ClCompile>
@@ -486,24 +465,6 @@
     <ClCompile Include="thirdparty\vk-bootstrap\src\VkBootstrap.cpp">
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClCompile>
-    <ClCompile Include="inputmanager.cpp">
-      <Filter>Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>Rendering\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="material.cpp">
-      <Filter>Rendering\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="rendermanager.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>Rendering\Assets</Filter>
-    </ClCompile>
-    <ClCompile Include="hostmanager.cpp">
-      <Filter>Managed</Filter>
-    </ClCompile>
     <ClCompile Include="thirdparty\implot\implot_items.cpp">
       <Filter>Thirdparty\ImPlot</Filter>
     </ClCompile>
@@ -516,59 +477,75 @@
     <ClCompile Include="thirdparty\volk\volk.c">
       <Filter>Thirdparty\Volk</Filter>
     </ClCompile>
-    <ClCompile Include="vulkanrendercontext.cpp">
-      <Filter>Rendering\Platform\Vulkan</Filter>
+    <ClCompile Include="Entities\modelentity.cpp">
+      <Filter>Entities</Filter>
     </ClCompile>
-    <ClCompile Include="baserendercontext.cpp">
-      <Filter>Rendering\Platform</Filter>
+    <ClCompile Include="Managed\hostmanager.cpp">
+      <Filter>Managed</Filter>
     </ClCompile>
-    <ClCompile Include="pipeline.cpp">
-      <Filter>Rendering\Platform\Vulkan</Filter>
-    </ClCompile>
-    <ClCompile Include="shadercompiler.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="projectmanager.cpp">
+    <ClCompile Include="Misc\inputmanager.cpp">
       <Filter>Misc</Filter>
     </ClCompile>
+    <ClCompile Include="Misc\logmanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\projectmanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\cvarmanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\editormanager.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Misc\globalvars.cpp">
+      <Filter>Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="Physics\physicsmanager.cpp">
+      <Filter>Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Assets\model.cpp">
+      <Filter>Rendering\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Assets\texture.cpp">
+      <Filter>Rendering\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Assets\material.cpp">
+      <Filter>Rendering\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Platform\Vulkan\vulkanrendercontext.cpp">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\Platform\Vulkan\pipeline.cpp">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\window.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\shadercompiler.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\baserendercontext.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\renderdocmanager.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Rendering\rendermanager.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Root\root.cpp">
+      <Filter>Root</Filter>
+    </ClCompile>
+    <ClCompile Include="Root\serverroot.cpp">
+      <Filter>Root</Filter>
+    </ClCompile>
+    <ClCompile Include="Root\clientroot.cpp">
+      <Filter>Root</Filter>
+    </ClCompile>
+    <ClCompile Include="Managed\managedcallback.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="modelentity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="baseentity.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="entitymanager.h">
-      <Filter>Entities</Filter>
-    </ClInclude>
-    <ClInclude Include="window.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="physicsmanager.h">
-      <Filter>Physics</Filter>
-    </ClInclude>
-    <ClInclude Include="defs.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="globalvars.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="subsystem.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="logmanager.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="renderdocmanager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="cvarmanager.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="root.h">
-      <Filter>Root</Filter>
-    </ClInclude>
     <ClInclude Include="thirdparty\imgui\imgui_internal.h">
       <Filter>Thirdparty\ImGUI</Filter>
     </ClInclude>
@@ -1361,33 +1338,6 @@
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h">
       <Filter>Thirdparty\VkBootstrap</Filter>
     </ClInclude>
-    <ClInclude Include="gitdefs.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="handlemap.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="inputmanager.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="texture.h">
-      <Filter>Rendering\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="material.h">
-      <Filter>Rendering\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="rendermanager.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="model.h">
-      <Filter>Rendering\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="mathtypes.h">
-      <Filter>Misc</Filter>
-    </ClInclude>
-    <ClInclude Include="hostmanager.h">
-      <Filter>Managed</Filter>
-    </ClInclude>
     <ClInclude Include="fontawesome.h">
       <Filter>Thirdparty\FontAwesome</Filter>
     </ClInclude>
@@ -1400,60 +1350,122 @@
     <ClInclude Include="thirdparty\volk\volk.h">
       <Filter>Thirdparty\Volk</Filter>
     </ClInclude>
-    <ClInclude Include="vulkanrendercontext.h">
-      <Filter>Rendering\Platform\Vulkan</Filter>
+    <ClInclude Include="Entities\modelentity.h">
+      <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="baserendercontext.h">
-      <Filter>Rendering\Platform</Filter>
+    <ClInclude Include="Entities\baseentity.h">
+      <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="vkinit.h">
-      <Filter>Rendering\Platform\Vulkan</Filter>
+    <ClInclude Include="Entities\entitymanager.h">
+      <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="utilarray.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Managed\Bindings\client.h">
+      <Filter>Managed\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="util.h">
-      <Filter>Util</Filter>
+    <ClInclude Include="Managed\Bindings\consolesystem.h">
+      <Filter>Managed\Bindings</Filter>
     </ClInclude>
-    <ClInclude Include="rendering.h">
-      <Filter>Rendering</Filter>
+    <ClInclude Include="Managed\hostmanager.h">
+      <Filter>Managed</Filter>
     </ClInclude>
-    <ClInclude Include="vkmacros.h">
-      <Filter>Rendering\Platform\Vulkan</Filter>
+    <ClInclude Include="Misc\globalvars.h">
+      <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="pipeline.h">
-      <Filter>Rendering\Platform\Vulkan</Filter>
+    <ClInclude Include="Misc\handlemap.h">
+      <Filter>Misc</Filter>
     </ClInclude>
-    <ClInclude Include="mesh.h">
+    <ClInclude Include="Misc\inputmanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\logmanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\mathtypes.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\projectmanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\projectmanifest.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\subsystem.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\cvarmanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\defs.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Misc\editormanager.h">
+      <Filter>Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics\physicsmanager.h">
+      <Filter>Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Assets\model.h">
       <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="consolesystem.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Assets\texture.h">
+      <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="editor.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Assets\material.h">
+      <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="entities.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Assets\mesh.h">
+      <Filter>Rendering\Assets</Filter>
     </ClInclude>
-    <ClInclude Include="input.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Platform\Null\nullrendercontext.h">
+      <Filter>Rendering\Platform\Null</Filter>
     </ClInclude>
-    <ClInclude Include="physics.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Platform\Vulkan\vkmacros.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="engine.h">
-      <Filter>Managed\Bindings</Filter>
+    <ClInclude Include="Rendering\Platform\Vulkan\vulkanrendercontext.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
     </ClInclude>
-    <ClInclude Include="shadercompiler.h">
+    <ClInclude Include="Rendering\Platform\Vulkan\pipeline.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\Platform\Vulkan\vkinit.h">
+      <Filter>Rendering\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\rendermanager.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="projectmanifest.h">
-      <Filter>Misc</Filter>
+    <ClInclude Include="Rendering\window.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="projectmanager.h">
-      <Filter>Misc</Filter>
+    <ClInclude Include="Rendering\rendering.h">
+      <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Rendering\shadercompiler.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\baserendercontext.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Rendering\renderdocmanager.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Root\root.h">
+      <Filter>Root</Filter>
+    </ClInclude>
+    <ClInclude Include="Root\serverroot.h">
+      <Filter>Root</Filter>
+    </ClInclude>
+    <ClInclude Include="Root\clientroot.h">
+      <Filter>Root</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\util.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\utilarray.h">
+      <Filter>Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Managed\managedcallback.h" />
+    <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">

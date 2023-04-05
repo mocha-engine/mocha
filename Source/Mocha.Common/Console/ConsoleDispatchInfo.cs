@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 
 namespace Mocha.Common.Console;
 
@@ -38,4 +33,12 @@ public struct BoolCVarDispatchInfo
 	public IntPtr name;
 	public bool oldValue;
 	public bool newValue;
+}
+
+[StructLayout( LayoutKind.Sequential )]
+public struct IntCVarDispatchInfo
+{
+	public IntPtr name;
+	public int oldValue;
+	public int newValue;
 }

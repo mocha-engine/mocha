@@ -46,32 +46,55 @@ public class BaseGame : IGame
 		} );
 	}
 
-	public virtual void FrameUpdate()
+	public void FrameUpdate()
 	{
 		UIManager.Instance.Render();
 
 		TryCallMethodOnEntity( "FrameUpdate" );
 	}
 
-	public virtual void Update()
+	public void Update()
 	{
-		// HACK: Clear DebugOverlay here because doing it
-		// per-frame doesn't play nice with tick-based
-		// entries (needs fix)
+		if ( Core.IsClient )
+		{
+			// HACK: Clear DebugOverlay here because doing it
+			// per-frame doesn't play nice with tick-based
+			// entries (needs fix)
 
-		DebugOverlay.screenTextList.Clear();
-		DebugOverlay.currentLine = 0;
+			DebugOverlay.screenTextList.Clear();
+			DebugOverlay.currentLine = 0;
+		}
 
-		TryCallMethodOnEntity( "Update" );
+		DebugOverlay.ScreenText( $"BaseGame.Update assembly {GetType().Assembly.GetHashCode()}" );
 	}
 
-	public virtual void Shutdown()
+	public void Shutdown()
 	{
+		OnShutdown();
 	}
 
-	public virtual void Startup()
+	public void Startup()
 	{
+		OnStartup();
 	}
+
+	#region "Public API"
+	/// <summary>
+	/// Called on the server when the game starts up
+	/// </summary>
+	public virtual void OnStartup()
+	{
+
+	}
+
+	/// <summary>
+	/// Called on the server when the game shuts down
+	/// </summary>
+	public virtual void OnShutdown()
+	{
+
+	}
+	#endregion
 
 	[Event.Game.Hotload]
 	public void OnHotload()

@@ -10,7 +10,7 @@ public class Player : ModelEntity
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );
 
 	[Category( "Player" )]
-	public Vector3 PlayerHalfExtents { get; set; }
+	public Vector3 PlayerBounds { get; set; }
 
 	[Category( "Player" )]
 	public Vector3 EyePosition { get; set; }

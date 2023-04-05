@@ -15,33 +15,19 @@ public class NativeLogger : ILogger
 		return logStr;
 	}
 
-	public void Trace( object? obj )
+	private void Log( object? obj, Action<string, string> logAction )
 	{
+		var loggerName = Core.IsClient ? "cl" : "sv";
+
 		string str = GetString( obj );
 		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedTrace( str );
+		logAction( loggerName, str );
 	}
 
-	public void Info( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedInfo( str );
-	}
-
-	public void Warning( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedWarning( str );
-	}
-
-	public void Error( object? obj )
-	{
-		string str = GetString( obj );
-		OnLog?.Invoke( str );
-		Glue.LogManager.ManagedError( str );
-	}
+	public void Trace( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedTrace );
+	public void Info( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedInfo );
+	public void Warning( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedWarning );
+	public void Error( object? obj ) => Log( obj, NativeEngine.GetLogManager().ManagedError );
 
 	public struct LogEntry
 	{
@@ -60,7 +46,8 @@ public class NativeLogger : ILogger
 
 	public List<LogEntry> GetHistory()
 	{
-		var logHistory = Glue.LogManager.GetLogHistory();
+		var logManager = NativeEngine.GetLogManager();
+		var logHistory = logManager.GetLogHistory();
 
 		LogEntry[] logEntries = new LogEntry[logHistory.count];
 		var ptr = logHistory.items;

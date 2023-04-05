@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Upgrading;
 
 /// <summary>
 /// A contract defining an object that can upgrade members from two different assemblies.
@@ -13,13 +13,13 @@ internal interface IMemberUpgrader
 	int Priority { get; }
 
 	/// <summary>
-	/// Does this upgrader support upgrading for this member?
+	/// Returns whether or not the upgrader supports upgrading the member.
 	/// </summary>
+	/// <returns>Whether or not the upgrader supports upgrading the member.</returns>
 	bool CanUpgrade( MemberInfo memberInfo );
 
 	/// <summary>
-	/// Performs the upgrade for this member: copies the contents of
-	/// oldInstance into newInstance.
+	/// Performs the upgrade for this member. Copies the contents of <see ref="oldInstance"/> into <see ref="newInstance"/>.
 	/// </summary>
-	void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember );
+	void UpgradeMember( object? oldInstance, UpgradableMember oldMember, object? newInstance, UpgradableMember newMember );
 }

@@ -10,6 +10,9 @@ public class BaseEntity : IEntity
 	[HideInInspector]
 	public uint NativeHandle { get; protected set; }
 
+	[HideInInspector]
+	private Glue.BaseEntity NativeEntity => NativeEngine.GetEntityManager().GetBaseEntity( NativeHandle );
+
 	public bool IsValid()
 	{
 		return true;
@@ -18,39 +21,39 @@ public class BaseEntity : IEntity
 	[Category( "Transform" )]
 	public Vector3 Scale
 	{
-		get => Glue.Entities.GetScale( NativeHandle );
-		set => Glue.Entities.SetScale( NativeHandle, value );
+		get => NativeEntity.GetScale();
+		set => NativeEntity.SetScale( value );
 	}
 
 	[Category( "Transform" )]
 	public Vector3 Position
 	{
-		get => Glue.Entities.GetPosition( NativeHandle );
-		set => Glue.Entities.SetPosition( NativeHandle, value );
+		get => NativeEntity.GetPosition();
+		set => NativeEntity.SetPosition( value );
 	}
 
 	[Category( "Transform" )]
 	public Rotation Rotation
 	{
-		get => Glue.Entities.GetRotation( NativeHandle );
-		set => Glue.Entities.SetRotation( NativeHandle, value );
+		get => NativeEntity.GetRotation();
+		set => NativeEntity.SetRotation( value );
 	}
 
 	[HideInInspector]
 	public string Name
 	{
-		get => Glue.Entities.GetName( NativeHandle );
-		set => Glue.Entities.SetName( NativeHandle, value );
+		get => NativeEntity.GetName();
+		set => NativeEntity.SetName( value );
 	}
 
 	public bool IsViewModel
 	{
-		set => Glue.Entities.SetViewmodel( NativeHandle, value );
+		set => NativeEntity.SetViewmodel( value );
 	}
 
 	public bool IsUI
 	{
-		set => Glue.Entities.SetUI( NativeHandle, value );
+		set => NativeEntity.SetUI( value );
 	}
 
 	public BaseEntity()
@@ -66,6 +69,9 @@ public class BaseEntity : IEntity
 		var displayInfo = DisplayInfo.For( this );
 		Name = $"[{displayInfo.Category}] {displayInfo.Name} {NativeHandle}";
 
+		Event.Register( this );
+		Log.Info( $"Spawning entity {Name} on {(Core.IsClient ? "client" : "server")}" );
+
 		Spawn();
 	}
 
@@ -75,7 +81,7 @@ public class BaseEntity : IEntity
 
 	protected virtual void CreateNativeEntity()
 	{
-		NativeHandle = Glue.Entities.CreateBaseEntity();
+		NativeHandle = NativeEngine.CreateBaseEntity();
 	}
 
 	public virtual void Update() { }

@@ -263,7 +263,7 @@ public partial class QuakeWalkController
 
 	public TraceResult TraceBBox( Vector3 start, Vector3 end )
 	{
-		return Cast.Ray( start, end ).WithHalfExtents( Player.PlayerHalfExtents ).Ignore( Player ).Run();
+		return Cast.Ray( start, end ).WithHalfExtents( Player.PlayerBounds ).Ignore( Player ).Run();
 	}
 
 	private void TraceToGround()

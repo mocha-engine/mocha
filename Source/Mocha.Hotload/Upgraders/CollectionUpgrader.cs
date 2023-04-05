@@ -1,11 +1,12 @@
-﻿using System.Collections;
+﻿using Mocha.Hotload.Util;
+using System.Collections;
 using System.Reflection;
 using System.Runtime.Serialization;
 
-namespace Mocha.Hotload;
+namespace Mocha.Hotload.Upgrading.Upgraders;
 
 /// <summary>
-/// A member upgrader for any collections.
+/// A member upgrader for any <see cref="ICollection"/>s.
 /// </summary>
 internal sealed class CollectionUpgrader : IMemberUpgrader
 {
@@ -19,7 +20,7 @@ internal sealed class CollectionUpgrader : IMemberUpgrader
 	}
 
 	/// <inheritdoc />
-	public void UpgradeMember( object oldInstance, UpgradableMember oldMember, object newInstance, UpgradableMember newMember )
+	public void UpgradeMember( object? oldInstance, UpgradableMember oldMember, object? newInstance, UpgradableMember newMember )
 	{
 		var oldValue = oldMember.GetValue( oldInstance );
 		if ( oldValue is null )

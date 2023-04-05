@@ -14,7 +14,7 @@ public static partial class Notifications
 			ImGuiWindowFlags.NoMove;
 
 		const float padding = 24.0f;
-		const float margin = 16.0f;
+		const float margin = 8.0f;
 
 		var viewport = ImGui.GetMainViewport();
 		var workPos = viewport.WorkPos;
@@ -28,6 +28,7 @@ public static partial class Notifications
 		float y = 0;
 
 		var notifications = Common.Notify.Notifications.ToArray();
+
 		for ( int i = 0; i < notifications.Length; i++ )
 		{
 			var notification = notifications[i];
@@ -52,7 +53,7 @@ public static partial class Notifications
 			ImGui.SetNextWindowSize( new System.Numerics.Vector2( 0, 0 ) );
 			ImGui.SetNextWindowViewport( ImGui.GetMainViewport().ID );
 
-			if ( ImGui.Begin( $"##{notification.GetHashCode()}_overlay", windowFlags ) )
+			if ( ImGui.Begin( $"##notification_{i}_overlay", windowFlags ) )
 			{
 				ImGui.PushStyleColor( ImGuiCol.Text, new Vector4( 1, 1, 1, alpha ) );
 

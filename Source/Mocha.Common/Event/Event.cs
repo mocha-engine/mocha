@@ -46,16 +46,28 @@ public static partial class Event
 
 	public static void Run( string name, params object[] parameters )
 	{
-		s_events.ForEach( e =>
+		s_events.ToList().ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, parameters );
 		} );
 	}
 
+	public static void Run( Assembly targetAssembly, string name )
+	{
+		s_events.ToList().ForEach( e =>
+		{
+			if ( e.Object.GetType().Assembly != targetAssembly )
+				return;
+
+			if ( e.Name == name )
+				e.Method?.Invoke( e.Object, null );
+		} );
+	}
+
 	public static void Run( string name )
 	{
-		s_events.ForEach( e =>
+		s_events.ToList().ForEach( e =>
 		{
 			if ( e.Name == name )
 				e.Method?.Invoke( e.Object, null );

@@ -2,6 +2,8 @@
 
 public static class ImGuiX
 {
+	private static Glue.EditorManager NativeEditor => NativeEngine.GetEditorManager();
+
 	public static void SeparatorH()
 	{
 		ImGui.Dummy( new Vector2( 0, 4 ) );
@@ -48,32 +50,32 @@ public static class ImGuiX
 
 	public static void TextMonospace( string text )
 	{
-		Glue.Editor.TextMonospace( text );
+		NativeEditor.TextMonospace( text );
 	}
 
 	public static void TextLight( string text )
 	{
-		Glue.Editor.TextLight( text );
+		NativeEditor.TextLight( text );
 	}
 
 	public static void TextBold( string text )
 	{
-		Glue.Editor.TextBold( text );
+		NativeEditor.TextBold( text );
 	}
 
 	public static void TextHeading( string text )
 	{
-		Glue.Editor.TextHeading( text );
+		NativeEditor.TextHeading( text );
 	}
 
 	public static void TextSubheading( string text )
 	{
-		Glue.Editor.TextSubheading( text );
+		NativeEditor.TextSubheading( text );
 	}
 
 	public static bool BeginMainStatusBar()
 	{
-		return Glue.Editor.BeginMainStatusBar();
+		return NativeEditor.BeginMainStatusBar();
 	}
 
 	public static void EndMainStatusBar()
@@ -86,27 +88,27 @@ public static class ImGuiX
 	{
 		ImGui.SetNextWindowViewport( ImGui.GetMainViewport().ID );
 
+		ImGui.SetNextWindowBgAlpha( 0.5f );
+		ImGui.PushStyleVar( ImGuiStyleVar.WindowBorderSize, 0 );
+
 		bool b = ImGui.Begin( name, ImGuiWindowFlags.NoDecoration | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoInputs );
 
 		if ( b )
-		{
-			Vector2 workPos = ImGui.GetMainViewport().WorkPos;
-
-			ImGui.SetWindowPos( new Vector2( workPos.X + 16, workPos.Y + 16 ) );
 			ImGui.SetWindowSize( new Vector2( -1, -1 ) );
-		}
+
+		ImGui.PopStyleVar();
 
 		return b;
 	}
 
 	public static string GetGPUName()
 	{
-		return Glue.Editor.GetGPUName();
+		return NativeEditor.GetGPUName();
 	}
 
 	public static void RenderViewDropdown()
 	{
-		Glue.Editor.RenderViewDropdown();
+		NativeEditor.RenderViewDropdown();
 	}
 
 	public static string Align( string str ) => str.PadRight( 16, ' ' );
@@ -135,12 +137,12 @@ public static class ImGuiX
 
 	public static void Image( Texture texture, Vector2 size )
 	{
-		Glue.Editor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
+		NativeEditor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
 	}
 
 	public static void Image( Texture texture, Vector2 size, Vector4 tint )
 	{
-		Glue.Editor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
+		NativeEditor.Image( texture.NativeTexture, texture.Width, texture.Height, (int)size.X, (int)size.Y );
 	}
 
 	public static void Image( string texturePath, Vector2 size )
@@ -153,10 +155,12 @@ public static class ImGuiX
 		Image( Texture.FromCache( texture ), size, tint );
 	}
 
-	public static void Separator()
+	public static void Separator( Vector4? _color = null )
 	{
+		var color = _color ?? new Vector4( 0.28f, 0.28f, 0.28f, 0.29f );
+
 		ImGui.Dummy( new( 0, 4 ) );
-		ImGui.PushStyleColor( ImGuiCol.Separator, new System.Numerics.Vector4( 0.28f, 0.28f, 0.28f, 0.29f ) );
+		ImGui.PushStyleColor( ImGuiCol.Separator, color );
 		ImGui.Separator();
 		ImGui.PopStyleColor();
 		ImGui.Dummy( new( 0, 4 ) );

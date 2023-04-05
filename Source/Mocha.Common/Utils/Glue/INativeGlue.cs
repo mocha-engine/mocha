@@ -2,5 +2,5 @@
 
 public interface INativeGlue
 {
-	public IntPtr NativePtr { get; }
+	public IntPtr NativePtr { get; set; }
 }

@@ -2,24 +2,26 @@
 
 public static partial class Input
 {
-	public static bool Left => Glue.Input.IsButtonDown( 1 );
-	public static bool Middle => Glue.Input.IsButtonDown( 2 );
-	public static bool Right => Glue.Input.IsButtonDown( 3 );
+	private static Glue.InputManager NativeInput => NativeEngine.GetInputManager();
 
-	public static bool Button4 => Glue.Input.IsButtonDown( 4 );
-	public static bool Button5 => Glue.Input.IsButtonDown( 5 );
+	public static bool Left => NativeInput.IsButtonDown( 1 );
+	public static bool Middle => NativeInput.IsButtonDown( 2 );
+	public static bool Right => NativeInput.IsButtonDown( 3 );
+
+	public static bool Button4 => NativeInput.IsButtonDown( 4 );
+	public static bool Button5 => NativeInput.IsButtonDown( 5 );
 
 	// TODO: [ConVar.Archive( "mouse_sensitivity", 2.0f, "Player mouse look sensitivity" )]
 	public static float MouseSensitivity { get; set; } = 2.5f;
 
-	public static Vector2 MousePosition => Glue.Input.GetMousePosition();
-	public static Vector2 MouseDelta => Glue.Input.GetMouseDelta();
+	public static Vector2 MousePosition => NativeInput.GetMousePosition();
+	public static Vector2 MouseDelta => NativeInput.GetMouseDelta();
 
 	public static Rotation Rotation { get; private set; } = Rotation.Identity;
 
 	public static Vector3 Direction { get; private set; }
 
-	private static bool IsKeyDown( InputButton key ) => Glue.Input.IsKeyDown( (int)key );
+	private static bool IsKeyDown( InputButton key ) => NativeInput.IsKeyDown( (int)key );
 
 	public static bool Jump => IsKeyDown( InputButton.KeySpace );
 	public static bool Crouch => IsKeyDown( InputButton.KeyControl );
