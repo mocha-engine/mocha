@@ -1,7 +1,10 @@
 ﻿using System.Xml;
 
-namespace MochaTool.InteropGen;
+namespace MochaTool.InteropGen.Parsing;
 
+/// <summary>
+/// Contains functionality for parsing vcxproj files.
+/// </summary>
 internal static class VcxprojParser
 {
 	// Note that these paths only work for the windows x64 platforms right now.
@@ -11,19 +14,6 @@ internal static class VcxprojParser
 	private const string ExternalIncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:ExternalIncludePath";
 	private const string IncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:IncludePath";
 
-	private static string GetNodeContents( XmlNode root, string xpath, XmlNamespaceManager namespaceManager )
-	{
-		var nodeList = root.SelectNodes( xpath, namespaceManager );
-		if ( nodeList?.Count == 0 || nodeList?[0] == null )
-			throw new Exception( "Couldn't find IncludePath!" );
-
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-		var includeStr = nodeList[0].InnerText;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-
-		return includeStr;
-	}
-
 	/// <summary>
 	/// Parse the include list from a vcxproj file.
 	/// </summary>
@@ -31,20 +21,20 @@ internal static class VcxprojParser
 	/// This currently only supports x64-windows, so any different includes for other platforms
 	/// will not be reflected here.
 	/// </remarks>
-	public static List<string> ParseIncludes( string path )
+	internal static List<string> ParseIncludes( string path )
 	{
-		XmlDocument doc = new XmlDocument();
+		var doc = new XmlDocument();
 		doc.Load( path );
 
-		XmlNamespaceManager namespaceManager = new XmlNamespaceManager( doc.NameTable );
+		var namespaceManager = new XmlNamespaceManager( doc.NameTable );
 		namespaceManager.AddNamespace( "rs", "http://schemas.microsoft.com/developer/msbuild/2003" );
 
-		if ( doc.DocumentElement == null )
+		if ( doc.DocumentElement is null )
 			throw new Exception( "Failed to parse root node!" );
 
-		XmlNode root = doc.DocumentElement;
+		var root = doc.DocumentElement;
 
-		List<string> includes = new();
+		var includes = new List<string>();
 
 		// Select Project -> PropertyGroup -> ExternalIncludePath
 		{
@@ -70,7 +60,7 @@ internal static class VcxprojParser
 			{ "ExternalIncludePath", "" }
 		};
 
-		List<string> parsedIncludes = new();
+		var parsedIncludes = new List<string>();
 
 		// Simple find-and-replace for macros and environment variables
 		foreach ( var include in includes )
@@ -78,13 +68,22 @@ internal static class VcxprojParser
 			var processedInclude = include;
 
 			foreach ( var environmentVariable in environmentVariables )
-			{
 				processedInclude = processedInclude.Replace( $"$({environmentVariable.Key})", environmentVariable.Value );
-			}
 
 			parsedIncludes.Add( processedInclude );
 		}
 
 		return parsedIncludes;
+	}
+
+	private static string GetNodeContents( XmlNode root, string xpath, XmlNamespaceManager namespaceManager )
+	{
+		var nodeList = root.SelectNodes( xpath, namespaceManager );
+		if ( nodeList?.Count == 0 || nodeList?[0] is null )
+			throw new Exception( "Couldn't find IncludePath!" );
+
+		var includeStr = nodeList[0]!.InnerText;
+
+		return includeStr;
 	}
 }

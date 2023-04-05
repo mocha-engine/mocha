@@ -1,86 +1,110 @@
-﻿namespace MochaTool.InteropGen;
+﻿using Microsoft.Extensions.Logging;
+using MochaTool.InteropGen.CodeGen;
+using MochaTool.InteropGen.Extensions;
+using MochaTool.InteropGen.Parsing;
 
+namespace MochaTool.InteropGen;
+
+/// <summary>
+/// The main entry point to the IntropGen program.
+/// </summary>
 public static class Program
 {
-	internal static List<string> s_generatedPaths { get; set; } = new();
-	internal static List<IUnit> s_units { get; set; } = new();
-	internal static List<string> s_files { get; set; } = new();
+	/// <summary>
+	/// Contains all of the parsed units to generate bindings for.
+	/// </summary>
+	private static readonly List<IUnit> s_units = new();
+	/// <summary>
+	/// Contains all of the files that need to be generated.
+	/// </summary>
+	private static readonly List<string> s_files = new();
 
-	private static void ProcessHeader( string baseDir, string path )
+	/// <summary>
+	/// The entry point to the program.
+	/// </summary>
+	/// <param name="args">The command-line arguments given to the program.</param>
+	public static void Main( string[] args )
 	{
-		Console.WriteLine( $"Processing header {path}..." );
+		using var _totalTime = new StopwatchLog( "InteropGen", LogLevel.Information );
 
-		var units = Parser.GetUnits( path );
-		var fileName = Path.GetFileNameWithoutExtension( path );
+		var baseDir = args[0];
+		Log.LogIntro();
 
-		var managedGenerator = new ManagedCodeGenerator( units );
-		var managedCode = managedGenerator.GenerateManagedCode();
-		File.WriteAllText( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
+		//
+		// Prep
+		//
+		DeleteExistingFiles( baseDir );
 
-		var nativeGenerator = new NativeCodeGenerator( units );
-		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
-		var nativeCode = nativeGenerator.GenerateNativeCode( relativePath );
+		using ( var _parseTime = new StopwatchLog( "Parsing" ) )
+			Parse( baseDir );
 
-		Console.WriteLine( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h" );
-		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
+		//
+		// Expand methods out into list of (method name, method)
+		//
+		var methods = s_units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
-		s_files.Add( fileName );
-		s_units.AddRange( units );
+		//
+		// Write files
+		//
+		WriteManagedStruct( baseDir, methods );
+		WriteNativeStruct( baseDir, methods );
+		WriteNativeIncludes( baseDir );
 	}
 
-	private static void QueueDirectory( ref List<string> queue, string directory )
+	/// <summary>
+	/// Deletes and re-creates the generated file directories.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
+	private static void DeleteExistingFiles( string baseDir )
 	{
-		foreach ( var file in Directory.GetFiles( directory ) )
-		{
-			if ( file.EndsWith( ".h" ) && !file.EndsWith( ".generated.h" ) )
-			{
-				var fileContents = File.ReadAllText( file );
+		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue";
+		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated";
 
-				if ( !fileContents.Contains( "GENERATE_BINDINGS", StringComparison.CurrentCultureIgnoreCase ) )
-					continue; // Fast early bail
+		if ( Directory.Exists( destHeaderDir ) )
+			Directory.Delete( destHeaderDir, true );
+		if ( Directory.Exists( destCsDir ) )
+			Directory.Delete( destCsDir, true );
 
-				QueueFile( ref queue, file );
-			}
-		}
-
-		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
-		{
-			QueueDirectory( ref queue, subDirectory );
-		}
+		Directory.CreateDirectory( destHeaderDir );
+		Directory.CreateDirectory( destCsDir );
 	}
 
-	private static void QueueFile( ref List<string> queue, string path )
-	{
-		queue.Add( path );
-	}
-
+	/// <summary>
+	/// Parses all header files in the Mocha.Host project for interop generation.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void Parse( string baseDir )
 	{
-		List<string> queue = new();
-		QueueDirectory( ref queue, baseDir );
+		// Find and queue all of the header files to parse.
+		var queue = new List<string>();
+		QueueDirectory( queue, baseDir + "\\Mocha.Host" );
 
-		var dispatcher = new ThreadDispatcher<string>( ( files ) =>
+		// Dispatch jobs to parse all files.
+		var dispatcher = new ThreadDispatcher<string>( async ( files ) =>
 		{
 			foreach ( var path in files )
-			{
-				ProcessHeader( baseDir, path );
-			}
+				await ProcessHeaderAsync( baseDir, path );
 		}, queue );
 
 		// Wait for all threads to finish...
 		while ( !dispatcher.IsComplete )
-			Thread.Sleep( 500 );
+			Thread.Sleep( 1 );
 	}
 
-	private static void WriteManagedStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	/// <summary>
+	/// Writes the C# unmanaged arguments.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
+	/// <param name="methods">An enumerable list of all of the methods to write in the struct.</param>
+	private static void WriteManagedStruct( string baseDir, IEnumerable<(string Name, Method method)> methods )
 	{
 		var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
 
-		managedStructWriter.WriteLine( $"using System.Runtime.InteropServices;" );
+		managedStructWriter.WriteLine( "using System.Runtime.InteropServices;" );
 		managedStructWriter.WriteLine();
-		managedStructWriter.WriteLine( $"[StructLayout( LayoutKind.Sequential )]" );
-		managedStructWriter.WriteLine( $"public struct UnmanagedArgs" );
-		managedStructWriter.WriteLine( $"{{" );
+		managedStructWriter.WriteLine( "[StructLayout( LayoutKind.Sequential )]" );
+		managedStructWriter.WriteLine( "public struct UnmanagedArgs" );
+		managedStructWriter.WriteLine( '{' );
 
 		managedStructWriter.Indent++;
 
@@ -92,13 +116,18 @@ public static class Program
 
 		managedStructWriter.Indent--;
 
-		managedStructWriter.WriteLine( $"}}" );
+		managedStructWriter.WriteLine( '}' );
 		managedStructWriter.Dispose();
 
 		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
 	}
 
-	private static void WriteNativeStruct( string baseDir, ref List<(string Name, Method method)> methods )
+	/// <summary>
+	/// Writes the C++ unmanaged arguments.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
+	/// <param name="methods">An enumerable list of all of the methods to write in the struct.</param>
+	private static void WriteNativeStruct( string baseDir, IEnumerable<(string Name, Method method)> methods )
 	{
 		var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
 
@@ -107,7 +136,7 @@ public static class Program
 		nativeStructWriter.WriteLine( "#include \"InteropList.generated.h\"" );
 		nativeStructWriter.WriteLine();
 		nativeStructWriter.WriteLine( "struct UnmanagedArgs" );
-		nativeStructWriter.WriteLine( $"{{" );
+		nativeStructWriter.WriteLine( '{' );
 		nativeStructWriter.Indent++;
 
 		nativeStructWriter.WriteLine( "void* __Root;" );
@@ -117,11 +146,11 @@ public static class Program
 		nativeStructWriter.WriteLine();
 
 		nativeStructWriter.Indent--;
-		nativeStructWriter.WriteLine( $"}};" );
+		nativeStructWriter.WriteLine( "};" );
 		nativeStructWriter.WriteLine();
 
 		nativeStructWriter.WriteLine( "inline UnmanagedArgs args" );
-		nativeStructWriter.WriteLine( $"{{" );
+		nativeStructWriter.WriteLine( '{' );
 		nativeStructWriter.Indent++;
 
 		nativeStructWriter.WriteLine( "Root::GetInstance()," );
@@ -131,15 +160,19 @@ public static class Program
 		nativeStructWriter.WriteLine();
 
 		nativeStructWriter.Indent--;
-		nativeStructWriter.WriteLine( $"}};" );
+		nativeStructWriter.WriteLine( "};" );
 
 		nativeStructWriter.WriteLine();
-		nativeStructWriter.WriteLine( $"#endif // __GENERATED_UNMANAGED_ARGS_H" );
+		nativeStructWriter.WriteLine( "#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		nativeStructWriter.Dispose();
 
 		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
 	}
 
+	/// <summary>
+	/// Writes the C++ includes for the host project.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void WriteNativeIncludes( string baseDir )
 	{
 		var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
@@ -160,48 +193,56 @@ public static class Program
 		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\InteropList.generated.h", baseNativeListWriter.ToString() );
 	}
 
-	private static void DeleteExistingFiles( string baseDir )
+	/// <summary>
+	/// Parses a header file and generates its C# and C++ interop code.
+	/// </summary>
+	/// <param name="baseDir">The base directory that contains the source projects.</param>
+	/// <param name="path"></param>
+	/// <returns>A task that represents the asynchronous operation.</returns>
+	private static async Task ProcessHeaderAsync( string baseDir, string path )
 	{
-		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue\\";
-		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated\\";
+		Log.ProcessingHeader( path );
 
-		if ( Directory.Exists( destHeaderDir ) )
-			Directory.Delete( destHeaderDir, true );
-		if ( Directory.Exists( destCsDir ) )
-			Directory.Delete( destCsDir, true );
+		// Parse header.
+		var units = Parser.GetUnits( path );
 
-		Directory.CreateDirectory( destHeaderDir );
-		Directory.CreateDirectory( destCsDir );
+		// Generate interop code.
+		var managedCode = ManagedCodeGenerator.GenerateCode( units );
+		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
+		var nativeCode = NativeCodeGenerator.GenerateCode( relativePath, units );
+
+		// Write interop code.
+		var fileName = Path.GetFileNameWithoutExtension( path );
+		var csTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
+		var nativeTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
+
+		// Wait for writing to finish.
+		await Task.WhenAll( csTask, nativeTask );
+
+		s_files.Add( fileName );
+		s_units.AddRange( units );
 	}
 
-	public static void Main( string[] args )
+	/// <summary>
+	/// Searches the directory for any header files that should be parsed.
+	/// </summary>
+	/// <param name="queue">The queue collection to append to.</param>
+	/// <param name="directory">The absolute path to the directory to search for files.</param>
+	private static void QueueDirectory( ICollection<string> queue, string directory )
 	{
-		var baseDir = args[0];
-		var start = DateTime.Now;
+		foreach ( var file in Directory.GetFiles( directory, "*.h" ) )
+		{
+			if ( file.EndsWith( ".generated.h" ) )
+				continue;
 
-		Console.WriteLine( "Generating C# <--> C++ interop code..." );
+			var fileContents = File.ReadAllText( file );
+			if ( !fileContents.Contains( "GENERATE_BINDINGS", StringComparison.CurrentCultureIgnoreCase ) )
+				continue; // Fast early bail
 
-		//
-		// Prep
-		//
-		DeleteExistingFiles( baseDir );
-		Parse( baseDir );
+			queue.Add( file );
+		}
 
-		//
-		// Expand methods out into list of (method name, method)
-		//
-		var methods = s_units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
-
-		//
-		// Write files
-		//
-		WriteManagedStruct( baseDir, ref methods );
-		WriteNativeStruct( baseDir, ref methods );
-		WriteNativeIncludes( baseDir );
-
-		// Track time & output total duration
-		var end = DateTime.Now;
-		var totalTime = end - start;
-		Console.WriteLine( $"-- Took {totalTime.TotalSeconds} seconds." );
+		foreach ( var subDirectory in Directory.GetDirectories( directory ) )
+			QueueDirectory( queue, subDirectory );
 	}
 }
