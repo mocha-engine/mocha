@@ -1,9 +1,9 @@
 <p align="center">
     <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
     <br>
-    <a href="https://github.com/xezno/mocha/blob/master/LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/xezno/mocha"></a>
+    <a href="https://github.com/mocha-engine/mocha/blob/master/LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/mocha-engine/mocha"></a>
     <a href="https://discord.gg/SDP4R6Wsza"><img alt="Discord" src="https://img.shields.io/discord/1051715074043150336"></a>
-    <a href="https://github.com/xezno/mocha/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/xezno/mocha"></a>
+    <a href="https://github.com/mocha-engine/mocha/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/mocha-engine/mocha"></a>
     <a href="https://wiki.getmocha.org/index.php/Main_Page"><img alt="Wiki" src="https://img.shields.io/badge/wiki-click%20here-blue"></a>
 </p>
 
@@ -32,7 +32,7 @@ Mocha is a work-in-progress game engine that aims to (eventually) leverage moder
 
 ### Instructions
 
-1. First, clone the repository recursively with `git clone --recursive https://github.com/xezno/mocha`
+1. First, clone the repository recursively with `git clone --recursive https://github.com/mocha-engine/mocha`
 2. Run **Source/setup_x64.cmd** if building for 64-bit (recommended), or **Source/setup_x86.cmd** if building for 32-bit.
 3. Once complete, open **Source/Mocha.sln** and build the solution.
 4. Run **Host** to start the engine and run SpaceGame.
@@ -49,7 +49,7 @@ Style conventions are detailed on [the Mocha wiki](https://wiki.getmocha.org/ind
 
 ## Issues and Support
 
-Feel free to [open an issue](https://github.com/xezno/mocha/issues/new) if you encounter any bugs or problems, have any feature requests, or have any questions.
+Feel free to [open an issue](https://github.com/mocha-engine/mocha/issues/new) if you encounter any bugs or problems, have any feature requests, or have any questions.
 
 ## Free and Open Source
 
@@ -79,7 +79,7 @@ Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 This license allows you to distribute your games under whatever license you wish (as Mocha would be considered a Library), however modifying and distributing the engine requires full source disclosure.
 
-A copy of this license is available at [LICENSE.md](https://github.com/xezno/mocha/blob/master/LICENSE.md).
+A copy of this license is available at [LICENSE.md](https://github.com/mocha-engine/mocha/blob/master/LICENSE.md).
 
 ## Acknowledgements
 * [Badges](https://shields.io)
