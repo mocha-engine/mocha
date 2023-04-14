@@ -8,6 +8,7 @@
 #include <Misc/inputmanager.h>
 #include <Misc/logmanager.h>
 #include <Misc/projectmanager.h>
+#include <Networking/networkingmanager.h>
 #include <Physics/physicsmanager.h>
 #include <Rendering/renderdocmanager.h>
 #include <Rendering/rendermanager.h>
@@ -38,6 +39,9 @@ void Root::Startup()
 	Globals::m_inputManager = new InputManager();
 	Globals::m_inputManager->Startup();
 
+	Globals::m_networkingManager = new NetworkingManager();
+	Globals::m_networkingManager->Startup();
+
 	Globals::m_renderManager = new RenderManager();
 	Globals::m_renderManager->Startup();
 
@@ -53,6 +57,7 @@ void Root::Shutdown()
 	Globals::m_hostManager->Shutdown();
 	Globals::m_editorManager->Shutdown();
 	Globals::m_renderManager->Shutdown();
+	Globals::m_networkingManager->Shutdown();
 	Globals::m_inputManager->Shutdown();
 	Globals::m_renderdocManager->Shutdown();
 	Globals::m_physicsManager->Shutdown();

@@ -544,6 +544,9 @@
       <Filter>Root</Filter>
     </ClCompile>
     <ClCompile Include="Managed\managedcallback.cpp" />
+    <ClCompile Include="Networking\valvesocketserver.cpp" />
+    <ClCompile Include="Networking\valvesocketclient.cpp" />
+    <ClCompile Include="Networking\networkingmanager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="thirdparty\imgui\imgui_internal.h">
@@ -1465,7 +1468,11 @@
       <Filter>Util</Filter>
     </ClInclude>
     <ClInclude Include="Managed\managedcallback.h" />
+    <ClInclude Include="Networking\valvesocketserver.h" />
+    <ClInclude Include="Networking\valvesocketclient.h" />
+    <ClInclude Include="Networking\networkingmanager.h" />
     <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
+    <ClInclude Include="Networking\valvesocketreceivedmessage.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">
