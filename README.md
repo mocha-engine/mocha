@@ -7,7 +7,7 @@
     <a href="https://wiki.getmocha.org/index.php/Main_Page"><img alt="Wiki" src="https://img.shields.io/badge/wiki-click%20here-blue"></a>
 </p>
 
-Mocha is a work-in-progress game engine that aims to (eventually) leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.
+Mocha is a game engine that aims to (eventually) leverage modern graphics technologies to deliver high-quality visuals. It is equipped with a Vulkan renderer, a C# scripting system, and a hot-loading HTML/CSS user interface solution. In addition, Mocha offers a Jolt physics implementation and a physically-based shading and material system. The engine includes an ImGui-based editor for easy customization.
 
 ![Mocha Screenshot](https://user-images.githubusercontent.com/12881812/210655312-1e0d25a1-e4bf-49d9-943b-f88f932f7e08.png)
 
