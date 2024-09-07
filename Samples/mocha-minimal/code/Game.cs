@@ -17,7 +17,7 @@ public class Game : BaseGame
 
 		// Spawn a player
 		var player = new Player();
-		player.Position = new Vector3( 0, 0, 50 );
+		player.Position = new Vector3( 0, 5, 10 );
 
 		Hud = new UIManager();
 		Hud.SetTemplate( "ui/Game.html" );
