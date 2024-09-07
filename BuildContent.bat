@@ -1,0 +1,1 @@
+build\MochaTool.AssetCompiler.exe --mountpoints "samples/mocha-minimal/content/" "content/core/" -f
