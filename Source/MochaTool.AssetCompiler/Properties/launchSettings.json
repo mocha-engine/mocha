@@ -2,7 +2,7 @@
   "profiles": {
     "Run Asset Compiler": {
       "commandName": "Project",
-      "commandLineArgs": "--mountpoints \"samples/mocha-minimal/content/\" \"content/core/\"",
+      "commandLineArgs": "--mountpoints \"samples/mocha-minimal/content/\" \"content/core/\" -f",
       "workingDirectory": "$(SolutionDir)..",
       "remoteDebugEnabled": false
     }
