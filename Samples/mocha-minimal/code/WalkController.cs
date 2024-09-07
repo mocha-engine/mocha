@@ -32,7 +32,7 @@ public class WalkController
 
 		Event.Register( this );
 
-		Player.Position = new Vector3( 0, 0, 10 );
+		Player.Position = new Vector3( 0, 5, 10 );
 	}
 
 	[Event.Tick]
@@ -82,7 +82,7 @@ public class WalkController
 
 		var direction = Input.Direction.WithZ( 0 );
 
-		return direction * rotation;
+		return (direction * rotation).Normal;
 	}
 
 	private Vector3 Accelerate( Vector3 accelDir, Vector3 oldVelocity, float accelerate, float maxSpeed )
