@@ -125,10 +125,10 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 	constants.data.x = ( int )Globals::m_debugView;
 
 	std::vector<Vector3> lightPositions = {};
-	lightPositions.push_back( { 0, 4, 4 } );
-	lightPositions.push_back( { 4, 0, 4 } );
-	lightPositions.push_back( { 0, -4, 4 } );
-	lightPositions.push_back( { -4, 0, 4 } );
+	lightPositions.push_back( { 0, 4, 2 } );
+	lightPositions.push_back( { 4, 4, 2 } );
+	lightPositions.push_back( { 0, -4, 2 } );
+	lightPositions.push_back( { -4, 4, 2 } );
 
 	std::vector<glm::vec4> packedLightInfo = {};
 	for ( int i = 0; i < 4; ++i )

@@ -36,16 +36,16 @@ public class Material : Asset
 			DiffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
 
 		if ( !string.IsNullOrEmpty( materialFormat.Data.NormalTexture ) )
-			NormalTexture = new Texture( materialFormat.Data.NormalTexture );
+			NormalTexture = new Texture( materialFormat.Data.NormalTexture, false );
 
 		if ( !string.IsNullOrEmpty( materialFormat.Data.AmbientOcclusionTexture ) )
-			AmbientOcclusionTexture = new Texture( materialFormat.Data.AmbientOcclusionTexture );
+			AmbientOcclusionTexture = new Texture( materialFormat.Data.AmbientOcclusionTexture, false );
 
 		if ( !string.IsNullOrEmpty( materialFormat.Data.MetalnessTexture ) )
-			MetalnessTexture = new Texture( materialFormat.Data.MetalnessTexture );
+			MetalnessTexture = new Texture( materialFormat.Data.MetalnessTexture, false );
 
 		if ( !string.IsNullOrEmpty( materialFormat.Data.RoughnessTexture ) )
-			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture );
+			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture, false );
 
 		var textures = new List<Glue.Texture>()
 		{
