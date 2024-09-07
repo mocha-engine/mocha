@@ -750,7 +750,7 @@ void CVarEntry::FromString( std::string valueStr )
 		else if ( valueStr == "false" || valueStr == "0" || valueStr == "no" )
 			value = false;
 		else
-			assert( false ); // Invalid bool value
+			return;
 
 		SetValue<bool>( value );
 	}
