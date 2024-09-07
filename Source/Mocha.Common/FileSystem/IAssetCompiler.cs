@@ -11,12 +11,12 @@ public interface IAssetCompiler
 	/// Compiles an asset synchronously.
 	/// </summary>
 	/// <param name="path">The path to the source file.</param>
-	void CompileFile( string path );
+	void CompileFile( string path, bool forceRecompile = false );
 
 	/// <summary>
 	/// Compiles an asset asynchronously.
 	/// </summary>
 	/// <param name="path">The path to the source file.</param>
 	/// <returns>The task that represents the asynchronous operation.</returns>
-	Task CompileFileAsync( string path );
+	Task CompileFileAsync( string path, bool forceRecompile = false );
 }

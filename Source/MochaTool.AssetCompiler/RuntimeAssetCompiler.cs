@@ -6,9 +6,6 @@ public class RuntimeAssetCompiler : AssetCompilerBase
 
 	public RuntimeAssetCompiler()
 	{
-		// Only notify on file created
-		var filters = NotifyFilters.CreationTime;
-
 		_watchers = FileSystem.Mounted.CreateMountedFileSystemWatchers( "*.*", path =>
 		{
 			// Prevent an infinite loop -- don't recompile assets that we just compiled!
@@ -30,7 +27,7 @@ public class RuntimeAssetCompiler : AssetCompilerBase
 				}
 			}
 
-			CompileFile( path );
-		}, filters );
+			CompileFile( path, true );
+		} );
 	}
 }

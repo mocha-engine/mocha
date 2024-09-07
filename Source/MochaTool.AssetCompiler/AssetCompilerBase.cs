@@ -60,10 +60,10 @@ public class AssetCompilerBase : IAssetCompiler
 	}
 
 	/// <inheritdoc/>
-	public void CompileFile( string path ) => CompileFileAsync( path ).Wait();
+	public void CompileFile( string path, bool forceRecompile = false ) => CompileFileAsync( path, forceRecompile ).Wait();
 
 	/// <inheritdoc/>
-	public async Task CompileFileAsync( string relativePath )
+	public async Task CompileFileAsync( string relativePath, bool forceRecompile = false )
 	{
 		// Check if we have a compiler for the file.
 		var fileExtension = Path.GetExtension( relativePath );
@@ -95,13 +95,16 @@ public class AssetCompilerBase : IAssetCompiler
 		var compiledPath = Path.ChangeExtension( relativePath, compiler.CompiledExtension );
 
 		// Check if we need to recompile.
-		if ( compiler.SupportsMochaFile && FileSystem.Mounted.Exists( compiledPath, FileSystemOptions.AssetCompiler ) )
+		if ( !forceRecompile )
 		{
-			MochaFile<object> compiledFile = Serializer.Deserialize<MochaFile<object>>( await FileSystem.Mounted.ReadAllBytesAsync( compiledPath, FileSystemOptions.AssetCompiler ) );
-			if ( Enumerable.SequenceEqual( hash, compiledFile.AssetHash ) )
+			if ( compiler.SupportsMochaFile && FileSystem.Mounted.Exists( compiledPath, FileSystemOptions.AssetCompiler ) )
 			{
-				ResultLog.UpToDate( relativePath );
-				return;
+				MochaFile<object> compiledFile = Serializer.Deserialize<MochaFile<object>>( await FileSystem.Mounted.ReadAllBytesAsync( compiledPath, FileSystemOptions.AssetCompiler ) );
+				if ( Enumerable.SequenceEqual( hash, compiledFile.AssetHash ) )
+				{
+					ResultLog.UpToDate( relativePath );
+					return;
+				}
 			}
 		}
 

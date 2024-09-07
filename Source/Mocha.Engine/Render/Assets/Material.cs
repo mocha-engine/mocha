@@ -57,18 +57,38 @@ public class Material : Asset
 			BlueNoiseTexture.NativeTexture
 		};
 
-		var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
-		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
+		{
+			var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
+			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
-		NativeMaterial = new(
-			Path,
-			shaderFormat.Data.VertexShaderData.ToInterop(),
-			shaderFormat.Data.FragmentShaderData.ToInterop(),
-			Vertex.VertexAttributes.ToInterop(),
-			textures.ToInterop(),
-			SamplerType.Point,
-			false
-		);
+			NativeMaterial = new(
+				Path,
+				shaderFormat.Data.VertexShaderData.ToInterop(),
+				shaderFormat.Data.FragmentShaderData.ToInterop(),
+				Vertex.VertexAttributes.ToInterop(),
+				textures.ToInterop(),
+				SamplerType.Point,
+				false
+			);
+		}
+
+		//
+		// alex: this might be the worst possible way to do shader hotloading.
+		// perhaps we should have some sort of hook in the resource compiler
+		// so that we don't have to pull this shit off
+		//
+		FileSystem.Mounted.CreateWatcher( "shaders", "pbr.mshdr_c", ( _ ) =>
+		{
+			var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
+			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
+
+			NativeMaterial.SetShaderData( 
+				shaderFormat.Data.VertexShaderData.ToInterop(), 
+				shaderFormat.Data.FragmentShaderData.ToInterop() 
+			);
+
+			NativeMaterial.Reload();
+		} );
 	}
 
 	/// <summary>

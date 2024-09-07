@@ -39,6 +39,12 @@ void Material::Reload()
 	m_isDirty.store( true );
 }
 
+void Material::SetShaderData( UtilArray vertexShaderData, UtilArray fragmentShaderData )
+{
+	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();
+	m_fragmentShaderData = fragmentShaderData.GetData<uint32_t>();
+}
+
 void Material::CreateResources()
 {
 	PipelineInfo_t pipelineInfo = {};

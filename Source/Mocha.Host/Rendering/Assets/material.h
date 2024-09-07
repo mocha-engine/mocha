@@ -35,6 +35,7 @@ public:
 
 	GENERATE_BINDINGS void CreateResources();
 	GENERATE_BINDINGS void Reload();
+	GENERATE_BINDINGS void SetShaderData( UtilArray vertexShaderData, UtilArray fragmentShaderData );
 
 	SamplerType m_samplerType = {};
 	Descriptor m_descriptor = {};
