@@ -60,10 +60,7 @@ public class Player : Mocha.Player
 		//
 		// Field of view
 		//
-		float targetFov = 90f;
-
-		Camera.FieldOfView = lastFov.LerpTo( targetFov, 10 * Time.Delta );
-		lastFov = Camera.FieldOfView;
+		Camera.FieldOfView = 90f;
 
 		//
 		// Z planes

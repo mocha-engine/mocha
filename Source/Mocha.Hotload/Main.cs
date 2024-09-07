@@ -142,7 +142,7 @@ public static class Main
 		else
 		{
 			SetServerContext( false );
-
+			
 			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 			// The editor should never fail to compile.
 			Debug.Assert( s_editor.EntryPoint is not null );
