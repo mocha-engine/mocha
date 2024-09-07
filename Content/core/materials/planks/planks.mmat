@@ -2,5 +2,6 @@
     "DiffuseTexture": "materials/planks/planks_color.mtex",
     "NormalTexture": "materials/planks/planks_normal.mtex",
     "AmbientOcclusionTexture": "materials/planks/planks_ao.mtex",
-    "RoughnessTexture": "materials/planks/planks_rough.mtex"
+    "RoughnessTexture": "materials/planks/planks_rough.mtex",
+    "MetalnessTexture": "materials/planks/planks_metal.mtex"
 }
