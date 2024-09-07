@@ -2,6 +2,7 @@
 
 #include <Rendering/rendering.h>
 #include <glslang/SPIRV/GlslangToSpv.h>
+#include <glslang/Public/ShaderLang.h>
 #include <volk.h>
 
 //
