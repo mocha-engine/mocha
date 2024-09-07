@@ -319,7 +319,7 @@ namespace VKInit
 
 		info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_NEAREST;
 		info.minLod = 0.0f;
-		info.maxLod = 5.0f;
+		info.maxLod = VK_LOD_CLAMP_NONE;
 
 		return info;
 	}

@@ -76,7 +76,7 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 	{
 		DescriptorUpdateInfo_t updateInfo = {};
 		updateInfo.binding = i;
-		updateInfo.samplerType = SAMPLER_TYPE_POINT;
+		updateInfo.samplerType = SAMPLER_TYPE_ANISOTROPIC;
 		updateInfo.src = &mesh->material->m_textures[i].m_image;
 
 		m_renderContext->UpdateDescriptor( mesh->material->m_descriptor, updateInfo );
