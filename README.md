@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://user-images.githubusercontent.com/12881812/210671438-4d622459-fc1b-4164-ba8a-932dd2926524.png" />
+    <img src="https://github.com/user-attachments/assets/b32837d0-d6e4-453c-8c1c-8502b2255bc8" width="512" />
     <br>
     <a href="https://github.com/mocha-engine/mocha/blob/master/LICENSE.md"><img alt="GitHub" src="https://img.shields.io/github/license/mocha-engine/mocha"></a>
     <a href="https://discord.gg/SDP4R6Wsza"><img alt="Discord" src="https://img.shields.io/discord/1051715074043150336"></a>
