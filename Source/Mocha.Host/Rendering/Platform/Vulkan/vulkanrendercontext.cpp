@@ -647,6 +647,15 @@ void VulkanRenderContext::FinalizeAndCreateDevice( vkb::PhysicalDevice physicalD
 		deviceBuilder = deviceBuilder.add_pNext( &accelFeature ).add_pNext( &rayQueryFeature );
 	}
 
+	if ( EngineProperties::Bindless )
+	{
+		VkPhysicalDeviceDescriptorIndexingFeatures indexingFeatures = {};
+		indexingFeatures.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES;
+		indexingFeatures.pNext = nullptr;
+
+		deviceBuilder = deviceBuilder.add_pNext( &indexingFeatures );
+	}
+
 	vkb::Device vkbDevice = deviceBuilder.build().value();
 
 	m_device = vkbDevice.device;
@@ -770,6 +779,8 @@ void VulkanRenderContext::CreateSyncStructures()
 	// Fences are handled by VulkanCommandContexts. Our main fence is m_mainContext.fence.
 }
 
+static const uint32_t MaxBindlessResources = 16536;
+
 void VulkanRenderContext::CreateDescriptors()
 {
 	VkDescriptorPoolSize poolSizes[] = { { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
@@ -787,6 +798,16 @@ void VulkanRenderContext::CreateDescriptors()
 	poolInfo.pPoolSizes = poolSizes;
 
 	VK_CHECK( vkCreateDescriptorPool( m_device, &poolInfo, nullptr, &m_descriptorPool ) );
+
+	VkDescriptorPoolSize bindlessPoolSizes[] = { { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, MaxBindlessResources },
+	    { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, MaxBindlessResources } };
+
+	poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_UPDATE_AFTER_BIND_BIT;
+	poolInfo.maxSets = MaxBindlessResources * ( uint32_t )std::size( bindlessPoolSizes );
+	poolInfo.poolSizeCount = (uint32_t)std::size( bindlessPoolSizes );
+	poolInfo.pPoolSizes = bindlessPoolSizes;
+
+	VK_CHECK( vkCreateDescriptorPool( m_device, &poolInfo, nullptr, &m_bindlessDescriptorPool ) );
 }
 
 void VulkanRenderContext::CreateRenderTargets()
@@ -1879,13 +1900,24 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 	SetParent( parent );
 
 	std::vector<VkDescriptorSetLayoutBinding> bindings = {};
+	bool isBindless = false;
 
 	for ( int i = 0; i < descriptorInfo.bindings.size(); ++i )
 	{
 		VkDescriptorSetLayoutBinding binding = {};
 		binding.binding = i;
 		binding.descriptorType = GetDescriptorType( descriptorInfo.bindings[i].type );
-		binding.descriptorCount = 1;
+
+		if (descriptorInfo.bindings[i].isBindless)
+		{
+			binding.descriptorCount = MaxBindlessResources;
+			isBindless = true;
+		}
+		else
+		{
+			binding.descriptorCount = 1;
+		}
+
 		binding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT | VK_SHADER_STAGE_VERTEX_BIT;
 		binding.pImmutableSamplers = nullptr;
 
@@ -1894,12 +1926,51 @@ VulkanDescriptor::VulkanDescriptor( VulkanRenderContext* parent, DescriptorInfo_
 
 	VkDescriptorSetLayoutCreateInfo layoutInfo =
 	    VKInit::DescriptorSetLayoutCreateInfo( bindings.data(), static_cast<uint32_t>( bindings.size() ) );
-	VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
 
-	VkDescriptorSetAllocateInfo allocInfo =
-	    VKInit::DescriptorSetAllocateInfo( m_parent->m_descriptorPool, &descriptorSetLayout, 1 );
+	if ( isBindless )
+	{
+		layoutInfo.flags |= VK_DESCRIPTOR_SET_LAYOUT_CREATE_UPDATE_AFTER_BIND_POOL_BIT;
 
-	VK_CHECK( vkAllocateDescriptorSets( m_parent->m_device, &allocInfo, &descriptorSet ) );
+		VkDescriptorBindingFlags bindlessFlags = VK_DESCRIPTOR_BINDING_PARTIALLY_BOUND_BIT | VK_DESCRIPTOR_BINDING_UPDATE_AFTER_BIND_BIT;
+		VkDescriptorSetLayoutBindingFlagsCreateInfo extendedInfo = {};
+		extendedInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_BINDING_FLAGS_CREATE_INFO_EXT;
+		extendedInfo.pNext = nullptr;
+		extendedInfo.bindingCount = 1;
+		extendedInfo.pBindingFlags = &bindlessFlags;
+
+		layoutInfo.pNext = &extendedInfo;
+
+		VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
+	}
+	else
+	{
+		VK_CHECK( vkCreateDescriptorSetLayout( m_parent->m_device, &layoutInfo, nullptr, &descriptorSetLayout ) );
+	}
+
+	if ( isBindless )
+	{
+		VkDescriptorSetAllocateInfo allocInfo =
+		    VKInit::DescriptorSetAllocateInfo( m_parent->m_bindlessDescriptorPool, &descriptorSetLayout, 1 );
+
+		VkDescriptorSetVariableDescriptorCountAllocateInfo countInfo = {};
+		countInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_VARIABLE_DESCRIPTOR_COUNT_ALLOCATE_INFO;
+		countInfo.pNext = nullptr;
+
+		uint32_t maxBinding = MaxBindlessResources - 1;
+		countInfo.pDescriptorCounts = &maxBinding;
+		countInfo.descriptorSetCount = 1;
+		
+		allocInfo.pNext = &countInfo;
+
+		VK_CHECK( vkAllocateDescriptorSets( m_parent->m_device, &allocInfo, &descriptorSet ) );
+	}
+	else
+	{
+		VkDescriptorSetAllocateInfo allocInfo =
+		    VKInit::DescriptorSetAllocateInfo( m_parent->m_descriptorPool, &descriptorSetLayout, 1 );
+
+		VK_CHECK( vkAllocateDescriptorSets( m_parent->m_device, &allocInfo, &descriptorSet ) );
+	}
 
 	SetDebugName( descriptorInfo.name.c_str(), VK_OBJECT_TYPE_DESCRIPTOR_SET, ( uint64_t )descriptorSet );
 

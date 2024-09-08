@@ -14,6 +14,7 @@ namespace EngineProperties
 	extern StringCVar LoadedProject;
 	extern BoolCVar Raytracing;
 	extern BoolCVar Renderdoc;
+	extern BoolCVar Bindless;
 
 	extern StringCVar ServerHostname;
 	extern StringCVar ServerPassword;
