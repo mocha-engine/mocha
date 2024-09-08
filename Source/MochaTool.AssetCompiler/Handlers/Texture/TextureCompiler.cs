@@ -126,7 +126,7 @@ public partial class TextureCompiler : BaseCompiler
 		byte[] resizedData = new byte[4 * targetWidth * targetWidth];
 
 		Rgba32[] pixels = new Rgba32[width * height];
-		for ( int i = 0; i < pixels.Length; i ++ )
+		for ( int i = 0; i < pixels.Length; i++ )
 		{
 			pixels[i] = new Rgba32(
 				data[(i * 4) + 0],
