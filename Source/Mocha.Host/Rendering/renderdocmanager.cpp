@@ -29,7 +29,7 @@ void RenderdocManager::Startup()
 	auto renderdocDll = LoadLibraryA( "renderdoc.dll" );
 	if ( renderdocDll == nullptr )
 	{
-		spdlog::error( "Failed to load RenderDoc DLL - Error: %#x", GetLastError() );
+		spdlog::error( "Failed to load RenderDoc DLL - Error: {}", GetLastError() );
 		return;
 	}
 
