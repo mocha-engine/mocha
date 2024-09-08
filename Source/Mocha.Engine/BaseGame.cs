@@ -1,8 +1,13 @@
-﻿namespace Mocha;
+﻿using Mocha.Networking;
+
+namespace Mocha;
 
 public class BaseGame : IGame
 {
 	public static BaseGame Current { get; set; }
+
+	private static Server? s_server;
+	private static Client? s_client;
 
 	public BaseGame()
 	{
@@ -55,6 +60,10 @@ public class BaseGame : IGame
 
 	public void Update()
 	{
+		// TODO: This is garbage and should not be here!!!
+		s_server?.Update();
+		s_client?.Update();
+
 		if ( Core.IsClient )
 		{
 			// HACK: Clear DebugOverlay here because doing it
@@ -75,6 +84,19 @@ public class BaseGame : IGame
 
 	public void Startup()
 	{
+		if ( Core.IsClient )
+		{
+			s_client = new BaseGameClient( "127.0.0.1" );
+		}
+		else
+		{
+			s_server = new BaseGameServer()
+			{
+				OnClientConnectedEvent = ( connection ) => OnClientConnected( connection.GetClient() ),
+				OnClientDisconnectedEvent = ( connection ) => OnClientDisconnected( connection.GetClient() ),
+			};
+		}
+
 		OnStartup();
 	}
 
@@ -91,6 +113,22 @@ public class BaseGame : IGame
 	/// Called on the server when the game shuts down
 	/// </summary>
 	public virtual void OnShutdown()
+	{
+
+	}
+
+	/// <summary>
+	/// Called on the server whenever a client joins
+	/// </summary>
+	public virtual void OnClientConnected( IClient client )
+	{
+
+	}
+
+	/// <summary>
+	/// Called on the server whenever a client leaves
+	/// </summary>
+	public virtual void OnClientDisconnected( IClient client )
 	{
 
 	}
