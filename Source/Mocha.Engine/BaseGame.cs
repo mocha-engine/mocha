@@ -37,9 +37,11 @@ public class BaseGame : IGame
 			}
 			catch ( Exception ex )
 			{
-				Notify.AddError( ex.GetType().Name, ex.Message, FontAwesome.Exclamation );
+				var targetEx = ex.InnerException ?? ex;
 
-				Log.Error( ex );
+				Notify.AddError( targetEx.GetType().Name, targetEx.Message, FontAwesome.Exclamation );
+
+				Log.Error( targetEx );
 
 				FailedMethods.Add( methodHash );
 			}
