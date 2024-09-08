@@ -1,5 +1,8 @@
 ﻿using BCnEncoder.Encoder;
 using BCnEncoder.Shared;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 using StbImageSharp;
 using System.Diagnostics;
 using System.Text.Json;
@@ -119,6 +122,26 @@ public partial class TextureCompiler : BaseCompiler
 
 	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, TextureFormat format )
 	{
+		var targetWidth = MathX.CalcMipSize( (int)width, (int)mip );
+		byte[] resizedData = new byte[4 * targetWidth * targetWidth];
+
+		Rgba32[] pixels = new Rgba32[width * height];
+		for ( int i = 0; i < pixels.Length; i ++ )
+		{
+			pixels[i] = new Rgba32(
+				data[(i * 4) + 0],
+				data[(i * 4) + 1],
+				data[(i * 4) + 2],
+				data[(i * 4) + 3]
+			);
+		}
+
+		using ( var image = Image.LoadPixelData<Rgba32>( pixels.AsSpan(), (int)width, (int)height ) )
+		{
+			image.Mutate( x => x.Resize( targetWidth, targetWidth, KnownResamplers.Lanczos5 ) );
+			image.CopyPixelDataTo( resizedData );
+		}
+
 		var encoder = new BcEncoder();
 
 		encoder.OutputOptions.GenerateMipMaps = true;
@@ -126,7 +149,7 @@ public partial class TextureCompiler : BaseCompiler
 		encoder.OutputOptions.Format = TextureFormatToCompressionFormat( format );
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
-		return encoder.EncodeToRawBytes( data, (int)width, (int)height, PixelFormat.Rgba32, (int)mip, out _, out _ );
+		return encoder.EncodeToRawBytes( resizedData, (int)targetWidth, (int)targetWidth, PixelFormat.Rgba32, 0, out _, out _ );
 	}
 
 	private static bool IsPowerOfTwo( int x )
