@@ -21,7 +21,7 @@ Window::Window( uint32_t width, uint32_t height )
 {
 	SDL_Init( SDL_INIT_VIDEO );
 
-	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN );
+	SDL_WindowFlags windowFlags = ( SDL_WindowFlags )( SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_HIDDEN | SDL_WINDOW_ALLOW_HIGHDPI );
 	m_visible = false;
 
 	std::string windowTitle = std::string( Globals::m_projectManager->GetProject().name + " [" +
@@ -101,7 +101,7 @@ void Window::Update()
 				SDL_GetWindowWMInfo( SDL_GetWindowFromID( we.windowID ), &wmi );
 				auto hwnd = wmi.info.win.window;
 
-				SetWindowTheme( hwnd, L"DarkMode_Explorer", NULL );
+				SetWindowTheme( hwnd, L"Explorer", NULL );
 
 				BOOL darkMode = 1;
 				if ( FAILED( DwmSetWindowAttribute( hwnd, 20, &darkMode, sizeof( darkMode ) ) ) )
