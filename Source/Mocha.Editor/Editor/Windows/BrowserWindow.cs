@@ -24,6 +24,8 @@ internal class BrowserWindow : EditorWindow
 	public BrowserWindow()
 	{
 		CacheEverything();
+
+		isVisible = false;
 	}
 
 	public void SelectItem( string name )
