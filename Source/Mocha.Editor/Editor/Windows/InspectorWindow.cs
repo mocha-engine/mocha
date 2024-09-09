@@ -14,6 +14,8 @@ public class InspectorWindow : EditorWindow
 	public InspectorWindow()
 	{
 		Instance = this;
+
+		isVisible = false;
 	}
 
 	public override void Draw()
