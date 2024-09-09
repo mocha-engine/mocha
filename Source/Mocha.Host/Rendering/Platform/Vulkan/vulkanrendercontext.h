@@ -488,6 +488,12 @@ private:
 	/// </summary>
 	VulkanDeletionQueue m_frameDeletionQueue = {};
 
+	//
+	// Bindless
+	//
+	VulkanDescriptor m_bindlessDescriptor;
+	std::deque<VulkanImageTexture> m_bindlessTextureUpdates = {};
+
 protected:
 	// ----------------------------------------
 

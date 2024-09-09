@@ -188,7 +188,7 @@ Fragment
 
 	float ambient()
 	{
-		return 0.05;
+		return 0.0;
 	}
 
 	vec3 sampleTexture( sampler2D target )
