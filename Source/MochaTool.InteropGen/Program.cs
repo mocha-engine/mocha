@@ -27,7 +27,7 @@ public static class Program
 	{
 		if ( args.Length != 1 )
 		{
-			Log.LogError( "The base directory to generate code from is required to run this tool" );
+			Log.LogIntroError();
 			return;
 		}
 
