@@ -87,7 +87,27 @@ public static class Assimp
 
 		string material = "internal:missing";
 
-		if ( mesh.MaterialIndex >= 0 && mesh.MaterialIndex < modelInfo.Materials.Count )
+		var materialSearchName = scene.Materials[mesh.MaterialIndex].Name;
+		var searchPaths = new[]
+		{
+			$"materials/{materialSearchName}.mmat",
+			$"materials/{materialSearchName}/{materialSearchName}.mmat",
+			$"textures/{materialSearchName}/{materialSearchName}.mmat",
+			$"textures/{materialSearchName}.mmat",
+		};
+		var materialWasFound = false;
+
+		foreach ( var searchPath in searchPaths )
+		{
+			if ( FileSystem.Mounted.Exists( searchPath ) )
+			{
+				material = searchPath;
+				materialWasFound = true;
+				break;
+			}
+		}
+
+		if ( !materialWasFound && mesh.MaterialIndex >= 0 && mesh.MaterialIndex < modelInfo.Materials.Count )
 			material = modelInfo.Materials[mesh.MaterialIndex];
 
 		return new Model( vertices.ToArray(), indices.ToArray(), material );
