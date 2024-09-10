@@ -95,10 +95,11 @@ internal static class ManagedCodeGenerator
 		//
 		// Gather everything we need into nice lists
 		//
-		List<string> decls = new();
+		var decls = new string[c.Methods.Length];
 
-		foreach ( var method in c.Methods )
+		for ( var i = 0; i < decls.Length; i++ ) 
 		{
+			var method = c.Methods[i];
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
@@ -128,7 +129,7 @@ internal static class ManagedCodeGenerator
 			// any parameters. The return type is the last type argument passed to
 			// the delegate.
 			//
-			decls.Add( $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{c.Name}_{name}MethodPtr;" );
+			decls[i] = $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{c.Name}_{name}MethodPtr;";
 		}
 
 		//
@@ -274,10 +275,11 @@ internal static class ManagedCodeGenerator
 		//
 		// Gather everything we need into nice lists
 		//
-		List<string> decls = new();
+		var decls = new string[ns.Methods.Length];
 
-		foreach ( var method in ns.Methods )
+		for ( var i = 0; i < decls.Length; i++ )
 		{
+			var method = ns.Methods[i];
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
 
@@ -298,7 +300,7 @@ internal static class ManagedCodeGenerator
 			// any parameters. The return type is the last type argument passed to
 			// the delegate.
 			//
-			decls.Add( $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{ns.Name}_{name}MethodPtr;" );
+			decls[i] = $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{ns.Name}_{name}MethodPtr;";
 		}
 
 		//
