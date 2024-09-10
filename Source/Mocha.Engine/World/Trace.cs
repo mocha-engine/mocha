@@ -2,8 +2,7 @@
 
 public class Cast
 {
-	private readonly List<BaseEntity> _ignoredEntities = new();
-	private Common.TraceInfo _info;
+	private TraceInfo _info;
 
 	public static Cast Ray( Ray ray, float distance )
 	{
@@ -49,27 +48,12 @@ public class Cast
 		return this;
 	}
 
-	public Cast Ignore( ModelEntity entityToIgnore )
-	{
-		_ignoredEntities.Add( entityToIgnore );
-		return this;
-	}
-
 	public TraceResult Run()
 	{
 		var traceInfo = _info;
-		traceInfo.ignoredEntityCount = _ignoredEntities.Count;
 
-		unsafe
-		{
-			fixed ( void* data = _ignoredEntities.Select( x => x.NativeHandle ).ToArray() )
-			{
-				traceInfo.ignoredEntityHandles = (IntPtr)data;
-
-				var physicsManager = NativeEngine.GetPhysicsManager();
-				var result = physicsManager.Trace( traceInfo );
-				return TraceResult.From( result );
-			}
-		}
+		var physicsManager = NativeEngine.GetPhysicsManager();
+		var result = physicsManager.Trace( traceInfo );
+		return TraceResult.From( result );
 	}
 }

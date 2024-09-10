@@ -7,7 +7,6 @@ public struct TraceResult
 	public Vector3 EndPosition;
 	public float Fraction;
 	public Vector3 Normal;
-	public BaseEntity Entity;
 
 	public bool StartedSolid;
 	public bool EndedSolid;
@@ -23,8 +22,6 @@ public struct TraceResult
 			Normal = orig.normal,
 			StartedSolid = orig.startedSolid,
 			EndedSolid = orig.endedSolid,
-
-			Entity = BaseEntity.All.FirstOrDefault( x => x.NativeHandle == orig.entityHandle )
 		};
 	}
 }

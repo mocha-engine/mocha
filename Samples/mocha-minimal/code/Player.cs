@@ -2,7 +2,7 @@
 
 public class Player : Mocha.Player
 {
-	public WalkController WalkController { get; private set; }
+	public BaseController WalkController { get; private set; }
 
 	public float Health { get; set; }
 
@@ -12,7 +12,7 @@ public class Player : Mocha.Player
 		base.Spawn();
 
 		PlayerBounds = new( 0.5f, 0.5f, 1.8f ); // Metres
-		SetCubePhysics( PlayerBounds, false );
+		// SetCubePhysics( PlayerBounds, false );
 	}
 
 	private void UpdateEyeTransform()
@@ -25,18 +25,32 @@ public class Player : Mocha.Player
 	{
 		base.Respawn();
 
-		WalkController = new( this );
-		Velocity = Vector3.Zero;
+		WalkController = new NoClipController( this );
+		// Velocity = Vector3.Zero;
 		Position = new Vector3( 0.0f, 4.0f, 5.0f );
 	}
 
+	[Event.Tick]
 	public void PredictedUpdate()
 	{
 		UpdateEyeTransform();
+		WalkController.PredictedUpdate();
 	}
+
+	bool wasCrouch = false;
 
 	public override void FrameUpdate()
 	{
+		if ( Input.Crouch && !wasCrouch )
+		{
+			if ( WalkController is WalkController )
+				WalkController = new NoClipController( this );
+			else
+				WalkController = new WalkController( this );
+		}
+
+		wasCrouch = Input.Crouch;
+
 		UpdateCamera();
 		UpdateEyeTransform();
 

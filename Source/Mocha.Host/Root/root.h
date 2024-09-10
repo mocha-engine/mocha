@@ -8,7 +8,7 @@ class RenderManager;
 class RenderdocManager;
 class HostManager;
 class LogManager;
-class EntityManager;
+class SceneGraph;
 class PhysicsManager;
 class InputManager;
 class BaseRenderContext;
@@ -35,7 +35,7 @@ public:
 	// Managed bindings for things we want to access from C#
 	//
 	GENERATE_BINDINGS LogManager* GetLogManager() { return Globals::m_logManager; }
-	GENERATE_BINDINGS EntityManager* GetEntityManager() { return Globals::m_entityManager; }
+	GENERATE_BINDINGS SceneGraph* GetSceneGraph() { return Globals::m_sceneGraph; }
 	GENERATE_BINDINGS InputManager* GetInputManager() { return Globals::m_inputManager; }
 	GENERATE_BINDINGS CVarManager* GetCVarManager() { return Globals::m_cvarManager; }
 	GENERATE_BINDINGS PhysicsManager* GetPhysicsManager() { return Globals::m_physicsManager; }
@@ -58,9 +58,6 @@ public:
 	GENERATE_BINDINGS inline bool IsDedicatedServer() { return Globals::m_isDedicatedServer; }
 
 	GENERATE_BINDINGS const char* GetProjectPath();
-
-	GENERATE_BINDINGS uint32_t CreateBaseEntity();
-	GENERATE_BINDINGS uint32_t CreateModelEntity();
 
 	GENERATE_BINDINGS inline void SetCameraPosition( Vector3 position ) { Globals::m_cameraPos = position; }
 	GENERATE_BINDINGS inline Vector3 GetCameraPosition() { return Globals::m_cameraPos; }

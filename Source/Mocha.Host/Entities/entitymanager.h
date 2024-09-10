@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Entities/baseentity.h>
-#include <Entities/modelentity.h>
 #include <Misc/handlemap.h>
 #include <Misc/mathtypes.h>
 #include <Misc/subsystem.h>
@@ -10,61 +9,66 @@
 #include <memory>
 #include <unordered_map>
 
-class EntityManager : HandleMap<BaseEntity>, ISubSystem
+class SceneGraph : HandleMap<SceneMesh>, ISubSystem
 {
 public:
 	template <typename T>
-	Handle AddEntity( T entity );
+	Handle AddMesh( T sceneMesh );
 
 	template <typename T>
-	std::shared_ptr<T> GetEntity( Handle entityHandle );
+	std::shared_ptr<T> GetMesh( Handle meshHandle );
 
-	void ForEach( std::function<void( std::shared_ptr<BaseEntity> entity )> func );
+	void ForEach( std::function<void( std::shared_ptr<SceneMesh> mesh )> func );
 
 	template <typename T>
-	void ForEachSpecific( std::function<void( std::shared_ptr<T> entity )> func );
+	void ForEachSpecific( std::function<void( std::shared_ptr<T> mesh )> func );
 
-	void For( std::function<void( Handle handle, std::shared_ptr<BaseEntity> entity )> func );
+	void For( std::function<void( Handle handle, std::shared_ptr<SceneMesh> mesh )> func );
 
 	void Startup() override{};
 
 	void Shutdown() override{};
 
-	GENERATE_BINDINGS BaseEntity* GetBaseEntity( uint32_t entityHandle ) { return GetEntity<BaseEntity>( entityHandle ).get(); }
-	GENERATE_BINDINGS ModelEntity* GetModelEntity( uint32_t entityHandle )
+	GENERATE_BINDINGS SceneMesh* GetMesh( uint32_t meshHandle )
 	{
-		return GetEntity<ModelEntity>( entityHandle ).get();
+		return GetMesh<SceneMesh>( meshHandle ).get();
+	}
+
+	GENERATE_BINDINGS Handle CreateMesh()
+	{
+		SceneMesh* sceneMesh = new SceneMesh();
+		return AddMesh( *sceneMesh );
 	}
 };
 
 template <typename T>
-inline Handle EntityManager::AddEntity( T entity )
+inline Handle SceneGraph::AddMesh( T actor )
 {
-	return AddSpecific<T>( entity );
+	return AddSpecific<T>( actor );
 }
 
 template <typename T>
-inline std::shared_ptr<T> EntityManager::GetEntity( Handle entityHandle )
+inline std::shared_ptr<T> SceneGraph::GetMesh( Handle meshHandle )
 {
-	return GetSpecific<T>( entityHandle );
+	return GetSpecific<T>( meshHandle );
 }
 
-inline void EntityManager::ForEach( std::function<void( std::shared_ptr<BaseEntity> entity )> func )
+inline void SceneGraph::ForEach( std::function<void( std::shared_ptr<SceneMesh> mesh )> func )
 {
-	HandleMap<BaseEntity>::ForEach( func );
+	HandleMap<SceneMesh>::ForEach( func );
 }
 
-inline void EntityManager::For( std::function<void( Handle handle, std::shared_ptr<BaseEntity> entity )> func )
+inline void SceneGraph::For( std::function<void( Handle handle, std::shared_ptr<SceneMesh> mesh )> func )
 {
-	HandleMap<BaseEntity>::For( func );
+	HandleMap<SceneMesh>::For( func );
 }
 
 template <typename T>
-inline void EntityManager::ForEachSpecific( std::function<void( std::shared_ptr<T> entity )> func )
+inline void SceneGraph::ForEachSpecific( std::function<void( std::shared_ptr<T> mesh )> func )
 {
-	ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	ForEach( [&]( std::shared_ptr<SceneMesh> mesh ) {
 		// Can we cast to this?
-		auto derivedEntity = std::dynamic_pointer_cast<T>( entity );
+		auto derivedEntity = std::dynamic_pointer_cast<T>( mesh );
 
 		if ( derivedEntity == nullptr )
 			return;

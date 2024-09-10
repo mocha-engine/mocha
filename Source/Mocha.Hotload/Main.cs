@@ -68,9 +68,9 @@ public static class Main
 
 		// TODO: Is there a better way to register these cvars?
 		// Register cvars for assemblies that will never hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( Main ).Assembly );  // Hotload
-		ConsoleSystem.Internal.RegisterAssembly( typeof( IGame ).Assembly );  // Common
-		ConsoleSystem.Internal.RegisterAssembly( typeof( BaseGame ).Assembly );      // Engine
+		ConsoleSystem.Internal.RegisterAssembly( typeof( Main ).Assembly );			// Hotload
+		ConsoleSystem.Internal.RegisterAssembly( typeof( IGame ).Assembly );		// Common
+		ConsoleSystem.Internal.RegisterAssembly( typeof( BaseGame ).Assembly );		// Engine
 
 		// Initialize upgrader, we do this as early as possible to prevent
 		// slowdowns while the engine is running.

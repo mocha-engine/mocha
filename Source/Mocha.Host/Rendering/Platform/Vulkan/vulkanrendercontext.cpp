@@ -1543,7 +1543,7 @@ RenderStatus VulkanRenderContext::UpdateDescriptor( Descriptor d, DescriptorUpda
 	VkDescriptorImageInfo imageInfo = {};
 	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 	imageInfo.imageView = texture->imageView;
-	imageInfo.sampler = SAMPLER_TYPE_ANISOTROPIC ? m_anisoSampler.sampler : m_pointSampler.sampler; // TODO
+	imageInfo.sampler = updateInfo.samplerType == SAMPLER_TYPE_ANISOTROPIC ? m_anisoSampler.sampler : m_pointSampler.sampler; // TODO
 
 	auto descriptorWrite = VKInit::WriteDescriptorImage(
 	    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor->descriptorSet, &imageInfo, updateInfo.binding );

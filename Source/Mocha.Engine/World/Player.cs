@@ -1,10 +1,10 @@
 ﻿namespace Mocha;
 
 [Category( "Player" ), Icon( FontAwesome.User )]
-public class Player : ModelEntity
+public class Player : Actor
 {
 	[HideInInspector]
-	public static Player? Local => BaseEntity.All.OfType<Player>().FirstOrDefault();
+	public static Player? Local => Actor.All.OfType<Player>().FirstOrDefault();
 
 	[HideInInspector]
 	public Ray EyeRay => new Ray( EyePosition, EyeRotation.Forward );
@@ -24,17 +24,14 @@ public class Player : ModelEntity
 	[Category( "Player" )]
 	public Rotation LocalEyeRotation { get; set; }
 
-	[Category( "Player" )]
-	public ViewModel ViewModel { get; set; }
-
 	protected override void Spawn()
 	{
 		base.Spawn();
 
-		Restitution = 0.0f;
+		/*Restitution = 0.0f;
 		Friction = 1.0f;
 		Mass = 100f;
-		IgnoreRigidbodyRotation = true;
+		IgnoreRigidbodyRotation = true;*/
 
 		// ViewModel = new();
 		Respawn();

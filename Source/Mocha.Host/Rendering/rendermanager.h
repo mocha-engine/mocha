@@ -19,7 +19,7 @@ private:
 	glm::mat4x4 CalculateViewProjMatrix();
 	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
-	void RenderEntity( ModelEntity* entity );
+	void RenderSceneMesh( SceneMesh* mesh );
 
 	// Render a mesh. This will handle all the pipelines, descriptors, buffers, etc. for you - just call
 	// this once and it'll do all the work.

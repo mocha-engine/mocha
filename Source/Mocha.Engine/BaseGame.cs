@@ -21,7 +21,7 @@ public class BaseGame : IGame
 
 	private void TryCallMethodOnEntity( string methodName )
 	{
-		BaseEntity.All.ToList().ForEach( entity =>
+		Actor.All.ToList().ForEach( entity =>
 		{
 			var method = entity.GetType().GetMethod( methodName )!;
 			var methodHash = HashCode.Combine( method, entity );
@@ -50,8 +50,6 @@ public class BaseGame : IGame
 
 	public void FrameUpdate()
 	{
-		UIManager.Instance.Render();
-
 		TryCallMethodOnEntity( "FrameUpdate" );
 	}
 

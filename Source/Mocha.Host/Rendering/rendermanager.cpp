@@ -5,7 +5,6 @@
 //
 #include <Entities/baseentity.h>
 #include <Entities/entitymanager.h>
-#include <Entities/modelentity.h>
 #include <Managed/hostmanager.h>
 #include <Misc/cvarmanager.h>
 #include <Misc/defs.h>
@@ -76,7 +75,7 @@ void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 	{
 		DescriptorUpdateInfo_t updateInfo = {};
 		updateInfo.binding = i;
-		updateInfo.samplerType = SAMPLER_TYPE_ANISOTROPIC;
+		updateInfo.samplerType = mesh->material->m_samplerType;
 		updateInfo.src = &mesh->material->m_textures[i].m_image;
 
 		m_renderContext->UpdateDescriptor( mesh->material->m_descriptor, updateInfo );
@@ -114,11 +113,11 @@ void RenderManager::Shutdown()
 	m_renderContext->Shutdown();
 }
 
-void RenderManager::RenderEntity( ModelEntity* entity )
+void RenderManager::RenderSceneMesh( SceneMesh* mesh )
 {
 	// Create and bind constants
 	RenderPushConstants constants = {};
-	constants.modelMatrix = entity->m_transform.GetModelMatrix();
+	constants.modelMatrix = mesh->m_transform.GetModelMatrix();
 	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
 	constants.cameraPos = Globals::m_cameraPos.ToGLM();
 	constants.time = Globals::m_curTime;
@@ -133,7 +132,7 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 	std::vector<glm::vec4> packedLightInfo = {};
 	for ( int i = 0; i < 4; ++i )
 	{
-		packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 50.0f } );
+		packedLightInfo.push_back( { lightPositions[i].x, lightPositions[i].y, lightPositions[i].z, 10.0f } );
 	}
 
 	constants.vLightInfoWS[0] = packedLightInfo[0];
@@ -141,9 +140,9 @@ void RenderManager::RenderEntity( ModelEntity* entity )
 	constants.vLightInfoWS[2] = packedLightInfo[2];
 	constants.vLightInfoWS[3] = packedLightInfo[3];
 
-	for ( auto& mesh : entity->GetModel()->m_meshes )
+	for ( auto& m : mesh->GetModel()->m_meshes )
 	{
-		RenderMesh( constants, &mesh );
+		RenderMesh( constants, &m );
 	}
 }
 
@@ -177,25 +176,11 @@ void RenderManager::DrawGame()
 	auto viewProjMatrix = CalculateViewProjMatrix();
 	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
 
-	Globals::m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
-		if ( !entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) && !entity->HasFlag( EntityFlags::ENTITY_UI ) )
-			RenderEntity( entity.get() );
-	} );
-
 	//
-	// Render viewmodels
+	// Render everything
 	//
-	Globals::m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
-		if ( entity->HasFlag( EntityFlags::ENTITY_VIEWMODEL ) )
-			RenderEntity( entity.get() );
-	} );
-
-	//
-	// Render UI last
-	//
-	Globals::m_entityManager->ForEachSpecific<ModelEntity>( [&]( std::shared_ptr<ModelEntity> entity ) {
-		if ( entity->HasFlag( EntityFlags::ENTITY_UI ) )
-			RenderEntity( entity.get() );
+	Globals::m_sceneGraph->ForEachSpecific<SceneMesh>( [&]( std::shared_ptr<SceneMesh> mesh ) {
+		RenderSceneMesh( mesh.get() );
 	} );
 
 	m_renderContext->EndRendering();

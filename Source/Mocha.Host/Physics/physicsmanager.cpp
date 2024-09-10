@@ -74,8 +74,10 @@ void PhysicsManager::Update()
 	const int collisionSteps = 4;
 	const int integrationSubSteps = 1;
 
+	/*
+
 	// Retrieve properties that were saved off last frame
-	Globals::m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	Globals::m_actorManager->ForEach( [&]( std::shared_ptr<Actor> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -105,7 +107,7 @@ void PhysicsManager::Update()
 	m_physicsInstance->m_physicsSystem.Update( Globals::m_tickDeltaTime, collisionSteps, integrationSubSteps,
 	    m_physicsInstance->m_tempAllocator, m_physicsInstance->m_jobSystem );
 
-	Globals::m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
+	Globals::m_actorManager->ForEach( [&]( std::shared_ptr<Actor> entity ) {
 		// Is this a valid entity to do physics stuff on?
 		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
 
@@ -144,8 +146,10 @@ void PhysicsManager::Update()
 		if ( body->type == PhysicsType::PHYSICS_MODE_DYNAMIC )
 			modelEntity->SetVelocity( JoltConversions::JoltToMochaVec3( velocity ) );
 	} );
+	*/
 }
 
+/*
 uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 {
 	// Add the body to the physics world
@@ -223,6 +227,7 @@ uint32_t PhysicsManager::AddBody( ModelEntity* entity, PhysicsBody body )
 
 	return Add( body );
 }
+*/
 
 TraceResult PhysicsManager::Trace( TraceInfo traceInfo )
 {
@@ -275,14 +280,9 @@ uint32_t PhysicsManager::FindEntityHandleForBodyId( JPH::BodyID bodyId )
 	// Step 2: find entity handle
 	//
 	uint32_t entityHandle = UINT32_MAX;
-	Globals::m_entityManager->For( [&]( Handle handle, std::shared_ptr<BaseEntity> entity ) {
-		auto modelEntity = std::dynamic_pointer_cast<ModelEntity>( entity );
-
-		if ( modelEntity == nullptr )
-			return;
-
-		if ( modelEntity->GetPhysicsHandle() == physicsHandle )
-			entityHandle = handle;
+	Globals::m_sceneGraph->For( [&]( Handle handle, std::shared_ptr<SceneMesh> mesh ) {
+		// if ( modelEntity->GetPhysicsHandle() == physicsHandle )
+			// entityHandle = handle;
 	} );
 
 	// Did we find one?
