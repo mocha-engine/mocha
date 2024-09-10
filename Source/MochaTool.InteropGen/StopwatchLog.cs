@@ -7,7 +7,7 @@ namespace MochaTool.InteropGen;
 /// <summary>
 /// Represents a scoped logger for recording time taken to complete an operation.
 /// </summary>
-internal readonly struct StopwatchLog : IDisposable
+internal readonly ref struct StopwatchLog
 {
 	/// <summary>
 	/// The name of the operation being completed.
