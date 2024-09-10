@@ -25,6 +25,12 @@ public static class Program
 	/// <param name="args">The command-line arguments given to the program.</param>
 	public static void Main( string[] args )
 	{
+		if ( args.Length != 1 )
+		{
+			Log.LogError( "The base directory to generate code from is required to run this tool" );
+			return;
+		}
+
 		using var _totalTime = new StopwatchLog( "InteropGen", LogLevel.Information );
 
 		var baseDir = args[0];
