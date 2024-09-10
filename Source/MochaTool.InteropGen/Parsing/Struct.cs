@@ -5,7 +5,7 @@ namespace MochaTool.InteropGen.Parsing;
 /// <summary>
 /// Represents a struct in C++.
 /// </summary>
-internal sealed class Struct : IUnit
+internal sealed class Struct : IContainerUnit
 {
 	/// <inheritdoc/>
 	public string Name { get; }
@@ -56,9 +56,9 @@ internal sealed class Struct : IUnit
 	}
 
 	/// <inheritdoc/>
-	IUnit IUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
+	IContainerUnit IContainerUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
 	/// <inheritdoc/>
-	IUnit IUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
+	IContainerUnit IContainerUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
 
 	/// <summary>
 	/// Returns a new instance of <see cref="Struct"/>.
@@ -67,7 +67,7 @@ internal sealed class Struct : IUnit
 	/// <param name="fields">The fields contained in the struct.</param>
 	/// <param name="methods">The methods contained in the struct.</param>
 	/// <returns>A new instance of <see cref="Struct"/>.</returns>
-	internal static Struct NewStructure( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	internal static Struct Create( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		return new( name, fields, methods );
 	}

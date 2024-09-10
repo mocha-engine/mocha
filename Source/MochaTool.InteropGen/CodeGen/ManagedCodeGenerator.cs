@@ -66,8 +66,8 @@ internal static class ManagedCodeGenerator
 		{
 			switch ( unit )
 			{
-				case Class c when c.IsNamespace:
-					GenerateNamespaceCode( writer, c );
+				case Namespace n:
+					GenerateNamespaceCode( writer, n );
 					break;
 				case Class c:
 					GenerateClassCode( writer, c );
@@ -269,7 +269,7 @@ internal static class ManagedCodeGenerator
 	/// </summary>
 	/// <param name="writer">The writer to append the code to.</param>
 	/// <param name="ns">The namespace to write code for.</param>
-	private static void GenerateNamespaceCode( IndentedTextWriter writer, Class ns )
+	private static void GenerateNamespaceCode( IndentedTextWriter writer, Namespace ns )
 	{
 		//
 		// Gather everything we need into nice lists

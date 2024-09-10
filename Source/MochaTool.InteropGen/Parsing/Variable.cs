@@ -3,12 +3,12 @@
 /// <summary>
 /// Represents a variable in C++. This can be a field, parameter, etc.
 /// </summary>
-internal sealed class Variable
+internal sealed class Variable : IUnit
 {
 	/// <summary>
 	/// The name of the variable.
 	/// </summary>
-	internal string Name { get; }
+	public string Name { get; }
 	/// <summary>
 	/// The literal string containing the type of the variable.
 	/// </summary>

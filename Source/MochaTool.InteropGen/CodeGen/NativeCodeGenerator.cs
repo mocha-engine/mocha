@@ -44,13 +44,12 @@ internal static class NativeCodeGenerator
 
 		foreach ( var unit in units )
 		{
-			if ( unit is not Class c )
-				continue;
-
-			if ( c.IsNamespace )
-				GenerateNamespaceCode( writer, c );
-			else
+			if ( unit is Namespace n )
+				GenerateNamespaceCode( writer, n );
+			else if ( unit is Class c )
 				GenerateClassCode( writer, c );
+			else
+				continue;
 
 			writer.WriteLine();
 		}
@@ -116,7 +115,7 @@ internal static class NativeCodeGenerator
 	/// </summary>
 	/// <param name="writer">The writer to append the code to.</param>
 	/// <param name="ns">The namespace to write code for.</param>
-	private static void GenerateNamespaceCode( IndentedTextWriter writer, Class ns )
+	private static void GenerateNamespaceCode( IndentedTextWriter writer, Namespace ns )
 	{
 		foreach ( var method in ns.Methods )
 		{

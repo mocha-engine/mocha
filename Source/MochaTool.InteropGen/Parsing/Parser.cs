@@ -16,13 +16,13 @@ internal static class Parser
 	private static readonly string[] s_launchArgs = GetLaunchArgs();
 
 	/// <summary>
-	/// Parses a header file and returns all of the <see cref="IUnit"/>s contained inside.
+	/// Parses a header file and returns all of the <see cref="IContainerUnit"/>s contained inside.
 	/// </summary>
 	/// <param name="path">The absolute path to the header file to parse.</param>
-	/// <returns>All of the <see cref="IUnit"/>s contained inside the header file.</returns>
-	internal unsafe static IEnumerable<IUnit> GetUnits( string path )
+	/// <returns>All of the <see cref="IContainerUnit"/>s contained inside the header file.</returns>
+	internal unsafe static IEnumerable<IContainerUnit> GetUnits( string path )
 	{
-		var units = new List<IUnit>();
+		var units = new List<IContainerUnit>();
 
 		using var index = CXIndex.Create();
 		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
@@ -59,13 +59,13 @@ internal static class Parser
 				// Struct / class / namespace
 				//
 				case CXCursorKind.CXCursor_ClassDecl:
-					units.Add( Class.NewClass( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
+					units.Add( Class.Create( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_StructDecl:
-					units.Add( Struct.NewStructure( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
+					units.Add( Struct.Create( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
 					break;
 				case CXCursorKind.CXCursor_Namespace:
-					units.Add( Class.NewNamespace( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
+					units.Add( Namespace.Create( cursor.Spelling.ToString() ) );
 					break;
 
 				//
@@ -114,7 +114,7 @@ internal static class Parser
 	/// <param name="cursor">The cursor that is traversing the method.</param>
 	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
 	/// <returns>The next action the cursor should take in traversal.</returns>
-	private static unsafe CXChildVisitResult VisitMethod( in CXCursor cursor, ICollection<IUnit> units )
+	private static unsafe CXChildVisitResult VisitMethod( in CXCursor cursor, ICollection<IContainerUnit> units )
 	{
 		// Early bails.
 		if ( !cursor.HasGenerateBindingsAttribute() )
@@ -202,7 +202,7 @@ internal static class Parser
 	/// <param name="cursor">The cursor that is traversing the method.</param>
 	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
 	/// <returns>The next action the cursor should take in traversal.</returns>
-	private static CXChildVisitResult VisitField( in CXCursor cursor, ICollection<IUnit> units )
+	private static CXChildVisitResult VisitField( in CXCursor cursor, ICollection<IContainerUnit> units )
 	{
 		// Early bail.
 		if ( !cursor.HasGenerateBindingsAttribute() )

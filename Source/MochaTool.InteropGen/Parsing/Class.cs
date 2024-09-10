@@ -3,14 +3,12 @@
 namespace MochaTool.InteropGen.Parsing;
 
 /// <summary>
-/// Represents a class or namespace in C++.
+/// Represents a class in C++.
 /// </summary>
-internal sealed class Class : IUnit
+internal sealed class Class : IContainerUnit
 {
 	/// <inheritdoc/>
 	public string Name { get; }
-	/// <inheritdoc/>
-	public bool IsNamespace { get; }
 
 	/// <inheritdoc/>
 	public ImmutableArray<Variable> Fields { get; }
@@ -20,14 +18,12 @@ internal sealed class Class : IUnit
 	/// <summary>
 	/// Initializes a new instance of <see cref="Class"/>.
 	/// </summary>
-	/// <param name="name">The name of the class or namespace.</param>
-	/// <param name="isNamespace">Whether or not it is a class or namespace.</param>
+	/// <param name="name">The name of the class.</param>
 	/// <param name="fields">All of the fields that are contained.</param>
 	/// <param name="methods">All of the methods that are contained.</param>
-	private Class( string name, bool isNamespace, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	private Class( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
 		Name = name;
-		IsNamespace = isNamespace;
 
 		Fields = fields;
 		Methods = methods;
@@ -40,7 +36,7 @@ internal sealed class Class : IUnit
 	/// <returns>A new instance of the <see cref="Class"/> with the fields given.</returns>
 	internal Class WithFields( in ImmutableArray<Variable> fields )
 	{
-		return new Class( Name, IsNamespace, fields, Methods );
+		return new Class( Name, fields, Methods );
 	}
 
 	/// <summary>
@@ -50,7 +46,7 @@ internal sealed class Class : IUnit
 	/// <returns>A new instance of the <see cref="Class"/> with the methods given.</returns>
 	internal Class WithMethods( in ImmutableArray<Method> methods )
 	{
-		return new Class( Name, IsNamespace, Fields, methods );
+		return new Class( Name, Fields, methods );
 	}
 
 	/// <inheritdoc/>
@@ -60,9 +56,9 @@ internal sealed class Class : IUnit
 	}
 
 	/// <inheritdoc/>
-	IUnit IUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
+	IContainerUnit IContainerUnit.WithFields( in ImmutableArray<Variable> fields ) => WithFields( fields );
 	/// <inheritdoc/>
-	IUnit IUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
+	IContainerUnit IContainerUnit.WithMethods( in ImmutableArray<Method> methods ) => WithMethods( methods );
 
 	/// <summary>
 	/// Returns a new instance of <see cref="Class"/>.
@@ -71,20 +67,10 @@ internal sealed class Class : IUnit
 	/// <param name="fields">The fields contained in the class.</param>
 	/// <param name="methods">The methods contained in the class.</param>
 	/// <returns>A new instance of <see cref="Class"/>.</returns>
-	internal static Class NewClass( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
+	internal static Class Create( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
-		return new Class( name, false, fields, methods );
+		return new Class( name, fields, methods );
 	}
 
-	/// <summary>
-	/// Returns a new instance of <see cref="Class"/> as a namespace.
-	/// </summary>
-	/// <param name="name">The name of the namespace.</param>
-	/// <param name="fields">The fields contained in the namespace.</param>
-	/// <param name="methods">The methods contained in the namespace.</param>
-	/// <returns>A new instance of <see cref="Class"/> as a namespace.</returns>
-	internal static Class NewNamespace( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
-	{
-		return new Class( name, true, fields, methods );
-	}
+	
 }
