@@ -41,7 +41,7 @@ internal sealed class ThreadDispatcher<T>
 			var thread = new Thread( () =>
 			{
 				threadStart( threadQueue );
-				_threadsCompleted++;
+				Interlocked.Increment( ref _threadsCompleted );
 			} );
 
 			thread.Start();
