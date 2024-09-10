@@ -72,5 +72,5 @@ internal sealed class Class : IContainerUnit
 		return new Class( name, fields, methods );
 	}
 
-	
+
 }
