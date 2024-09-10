@@ -94,18 +94,21 @@ internal static class Parser
 		for ( int i = 0; i < units.Count; i++ )
 		{
 			var item = units[i];
-			item = item.WithFields( item.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() )
-				.WithMethods( item.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() );
 
-			units[i] = item;
+			var fields = item.Fields.GroupBy( x => x.Name ).Select( x => x.First() );
+			var methods = item.Methods.GroupBy( x => x.Name ).Select( x => x.First() );
+
+			if ( !fields.Any() && !methods.Any() )
+				continue;
+
+			units[i] = item.WithFields( fields.ToImmutableArray() )
+				.WithMethods( methods.ToImmutableArray() );
 		}
 
 		//
 		// Remove any units that have no methods or fields
 		//
-		units = units.Where( x => x.Methods.Length > 0 || x.Fields.Length > 0 ).ToList();
-
-		return units;
+		return units.Where( x => x.Methods.Length > 0 || x.Fields.Length > 0 );
 	}
 
 	/// <summary>
