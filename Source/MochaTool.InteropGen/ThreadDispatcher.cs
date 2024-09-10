@@ -1,6 +1,6 @@
 ﻿namespace MochaTool.InteropGen;
 
-internal class ThreadDispatcher<T>
+internal sealed class ThreadDispatcher<T>
 {
 	internal delegate void ThreadCallback( T[] threadQueue );
 	internal delegate Task AsyncThreadCallback( T[] threadQueue );
