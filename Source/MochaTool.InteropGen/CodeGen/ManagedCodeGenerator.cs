@@ -97,7 +97,7 @@ internal static class ManagedCodeGenerator
 		//
 		var decls = new string[c.Methods.Length];
 
-		for ( var i = 0; i < decls.Length; i++ ) 
+		for ( var i = 0; i < decls.Length; i++ )
 		{
 			var method = c.Methods[i];
 			var returnType = Utils.GetManagedType( method.ReturnType );
