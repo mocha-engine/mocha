@@ -2,7 +2,6 @@
 using MochaTool.InteropGen.CodeGen;
 using MochaTool.InteropGen.Extensions;
 using MochaTool.InteropGen.Parsing;
-using System.Diagnostics;
 
 namespace MochaTool.InteropGen;
 
