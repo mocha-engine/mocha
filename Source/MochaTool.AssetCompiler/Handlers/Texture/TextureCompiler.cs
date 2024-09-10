@@ -134,7 +134,8 @@ public partial class TextureCompiler : BaseCompiler
 	private static byte[] BlockCompression( byte[] data, uint width, uint height, uint mip, TextureFormat format )
 	{
 		var targetWidth = MathX.CalcMipSize( (int)width, (int)mip );
-		byte[] resizedData = new byte[4 * targetWidth * targetWidth];
+		var targetHeight = MathX.CalcMipSize( (int)height, (int)mip );
+		byte[] resizedData = new byte[4 * targetWidth * targetHeight];
 
 		Rgba32[] pixels = new Rgba32[width * height];
 		for ( int i = 0; i < pixels.Length; i++ )
@@ -149,7 +150,7 @@ public partial class TextureCompiler : BaseCompiler
 
 		using ( var image = Image.LoadPixelData<Rgba32>( pixels.AsSpan(), (int)width, (int)height ) )
 		{
-			image.Mutate( x => x.Resize( targetWidth, targetWidth, KnownResamplers.Lanczos5 ) );
+			image.Mutate( x => x.Resize( targetWidth, targetHeight, KnownResamplers.Lanczos5 ) );
 			image.CopyPixelDataTo( resizedData );
 		}
 
@@ -160,7 +161,7 @@ public partial class TextureCompiler : BaseCompiler
 		encoder.OutputOptions.Format = TextureFormatToCompressionFormat( format );
 		encoder.OutputOptions.FileFormat = OutputFileFormat.Dds;
 
-		return encoder.EncodeToRawBytes( resizedData, (int)targetWidth, (int)targetWidth, PixelFormat.Rgba32, 0, out _, out _ );
+		return encoder.EncodeToRawBytes( resizedData, (int)targetWidth, (int)targetHeight, PixelFormat.Rgba32, 0, out _, out _ );
 	}
 
 	private static bool IsPowerOfTwo( int x )

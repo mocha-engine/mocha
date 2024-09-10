@@ -33,7 +33,7 @@ public partial class Texture : Asset
 		var mipCount = textureFormat.Data.MipCount;
 		var format = GetRenderTextureFormat( textureFormat.Data.Format, isSrgb );
 
-		NativeTexture = new( Path, DataWidth, DataHeight );
+		NativeTexture = new( Path, Width, Height );
 
 		// Flatten mip data into one big buffer
 		List<byte> textureData = new List<byte>();
@@ -42,7 +42,7 @@ public partial class Texture : Asset
 			textureData.AddRange( mipData[i] );
 		}
 
-		NativeTexture.SetData( DataWidth, DataHeight, (uint)mipCount, textureData.ToInterop(), (int)format );
+		NativeTexture.SetData( Width, Height, (uint)mipCount, textureData.ToInterop(), (int)format );
 	}
 
 	/// <summary>
