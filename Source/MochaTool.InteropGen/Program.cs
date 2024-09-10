@@ -13,11 +13,11 @@ public static class Program
 	/// <summary>
 	/// Contains all of the parsed units to generate bindings for.
 	/// </summary>
-	private static readonly List<IUnit> s_units = new();
+	private static readonly List<IUnit> s_units = [];
 	/// <summary>
 	/// Contains all of the files that need to be generated.
 	/// </summary>
-	private static readonly List<string> s_files = new();
+	private static readonly List<string> s_files = [];
 
 	/// <summary>
 	/// The entry point to the program.
