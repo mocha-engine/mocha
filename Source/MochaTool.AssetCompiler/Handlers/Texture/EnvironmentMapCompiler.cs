@@ -53,7 +53,7 @@ public partial class EnvironmentMapCompiler : BaseCompiler
 				Width = (uint)imageWidth,
 				Height = (uint)imageHeight,
 				MipCount = 1,
-				Format = textureMeta.Format
+				Format = textureMeta.Format ?? TextureFormat.BC3
 			};
 		}
 		else
@@ -67,7 +67,7 @@ public partial class EnvironmentMapCompiler : BaseCompiler
 				Width = (uint)image.Width,
 				Height = (uint)image.Height,
 				MipCount = 1,
-				Format = textureMeta.Format
+				Format = textureMeta.Format ?? TextureFormat.BC3
 			};
 
 			imageData = image.Data;

@@ -2,7 +2,7 @@
 
 public struct TextureMetadata
 {
-	public TextureFormat Format { get; set; } = TextureFormat.BC3;
+	public TextureFormat? Format { get; set; }
 
 	public TextureMetadata() { }
 }

@@ -41,6 +41,7 @@ public partial class TextureCompiler : BaseCompiler
 
 		// Setup image and format.
 		var image = ImageResult.FromMemory( input.SourceData.ToArray(), ColorComponents.RedGreenBlueAlpha );
+		var format = textureMeta.Format ?? GetBestTextureFormat( image );
 		var textureFormat = new TextureInfo
 		{
 			DataWidth = (uint)image.Width,
@@ -48,7 +49,7 @@ public partial class TextureCompiler : BaseCompiler
 			Width = (uint)image.Width,
 			Height = (uint)image.Height,
 			MipCount = 5,
-			Format = textureMeta.Format
+			Format = format
 		};
 		textureFormat.MipData = new byte[textureFormat.MipCount][];
 		textureFormat.MipDataLength = new int[textureFormat.MipCount];
@@ -92,7 +93,7 @@ public partial class TextureCompiler : BaseCompiler
 		// Setup mip-maps.
 		for ( uint i = 0; i < textureFormat.MipCount; ++i )
 		{
-			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, textureMeta.Format );
+			textureFormat.MipData[i] = BlockCompression( image.Data, textureFormat.DataWidth, textureFormat.DataHeight, i, format );
 			textureFormat.MipDataLength[i] = textureFormat.MipData[i].Length;
 		}
 
@@ -106,6 +107,16 @@ public partial class TextureCompiler : BaseCompiler
 		};
 
 		return Succeeded( Serializer.Serialize( mochaFile ) );
+	}
+
+	private TextureFormat GetBestTextureFormat( ImageResult textureInfo )
+	{
+		if ( textureInfo.Width < 512 && textureInfo.Height < 512 )
+		{
+			return TextureFormat.RGBA;
+		}
+
+		return TextureFormat.BC3;
 	}
 
 	private static CompressionFormat TextureFormatToCompressionFormat( TextureFormat format )
