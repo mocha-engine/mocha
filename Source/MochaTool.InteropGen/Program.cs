@@ -48,7 +48,7 @@ public static class Program
 		//
 		// Expand methods out into list of (method name, method)
 		//
-		var methods = s_units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
+		var methods = s_units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToArray();
 
 		//
 		// Write files
