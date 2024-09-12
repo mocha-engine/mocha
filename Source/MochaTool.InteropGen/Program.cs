@@ -64,8 +64,8 @@ public static class Program
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void DeleteExistingFiles( string baseDir )
 	{
-		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue";
-		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated";
+		var destCsDir = Path.Combine( baseDir, "Mocha.Common", "Glue" );
+		var destHeaderDir = Path.Combine( baseDir, "Mocha.Host", "generated" );
 
 		if ( Directory.Exists( destHeaderDir ) )
 			Directory.Delete( destHeaderDir, true );
@@ -84,7 +84,7 @@ public static class Program
 	{
 		// Find and queue all of the header files to parse.
 		var queue = new List<string>();
-		QueueDirectory( queue, baseDir + "\\Mocha.Host" );
+		QueueDirectory( queue, Path.Combine( baseDir, "Mocha.Host" ) );
 
 		// Dispatch jobs to parse all files.
 		var dispatcher = TaskPool<string>.Dispatch( queue, async files =>
@@ -172,7 +172,8 @@ public static class Program
 		nativeStructWriter.WriteLine( "#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		nativeStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Host", "generated", "UnmanagedArgs.generated.h" );
+		File.WriteAllText( path, baseNativeStructWriter.ToString() );
 	}
 
 	/// <summary>
@@ -196,7 +197,8 @@ public static class Program
 		nativeListWriter.WriteLine();
 		nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
 
-		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\InteropList.generated.h", baseNativeListWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Host", "generated", "InteropList.generated.h" );
+		File.WriteAllText( path, baseNativeListWriter.ToString() );
 	}
 
 	/// <summary>
@@ -214,13 +216,15 @@ public static class Program
 
 		// Generate interop code.
 		var managedCode = ManagedCodeGenerator.GenerateCode( units );
-		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
+		var relativePath = Path.GetRelativePath( Path.Combine( baseDir, "Mocha.Host" ), path );
 		var nativeCode = NativeCodeGenerator.GenerateCode( relativePath, units );
 
 		// Write interop code.
 		var fileName = Path.GetFileNameWithoutExtension( path );
-		var csTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
-		var nativeTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
+		var csPath = Path.Combine( baseDir, "Mocha.Common", "Glue", $"{fileName}.generated.cs" );
+		var csTask = File.WriteAllTextAsync( csPath, managedCode );
+		var nativePath = Path.Combine( baseDir, "Mocha.Host", "generated", $"{fileName}.generated.h" );
+		var nativeTask = File.WriteAllTextAsync( nativePath, nativeCode );
 
 		// Wait for writing to finish.
 		await Task.WhenAll( csTask, nativeTask );

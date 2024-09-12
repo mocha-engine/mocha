@@ -38,7 +38,7 @@ internal static class NativeCodeGenerator
 		writer.WriteLine();
 
 		writer.WriteLine( "#pragma once" );
-		writer.WriteLine( $"#include \"..\\{headerPath}\"" );
+		writer.WriteLine( $"#include \"{Path.Combine( "..", headerPath )}\"" );
 
 		writer.WriteLine();
 

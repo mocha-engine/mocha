@@ -232,7 +232,7 @@ internal static class Parser
 	private static string[] GetLaunchArgs()
 	{
 		// Generate includes from vcxproj
-		var includeDirs = VcxprojParser.ParseIncludes( "../Mocha.Host/Mocha.Host.vcxproj" );
+		var includeDirs = VcxprojParser.ParseIncludes( Path.Combine( "..", "Mocha.Host", "Mocha.Host.vcxproj" ) );
 
 		var args = new List<string>
 		{
