@@ -127,7 +127,8 @@ public static class Program
 		managedStructWriter.WriteLine( '}' );
 		managedStructWriter.Dispose();
 
-		await File.WriteAllTextAsync( $"{baseDir}/Mocha.Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Common", "Glue", "UnmanagedArgs.cs" );
+		await File.WriteAllTextAsync( path, baseManagedStructWriter.ToString() );
 	}
 
 	/// <summary>
