@@ -14,8 +14,7 @@ public static class Program
 	/// <summary>
 	/// Contains all of the parsed units to generate bindings for.
 	/// </summary>
-	private static readonly List<IUnit> s_units = [];
-	private static readonly List<IContainerUnit> s_units = new();
+	private static readonly List<IContainerUnit> s_units = [];
 	/// <summary>
 	/// Contains all of the files that need to be generated.
 	/// </summary>
