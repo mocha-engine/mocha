@@ -1,5 +1,6 @@
 ﻿using MochaTool.InteropGen.Extensions;
 using System.CodeDom.Compiler;
+using System.Collections.Frozen;
 
 namespace MochaTool.InteropGen;
 
@@ -11,7 +12,7 @@ internal static class Utils
 	/// <summary>
 	/// Used as a lookup table for mapping native types to managed ones.
 	/// </summary>
-	private static readonly Dictionary<string, string> s_lookupTable = new()
+	private static readonly FrozenDictionary<string, string> s_lookupTable = new Dictionary<string, string>()
 	{
 		// Native type		Managed type
 		//-------------------------------
@@ -40,7 +41,7 @@ internal static class Utils
 		{ "Quaternion", "Rotation" },
 		{ "InteropStruct", "IInteropArray" },
 		{ "Handle", "uint" }
-	};
+	}.ToFrozenDictionary();
 
 	/// <summary>
 	/// Returns whether or not the string represents a pointer.
