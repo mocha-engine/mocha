@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mocha.Common;
 using MochaTool.InteropGen.CodeGen;
 using MochaTool.InteropGen.Extensions;
 using MochaTool.InteropGen.Parsing;
@@ -31,7 +32,7 @@ public static class Program
 			return;
 		}
 
-		using var _totalTime = new StopwatchLog( "InteropGen", LogLevel.Information );
+		using var _totalTime = new StopwatchLog( "InteropGen", Microsoft.Extensions.Logging.LogLevel.Information );
 
 		var baseDir = args[0];
 		Log.LogIntro();
@@ -86,15 +87,14 @@ public static class Program
 		QueueDirectory( queue, baseDir + "\\Mocha.Host" );
 
 		// Dispatch jobs to parse all files.
-		var dispatcher = new ThreadDispatcher<string>( async ( files ) =>
+		var dispatcher = TaskPool<string>.Dispatch( queue, async files =>
 		{
 			foreach ( var path in files )
 				await ProcessHeaderAsync( baseDir, path );
-		}, queue );
+		} );
 
 		// Wait for all threads to finish...
-		while ( !dispatcher.IsComplete )
-			Thread.Sleep( 1 );
+		dispatcher.WaitForComplete();
 	}
 
 	/// <summary>

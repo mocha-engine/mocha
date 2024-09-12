@@ -13,6 +13,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Mocha.Common\Mocha.Common.csproj" />
 		<PackageReference Include="ClangSharp" Version="17.0.1" />
 		<PackageReference Include="libClangSharp.runtime.win-x64" Version="17.0.4" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
