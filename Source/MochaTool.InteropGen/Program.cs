@@ -15,6 +15,7 @@ public static class Program
 	/// Contains all of the parsed units to generate bindings for.
 	/// </summary>
 	private static readonly List<IUnit> s_units = [];
+	private static readonly List<IContainerUnit> s_units = new();
 	/// <summary>
 	/// Contains all of the files that need to be generated.
 	/// </summary>
@@ -48,7 +49,7 @@ public static class Program
 		//
 		// Expand methods out into list of (method name, method)
 		//
-		var methods = s_units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
+		var methods = s_units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
 
 		//
 		// Write files
