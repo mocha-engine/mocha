@@ -36,14 +36,14 @@ internal static class VcxprojParser
 		{ "ExternalIncludePath", "" }
 	}.ToFrozenDictionary();
 
-/// <summary>
-/// Parse the include list from a vcxproj file.
-/// </summary>
-/// <remarks>
-/// This currently only supports x64-windows, so any different includes for other platforms
-/// will not be reflected here.
-/// </remarks>
-internal static List<string> ParseIncludes( string path )
+	/// <summary>
+	/// Parse the include list from a vcxproj file.
+	/// </summary>
+	/// <remarks>
+	/// This currently only supports x64-windows, so any different includes for other platforms
+	/// will not be reflected here.
+	/// </remarks>
+	internal static List<string> ParseIncludes( string path )
 	{
 		var doc = new XmlDocument();
 		doc.Load( path );
