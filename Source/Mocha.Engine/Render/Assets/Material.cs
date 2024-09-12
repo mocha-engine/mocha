@@ -82,9 +82,9 @@ public class Material : Asset
 			var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
 			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
-			NativeMaterial.SetShaderData( 
-				shaderFormat.Data.VertexShaderData.ToInterop(), 
-				shaderFormat.Data.FragmentShaderData.ToInterop() 
+			NativeMaterial.SetShaderData(
+				shaderFormat.Data.VertexShaderData.ToInterop(),
+				shaderFormat.Data.FragmentShaderData.ToInterop()
 			);
 
 			NativeMaterial.Reload();
