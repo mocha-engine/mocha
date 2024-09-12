@@ -22,10 +22,10 @@ internal class ThreadDispatcher<T>
 
 	private void Setup( List<T> queue, Action<List<T>> threadStart )
 	{
-		var batchSize = queue.Count / _threadCount - 1;
+		var batchSize = queue.Count / (_threadCount - 1);
 
 		if ( batchSize == 0 )
-			return; // Bail to avoid division by zero
+			throw new InvalidOperationException( "There are no items to batch for threads" );
 
 		var batched = queue
 			.Select( ( Value, Index ) => new { Value, Index } )

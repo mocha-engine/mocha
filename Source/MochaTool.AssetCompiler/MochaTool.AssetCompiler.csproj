@@ -8,7 +8,9 @@
 		<Platforms>AnyCPU;x64;x86</Platforms>
 		<RootNamespace>$(MSBuildProjectName.Replace(" ", "_"))</RootNamespace>
 		<AssemblyName>$(MSBuildProjectName)</AssemblyName>
-		<StartupObject>MochaTool.AssetCompiler.CommandLine</StartupObject>
+		<OutputPath>$(SolutionDir)..\build</OutputPath>
+		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
 
 	<ItemGroup>
