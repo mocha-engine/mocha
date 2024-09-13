@@ -64,9 +64,11 @@ internal sealed class Namespace : IContainerUnit
 	/// Returns a new instance of <see cref="Namespace"/>.
 	/// </summary>
 	/// <param name="name">The name of the namespace.</param>
+	/// <param name="fields">The fields contained in the class.</param>
+	/// <param name="methods">The methods contained in the class.</param>
 	/// <returns>A new instance of <see cref="Namespace"/>.</returns>
-	internal static Namespace Create( string name )
+	internal static Namespace Create( string name, in ImmutableArray<Variable> fields, in ImmutableArray<Method> methods )
 	{
-		return new Namespace( name, ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty );
+		return new Namespace( name, fields, methods );
 	}
 }
