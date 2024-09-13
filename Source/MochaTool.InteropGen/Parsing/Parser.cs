@@ -16,16 +16,17 @@ internal static class Parser
 	private static readonly string[] s_launchArgs = GetLaunchArgs();
 
 	/// <summary>
-	/// Parses a header file and returns all of the <see cref="IUnit"/>s contained inside.
+	/// Parses a header file and returns all of the <see cref="IContainerUnit"/>s contained inside.
 	/// </summary>
 	/// <param name="path">The absolute path to the header file to parse.</param>
-	/// <returns>All of the <see cref="IUnit"/>s contained inside the header file.</returns>
-	internal unsafe static IEnumerable<IUnit> GetUnits( string path )
+	/// <returns>All of the <see cref="IContainerUnit"/>s contained inside the header file.</returns>
+	internal unsafe static IEnumerable<IContainerUnit> GetUnits( string path )
 	{
-		var units = new List<IUnit>();
+		using var _time = new StopwatchLog( $"Parse {path}" );
+		var units = new List<IContainerUnit>();
 
 		using var index = CXIndex.Create();
-		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_SkipFunctionBodies );
 
 		// Only start walking diagnostics if logging is enabled to the minimum level.
 		if ( Log.IsEnabled( LogLevel.Warning ) )
@@ -48,7 +49,10 @@ internal static class Parser
 			}
 		}
 
-		CXChildVisitResult cursorVisitor( CXCursor cursor, CXCursor parent, void* data )
+		ContainerBuilder? currentContainer = null;
+
+		// Visits all immediate members inside of a class/struct/namespace declaration.
+		CXChildVisitResult cursorMemberVisitor( CXCursor cursor, CXCursor parent, void* data )
 		{
 			if ( !cursor.Location.IsFromMainFile )
 				return CXChildVisitResult.CXChildVisit_Continue;
@@ -56,55 +60,52 @@ internal static class Parser
 			switch ( cursor.Kind )
 			{
 				//
-				// Struct / class / namespace
-				//
-				case CXCursorKind.CXCursor_ClassDecl:
-					units.Add( Class.NewClass( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
-					break;
-				case CXCursorKind.CXCursor_StructDecl:
-					units.Add( Struct.NewStructure( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
-					break;
-				case CXCursorKind.CXCursor_Namespace:
-					units.Add( Class.NewNamespace( cursor.Spelling.ToString(), ImmutableArray<Variable>.Empty, ImmutableArray<Method>.Empty ) );
-					break;
-
-				//
 				// Methods
 				//
 				case CXCursorKind.CXCursor_Constructor:
 				case CXCursorKind.CXCursor_CXXMethod:
 				case CXCursorKind.CXCursor_FunctionDecl:
-					return VisitMethod( cursor, units );
+					return VisitMethod( cursor, currentContainer );
 
 				//
 				// Field
 				//
 				case CXCursorKind.CXCursor_FieldDecl:
-					return VisitField( cursor, units );
+					return VisitField( cursor, currentContainer );
 			}
 
+			return CXChildVisitResult.CXChildVisit_Continue;
+		}
+
+		// Visits all elements within the translation unit.
+		CXChildVisitResult cursorContainerVisitor( CXCursor cursor, CXCursor parent, void* data )
+		{
+			if ( !cursor.Location.IsFromMainFile )
+				return CXChildVisitResult.CXChildVisit_Continue;
+
+			var containerType = cursor.Kind switch
+			{
+				CXCursorKind.CXCursor_ClassDecl => ContainerType.Class,
+				CXCursorKind.CXCursor_StructDecl => ContainerType.Struct,
+				CXCursorKind.CXCursor_Namespace => ContainerType.Namespace,
+				_ => ContainerType.Invalid
+			};
+
+			// Bail from recursing through if it's not an item we care about.
+			if ( containerType == ContainerType.Invalid )
+				return CXChildVisitResult.CXChildVisit_Continue;
+
+			currentContainer = new ContainerBuilder( containerType, cursor.Spelling.ToString() );
+			cursor.VisitChildren( cursorMemberVisitor, default );
+
+			if ( !currentContainer.IsEmpty )
+				units.Add( currentContainer.Build() );
+
+			// Recurse through nested classes and structs.
 			return CXChildVisitResult.CXChildVisit_Recurse;
 		}
 
-		unit.Cursor.VisitChildren( cursorVisitor, default );
-
-		//
-		// Remove all items with duplicate names
-		//
-		for ( int i = 0; i < units.Count; i++ )
-		{
-			var item = units[i];
-			item = item.WithFields( item.Fields.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() )
-				.WithMethods( item.Methods.GroupBy( x => x.Name ).Select( x => x.First() ).ToImmutableArray() );
-
-			units[i] = item;
-		}
-
-		//
-		// Remove any units that have no methods or fields
-		//
-		units = units.Where( x => x.Methods.Length > 0 || x.Fields.Length > 0 ).ToList();
-
+		unit.Cursor.VisitChildren( cursorContainerVisitor, default );
 		return units;
 	}
 
@@ -112,20 +113,16 @@ internal static class Parser
 	/// The visitor method for walking a method declaration.
 	/// </summary>
 	/// <param name="cursor">The cursor that is traversing the method.</param>
-	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
+	/// <param name="currentContainer">The current C++ container being parsed.</param>
 	/// <returns>The next action the cursor should take in traversal.</returns>
-	private static unsafe CXChildVisitResult VisitMethod( in CXCursor cursor, ICollection<IUnit> units )
+	private static unsafe CXChildVisitResult VisitMethod( in CXCursor cursor, ContainerBuilder? currentContainer )
 	{
 		// Early bails.
+		if ( currentContainer is null )
+			return CXChildVisitResult.CXChildVisit_Continue;
 		if ( !cursor.HasGenerateBindingsAttribute() )
 			return CXChildVisitResult.CXChildVisit_Continue;
 		if ( cursor.CXXAccessSpecifier != CX_CXXAccessSpecifier.CX_CXXPublic && cursor.Kind != CXCursorKind.CXCursor_FunctionDecl )
-			return CXChildVisitResult.CXChildVisit_Continue;
-
-		// Verify that the method has an owner.
-		var ownerName = cursor.LexicalParent.Spelling.ToString();
-		var owner = units.FirstOrDefault( x => x.Name == ownerName );
-		if ( owner is null )
 			return CXChildVisitResult.CXChildVisit_Continue;
 
 		string name;
@@ -139,7 +136,7 @@ internal static class Parser
 		if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
 		{
 			name = "Ctor";
-			returnType = owner.Name + '*';
+			returnType = currentContainer.Name + '*';
 			isStatic = false;
 			isConstructor = true;
 			isDestructor = false;
@@ -148,7 +145,7 @@ internal static class Parser
 		else if ( cursor.Kind == CXCursorKind.CXCursor_Destructor )
 		{
 			name = "DeCtor";
-			returnType = '~' + owner.Name;
+			returnType = '~' + currentContainer.Name;
 			isStatic = false;
 			isConstructor = false;
 			isDestructor = true;
@@ -189,9 +186,7 @@ internal static class Parser
 			method = Method.NewMethod( name, returnType, isStatic, parametersBuilder.ToImmutable() );
 
 		// Update owner with new method.
-		var newOwner = owner.WithMethods( owner.Methods.Add( method ) );
-		units.Remove( owner );
-		units.Add( newOwner );
+		currentContainer.AddMethod( method );
 
 		return CXChildVisitResult.CXChildVisit_Continue;
 	}
@@ -200,24 +195,18 @@ internal static class Parser
 	/// The visitor method for walking a field declaration.
 	/// </summary>
 	/// <param name="cursor">The cursor that is traversing the method.</param>
-	/// <param name="units">The <see cref="IUnit"/> collection to fetch method owners from.</param>
+	/// <param name="currentContainer">The current C++ container being parsed.</param>
 	/// <returns>The next action the cursor should take in traversal.</returns>
-	private static CXChildVisitResult VisitField( in CXCursor cursor, ICollection<IUnit> units )
+	private static CXChildVisitResult VisitField( in CXCursor cursor, ContainerBuilder? currentContainer )
 	{
 		// Early bail.
+		if ( currentContainer is null )
+			return CXChildVisitResult.CXChildVisit_Continue;
 		if ( !cursor.HasGenerateBindingsAttribute() )
 			return CXChildVisitResult.CXChildVisit_Continue;
 
-		// Verify that the field has an owner.
-		var ownerName = cursor.LexicalParent.Spelling.ToString();
-		var owner = units.FirstOrDefault( x => x.Name == ownerName );
-		if ( owner is null )
-			return CXChildVisitResult.CXChildVisit_Recurse;
-
 		// Update owner with new field.
-		var newOwner = owner.WithFields( owner.Fields.Add( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) ) );
-		units.Remove( owner );
-		units.Add( newOwner );
+		currentContainer.AddField( new Variable( cursor.Spelling.ToString(), cursor.Type.ToString() ) );
 
 		return CXChildVisitResult.CXChildVisit_Recurse;
 	}
@@ -229,7 +218,7 @@ internal static class Parser
 	private static string[] GetLaunchArgs()
 	{
 		// Generate includes from vcxproj
-		var includeDirs = VcxprojParser.ParseIncludes( "../Mocha.Host/Mocha.Host.vcxproj" );
+		var includeDirs = VcxprojParser.ParseIncludes( Path.Combine( "..", "Mocha.Host", "Mocha.Host.vcxproj" ) );
 
 		var args = new List<string>
 		{

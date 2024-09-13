@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Mocha.Common;
 using MochaTool.InteropGen.CodeGen;
 using MochaTool.InteropGen.Extensions;
 using MochaTool.InteropGen.Parsing;
@@ -13,19 +14,25 @@ public static class Program
 	/// <summary>
 	/// Contains all of the parsed units to generate bindings for.
 	/// </summary>
-	private static readonly List<IUnit> s_units = new();
+	private static readonly List<IContainerUnit> s_units = [];
 	/// <summary>
 	/// Contains all of the files that need to be generated.
 	/// </summary>
-	private static readonly List<string> s_files = new();
+	private static readonly List<string> s_files = [];
 
 	/// <summary>
 	/// The entry point to the program.
 	/// </summary>
 	/// <param name="args">The command-line arguments given to the program.</param>
-	public static void Main( string[] args )
+	public static async Task Main( string[] args )
 	{
-		using var _totalTime = new StopwatchLog( "InteropGen", LogLevel.Information );
+		if ( args.Length != 1 )
+		{
+			Log.LogIntroError();
+			return;
+		}
+
+		using var _totalTime = new StopwatchLog( "InteropGen", Microsoft.Extensions.Logging.LogLevel.Information );
 
 		var baseDir = args[0];
 		Log.LogIntro();
@@ -36,19 +43,22 @@ public static class Program
 		DeleteExistingFiles( baseDir );
 
 		using ( var _parseTime = new StopwatchLog( "Parsing" ) )
-			Parse( baseDir );
+			await ParseAsync( baseDir );
 
 		//
 		// Expand methods out into list of (method name, method)
 		//
-		var methods = s_units.OfType<Class>().SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToList();
+		var methods = s_units.SelectMany( unit => unit.Methods, ( unit, method ) => (unit.Name, method) ).ToArray();
 
 		//
 		// Write files
 		//
-		WriteManagedStruct( baseDir, methods );
-		WriteNativeStruct( baseDir, methods );
-		WriteNativeIncludes( baseDir );
+		using var _writeTime = new StopwatchLog( "Writing" );
+		var managedStructTask = WriteManagedStructAsync( baseDir, methods );
+		var nativeStructTask = WriteNativeStructAsync( baseDir, methods );
+		var nativeIncludesTask = WriteNativeIncludesAsync( baseDir );
+
+		await Task.WhenAll( managedStructTask, nativeIncludesTask, nativeIncludesTask );
 	}
 
 	/// <summary>
@@ -57,8 +67,8 @@ public static class Program
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	private static void DeleteExistingFiles( string baseDir )
 	{
-		var destCsDir = $"{baseDir}\\Mocha.Common\\Glue";
-		var destHeaderDir = $"{baseDir}\\Mocha.Host\\generated";
+		var destCsDir = Path.Combine( baseDir, "Mocha.Common", "Glue" );
+		var destHeaderDir = Path.Combine( baseDir, "Mocha.Host", "generated" );
 
 		if ( Directory.Exists( destHeaderDir ) )
 			Directory.Delete( destHeaderDir, true );
@@ -73,22 +83,21 @@ public static class Program
 	/// Parses all header files in the Mocha.Host project for interop generation.
 	/// </summary>
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
-	private static void Parse( string baseDir )
+	private static async Task ParseAsync( string baseDir )
 	{
 		// Find and queue all of the header files to parse.
 		var queue = new List<string>();
-		QueueDirectory( queue, baseDir + "\\Mocha.Host" );
+		QueueDirectory( queue, Path.Combine( baseDir, "Mocha.Host" ) );
 
 		// Dispatch jobs to parse all files.
-		var dispatcher = new ThreadDispatcher<string>( async ( files ) =>
+		var dispatcher = TaskPool<string>.Dispatch( queue, async files =>
 		{
 			foreach ( var path in files )
 				await ProcessHeaderAsync( baseDir, path );
-		}, queue );
+		} );
 
 		// Wait for all threads to finish...
-		while ( !dispatcher.IsComplete )
-			Thread.Sleep( 1 );
+		await dispatcher.WaitForCompleteAsync();
 	}
 
 	/// <summary>
@@ -96,7 +105,7 @@ public static class Program
 	/// </summary>
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	/// <param name="methods">An enumerable list of all of the methods to write in the struct.</param>
-	private static void WriteManagedStruct( string baseDir, IEnumerable<(string Name, Method method)> methods )
+	private static async Task WriteManagedStructAsync( string baseDir, IEnumerable<(string Name, Method method)> methods )
 	{
 		var (baseManagedStructWriter, managedStructWriter) = Utils.CreateWriter();
 
@@ -119,7 +128,8 @@ public static class Program
 		managedStructWriter.WriteLine( '}' );
 		managedStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}/Mocha.Common/Glue/UnmanagedArgs.cs", baseManagedStructWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Common", "Glue", "UnmanagedArgs.cs" );
+		await File.WriteAllTextAsync( path, baseManagedStructWriter.ToString() );
 	}
 
 	/// <summary>
@@ -127,7 +137,7 @@ public static class Program
 	/// </summary>
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
 	/// <param name="methods">An enumerable list of all of the methods to write in the struct.</param>
-	private static void WriteNativeStruct( string baseDir, IEnumerable<(string Name, Method method)> methods )
+	private static async Task WriteNativeStructAsync( string baseDir, IEnumerable<(string Name, Method method)> methods )
 	{
 		var (baseNativeStructWriter, nativeStructWriter) = Utils.CreateWriter();
 
@@ -166,14 +176,15 @@ public static class Program
 		nativeStructWriter.WriteLine( "#endif // __GENERATED_UNMANAGED_ARGS_H" );
 		nativeStructWriter.Dispose();
 
-		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\UnmanagedArgs.generated.h", baseNativeStructWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Host", "generated", "UnmanagedArgs.generated.h" );
+		await File.WriteAllTextAsync( path, baseNativeStructWriter.ToString() );
 	}
 
 	/// <summary>
 	/// Writes the C++ includes for the host project.
 	/// </summary>
 	/// <param name="baseDir">The base directory that contains the source projects.</param>
-	private static void WriteNativeIncludes( string baseDir )
+	private static async Task WriteNativeIncludesAsync( string baseDir )
 	{
 		var (baseNativeListWriter, nativeListWriter) = Utils.CreateWriter();
 
@@ -190,7 +201,8 @@ public static class Program
 		nativeListWriter.WriteLine();
 		nativeListWriter.WriteLine( "#endif // __GENERATED_INTEROPLIST_H" );
 
-		File.WriteAllText( $"{baseDir}Mocha.Host\\generated\\InteropList.generated.h", baseNativeListWriter.ToString() );
+		var path = Path.Combine( baseDir, "Mocha.Host", "generated", "InteropList.generated.h" );
+		await File.WriteAllTextAsync( path, baseNativeListWriter.ToString() );
 	}
 
 	/// <summary>
@@ -208,13 +220,15 @@ public static class Program
 
 		// Generate interop code.
 		var managedCode = ManagedCodeGenerator.GenerateCode( units );
-		var relativePath = Path.GetRelativePath( $"{baseDir}/Mocha.Host/", path );
+		var relativePath = Path.GetRelativePath( Path.Combine( baseDir, "Mocha.Host" ), path );
 		var nativeCode = NativeCodeGenerator.GenerateCode( relativePath, units );
 
 		// Write interop code.
 		var fileName = Path.GetFileNameWithoutExtension( path );
-		var csTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Common\\Glue\\{fileName}.generated.cs", managedCode );
-		var nativeTask = File.WriteAllTextAsync( $"{baseDir}Mocha.Host\\generated\\{fileName}.generated.h", nativeCode );
+		var csPath = Path.Combine( baseDir, "Mocha.Common", "Glue", $"{fileName}.generated.cs" );
+		var csTask = File.WriteAllTextAsync( csPath, managedCode );
+		var nativePath = Path.Combine( baseDir, "Mocha.Host", "generated", $"{fileName}.generated.h" );
+		var nativeTask = File.WriteAllTextAsync( nativePath, nativeCode );
 
 		// Wait for writing to finish.
 		await Task.WhenAll( csTask, nativeTask );

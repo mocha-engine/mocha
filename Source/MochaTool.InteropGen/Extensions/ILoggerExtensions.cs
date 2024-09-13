@@ -17,6 +17,15 @@ internal static partial class ILoggerExtensions
 	internal static partial void LogIntro( this ILogger logger );
 
 	/// <summary>
+	/// Logs an error about missing required args.
+	/// </summary>
+	/// <param name="logger">The <see cref="ILogger"/> instance to log to.</param>
+	[LoggerMessage( EventId = -1,
+		Level = LogLevel.Error,
+		Message = "The base directory to generate code from is required to run this tool" )]
+	internal static partial void LogIntroError( this ILogger logger );
+
+	/// <summary>
 	/// Logs a timed operation to the user.
 	/// </summary>
 	/// <param name="logger">The <see cref="ILogger"/> instance to log to.</param>

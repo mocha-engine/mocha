@@ -5,12 +5,12 @@ namespace MochaTool.InteropGen.Parsing;
 /// <summary>
 /// Represents a method in C++.
 /// </summary>
-internal sealed class Method
+internal sealed class Method : IUnit
 {
 	/// <summary>
 	/// The name of the method.
 	/// </summary>
-	internal string Name { get; }
+	public string Name { get; }
 	/// <summary>
 	/// The literal string containing the return type of the method.
 	/// </summary>

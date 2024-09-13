@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Collections.Frozen;
+using System.Xml;
 
 namespace MochaTool.InteropGen.Parsing;
 
@@ -13,6 +14,27 @@ internal static class VcxprojParser
 	// should not be a big deal.
 	private const string ExternalIncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:ExternalIncludePath";
 	private const string IncludePath = "/rs:Project/rs:PropertyGroup[@Condition=\"'$(Configuration)|$(Platform)'=='Debug|x64'\"]/rs:IncludePath";
+
+	private static readonly FrozenDictionary<string, string> EnvironmentVariables = new Dictionary<string, string>()
+	{
+		{
+			"VULKAN_SDK",
+
+			Environment.GetEnvironmentVariable( "VULKAN_SDK" ) ??
+			Path.Combine( "C:", "VulkanSDK", "1.3.224.1", "Include" )
+		},
+		{ "ProjectDir", Path.Combine( "..", "Mocha.Host" ) },
+		{ "SolutionDir", $"..{Path.DirectorySeparatorChar}" },
+		{ "Platform", "x64" },
+		{
+			"VcpkgRoot",
+
+			Environment.GetEnvironmentVariable( "VCPKG_ROOT" ) ??
+			Path.Combine( "C:", "Users", Environment.UserName, "vcpkg" )
+		},
+		{ "IncludePath", Path.Combine( "..", "Mocha.Host" ) },
+		{ "ExternalIncludePath", "" }
+	}.ToFrozenDictionary();
 
 	/// <summary>
 	/// Parse the include list from a vcxproj file.
@@ -48,18 +70,6 @@ internal static class VcxprojParser
 			includes.AddRange( includeStr.Split( ';', StringSplitOptions.TrimEntries ) );
 		}
 
-		// Define environment variables
-		var environmentVariables = new Dictionary<string, string>()
-		{
-			{ "VULKAN_SDK", Environment.GetEnvironmentVariable( "VULKAN_SDK" ) ?? @"C:\VulkanSDK\1.3.224.1\Include" },
-			{ "ProjectDir", "..\\Mocha.Host\\" },
-			{ "SolutionDir", "..\\" },
-			{ "Platform", "x64" },
-			{ "VcpkgRoot", Environment.GetEnvironmentVariable( "VCPKG_ROOT" ) ?? $@"C:\Users\{Environment.UserName}\vcpkg" },
-			{ "IncludePath", "..\\Mocha.Host\\" },
-			{ "ExternalIncludePath", "" }
-		};
-
 		var parsedIncludes = new List<string>();
 
 		// Simple find-and-replace for macros and environment variables
@@ -67,7 +77,7 @@ internal static class VcxprojParser
 		{
 			var processedInclude = include;
 
-			foreach ( var environmentVariable in environmentVariables )
+			foreach ( var environmentVariable in EnvironmentVariables )
 				processedInclude = processedInclude.Replace( $"$({environmentVariable.Key})", environmentVariable.Value );
 
 			parsedIncludes.Add( processedInclude );
