@@ -22,6 +22,7 @@ internal static class Parser
 	/// <returns>All of the <see cref="IContainerUnit"/>s contained inside the header file.</returns>
 	internal unsafe static IEnumerable<IContainerUnit> GetUnits( string path )
 	{
+		using var _time = new StopwatchLog( $"Parse {path}" );
 		var units = new List<IContainerUnit>();
 
 		using var index = CXIndex.Create();

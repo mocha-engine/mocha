@@ -53,6 +53,7 @@ public static class Program
 		//
 		// Write files
 		//
+		using var _writeTime = new StopwatchLog( "Writing" );
 		var managedStructTask = WriteManagedStructAsync( baseDir, methods );
 		var nativeStructTask = WriteNativeStructAsync( baseDir, methods );
 		var nativeIncludesTask = WriteNativeIncludesAsync( baseDir );
