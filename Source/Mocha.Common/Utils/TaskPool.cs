@@ -1,6 +1,6 @@
 ﻿namespace Mocha.Common;
 
-public class TaskPool<T>
+public sealed class TaskPool<T>
 {
 	public delegate Task TaskCallback( T[] taskQueue );
 	public delegate void Continuation();
