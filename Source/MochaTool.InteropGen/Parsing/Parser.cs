@@ -26,7 +26,7 @@ internal static class Parser
 		var units = new List<IContainerUnit>();
 
 		using var index = CXIndex.Create();
-		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_None );
+		using var unit = CXTranslationUnit.Parse( index, path, s_launchArgs, ReadOnlySpan<CXUnsavedFile>.Empty, CXTranslationUnit_Flags.CXTranslationUnit_SkipFunctionBodies );
 
 		// Only start walking diagnostics if logging is enabled to the minimum level.
 		if ( Log.IsEnabled( LogLevel.Warning ) )
