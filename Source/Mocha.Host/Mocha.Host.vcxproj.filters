@@ -1353,9 +1353,6 @@
     <ClInclude Include="Entities\entitymanager.h">
       <Filter>Entities</Filter>
     </ClInclude>
-    <ClInclude Include="Managed\Bindings\client.h">
-      <Filter>Managed\Bindings</Filter>
-    </ClInclude>
     <ClInclude Include="Managed\Bindings\consolesystem.h">
       <Filter>Managed\Bindings</Filter>
     </ClInclude>
