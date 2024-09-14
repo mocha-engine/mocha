@@ -11,6 +11,7 @@ internal sealed class Method : IUnit
 	/// The name of the method.
 	/// </summary>
 	public string Name { get; }
+
 	/// <summary>
 	/// The literal string containing the return type of the method.
 	/// </summary>
@@ -20,10 +21,12 @@ internal sealed class Method : IUnit
 	/// Whether or not the method is a constructor.
 	/// </summary>
 	internal bool IsConstructor { get; } = false;
+
 	/// <summary>
 	/// Whether or not the method is a destructor.
 	/// </summary>
 	internal bool IsDestructor { get; } = false;
+
 	/// <summary>
 	/// Whether or not the method is static.
 	/// </summary>
@@ -33,6 +36,11 @@ internal sealed class Method : IUnit
 	/// An array of all the parameters in the method.
 	/// </summary>
 	internal ImmutableArray<Variable> Parameters { get; }
+
+	/// <summary>
+	/// A hash representing the signature for this method.
+	/// </summary>
+	public string Hash { get; }
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="Method"/>.
@@ -53,6 +61,33 @@ internal sealed class Method : IUnit
 		IsStatic = isStatic;
 
 		Parameters = parameters;
+
+		Hash = $"{Name}{ComputeHash()}";
+	}
+
+	private string ComputeHash()
+	{
+		//
+		// alex: We're taking an MD5 representation of the function signature and then truncating
+		// it to 8 characters. Our chances of a collision are "high" (~1 in 4,294,967,296) compared
+		// to other crypto-secure representations (e.g. SHA) but we're not too bothered about that
+		// here. Chances are we'll have 2 or 3 functions that share a name (thru method overloading).
+		//
+
+		var returnType = ReturnType;
+		var name = Name;
+		var parameters = string.Join( ",", Parameters.Select( x => $"{x.Type}{x.Name}" ) );
+
+		var signature = $"{returnType}{name}{parameters}";
+
+		// Use input string to calculate MD5 hash
+		using ( System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create() )
+		{
+			byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes( signature );
+			byte[] hashBytes = md5.ComputeHash( inputBytes );
+
+			return Convert.ToHexString( hashBytes )[..8];
+		}
 	}
 
 	/// <summary>

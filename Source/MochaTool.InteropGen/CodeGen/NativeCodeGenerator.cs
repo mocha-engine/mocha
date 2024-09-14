@@ -79,7 +79,7 @@ internal static class NativeCodeGenerator
 				return $"{x.Type} {x.Name}";
 			} ) );
 
-			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Name}( {argStr} )";
+			var signature = $"extern \"C\" inline {method.ReturnType} __{c.Name}_{method.Hash}( {argStr} )";
 			var body = "";
 			var parameters = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
 
@@ -129,7 +129,7 @@ internal static class NativeCodeGenerator
 				return $"{x.Type} {x.Name}";
 			} ) );
 
-			var signature = $"extern \"C\" inline {method.ReturnType} __{ns.Name}_{method.Name}( {argStr} )";
+			var signature = $"extern \"C\" inline {method.ReturnType} __{ns.Name}_{method.Hash}( {argStr} )";
 			var body = "";
 			var parameters = string.Join( ", ", method.Parameters.Select( x => x.Name ) );
 

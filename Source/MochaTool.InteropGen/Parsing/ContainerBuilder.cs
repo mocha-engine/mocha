@@ -11,6 +11,7 @@ internal sealed class ContainerBuilder
 	/// The type of container that is being built.
 	/// </summary>
 	internal ContainerType Type { get; }
+
 	/// <summary>
 	/// The name of the container.
 	/// </summary>
@@ -23,6 +24,29 @@ internal sealed class ContainerBuilder
 
 	private readonly ImmutableArray<Variable>.Builder fields;
 	private readonly ImmutableArray<Method>.Builder methods;
+
+	/// <summary>
+	/// Does a method with this name already exist in this container?
+	/// </summary>
+	public bool HasMethod( string name ) => methods.Any( x => x.Name == name );
+
+	/// <summary>
+	/// Finds an available name for a function. If one isn't available, follows
+	/// the function name up with a counter.
+	/// </summary>
+	public string FindFreeName( string desiredName )
+	{
+		var name = desiredName;
+		var index = 0;
+
+		while ( HasMethod( name ) )
+		{
+			index++;
+			name = $"{desiredName}{index}";
+		}
+
+		return desiredName;
+	}
 
 	/// <summary>
 	/// Initializes a new instance of <see cref="ContainerBuilder"/>.

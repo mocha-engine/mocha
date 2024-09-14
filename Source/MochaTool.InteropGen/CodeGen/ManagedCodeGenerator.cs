@@ -102,6 +102,7 @@ internal static class ManagedCodeGenerator
 			var method = c.Methods[i];
 			var returnType = Utils.GetManagedType( method.ReturnType );
 			var name = method.Name;
+			var hash = method.Hash;
 
 			var returnsPointer = Utils.IsPointer( method.ReturnType ) && !method.IsConstructor && !method.IsDestructor;
 
@@ -129,7 +130,7 @@ internal static class ManagedCodeGenerator
 			// any parameters. The return type is the last type argument passed to
 			// the delegate.
 			//
-			decls[i] = $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{c.Name}_{name}MethodPtr;";
+			decls[i] = $"private static {delegateSignature} _{hash} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{c.Name}_{hash};";
 		}
 
 		//
@@ -148,9 +149,8 @@ internal static class ManagedCodeGenerator
 		writer.WriteLine();
 
 		// Ctor
-		if ( c.Methods.Any( x => x.IsConstructor ) )
+		foreach ( var ctor in c.Methods.Where( x => x.IsConstructor ) )
 		{
-			var ctor = c.Methods.First( x => x.IsConstructor );
 			var managedCtorArgs = string.Join( ", ", ctor.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 
 			writer.WriteLine( $"public {c.Name}( {managedCtorArgs} )" );
@@ -158,7 +158,7 @@ internal static class ManagedCodeGenerator
 			writer.Indent++;
 
 			var ctorCallArgs = string.Join( ", ", ctor.Parameters.Select( x => x.Name ) );
-			writer.WriteLine( $"this.NativePtr = this.Ctor( {ctorCallArgs} );" );
+			writer.WriteLine( $"this.NativePtr = this.{ctor.Name}( {ctorCallArgs} );" );
 
 			writer.Indent--;
 			writer.WriteLine( "}" );
@@ -175,6 +175,7 @@ internal static class ManagedCodeGenerator
 			// Call parameters as comma-separated string
 			var managedCallParams = string.Join( ", ", method.Parameters.Select( x => $"{Utils.GetManagedType( x.Type )} {x.Name}" ) );
 			var name = method.Name;
+			var hash = method.Hash;
 
 			// We return a pointer to the created object if it's a ctor/dtor, but otherwise we'll do auto-conversions to our managed types
 			var returnType = (method.IsConstructor || method.IsDestructor) ? "IntPtr" : Utils.GetManagedType( method.ReturnType );
@@ -188,12 +189,12 @@ internal static class ManagedCodeGenerator
 				accessLevel += " static";
 
 			// Write function signature
-			writer.WriteLine( $"{accessLevel} {returnType} {name}( {managedCallParams} ) " );
+			writer.WriteLine( $"{accessLevel} {returnType} {method.Name}( {managedCallParams} ) " );
 			writer.WriteLine( "{" );
 			writer.Indent++;
 
 			// Spin up a MemoryContext instance
-			writer.WriteLine( $"using var ctx = new MemoryContext( \"{c.Name}.{name}\" );" );
+			writer.WriteLine( $"using var ctx = new MemoryContext( \"{c.Name}.{method.Name}\" );" );
 
 			//
 			// Gather function body
@@ -213,7 +214,7 @@ internal static class ManagedCodeGenerator
 			if ( returnsPointer )
 			{
 				// If we want to return a pointer:
-				writer.WriteLine( $"var ptr = _{name}( {functionCallArgs} );" );
+				writer.WriteLine( $"var ptr = _{hash}( {functionCallArgs} );" );
 				writer.WriteLine( $"var obj = FormatterServices.GetUninitializedObject( typeof( {returnType} ) ) as {returnType};" );
 				writer.WriteLine( $"obj.NativePtr = ptr;" );
 				writer.WriteLine( $"return obj;" );
@@ -229,7 +230,7 @@ internal static class ManagedCodeGenerator
 					writer.Write( "ctx.GetString( " );
 
 				// Call the function..
-				writer.Write( $"_{name}( {functionCallArgs} )" );
+				writer.Write( $"_{hash}( {functionCallArgs} )" );
 
 				// Finish string
 				if ( returnType == "string" )
@@ -300,7 +301,7 @@ internal static class ManagedCodeGenerator
 			// any parameters. The return type is the last type argument passed to
 			// the delegate.
 			//
-			decls[i] = $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{ns.Name}_{name}MethodPtr;";
+			decls[i] = $"private static {delegateSignature} _{name} = ({delegateSignature})Mocha.Common.Global.UnmanagedArgs.__{ns.Name}_{method.Hash};";
 		}
 
 		//

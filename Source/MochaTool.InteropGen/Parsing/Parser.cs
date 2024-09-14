@@ -135,7 +135,7 @@ internal static class Parser
 		// We're traversing a constructor.
 		if ( cursor.Kind == CXCursorKind.CXCursor_Constructor )
 		{
-			name = "Ctor";
+			name = currentContainer.FindFreeName( "Ctor" );
 			returnType = currentContainer.Name + '*';
 			isStatic = false;
 			isConstructor = true;
@@ -144,7 +144,7 @@ internal static class Parser
 		// We're traversing a destructor.
 		else if ( cursor.Kind == CXCursorKind.CXCursor_Destructor )
 		{
-			name = "DeCtor";
+			name = currentContainer.FindFreeName( "Dtor" );
 			returnType = '~' + currentContainer.Name;
 			isStatic = false;
 			isConstructor = false;
