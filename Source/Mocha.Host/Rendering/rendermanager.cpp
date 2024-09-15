@@ -121,8 +121,6 @@ void RenderManager::Shutdown()
 
 void SceneMeshPass::Execute()
 {
-	Globals::m_renderContext->BindConstants( *m_constants.get() );
-
 	for ( auto& sceneMesh : m_meshes )
 	{
 		bool materialWasDirty = false;
@@ -142,7 +140,7 @@ void SceneMeshPass::Execute()
 				}
 			}
 
-			if ( m.material->m_pipeline.IsValid() )
+			if ( !m.material->m_pipeline.IsValid() )
 			{
 				spdlog::error( "Material pipeline was INVALID. Was material dirty? {}", materialWasDirty );
 				__debugbreak();
@@ -163,6 +161,13 @@ void SceneMeshPass::Execute()
 
 			Globals::m_renderContext->BindVertexBuffer( m.vertexBuffer );
 
+			RenderPushConstants meshConstants = RenderPushConstants( m_constants );
+
+			meshConstants.modelMatrix = sceneMesh->m_transform.GetModelMatrix();
+			meshConstants.renderMatrix = CalculateViewProjMatrix() * meshConstants.modelMatrix;
+
+			Globals::m_renderContext->BindConstants( meshConstants );
+
 			if ( m.isIndexed )
 			{
 				Globals::m_renderContext->BindIndexBuffer( m.indexBuffer );
@@ -181,19 +186,9 @@ void SceneMeshPass::AddMesh( std::shared_ptr<SceneMesh> sceneMesh )
 	m_meshes.push_back( sceneMesh );
 }
 
-void SceneMeshPass::SetConstants( std::shared_ptr<RenderPushConstants> constants )
+void SceneMeshPass::SetConstants( RenderPushConstants constants )
 {
 	m_constants = constants;
-}
-
-glm::mat4x4 SceneMeshPass::CalculateViewProjMatrix()
-{
-	return glm::mat4x4();
-}
-
-glm::mat4x4 SceneMeshPass::CalculateViewmodelViewProjMatrix()
-{
-	return glm::mat4x4();
 }
 
 void SceneMeshPass::RenderSceneMesh( SceneMesh* mesh )
@@ -220,9 +215,7 @@ void RenderManager::Render()
 	SceneMeshPass sceneMeshPass{};
 
 	// Create and bind constants
-	/* RenderPushConstants constants = {};
-	// constants.modelMatrix = mesh->m_transform.GetModelMatrix();
-	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
+	RenderPushConstants constants = {};
 	constants.cameraPos = Globals::m_cameraPos.ToGLM();
 	constants.time = Globals::m_curTime;
 	constants.data.x = ( int )Globals::m_debugView;
@@ -244,20 +237,21 @@ void RenderManager::Render()
 	constants.vLightInfoWS[2] = packedLightInfo[2];
 	constants.vLightInfoWS[3] = packedLightInfo[3];
 
-	sceneMeshPass.SetConstants( std::shared_ptr<RenderPushConstants>( &constants ) );
+	sceneMeshPass.SetConstants( constants );
 
 	Globals::m_sceneGraph->ForEachSpecific<SceneMesh>( [&]( std::shared_ptr<SceneMesh> mesh ) {
 		if ( ( mesh->GetFlags() & SCENE_MESH_FLAGS_WORLD_LAYER ) != 0 )
 			sceneMeshPass.AddMesh( mesh );
 	} );
-	*/
 
 	//
 	// 2. Execute passes
 	//
 	Globals::m_renderContext->BeginRendering();
-	// sceneMeshPass.Execute();
+	sceneMeshPass.Execute();
 	Globals::m_renderContext->EndRendering();
+
+	Globals::m_hostManager->Render();
 }
 
 void RenderPass::Execute()

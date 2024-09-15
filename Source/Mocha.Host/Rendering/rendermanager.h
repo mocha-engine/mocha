@@ -27,14 +27,11 @@ class SceneMeshPass : public RenderPass
 public:
 	void Execute() override;
 	void AddMesh( std::shared_ptr<SceneMesh> sceneMesh );
-	void SetConstants( std::shared_ptr<RenderPushConstants> constants );
+	void SetConstants( RenderPushConstants constants );
 
 private:
-	std::shared_ptr<RenderPushConstants> m_constants;
+	RenderPushConstants m_constants;
 	std::vector<std::shared_ptr<SceneMesh>> m_meshes;
-
-	glm::mat4x4 CalculateViewProjMatrix();
-	glm::mat4x4 CalculateViewmodelViewProjMatrix();
 
 	void RenderSceneMesh( SceneMesh* mesh );
 
