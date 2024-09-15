@@ -23,9 +23,9 @@ public class PostProcess
 
 		model = new Model(
 			[
-				new Vertex() { Position = new Vector3( -1, -1, 0 ), UV = new Vector2(0, 0)},
-				new Vertex() { Position = new Vector3( 3, -1, 0 ), UV = new Vector2(2, 0)},
-				new Vertex() { Position = new Vector3( -1, 3, 0 ), UV = new Vector2(0, 2)},
+				new Vertex() { Position = new Vector3( -1, -1, 0 ), UV = new Vector2( 0, 0 ) },
+				new Vertex() { Position = new Vector3( 3, -1, 0 ), UV = new Vector2( 2, 0 ) },
+				new Vertex() { Position = new Vector3( -1, 3, 0 ), UV = new Vector2( 0, 2 ) },
 			],
 			material
 		);

@@ -13,7 +13,7 @@ public class Material : Asset
 
 	public Glue.Material NativeMaterial { get; private set; }
 
-    private Material() { }
+	private Material() { }
 
 	/// <summary>
 	/// Loads a material from an MMAT (compiled) file.
@@ -133,22 +133,22 @@ public class Material : Asset
 		// TODO: File watcher here!
 	}
 
-    public static Material FromShader( string shaderPath, VertexAttribute[] vertexAttributes )
-    {
-        Material material = new();
+	public static Material FromShader( string shaderPath, VertexAttribute[] vertexAttributes )
+	{
+		Material material = new();
 
-        var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( shaderPath );
-        var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
+		var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( shaderPath );
+		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
-        material.Path = "Procedural Material";
+		material.Path = "Procedural Material";
 
-        material.NativeMaterial = new(
-            material.Path,
-            shaderFormat.Data.VertexShaderData.ToInterop(),
-            shaderFormat.Data.FragmentShaderData.ToInterop(),
-            vertexAttributes.ToInterop()
-        );
+		material.NativeMaterial = new(
+			material.Path,
+			shaderFormat.Data.VertexShaderData.ToInterop(),
+			shaderFormat.Data.FragmentShaderData.ToInterop(),
+			vertexAttributes.ToInterop()
+		);
 
-        return material;
-    }
+		return material;
+	}
 }
