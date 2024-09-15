@@ -169,9 +169,7 @@ void Root::Run()
 				    Transform::Lerp( mesh->m_transformLastFrame, mesh->m_transformCurrentFrame, ( float )alpha );
 			} );
 
-			Globals::m_renderManager->DrawOverlaysAndEditor();
-
-			Globals::m_renderManager->DrawGame();
+			Globals::m_renderManager->Render();
 		}
 		// #endif
 	}

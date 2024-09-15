@@ -43,49 +43,55 @@
 #include <implot.h>
 
 FloatCVar maxFramerate(
-    "render.max_framerate", 144.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
+    "render.max_framerate", 240.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
-void RenderManager::RenderMesh( RenderPushConstants constants, Mesh* mesh )
+const char* GetGPUName()
 {
-	bool materialWasDirty = false;
+	GPUInfo info{};
+	assert( Globals::m_renderContext->GetGPUInfo( &info ) == RENDER_STATUS_OK );
+	return info.gpuName;
+}
 
-	// Check if material is dirty and create any resources
-	if ( mesh->material->IsDirty() )
-	{
-		mesh->material->CreateResources();
-		materialWasDirty = true;
+Size2D GetWindowExtent()
+{
+	Size2D size{};
+	assert( Globals::m_renderContext->GetRenderSize( &size ) == RENDER_STATUS_OK );
+	return size;
+}
 
-		if ( !mesh->material->m_pipeline.IsValid() )
-		{
-			spdlog::error( "Material pipeline is INVALID even though we just created a pipeline!" );
-			__debugbreak();
-		}
-	}
+glm::mat4 CalculateViewmodelViewProjMatrix()
+{
+	glm::mat4 viewMatrix, projMatrix;
 
-	if ( !mesh->material->m_pipeline.IsValid() )
-	{
-		spdlog::error( "Material pipeline was INVALID. Was material dirty? {}", materialWasDirty );
-		__debugbreak();
-	}
+	auto extent = GetWindowExtent();
+	float aspect = ( float )extent.x / ( float )extent.y;
 
-	m_renderContext->BindPipeline( mesh->material->m_pipeline );
-	m_renderContext->BindDescriptor( mesh->material->m_descriptor );
+	glm::vec3 up = glm::vec3( 0, 0, -1 );
+	glm::vec3 direction = glm::normalize( glm::rotate( Globals::m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = Globals::m_cameraPos.ToGLM();
 
-	for ( int i = 0; i < mesh->material->m_textures.size(); ++i )
-	{
-		DescriptorUpdateInfo_t updateInfo = {};
-		updateInfo.binding = i;
-		updateInfo.samplerType = mesh->material->m_samplerType;
-		updateInfo.src = &mesh->material->m_textures[i].m_image;
+	viewMatrix = glm::lookAt( position, position + direction, up );
+	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, Globals::m_cameraZNear, Globals::m_cameraZFar );
 
-		m_renderContext->UpdateDescriptor( mesh->material->m_descriptor, updateInfo );
-	}
+	return projMatrix * viewMatrix;
+}
 
-	m_renderContext->BindConstants( constants );
-	m_renderContext->BindVertexBuffer( mesh->vertexBuffer );
-	m_renderContext->BindIndexBuffer( mesh->indexBuffer );
+glm::mat4 CalculateViewProjMatrix()
+{
+	glm::mat4 viewMatrix, projMatrix;
 
-	m_renderContext->Draw( mesh->vertices.count, mesh->indices.count, 1 );
+	auto extent = GetWindowExtent();
+	float aspect = ( float )extent.x / ( float )extent.y;
+
+	glm::vec3 up = glm::vec3( 0, 0, -1 );
+	glm::vec3 direction = glm::normalize( glm::rotate( Globals::m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
+	glm::vec3 position = Globals::m_cameraPos.ToGLM();
+
+	viewMatrix = glm::lookAt( position, position + direction, up );
+	projMatrix =
+	    glm::perspective( glm::radians( Globals::m_cameraFov ), aspect, Globals::m_cameraZNear, Globals::m_cameraZFar );
+
+	return projMatrix * viewMatrix;
 }
 
 void RenderManager::Startup()
@@ -113,11 +119,109 @@ void RenderManager::Shutdown()
 	m_renderContext->Shutdown();
 }
 
-void RenderManager::RenderSceneMesh( SceneMesh* mesh )
+void SceneMeshPass::Execute()
 {
+	Globals::m_renderContext->BindConstants( *m_constants.get() );
+
+	for ( auto& sceneMesh : m_meshes )
+	{
+		bool materialWasDirty = false;
+
+		for ( auto& m : sceneMesh->GetModel()->GetMeshes() )
+		{
+			// Check if material is dirty and create any resources
+			if ( m.material->IsDirty() )
+			{
+				m.material->CreateResources();
+				materialWasDirty = true;
+
+				if ( !m.material->m_pipeline.IsValid() )
+				{
+					spdlog::error( "Material pipeline is INVALID even though we just created a pipeline!" );
+					__debugbreak();
+				}
+			}
+
+			if ( m.material->m_pipeline.IsValid() )
+			{
+				spdlog::error( "Material pipeline was INVALID. Was material dirty? {}", materialWasDirty );
+				__debugbreak();
+			}
+
+			Globals::m_renderContext->BindPipeline( m.material->m_pipeline );
+			Globals::m_renderContext->BindDescriptor( m.material->m_descriptor );
+
+			for ( int i = 0; i < m.material->m_textures.size(); ++i )
+			{
+				DescriptorUpdateInfo_t updateInfo = {};
+				updateInfo.binding = i;
+				updateInfo.samplerType = m.material->m_samplerType;
+				updateInfo.src = &m.material->m_textures[i].m_image;
+
+				Globals::m_renderContext->UpdateDescriptor( m.material->m_descriptor, updateInfo );
+			}
+
+			Globals::m_renderContext->BindVertexBuffer( m.vertexBuffer );
+
+			if ( m.isIndexed )
+			{
+				Globals::m_renderContext->BindIndexBuffer( m.indexBuffer );
+				Globals::m_renderContext->Draw( m.vertices.count, m.indices.count, 1 );
+			}
+			else
+			{
+				Globals::m_renderContext->Draw( m.vertices.count, 0, 1 );
+			}
+		}
+	}
+}
+
+void SceneMeshPass::AddMesh( std::shared_ptr<SceneMesh> sceneMesh )
+{
+	m_meshes.push_back( sceneMesh );
+}
+
+void SceneMeshPass::SetConstants( std::shared_ptr<RenderPushConstants> constants )
+{
+	m_constants = constants;
+}
+
+glm::mat4x4 SceneMeshPass::CalculateViewProjMatrix()
+{
+	return glm::mat4x4();
+}
+
+glm::mat4x4 SceneMeshPass::CalculateViewmodelViewProjMatrix()
+{
+	return glm::mat4x4();
+}
+
+void SceneMeshPass::RenderSceneMesh( SceneMesh* mesh )
+{
+}
+
+void SceneMeshPass::RenderMesh( RenderPushConstants constants, Mesh* mesh )
+{
+}
+
+void RenderManager::Render()
+{
+	// Server is headless - don't render
+	if ( Globals::m_executingRealm == REALM_SERVER )
+		return;
+
+	//
+	// 1. Queue passes
+	//
+
+	//
+	// A. Scene mesh pass; renders all visible world objects in the scene
+	//
+	SceneMeshPass sceneMeshPass{};
+
 	// Create and bind constants
-	RenderPushConstants constants = {};
-	constants.modelMatrix = mesh->m_transform.GetModelMatrix();
+	/* RenderPushConstants constants = {};
+	// constants.modelMatrix = mesh->m_transform.GetModelMatrix();
 	constants.renderMatrix = CalculateViewProjMatrix() * constants.modelMatrix;
 	constants.cameraPos = Globals::m_cameraPos.ToGLM();
 	constants.time = Globals::m_curTime;
@@ -140,83 +244,38 @@ void RenderManager::RenderSceneMesh( SceneMesh* mesh )
 	constants.vLightInfoWS[2] = packedLightInfo[2];
 	constants.vLightInfoWS[3] = packedLightInfo[3];
 
-	for ( auto& m : mesh->GetModel()->m_meshes )
-	{
-		RenderMesh( constants, &m );
-	}
-}
+	sceneMeshPass.SetConstants( std::shared_ptr<RenderPushConstants>( &constants ) );
 
-void RenderManager::DrawOverlaysAndEditor()
-{
-	// Server is headless - no overlays or editor
-	if ( Globals::m_executingRealm == REALM_SERVER )
-		return;
-
-	m_renderContext->BeginImGui();
-	ImGui::NewFrame();
-	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
-
-	Globals::m_hostManager->Render();
-	Globals::m_hostManager->DrawEditor();
-
-	m_renderContext->EndImGui();
-}
-
-void RenderManager::DrawGame()
-{
-	// Server is headless - don't render
-	if ( Globals::m_executingRealm == REALM_SERVER )
-		return;
-
-	RenderStatus res = m_renderContext->BeginRendering();
-
-	if ( res == RENDER_STATUS_WINDOW_SIZE_INVALID )
-		return;
-
-	auto viewProjMatrix = CalculateViewProjMatrix();
-	auto viewmodelViewProjMatrix = CalculateViewmodelViewProjMatrix();
-
-	//
-	// Render everything
-	//
 	Globals::m_sceneGraph->ForEachSpecific<SceneMesh>( [&]( std::shared_ptr<SceneMesh> mesh ) {
-		RenderSceneMesh( mesh.get() );
+		if ( ( mesh->GetFlags() & SCENE_MESH_FLAGS_WORLD_LAYER ) != 0 )
+			sceneMeshPass.AddMesh( mesh );
 	} );
+	*/
 
-	m_renderContext->EndRendering();
+	//
+	// 2. Execute passes
+	//
+	Globals::m_renderContext->BeginRendering();
+	// sceneMeshPass.Execute();
+	Globals::m_renderContext->EndRendering();
 }
 
-glm::mat4 RenderManager::CalculateViewmodelViewProjMatrix()
+void RenderPass::Execute()
 {
-	glm::mat4 viewMatrix, projMatrix;
-
-	auto extent = GetWindowExtent();
-	float aspect = ( float )extent.x / ( float )extent.y;
-
-	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( Globals::m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = Globals::m_cameraPos.ToGLM();
-
-	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix = glm::perspective( glm::radians( 60.0f ), aspect, Globals::m_cameraZNear, Globals::m_cameraZFar );
-
-	return projMatrix * viewMatrix;
 }
 
-glm::mat4 RenderManager::CalculateViewProjMatrix()
+void RenderPass::SetInputTexture( RenderTexture texture )
 {
-	glm::mat4 viewMatrix, projMatrix;
+}
 
-	auto extent = GetWindowExtent();
-	float aspect = ( float )extent.x / ( float )extent.y;
+void RenderPass::SetOutputTexture( RenderTexture texture )
+{
+}
 
-	glm::vec3 up = glm::vec3( 0, 0, -1 );
-	glm::vec3 direction = glm::normalize( glm::rotate( Globals::m_cameraRot.ToGLM(), glm::vec3( 1, 0, 0 ) ) );
-	glm::vec3 position = Globals::m_cameraPos.ToGLM();
+TonemapPass::TonemapPass( std::shared_ptr<Material> material )
+{
+}
 
-	viewMatrix = glm::lookAt( position, position + direction, up );
-	projMatrix =
-	    glm::perspective( glm::radians( Globals::m_cameraFov ), aspect, Globals::m_cameraZNear, Globals::m_cameraZFar );
-
-	return projMatrix * viewMatrix;
+void TonemapPass::Execute()
+{
 }

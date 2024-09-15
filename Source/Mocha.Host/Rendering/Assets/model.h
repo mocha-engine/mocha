@@ -26,6 +26,7 @@ public:
 	GENERATE_BINDINGS Model() {}
 
 	GENERATE_BINDINGS void AddMesh( const char* name, UtilArray vertices, UtilArray indices, Material* material );
+	GENERATE_BINDINGS void AddMesh( const char* name, UtilArray vertices, Material* material );
 
 	const std::vector<Mesh> GetMeshes() { return m_meshes; }
 };

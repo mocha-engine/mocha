@@ -101,11 +101,6 @@ public static class ImGuiX
 		return b;
 	}
 
-	public static string GetGPUName()
-	{
-		return NativeEditor.GetGPUName();
-	}
-
 	public static void RenderViewDropdown()
 	{
 		NativeEditor.RenderViewDropdown();

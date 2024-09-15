@@ -51,11 +51,6 @@ void EditorManager::TextLight( const char* text )
 	ImGui::PopStyleColor();
 }
 
-const char* EditorManager::GetGPUName()
-{
-	return Globals::m_renderManager->GetGPUName();
-}
-
 char* EditorManager::InputText( const char* name, char* inputBuf, int inputLength )
 {
 	ImGui::InputText( name, inputBuf, inputLength, ImGuiInputTextFlags_EnterReturnsTrue );

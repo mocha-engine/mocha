@@ -57,3 +57,12 @@ void Model::AddMesh( const char* name, UtilArray vertices, UtilArray indices, Ma
 	Mesh mesh( std::string( name ), vertices, indices, material );
 	UploadMesh( mesh );
 }
+
+void Model::AddMesh( const char* name, UtilArray vertices, Material* material )
+{
+	if ( vertices.size == 0 )
+		return;
+
+	Mesh mesh( std::string( name ), vertices, material );
+	UploadMesh( mesh );
+}

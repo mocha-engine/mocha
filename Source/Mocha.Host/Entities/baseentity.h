@@ -8,10 +8,20 @@
 class Camera;
 class Model;
 
+enum SceneMeshFlags
+{
+	SCENE_MESH_FLAGS_WORLD_LAYER = 1 << 1,
+	SCENE_MESH_FLAGS_UI_LAYER = 1 << 2,
+
+	SCENE_MESH_FLAGS_DEFAULT = SCENE_MESH_FLAGS_WORLD_LAYER,
+	SCENE_MESH_FLAGS_POSTPROCESS = SCENE_MESH_FLAGS_UI_LAYER,
+};
+
 class SceneMesh
 {
 private:
 	Model* m_model;
+	SceneMeshFlags m_flags = SCENE_MESH_FLAGS_DEFAULT;
 
 public:
 	SceneMesh()
@@ -34,4 +44,7 @@ public:
 
 	GENERATE_BINDINGS void SetModel( Model* model ) { m_model = model; }
 	GENERATE_BINDINGS Model* GetModel() { return m_model; }
+
+	GENERATE_BINDINGS void SetFlags( SceneMeshFlags flags ) { m_flags = flags; }
+	GENERATE_BINDINGS SceneMeshFlags GetFlags() { return m_flags; }
 };

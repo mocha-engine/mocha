@@ -6,7 +6,6 @@
     "dependencies": [
         "fmt",
         "glm",
-        "glslang",
         "nethost",
         "nlohmann-json",
         {
@@ -24,10 +23,6 @@
         {
             "name": "fmt",
             "version": "8.1.1"
-        },
-        {
-            "name": "glslang",
-            "version": "11.13.0"
         },
         {
             "name": "glm",

@@ -61,6 +61,9 @@
     <Filter Include="Rendering\Platform\Null">
       <UniqueIdentifier>{a6ab7305-4387-4823-9506-9137221613fd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Thirdparty\slang">
+      <UniqueIdentifier>{d58b7182-ebad-42cc-ada1-12a66f828a3d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="thirdparty\imgui\imgui_tables.cpp">
@@ -1457,6 +1460,48 @@
     </ClInclude>
     <ClInclude Include="Managed\managedcallback.h" />
     <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-prelude.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-scalar-intrinsics.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-types.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-types-core.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-cuda-prelude.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-gfx.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-hlsl-prelude.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-llvm.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-tag-version.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-torch-prelude.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-com-helper.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-com-ptr.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-host-prelude.h">
+      <Filter>Thirdparty\slang</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\DVec3.inl">
@@ -1501,5 +1546,13 @@
     <None Include="thirdparty\JoltPhysics\Jolt\Core\Profiler.inl">
       <Filter>Thirdparty\Jolt</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CopyFileToFolders Include="Thirdparty\slang\bin\slang.dll">
+      <Filter>Thirdparty\slang</Filter>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Thirdparty\slang\bin\slang-glslang.dll">
+      <Filter>Thirdparty\slang</Filter>
+    </CopyFileToFolders>
   </ItemGroup>
 </Project>

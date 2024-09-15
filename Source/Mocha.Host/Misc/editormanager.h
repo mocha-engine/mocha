@@ -23,7 +23,6 @@ public:
 	GENERATE_BINDINGS void TextHeading( const char* text );
 	GENERATE_BINDINGS void TextMonospace( const char* text );
 	GENERATE_BINDINGS void TextLight( const char* text );
-	GENERATE_BINDINGS const char* GetGPUName();
 	GENERATE_BINDINGS char* InputText( const char* name, char* inputBuf, int inputLength );
 	GENERATE_BINDINGS void RenderViewDropdown();
 	GENERATE_BINDINGS void Image( Texture* texture, uint32_t textureWidth, uint32_t textureHeight, int x, int y );

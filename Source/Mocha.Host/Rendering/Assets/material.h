@@ -48,6 +48,9 @@ public:
 	GENERATE_BINDINGS Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
 	    UtilArray vertexAttributes, UtilArray textures, SamplerType samplerType, bool ignoreDepth );
 
+	GENERATE_BINDINGS Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData,
+	    UtilArray vertexAttributes );
+
 	Material( const Material& other ) noexcept
 	    : m_isDirty( other.m_isDirty.load() )
 	    , m_textures( other.m_textures )

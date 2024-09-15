@@ -72,8 +72,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha.Host</TargetName>
-    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(ProjectDir)ThirdParty\slang\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(ProjectDir)ThirdParty\slang\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
@@ -83,8 +83,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)..\build</OutDir>
     <TargetName>Mocha.Host</TargetName>
-    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
-    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <ExternalIncludePath>$(VULKAN_SDK)\Include;$(ProjectDir)ThirdParty\volk;$(ProjectDir)ThirdParty\Renderdoc;$(ProjectDir)ThirdParty\FontAwesome;$(ProjectDir)ThirdParty\vk-bootstrap\src;$(ProjectDir)ThirdParty\imgui;$(ProjectDir)ThirdParty\implot;$(ProjectDir)ThirdParty\JoltPhysics;$(ProjectDir)ThirdParty\slang\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include;$(SolutionDir)vcpkg_installed\$(Platform)-windows\include\SDL2;$(ExternalIncludePath)</ExternalIncludePath>
+    <LibraryPath>$(ProjectDir)ThirdParty\slang\lib;$(LibraryPath)</LibraryPath>
     <SourcePath>$(VC_SourcePath)</SourcePath>
     <IncludePath>$(ProjectDir);$(IncludePath)</IncludePath>
     <LocalDebuggerWorkingDirectory>$(SolutionDir)..\</LocalDebuggerWorkingDirectory>
@@ -116,6 +116,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>slang-rt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -158,7 +159,7 @@ echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
 git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
+      <AdditionalDependencies>GameNetworkingSockets.lib;slang.lib;slang-rt.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -189,7 +190,7 @@ echo | set /p dummyName=#define GIT_BRANCH &gt;&gt; gitdefs.h
 git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     </PreBuildEvent>
     <Lib>
-      <AdditionalDependencies>GameNetworkingSockets.lib</AdditionalDependencies>
+      <AdditionalDependencies>GameNetworkingSockets.lib;slang.lib;slang-rt.lib;</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -656,6 +657,20 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMean.h" />
     <ClInclude Include="thirdparty\JoltPhysics\Jolt\TriangleSplitter\TriangleSplitterMorton.h" />
     <ClInclude Include="thirdparty\Renderdoc\renderdoc_app.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-com-helper.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-com-ptr.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-host-prelude.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-prelude.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-scalar-intrinsics.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-types-core.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cpp-types.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-cuda-prelude.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-gfx.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-hlsl-prelude.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-llvm.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-tag-version.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang-torch-prelude.h" />
+    <ClInclude Include="Thirdparty\slang\include\slang.h" />
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrap.h" />
     <ClInclude Include="thirdparty\vk-bootstrap\src\VkBootstrapDispatch.h" />
     <ClInclude Include="thirdparty\volk\volk.h" />
@@ -677,6 +692,12 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     <None Include="thirdparty\JoltPhysics\Jolt\Math\Vec8.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\Body.inl" />
     <None Include="thirdparty\JoltPhysics\Jolt\Physics\Body\MotionProperties.inl" />
+    <CopyFileToFolders Include="Thirdparty\slang\bin\slang-glslang.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
+    <CopyFileToFolders Include="Thirdparty\slang\bin\slang.dll">
+      <FileType>Document</FileType>
+    </CopyFileToFolders>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

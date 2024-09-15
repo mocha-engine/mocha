@@ -34,6 +34,24 @@ Material::Material( const char* name, UtilArray vertexShaderData, UtilArray frag
 	m_name = std::string( name );
 }
 
+Material::Material( const char* name, UtilArray vertexShaderData, UtilArray fragmentShaderData, UtilArray vertexAttributes )
+{
+	m_vertexShaderData = vertexShaderData.GetData<uint32_t>();
+	m_fragmentShaderData = fragmentShaderData.GetData<uint32_t>();
+
+	m_isDirty.store( true );
+
+	auto vertexAttribInfo = vertexAttributes.GetData<InteropVertexAttributeInfo>();
+	for ( int i = 0; i < vertexAttributes.count; i++ )
+	{
+		m_vertexAttribInfo.push_back( vertexAttribInfo[i].ToNative() );
+	}
+
+	m_samplerType = SAMPLER_TYPE_LINEAR;
+	m_ignoreDepth = true;
+	m_name = std::string( name );
+}
+
 void Material::Reload()
 {
 	m_isDirty.store( true );

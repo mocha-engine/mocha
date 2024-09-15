@@ -1,24 +1,19 @@
 #pragma once
 
+#include <slang.h>
+#include <slang-com-ptr.h>
 #include <Rendering/rendering.h>
-#include <glslang/SPIRV/GlslangToSpv.h>
-#include <glslang/Public/ShaderLang.h>
 #include <volk.h>
 
-//
-// This compiles from GLSL to SPIR-V.
-// It's not Vulkan-specific, so doesn't belong in
-// Platform/Vulkan/.
-//
+using namespace slang;
+
 class ShaderCompiler
 {
 private:
-	inline ShaderCompiler() { glslang::InitializeProcess(); }
-	inline ~ShaderCompiler() { glslang::FinalizeProcess(); }
+	Slang::ComPtr<IGlobalSession> m_globalSession;
 
-	void InitResources( TBuiltInResource& Resources );
-	EShLanguage FindLanguage( const ShaderType shader_type );
-	static std::string GetPreamble( EShLanguage language );
+	ShaderCompiler();
+	~ShaderCompiler();
 
 public:
 	static ShaderCompiler& Instance()
@@ -27,5 +22,5 @@ public:
 		return *instance;
 	}
 
-	bool Compile( const ShaderType shader_type, const char* pshader, std::vector<uint32_t>& spirv );
+	bool Compile( const ShaderType shaderType, const char* pshader, std::vector<uint32_t>& outSpirv );
 };

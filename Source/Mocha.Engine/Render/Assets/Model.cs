@@ -43,7 +43,7 @@ public partial class Model<T> : Asset, IModel where T : struct
 
 	protected void AddMesh( T[] vertices, Material material )
 	{
-		NativeModel.AddMesh( Path, vertices.ToInterop(), new uint[0].ToInterop(), material.NativeMaterial );
+		NativeModel.AddMesh( Path, vertices.ToInterop(), material.NativeMaterial );
 	}
 
 	protected void AddMesh( T[] vertices, uint[] indices, Material material )

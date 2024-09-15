@@ -1455,7 +1455,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	//
 	// Render editor
 	//
-	RenderImGui();
+	// RenderImGui();
 
 	//
 	// We want to present the image, so we'll manually transition the layout to
@@ -1595,7 +1595,10 @@ RenderStatus VulkanRenderContext::Draw( uint32_t vertexCount, uint32_t indexCoun
 	ErrorIf( !m_hasInitialized, RENDER_STATUS_NOT_INITIALIZED );
 	ErrorIf( !m_renderingActive, RENDER_STATUS_BEGIN_END_MISMATCH );
 
-	vkCmdDrawIndexed( m_mainContext.commandBuffer, indexCount, instanceCount, 0, 0, 0 );
+	if ( indexCount > 0 )
+		vkCmdDrawIndexed( m_mainContext.commandBuffer, indexCount, instanceCount, 0, 0, 0 );
+	else
+		vkCmdDraw( m_mainContext.commandBuffer, vertexCount, instanceCount, 0, 0 );
 
 	return RENDER_STATUS_OK;
 }

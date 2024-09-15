@@ -1,182 +1,69 @@
 #include "shadercompiler.h"
 
-void ShaderCompiler::InitResources( TBuiltInResource& Resources )
+using namespace slang;
+
+ShaderCompiler::ShaderCompiler()
 {
-	Resources.maxLights = 32;
-	Resources.maxClipPlanes = 6;
-	Resources.maxTextureUnits = 32;
-	Resources.maxTextureCoords = 32;
-	Resources.maxVertexAttribs = 64;
-	Resources.maxVertexUniformComponents = 4096;
-	Resources.maxVaryingFloats = 64;
-	Resources.maxVertexTextureImageUnits = 32;
-	Resources.maxCombinedTextureImageUnits = 80;
-	Resources.maxTextureImageUnits = 32;
-	Resources.maxFragmentUniformComponents = 4096;
-	Resources.maxDrawBuffers = 32;
-	Resources.maxVertexUniformVectors = 128;
-	Resources.maxVaryingVectors = 8;
-	Resources.maxFragmentUniformVectors = 16;
-	Resources.maxVertexOutputVectors = 16;
-	Resources.maxFragmentInputVectors = 15;
-	Resources.minProgramTexelOffset = -8;
-	Resources.maxProgramTexelOffset = 7;
-	Resources.maxClipDistances = 8;
-	Resources.maxComputeWorkGroupCountX = 65535;
-	Resources.maxComputeWorkGroupCountY = 65535;
-	Resources.maxComputeWorkGroupCountZ = 65535;
-	Resources.maxComputeWorkGroupSizeX = 1024;
-	Resources.maxComputeWorkGroupSizeY = 1024;
-	Resources.maxComputeWorkGroupSizeZ = 64;
-	Resources.maxComputeUniformComponents = 1024;
-	Resources.maxComputeTextureImageUnits = 16;
-	Resources.maxComputeImageUniforms = 8;
-	Resources.maxComputeAtomicCounters = 8;
-	Resources.maxComputeAtomicCounterBuffers = 1;
-	Resources.maxVaryingComponents = 60;
-	Resources.maxVertexOutputComponents = 64;
-	Resources.maxGeometryInputComponents = 64;
-	Resources.maxGeometryOutputComponents = 128;
-	Resources.maxFragmentInputComponents = 128;
-	Resources.maxImageUnits = 8;
-	Resources.maxCombinedImageUnitsAndFragmentOutputs = 8;
-	Resources.maxCombinedShaderOutputResources = 8;
-	Resources.maxImageSamples = 0;
-	Resources.maxVertexImageUniforms = 0;
-	Resources.maxTessControlImageUniforms = 0;
-	Resources.maxTessEvaluationImageUniforms = 0;
-	Resources.maxGeometryImageUniforms = 0;
-	Resources.maxFragmentImageUniforms = 8;
-	Resources.maxCombinedImageUniforms = 8;
-	Resources.maxGeometryTextureImageUnits = 16;
-	Resources.maxGeometryOutputVertices = 256;
-	Resources.maxGeometryTotalOutputComponents = 1024;
-	Resources.maxGeometryUniformComponents = 1024;
-	Resources.maxGeometryVaryingComponents = 64;
-	Resources.maxTessControlInputComponents = 128;
-	Resources.maxTessControlOutputComponents = 128;
-	Resources.maxTessControlTextureImageUnits = 16;
-	Resources.maxTessControlUniformComponents = 1024;
-	Resources.maxTessControlTotalOutputComponents = 4096;
-	Resources.maxTessEvaluationInputComponents = 128;
-	Resources.maxTessEvaluationOutputComponents = 128;
-	Resources.maxTessEvaluationTextureImageUnits = 16;
-	Resources.maxTessEvaluationUniformComponents = 1024;
-	Resources.maxTessPatchComponents = 120;
-	Resources.maxPatchVertices = 32;
-	Resources.maxTessGenLevel = 64;
-	Resources.maxViewports = 16;
-	Resources.maxVertexAtomicCounters = 0;
-	Resources.maxTessControlAtomicCounters = 0;
-	Resources.maxTessEvaluationAtomicCounters = 0;
-	Resources.maxGeometryAtomicCounters = 0;
-	Resources.maxFragmentAtomicCounters = 8;
-	Resources.maxCombinedAtomicCounters = 8;
-	Resources.maxAtomicCounterBindings = 1;
-	Resources.maxVertexAtomicCounterBuffers = 0;
-	Resources.maxTessControlAtomicCounterBuffers = 0;
-	Resources.maxTessEvaluationAtomicCounterBuffers = 0;
-	Resources.maxGeometryAtomicCounterBuffers = 0;
-	Resources.maxFragmentAtomicCounterBuffers = 1;
-	Resources.maxCombinedAtomicCounterBuffers = 1;
-	Resources.maxAtomicCounterBufferSize = 16384;
-	Resources.maxTransformFeedbackBuffers = 4;
-	Resources.maxTransformFeedbackInterleavedComponents = 64;
-	Resources.maxCullDistances = 8;
-	Resources.maxCombinedClipAndCullDistances = 8;
-	Resources.maxSamples = 4;
-	Resources.maxMeshOutputVerticesNV = 256;
-	Resources.maxMeshOutputPrimitivesNV = 512;
-	Resources.maxMeshWorkGroupSizeX_NV = 32;
-	Resources.maxMeshWorkGroupSizeY_NV = 1;
-	Resources.maxMeshWorkGroupSizeZ_NV = 1;
-	Resources.maxTaskWorkGroupSizeX_NV = 32;
-	Resources.maxTaskWorkGroupSizeY_NV = 1;
-	Resources.maxTaskWorkGroupSizeZ_NV = 1;
-	Resources.maxMeshViewCountNV = 4;
-	Resources.limits.nonInductiveForLoops = 1;
-	Resources.limits.whileLoops = 1;
-	Resources.limits.doWhileLoops = 1;
-	Resources.limits.generalUniformIndexing = 1;
-	Resources.limits.generalAttributeMatrixVectorIndexing = 1;
-	Resources.limits.generalVaryingIndexing = 1;
-	Resources.limits.generalSamplerIndexing = 1;
-	Resources.limits.generalVariableIndexing = 1;
-	Resources.limits.generalConstantMatrixVectorIndexing = 1;
+	createGlobalSession( m_globalSession.writeRef() );
 }
 
-EShLanguage ShaderCompiler::FindLanguage( const ShaderType shader_type )
+ShaderCompiler::~ShaderCompiler() { }
+
+bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, std::vector<uint32_t>& outSpirv )
 {
-	switch ( shader_type )
-	{
-	case SHADER_TYPE_VERTEX:
-		return EShLangVertex;
-	case SHADER_TYPE_FRAGMENT:
-		return EShLangFragment;
-	}
+	Slang::ComPtr<ISession> session;
 
-	__debugbreak(); // Invalid / unsupported shader type
-}
+	TargetDesc targetDesc{};
+	targetDesc.format = SLANG_SPIRV;
 
-std::string ShaderCompiler::GetPreamble( EShLanguage language )
-{
-	std::string preamble;
+	if ( shaderType == SHADER_TYPE_FRAGMENT )
+		targetDesc.profile = m_globalSession->findProfile( "fs_6_6" );
+	else if ( shaderType == SHADER_TYPE_VERTEX )
+		targetDesc.profile = m_globalSession->findProfile( "vs_6_6" );
 
-	//
-	// Add language type
-	//
-	switch ( language )
-	{
-	case EShLangVertex:
-		preamble += "#define VERTEX\n";
-		break;
-	case EShLangFragment:
-		preamble += "#define FRAGMENT\n";
-		break;
-	}
+	targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY | SLANG_TARGET_FLAG_GENERATE_WHOLE_PROGRAM;
 
-	return preamble;
-}
+	SessionDesc sessionDesc{};
+	sessionDesc.targets = &targetDesc;
+	sessionDesc.targetCount = 1;
 
-bool ShaderCompiler::Compile( const ShaderType shader_type, const char* pshader, std::vector<uint32_t>& spirv )
-{
-	EShLanguage stage = FindLanguage( shader_type );
-	glslang::TShader shader( stage );
-	glslang::TProgram program;
+	m_globalSession->createSession( sessionDesc, session.writeRef() );
 
-	TBuiltInResource builtInResources = {};
-	InitResources( builtInResources );
-	EShMessages messages = ( EShMessages )( EShMsgSpvRules | EShMsgVulkanRules );
+	Slang::ComPtr<IBlob> diagnostics;
+	IModule* module =
+	    session->loadModuleFromSourceString( "Shader", "Shader.slang", pShader, diagnostics.writeRef() );
 
-	const char* shaderStrings[1];
-	shaderStrings[0] = pshader;
-	shader.setStrings( shaderStrings, 1 );
+	if ( diagnostics )
+		spdlog::error( "Failed to compile shader: {}", ( const char* )diagnostics->getBufferPointer() );
 
-	//
-	// Set preamble so that each shader knows what it is and what it is being compiled for
-	//
-	std::string preamble = GetPreamble( stage );
-	shader.setPreamble( preamble.c_str() );
+	spdlog::info( "Entry point count: {}", module->getDefinedEntryPointCount() );
 
-	// Set spirv 1.4
-	shader.setEnvTarget( glslang::EShTargetSpv, glslang::EShTargetSpv_1_4 );
+	Slang::ComPtr<IEntryPoint> entryPoint;
 
-	if ( !shader.parse( &builtInResources, 460, false, messages ) )
-	{
-		spdlog::error( shader.getInfoLog() );
-		spdlog::error( shader.getInfoDebugLog() );
-		return false; // something didn't work
-	}
+	module->findEntryPointByName( "main", entryPoint.writeRef() );
 
-	program.addShader( &shader );
+	IComponentType* components[] = { module, entryPoint };
+	Slang::ComPtr<IComponentType> program;
+	session->createCompositeComponentType( components, 2, program.writeRef(), diagnostics.writeRef() );
 
-	if ( !program.link( messages ) )
-	{
-		spdlog::error( shader.getInfoLog() );
-		spdlog::error( shader.getInfoDebugLog() );
-		return false;
-	}
+	if ( diagnostics )
+		spdlog::error( "Failed to compile shader: {}", ( const char* )diagnostics->getBufferPointer() );
 
-	glslang::GlslangToSpv( *program.getIntermediate( stage ), spirv );
+	Slang::ComPtr<IComponentType> linkedProgram;
+	Slang::ComPtr<ISlangBlob> diagnosticBlob;
+	program->link( linkedProgram.writeRef(), diagnosticBlob.writeRef() );
+
+	int entryPointIndex = 0;
+	int targetIndex = 0;
+
+	Slang::ComPtr<IBlob> kernelBlob;
+	linkedProgram->getEntryPointCode( entryPointIndex, targetIndex, kernelBlob.writeRef(), diagnostics.writeRef() );
+
+	if ( diagnostics )
+		spdlog::error( "Failed to get code for shader: {}", ( const char* )diagnostics->getBufferPointer() );
+
+	const uint32_t* data = static_cast<const uint32_t*>( kernelBlob->getBufferPointer() );
+	size_t wordCount = kernelBlob->getBufferSize() / sizeof( uint32_t );
+	outSpirv = std::vector<uint32_t>( data, data + wordCount );
 	return true;
 }

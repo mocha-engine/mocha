@@ -16,6 +16,8 @@ struct Mesh
 
 	std::string name{};
 
+	bool isIndexed;
+
 	Mesh( Material* _material )
 	    : material( _material )
 	{
@@ -25,6 +27,15 @@ struct Mesh
 	    : name( _name )
 	    , material( _material )
 	    , indices( _indices )
+	    , isIndexed( true )
+	    , vertices( _vertices )
+	{
+	}
+
+	Mesh( std::string _name, UtilArray _vertices, Material* _material )
+	    : name( _name )
+	    , material( _material )
+	    , isIndexed( false )
 	    , vertices( _vertices )
 	{
 	}
