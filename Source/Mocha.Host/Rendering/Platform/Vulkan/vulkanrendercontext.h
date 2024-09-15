@@ -23,44 +23,43 @@ class VulkanRenderContext;
 
 // Static shaders
 static const std::string g_fullScreenTriVertexShader = R"(
-	struct VSInput
-	{
-		float3 vPosition : POSITION;
-		float2 vTexCoord : TEXCOORD;
-	};
+struct VSInput
+{
+    [[vk::location(0)]] float3 vPosition : POSITION;
+    [[vk::location(1)]] float2 vTexCoord : TEXCOORD;
+};
 
-	struct VSOutput
-	{
-		float2 vTexCoord : TEXCOORD;
-		float4 Position : SV_Position;
-	};
+struct VSOutput
+{
+    [[vk::location(0)]] float2 vTexCoord : TEXCOORD0;
+    float4 Position : SV_Position;
+};
 
-	[shader("vertex")]
-	VSOutput main(VSInput input) : SV_Position
-	{
-		VSOutput output;
-		output.vTexCoord = input.vTexCoord;
-		output.Position = float4(input.vPosition, 1.0);
-		return output;
-	}
+[shader("vertex")]
+VSOutput main(VSInput input)
+{
+    VSOutput output;
+    output.vTexCoord = input.vTexCoord;
+    output.Position = float4(input.vPosition, 1.0);
+    return output;
+}
 )";
 
 static const std::string g_fullScreenTriFragmentShader = R"(
-	struct VSOutput
-	{
-		float2 vTexCoord : TEXCOORD;
-		float4 Position : SV_Position;
-	};
+struct PSInput
+{
+    [[vk::location(0)]] float2 vTexCoord : TEXCOORD0;
+};
 
-	Texture2D renderTexture : register(t0);
-	SamplerState textureSampler : register(s0);
+[[vk::binding(0, 0)]] Texture2D renderTexture;
+[[vk::binding(0, 1)]] SamplerState textureSampler;
 
-	[shader("fragment")]
-	float4 main(VSOutput input) : SV_Target
-	{
-		float3 fragColor = renderTexture.Sample(textureSampler, input.vTexCoord).rgb;
-		return float4(1.0f, 0.0f, 1.0f, 1.0f);
-	}
+[shader("fragment")]
+float4 main(PSInput input) : SV_Target
+{
+    float3 fragColor = renderTexture.Sample(textureSampler, input.vTexCoord).rgb;
+    return float4(fragColor, 1.0f);
+}
 )";
 
 // ----------------------------------------------------------------------------------------------------------------------------
