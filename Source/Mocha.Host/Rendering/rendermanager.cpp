@@ -43,7 +43,7 @@
 #include <implot.h>
 
 FloatCVar maxFramerate(
-    "render.max_framerate", 240.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
+    "render.max_framerate", 320.0f, CVarFlags::Archive, "The maximum framerate at which the game should run." );
 
 const char* GetGPUName()
 {
