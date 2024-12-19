@@ -176,7 +176,9 @@ inline void HostManager::Invoke( std::string _method, void* params, const char_t
 
 	if (fnPtr == nullptr)
 	{
-		spdlog::error( "Failed to load managed method {}", _method );
+		spdlog::error( "Failed to load managed method {}, {}", _method, rc );
+		__debugbreak();
+		return;
 	}
 
 	// Invoke method

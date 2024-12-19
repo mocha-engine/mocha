@@ -15,7 +15,5 @@ public class Game : BaseGame
 		// Spawn a player
 		var player = new Player();
 		player.Position = new Vector3( 0, 5, 10 );
-
-		_ = new PostProcess( "shaders/tonemap/agx.mshdr" );
 	}
 }

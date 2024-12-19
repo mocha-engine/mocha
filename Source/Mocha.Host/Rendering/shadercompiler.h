@@ -2,8 +2,9 @@
 
 #include <slang.h>
 #include <slang-com-ptr.h>
-#include <Rendering/rendering.h>
-#include <volk.h>
+#include <vector>
+
+#include "baserendercontext.h"
 
 using namespace slang;
 
@@ -23,4 +24,12 @@ public:
 	}
 
 	bool Compile( const ShaderType shaderType, const char* pshader, std::vector<uint32_t>& outSpirv );
+
+	inline UtilArray CompileOffline( const ShaderType shaderType, const char* pshader )
+	{
+		std::vector<uint32_t> out;
+		Compile( shaderType, pshader, out );
+
+		return UtilArray::FromVector( out );
+	}
 };

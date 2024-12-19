@@ -52,7 +52,7 @@ struct PSInput
 };
 
 [[vk::binding(0, 0)]] Texture2D renderTexture;
-[[vk::binding(0, 1)]] SamplerState textureSampler;
+[[vk::binding(1, 0)]] SamplerState textureSampler;
 
 [shader("fragment")]
 float4 main(PSInput input) : SV_Target
@@ -380,7 +380,7 @@ private:
 	std::unordered_map<std::thread::id, std::shared_ptr<VulkanCommandContext>> m_uploadContexts;
 
 	VulkanSwapchain m_swapchain;
-	VulkanSampler m_anisoSampler, m_pointSampler;
+	VulkanSampler m_anisoSampler, m_pointSampler, m_linearSampler, m_bilinearSampler;
 
 	std::shared_ptr<VulkanCommandContext> GetUploadContext( std::thread::id thread );
 

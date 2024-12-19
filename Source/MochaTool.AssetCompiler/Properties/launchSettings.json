@@ -4,7 +4,8 @@
       "commandName": "Project",
       "commandLineArgs": "--mountpoints \"samples/mocha-minimal/content/\" \"content/core/\" -f",
       "workingDirectory": "$(SolutionDir)..",
-      "remoteDebugEnabled": false
+      "remoteDebugEnabled": false,
+      "nativeDebugging": true
     }
   }
 }

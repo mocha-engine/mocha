@@ -4,7 +4,6 @@ using Mocha.Common.Console;
 using Mocha.Hotload.Projects;
 using Mocha.Hotload.Upgrading;
 using Mocha.Hotload.Util;
-using MochaTool.AssetCompiler;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -126,7 +125,7 @@ public static class Main
 			s_manifest.Resources.Content,
 			"content\\core"
 		);
-		FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
+		// FileSystem.Mounted.AssetCompiler = new RuntimeAssetCompiler();
 
 		// Create assemblies.
 		if ( isDedicatedServer )

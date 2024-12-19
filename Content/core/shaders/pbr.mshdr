@@ -16,6 +16,8 @@ Common
 
     struct FS_IN
     {
+        float4 vPosition : SV_POSITION;
+
         float3 vColor : COLOR;
         float3 vPositionWS : TEXCOORD0;
         float3 vCameraWS : TEXCOORD1;
@@ -32,7 +34,7 @@ Common
     };
 
     // Push constants block
-    cbuffer PushConstants
+    [[vk::push_constant]] cbuffer PushConstants
     {
         float4 data;
 
@@ -59,6 +61,7 @@ Vertex
         float3 vBitangent : BINORMAL;
     };
 
+    [shader("vertex")]
     FS_IN main(VS_IN input)
     {
         FS_IN output;
@@ -67,7 +70,7 @@ Vertex
         output.vPositionWS = mul(float4(input.vPosition, 1.0f), model_matrix).xyz;
         output.vCameraWS = vCameraPosWS;
         output.vColor = input.vColor;
-        output.vTexCoord = input.vTexCoord;
+        output.vTexCoord = input.vTexCoord * float2( -1, 1 );
         output.vNormalWS = input.vNormal;
 
         // Calculate TBN matrix for lighting
@@ -95,6 +98,8 @@ Vertex
         
         // Finish - transform into clip space
         float4 position = mul(float4(input.vPosition, 1.0f), render_matrix);
+        output.vPosition = position;
+        
         return output;
     }
 }
@@ -103,13 +108,13 @@ Fragment
 {    
     #define PI              3.14159265359
 
-    Texture2D diffuseTexture : register(t0);
-    Texture2D normalTexture : register(t1);
-    Texture2D ambientOcclusionTexture : register(t2);
-    Texture2D metalnessTexture : register(t3);
-    Texture2D roughnessTexture : register(t4);
+    [[vk::binding(0, 0)]] Texture2D diffuseTexture;
+    [[vk::binding(1, 0)]] Texture2D normalTexture;
+    [[vk::binding(2, 0)]] Texture2D ambientOcclusionTexture;
+    [[vk::binding(3, 0)]] Texture2D metalnessTexture;
+    [[vk::binding(4, 0)]] Texture2D roughnessTexture;
 
-    SamplerState samplerState : register(s0);
+    [[vk::binding(6, 0)]] SamplerState samplerState;
 
     float3 fresnelSchlick(float cosTheta, float3 F0)
     {
@@ -207,6 +212,7 @@ Fragment
         return lerp(v / (1.0f + l), tv, tv);
     }
 
+	[shader("fragment")]
     float4 main(FS_IN input) : SV_TARGET
     {
         // Collect material properties

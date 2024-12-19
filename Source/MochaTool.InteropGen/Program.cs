@@ -163,9 +163,9 @@ public static class Program
 		nativeStructWriter.WriteLine( '{' );
 		nativeStructWriter.Indent++;
 
-		nativeStructWriter.WriteLine( "Root::GetInstance()," );
+		nativeStructWriter.WriteLine( ".__Root = Root::GetInstance()," );
 
-		nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $"(void*)__{x.Name}_{x.method.Hash}" ) );
+		nativeStructBody = string.Join( ",\r\n\t", methods.Select( x => $".__{x.Name}_{x.method.Hash} = (void*)__{x.Name}_{x.method.Hash}" ) );
 		nativeStructWriter.Write( nativeStructBody );
 		nativeStructWriter.WriteLine();
 

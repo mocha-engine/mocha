@@ -89,6 +89,11 @@ void Material::CreateResources()
 		descriptorInfo.bindings.push_back( bindingInfo );
 	}
 
+	DescriptorBindingInfo_t samplerBindingInfo = {};
+	samplerBindingInfo.type = DESCRIPTOR_BINDING_TYPE_SAMPLER;
+	samplerBindingInfo.sampler = m_samplerType;
+	descriptorInfo.bindings.push_back( samplerBindingInfo );
+
 	m_descriptor = Descriptor( descriptorInfo );
 	pipelineInfo.descriptors.push_back( &m_descriptor );
 

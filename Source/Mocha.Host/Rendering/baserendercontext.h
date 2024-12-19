@@ -43,6 +43,7 @@ enum SamplerType
 {
 	SAMPLER_TYPE_POINT,
 	SAMPLER_TYPE_LINEAR,
+	SAMPLER_TYPE_BILINEAR,
 	SAMPLER_TYPE_ANISOTROPIC
 };
 
@@ -55,7 +56,8 @@ enum BufferType
 
 enum DescriptorBindingType
 {
-	DESCRIPTOR_BINDING_TYPE_IMAGE
+	DESCRIPTOR_BINDING_TYPE_IMAGE,
+	DESCRIPTOR_BINDING_TYPE_SAMPLER,
 };
 
 enum VertexAttributeFormat
@@ -146,6 +148,7 @@ struct DescriptorBindingInfo_t
 {
 	DescriptorBindingType type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 	ImageTexture* texture = nullptr;
+	SamplerType sampler{};
 };
 
 struct DescriptorInfo_t
@@ -156,6 +159,7 @@ struct DescriptorInfo_t
 
 struct DescriptorUpdateInfo_t
 {
+	DescriptorBindingType type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 	int binding = 0;
 	ImageTexture* src = nullptr;
 	SamplerType samplerType = SAMPLER_TYPE_ANISOTROPIC;

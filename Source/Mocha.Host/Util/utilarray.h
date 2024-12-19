@@ -32,7 +32,9 @@ struct UtilArray
 		UtilArray array;
 		array.count = vec.size();
 		array.size = vec.size() * sizeof( T );
-		array.data = vec.data();
+
+		array.data = new uint8_t[array.size];
+		std::memcpy( array.data, vec.data(), array.size );
 
 		return array;
 	}

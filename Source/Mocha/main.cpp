@@ -14,6 +14,8 @@ char* getCmdOption( char** begin, char** end, const std::string& option );
 
 int APIENTRY WinMain( HINSTANCE hInst, HINSTANCE hInstPrev, LPSTR cmdline, int cmdshow )
 {
+	SetProcessDPIAware();
+
 	Globals::m_activeProjectPath = getCmdOption( __argv, __argv + __argc, "-project" );
 	Globals::m_isDedicatedServer = false;
 

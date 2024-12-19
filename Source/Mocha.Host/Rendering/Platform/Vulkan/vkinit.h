@@ -255,7 +255,7 @@ namespace VKInit
 	}
 
 	inline VkImageMemoryBarrier ImageMemoryBarrier(
-	    VkAccessFlags accessMask, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage image )
+	    VkAccessFlags accessMask, VkImageLayout oldLayout, VkImageLayout newLayout, VkImage image, VkImageAspectFlags aspectMask = VK_IMAGE_ASPECT_COLOR_BIT )
 	{
 		VkImageMemoryBarrier imageMemoryBarrier = {};
 		imageMemoryBarrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -265,7 +265,7 @@ namespace VKInit
 		imageMemoryBarrier.image = image;
 
 		imageMemoryBarrier.subresourceRange = {};
-		imageMemoryBarrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+		imageMemoryBarrier.subresourceRange.aspectMask = aspectMask;
 		imageMemoryBarrier.subresourceRange.baseMipLevel = 0;
 		imageMemoryBarrier.subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
 		imageMemoryBarrier.subresourceRange.baseArrayLayer = 0;

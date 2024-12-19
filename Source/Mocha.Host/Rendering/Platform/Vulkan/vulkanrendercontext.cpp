@@ -160,6 +160,19 @@ VulkanRenderTexture::VulkanRenderTexture( VulkanRenderContext* parent, RenderTex
 
 	SetDebugName( "RenderTexture Image", VK_OBJECT_TYPE_IMAGE, ( uint64_t )image );
 	SetDebugName( "RenderTexture Image View", VK_OBJECT_TYPE_IMAGE_VIEW, ( uint64_t )imageView );
+
+	
+	m_parent->ImmediateSubmit( [&]( VkCommandBuffer cmd ) -> RenderStatus {
+		{
+			VkImageMemoryBarrier transitionBarrier =
+			    VKInit::ImageMemoryBarrier( 0, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, image, GetAspectFlags( textureInfo.type ) );
+
+			vkCmdPipelineBarrier( cmd, VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT, 0, 0, nullptr, 0,
+			    nullptr, 1, &transitionBarrier );
+		}
+
+		return RenderStatus::RENDER_STATUS_OK;
+	} );
 }
 
 void VulkanRenderTexture::Delete() const
@@ -476,6 +489,8 @@ VkSamplerCreateInfo VulkanSampler::GetCreateInfo( SamplerType samplerType )
 		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
 	if ( samplerType == SAMPLER_TYPE_ANISOTROPIC )
 		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, true );
+	if ( samplerType == SAMPLER_TYPE_BILINEAR )
+		return VKInit::SamplerCreateInfo( VK_FILTER_LINEAR, VK_SAMPLER_ADDRESS_MODE_REPEAT, false );
 
 	__debugbreak(); // Invalid / unsupported sampler type.
 }
@@ -693,6 +708,7 @@ vkb::PhysicalDevice VulkanRenderContext::CreatePhysicalDevice( vkb::Instance vkb
 	//
 	VkPhysicalDeviceFeatures requiredFeatures = {};
 	requiredFeatures.samplerAnisotropy = VK_TRUE;
+	requiredFeatures.geometryShader = VK_TRUE;
 	selector = selector.set_required_features( requiredFeatures );
 
 	//
@@ -853,7 +869,9 @@ void VulkanRenderContext::CreateRenderTargets()
 void VulkanRenderContext::CreateSamplers()
 {
 	m_pointSampler = VulkanSampler( this, SAMPLER_TYPE_POINT );
+	m_linearSampler = VulkanSampler( this, SAMPLER_TYPE_LINEAR );
 	m_anisoSampler = VulkanSampler( this, SAMPLER_TYPE_ANISOTROPIC );
+	m_bilinearSampler = VulkanSampler( this, SAMPLER_TYPE_BILINEAR );
 }
 
 void VulkanRenderContext::CreateImGuiIconFont()
@@ -893,9 +911,10 @@ void VulkanRenderContext::CreateImGui()
 	ImPlot::CreateContext();
 
 	auto& io = ImGui::GetIO();
+	//io.FontGlobalScale = 1.0f / 1.25f;
 
 #define ADD_FONT( name, path, size )                   \
-	name = io.Fonts->AddFontFromFileTTF( path, size ); \
+	name = io.Fonts->AddFontFromFileTTF( path, size * 1.25f ); \
 	CreateImGuiIconFont();
 
 	ADD_FONT( m_mainFont, "Content\\core\\fonts\\editor\\Inter-Regular.ttf", 14.0f );
@@ -1101,6 +1120,7 @@ void VulkanRenderContext::CreateFullScreenTri()
 
 	DescriptorInfo_t descriptorInfo = {};
 	DescriptorBindingInfo_t colorTextureBinding = {};
+	DescriptorBindingInfo_t samplerBinding = {};
 
 	// HACK: Horrific hack to get render textures working with descriptor sets for now
 	VulkanImageTexture vkImageTexture;
@@ -1114,8 +1134,10 @@ void VulkanRenderContext::CreateFullScreenTri()
 	colorTextureBinding.texture = &m_fullScreenTri.imageTexture;
 	colorTextureBinding.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 
+	samplerBinding.type = DESCRIPTOR_BINDING_TYPE_SAMPLER;
+
 	descriptorInfo.name = "Fullscreen triangle descriptor";
-	descriptorInfo.bindings = std::vector<DescriptorBindingInfo_t>{ colorTextureBinding };
+	descriptorInfo.bindings = std::vector<DescriptorBindingInfo_t>{ colorTextureBinding, samplerBinding };
 
 	m_fullScreenTri.descriptor = Descriptor( descriptorInfo );
 
@@ -1442,9 +1464,15 @@ RenderStatus VulkanRenderContext::EndRendering()
 	BindDescriptor( m_fullScreenTri.descriptor );
 
 	DescriptorUpdateInfo_t updateInfo = {};
+	updateInfo.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 	updateInfo.binding = 0;
-	updateInfo.samplerType = SAMPLER_TYPE_POINT;
 	updateInfo.src = &m_fullScreenTri.imageTexture;
+
+	UpdateDescriptor( m_fullScreenTri.descriptor, updateInfo );
+
+	updateInfo.type = DESCRIPTOR_BINDING_TYPE_SAMPLER;
+	updateInfo.binding = 1;
+	updateInfo.samplerType = SAMPLER_TYPE_ANISOTROPIC;
 
 	UpdateDescriptor( m_fullScreenTri.descriptor, updateInfo );
 
@@ -1538,17 +1566,38 @@ RenderStatus VulkanRenderContext::UpdateDescriptor( Descriptor d, DescriptorUpda
 	BindDescriptor( d );
 
 	std::shared_ptr<VulkanDescriptor> descriptor = m_descriptors.Get( d.m_handle );
-	std::shared_ptr<VulkanImageTexture> texture = m_imageTextures.Get( updateInfo.src->m_handle );
 
-	VkDescriptorImageInfo imageInfo = {};
-	imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-	imageInfo.imageView = texture->imageView;
-	imageInfo.sampler = updateInfo.samplerType == SAMPLER_TYPE_ANISOTROPIC ? m_anisoSampler.sampler : m_pointSampler.sampler; // TODO
+	if (updateInfo.type == DESCRIPTOR_BINDING_TYPE_IMAGE)
+	{
+		std::shared_ptr<VulkanImageTexture> texture = m_imageTextures.Get( updateInfo.src->m_handle );
 
-	auto descriptorWrite = VKInit::WriteDescriptorImage(
-	    VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, descriptor->descriptorSet, &imageInfo, updateInfo.binding );
+		VkDescriptorImageInfo imageInfo = {};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = texture->imageView;
 
-	vkUpdateDescriptorSets( m_device, 1, &descriptorWrite, 0, nullptr );
+		auto descriptorWrite = VKInit::WriteDescriptorImage(
+		    VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, descriptor->descriptorSet, &imageInfo, updateInfo.binding );
+
+		vkUpdateDescriptorSets( m_device, 1, &descriptorWrite, 0, nullptr );
+	}
+	else if (updateInfo.type == DESCRIPTOR_BINDING_TYPE_SAMPLER)
+	{
+		VkDescriptorImageInfo imageInfo = {};
+
+		if ( updateInfo.samplerType == SAMPLER_TYPE_ANISOTROPIC )
+			imageInfo.sampler = m_anisoSampler.sampler;
+		else if ( updateInfo.samplerType == SAMPLER_TYPE_POINT )
+			imageInfo.sampler = m_pointSampler.sampler;
+		else if ( updateInfo.samplerType == SAMPLER_TYPE_LINEAR )
+			imageInfo.sampler = m_linearSampler.sampler;
+		else if ( updateInfo.samplerType == SAMPLER_TYPE_BILINEAR )
+			imageInfo.sampler = m_bilinearSampler.sampler;
+
+		auto descriptorWrite = VKInit::WriteDescriptorImage(
+		    VK_DESCRIPTOR_TYPE_SAMPLER, descriptor->descriptorSet, &imageInfo, updateInfo.binding );
+
+		vkUpdateDescriptorSets( m_device, 1, &descriptorWrite, 0, nullptr );
+	}
 
 	return RENDER_STATUS_OK;
 }
@@ -1915,7 +1964,10 @@ VkDescriptorType VulkanDescriptor::GetDescriptorType( DescriptorBindingType type
 	switch ( type )
 	{
 	case DESCRIPTOR_BINDING_TYPE_IMAGE:
-		return VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		return VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
+
+	case DESCRIPTOR_BINDING_TYPE_SAMPLER:
+		return VK_DESCRIPTOR_TYPE_SAMPLER;
 	}
 
 	__debugbreak(); // Invalid / unsupported descriptor binding type

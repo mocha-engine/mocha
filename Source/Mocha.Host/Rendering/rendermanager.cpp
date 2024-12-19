@@ -152,12 +152,19 @@ void SceneMeshPass::Execute()
 			for ( int i = 0; i < m.material->m_textures.size(); ++i )
 			{
 				DescriptorUpdateInfo_t updateInfo = {};
+				updateInfo.type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 				updateInfo.binding = i;
-				updateInfo.samplerType = m.material->m_samplerType;
 				updateInfo.src = &m.material->m_textures[i].m_image;
 
 				Globals::m_renderContext->UpdateDescriptor( m.material->m_descriptor, updateInfo );
 			}
+
+			DescriptorUpdateInfo_t samplerUpdateInfo = {};
+			samplerUpdateInfo.type = DESCRIPTOR_BINDING_TYPE_SAMPLER;
+			samplerUpdateInfo.binding = m.material->m_textures.size();
+			samplerUpdateInfo.samplerType = m.material->m_samplerType;
+
+			Globals::m_renderContext->UpdateDescriptor( m.material->m_descriptor, samplerUpdateInfo );
 
 			Globals::m_renderContext->BindVertexBuffer( m.vertexBuffer );
 

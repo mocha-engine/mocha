@@ -1,5 +1,9 @@
 #include "shadercompiler.h"
 
+#include "baserendercontext.h"
+#include <vector>
+#include "spdlog/spdlog.h"
+
 using namespace slang;
 
 ShaderCompiler::ShaderCompiler()
@@ -17,9 +21,9 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 	targetDesc.format = SLANG_SPIRV;
 
 	if ( shaderType == SHADER_TYPE_FRAGMENT )
-		targetDesc.profile = m_globalSession->findProfile( "fs_6_6" );
+		targetDesc.profile = m_globalSession->findProfile( "spirv_1_3" );
 	else if ( shaderType == SHADER_TYPE_VERTEX )
-		targetDesc.profile = m_globalSession->findProfile( "vs_6_6" );
+		targetDesc.profile = m_globalSession->findProfile( "spirv_1_3" );
 
 	targetDesc.flags = SLANG_TARGET_FLAG_GENERATE_SPIRV_DIRECTLY | SLANG_TARGET_FLAG_GENERATE_WHOLE_PROGRAM;
 
@@ -34,7 +38,7 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 	    session->loadModuleFromSourceString( "Shader", "Shader.slang", pShader, diagnostics.writeRef() );
 
 	if ( diagnostics )
-		spdlog::error( "Failed to compile shader: {}", ( const char* )diagnostics->getBufferPointer() );
+		spdlog::error( "Shader compiler: {}", ( const char* )diagnostics->getBufferPointer() );
 
 	spdlog::info( "Entry point count: {}", module->getDefinedEntryPointCount() );
 
@@ -47,7 +51,7 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 	session->createCompositeComponentType( components, 2, program.writeRef(), diagnostics.writeRef() );
 
 	if ( diagnostics )
-		spdlog::error( "Failed to compile shader: {}", ( const char* )diagnostics->getBufferPointer() );
+		spdlog::error( "Shader compiler: {}", ( const char* )diagnostics->getBufferPointer() );
 
 	Slang::ComPtr<IComponentType> linkedProgram;
 	Slang::ComPtr<ISlangBlob> diagnosticBlob;
@@ -60,7 +64,7 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 	linkedProgram->getEntryPointCode( entryPointIndex, targetIndex, kernelBlob.writeRef(), diagnostics.writeRef() );
 
 	if ( diagnostics )
-		spdlog::error( "Failed to get code for shader: {}", ( const char* )diagnostics->getBufferPointer() );
+		spdlog::error( "Shader compiler: {}", ( const char* )diagnostics->getBufferPointer() );
 
 	const uint32_t* data = static_cast<const uint32_t*>( kernelBlob->getBufferPointer() );
 	size_t wordCount = kernelBlob->getBufferSize() / sizeof( uint32_t );

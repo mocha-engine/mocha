@@ -1,6 +1,7 @@
-﻿using System.Text;
-using Veldrid;
-using Veldrid.SPIRV;
+﻿using Mocha;
+using Mocha.Glue;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace MochaTool.AssetCompiler;
 
@@ -16,33 +17,28 @@ public partial class ShaderCompiler : BaseCompiler
 	/// <inheritdoc/>
 	public override bool SupportsMochaFile => true;
 
+	[DllImport( "MochaTool.ShaderCompilerBindings.dll", CharSet = CharSet.Ansi )]
+	private static extern UtilArray CompileShader( ShaderType shaderType, string shaderSource );
+
 	/// <summary>
 	/// Compiles a shader from GLSL into SPIR-V using Veldrid's libshaderc bindings.
 	/// </summary>
 	/// <returns>Vulkan-compatible SPIR-V bytecode.</returns>
-	private int[] CompileShader( string? commonSource, string shaderSource, ShaderStages shaderStage, string debugName = "temp" )
+	private int[] CompileShader( string? commonSource, string shaderSource, ShaderType shaderType, string debugName = "temp" )
 	{
 		//
 		// Prepend a preamble with GLSL version & macro definitions
 		//
 		var preamble = new StringBuilder();
-		preamble.AppendLine( $"#version 460" );
 
 		preamble.AppendLine( commonSource );
-
 		preamble.AppendLine();
+
 		shaderSource = preamble.ToString() + shaderSource;
 
-		//
-		// Perform the compilation
-		//
-		var compileOptions = new GlslCompileOptions( false );
-		var compileResult = SpirvCompilation.CompileGlslToSpirv( shaderSource, $"{debugName}_{shaderStage}.glsl", shaderStage, compileOptions );
-
-		// Data will be in bytes, but we want it in 32-bit integers as that is what Vulkan expects
-		var dataBytes = compileResult.SpirvBytes;
-		var dataInts = new int[dataBytes.Length / 4];
-		Buffer.BlockCopy( dataBytes, 0, dataInts, 0, dataBytes.Length );
+		var shaderData = CompileShader( shaderType, shaderSource );
+		var dataInts = new int[shaderData.count];
+		Marshal.Copy( shaderData.data, dataInts, 0, dataInts.Length );
 
 		return dataInts;
 	}
@@ -62,13 +58,15 @@ public partial class ShaderCompiler : BaseCompiler
 		var shaderFormat = new ShaderInfo();
 
 		if ( shaderFile.Vertex != null )
-			shaderFormat.VertexShaderData = CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderStages.Vertex, debugName );
+			shaderFormat.VertexShaderData = CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderType.Vertex, debugName );
 
 		if ( shaderFile.Fragment != null )
-			shaderFormat.FragmentShaderData = CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderStages.Fragment, debugName );
+			shaderFormat.FragmentShaderData = CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderType.Fragment, debugName );
 
+		/*
 		if ( shaderFile.Compute != null )
 			shaderFormat.ComputeShaderData = CompileShader( shaderFile.Common, shaderFile.Compute, ShaderStages.Compute, debugName );
+		*/
 
 		// Wrapper for file.
 		var mochaFile = new MochaFile<ShaderInfo>
