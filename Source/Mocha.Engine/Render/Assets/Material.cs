@@ -65,8 +65,8 @@ public class Material : Asset
 
 			NativeMaterial = new(
 				Path,
-				shaderFormat.Data.VertexShaderData.ToInterop(),
-				shaderFormat.Data.FragmentShaderData.ToInterop(),
+				shaderFormat.Data.Vertex.Data.ToInterop(),
+				shaderFormat.Data.Fragment.Data.ToInterop(),
 				Vertex.VertexAttributes.ToInterop(),
 				textures.ToInterop(),
 				SamplerType.Point,
@@ -85,8 +85,8 @@ public class Material : Asset
 			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
 			NativeMaterial.SetShaderData(
-				shaderFormat.Data.VertexShaderData.ToInterop(),
-				shaderFormat.Data.FragmentShaderData.ToInterop()
+				shaderFormat.Data.Vertex.Data.ToInterop(),
+				shaderFormat.Data.Fragment.Data.ToInterop()
 			);
 
 			NativeMaterial.Reload();
@@ -122,8 +122,8 @@ public class Material : Asset
 
 		NativeMaterial = new(
 			Path,
-			shaderFormat.Data.VertexShaderData.ToInterop(),
-			shaderFormat.Data.FragmentShaderData.ToInterop(),
+			shaderFormat.Data.Vertex.Data.ToInterop(),
+			shaderFormat.Data.Fragment.Data.ToInterop(),
 			vertexAttributes.ToInterop(),
 			textures.ToInterop(),
 			sampler,
@@ -144,8 +144,8 @@ public class Material : Asset
 
 		material.NativeMaterial = new(
 			material.Path,
-			shaderFormat.Data.VertexShaderData.ToInterop(),
-			shaderFormat.Data.FragmentShaderData.ToInterop(),
+			shaderFormat.Data.Vertex.Data.ToInterop(),
+			shaderFormat.Data.Fragment.Data.ToInterop(),
 			vertexAttributes.ToInterop()
 		);
 

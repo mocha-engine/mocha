@@ -3,7 +3,7 @@
 #include "Rendering/baserendercontext.h"
 #include "Rendering/shadercompiler.h"
 
-extern "C" __declspec( dllexport ) UtilArray CompileShader( const ShaderType shaderType, const char* pshader )
+extern "C" __declspec( dllexport ) ShaderCompilerResult CompileShader( const ShaderType shaderType, const char* pshader )
 {
 	return ShaderCompiler::Instance().CompileOffline( shaderType, pshader );
 }

@@ -121,7 +121,16 @@ void RenderManager::Shutdown()
 
 void SceneMeshPass::Execute()
 {
-	for ( auto& sceneMesh : m_meshes )
+	// Make a copy here so that nothing can affect what we draw while we're drawing it
+	std::vector<std::shared_ptr<SceneMesh>> meshes = std::vector<std::shared_ptr<SceneMesh>>( m_meshes );
+
+	/*std::vector<glm::mat4> objectMatrices = {};
+	for ( auto& sceneMesh : meshes )
+	{
+		objectMatrices.push_back( sceneMesh->m_transform.GetModelMatrix() );
+	}*/
+
+	for ( auto& sceneMesh : meshes )
 	{
 		bool materialWasDirty = false;
 
@@ -193,6 +202,7 @@ void SceneMeshPass::AddMesh( std::shared_ptr<SceneMesh> sceneMesh )
 	m_meshes.push_back( sceneMesh );
 }
 
+// todo: remove
 void SceneMeshPass::SetConstants( RenderPushConstants constants )
 {
 	m_constants = constants;

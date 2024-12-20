@@ -1162,23 +1162,27 @@ void VulkanRenderContext::CreateFullScreenTri()
 
 	// Vertex
 	{
-		if ( !ShaderCompiler::Instance().Compile( SHADER_TYPE_VERTEX, g_fullScreenTriVertexShader.c_str(), vertexShaderBits ) )
+		ShaderCompilerResult result;
+		if ( !ShaderCompiler::Instance().Compile( SHADER_TYPE_VERTEX, g_fullScreenTriVertexShader.c_str(), result ) )
 		{
 			ErrorMessage( "Fullscreen triangle vertex shader failed to compile." );
 			abort();
 		}
+		vertexShaderBits = result.ShaderData.GetData<unsigned int>();
 
 		pipelineInfo.shaderInfo.vertexShaderData = vertexShaderBits;
 	}
 
 	// Fragment
 	{
+		ShaderCompilerResult result;
 		if ( !ShaderCompiler::Instance().Compile(
-		         SHADER_TYPE_FRAGMENT, g_fullScreenTriFragmentShader.c_str(), fragmentShaderBits ) )
+		         SHADER_TYPE_FRAGMENT, g_fullScreenTriFragmentShader.c_str(), result ) )
 		{
 			ErrorMessage( "Fullscreen triangle fragment shader failed to compile." );
 			abort();
 		}
+		fragmentShaderBits = result.ShaderData.GetData<unsigned int>();
 
 		pipelineInfo.shaderInfo.fragmentShaderData = fragmentShaderBits;
 	}

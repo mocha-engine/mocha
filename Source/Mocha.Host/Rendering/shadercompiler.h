@@ -8,6 +8,35 @@
 
 using namespace slang;
 
+
+enum ShaderReflectionType
+{
+	SHADER_REFLECTION_TYPE_UNKNOWN,
+
+	SHADER_REFLECTION_TYPE_BUFFER,
+	SHADER_REFLECTION_TYPE_TEXTURE,
+	SHADER_REFLECTION_TYPE_SAMPLER
+};
+
+struct ShaderReflectionBinding
+{
+	int Set;
+	int Binding;
+	ShaderReflectionType Type;
+	const char* Name;
+};
+
+struct ShaderReflectionInfo
+{
+	UtilArray Bindings;
+};
+
+struct ShaderCompilerResult
+{
+	UtilArray ShaderData;
+	ShaderReflectionInfo ReflectionData;
+};
+
 class ShaderCompiler
 {
 private:
@@ -23,13 +52,13 @@ public:
 		return *instance;
 	}
 
-	bool Compile( const ShaderType shaderType, const char* pshader, std::vector<uint32_t>& outSpirv );
+	bool Compile( const ShaderType shaderType, const char* pShader, ShaderCompilerResult& outResult );
 
-	inline UtilArray CompileOffline( const ShaderType shaderType, const char* pshader )
+	inline ShaderCompilerResult CompileOffline( const ShaderType shaderType, const char* pshader )
 	{
-		std::vector<uint32_t> out;
-		Compile( shaderType, pshader, out );
+		ShaderCompilerResult outResult;
+		Compile( shaderType, pshader, outResult );
 
-		return UtilArray::FromVector( out );
+		return outResult;
 	}
 };

@@ -17,14 +17,21 @@ public partial class ShaderCompiler : BaseCompiler
 	/// <inheritdoc/>
 	public override bool SupportsMochaFile => true;
 
+	[StructLayout( LayoutKind.Sequential )]
+	private struct ShaderCompilerResult
+	{
+		public UtilArray ShaderData;
+		public ShaderReflectionInfo ReflectionData;
+	}
+
 	[DllImport( "MochaTool.ShaderCompilerBindings.dll", CharSet = CharSet.Ansi )]
-	private static extern UtilArray CompileShader( ShaderType shaderType, string shaderSource );
+	private static extern ShaderCompilerResult CompileShader( ShaderType shaderType, string shaderSource );
 
 	/// <summary>
 	/// Compiles a shader from GLSL into SPIR-V using Veldrid's libshaderc bindings.
 	/// </summary>
 	/// <returns>Vulkan-compatible SPIR-V bytecode.</returns>
-	private int[] CompileShader( string? commonSource, string shaderSource, ShaderType shaderType, string debugName = "temp" )
+	private void CompileShader( string? commonSource, string shaderSource, ShaderType shaderType, out ShaderReflectionInfo reflectionInfo, out int[] shaderCode )
 	{
 		//
 		// Prepend a preamble with GLSL version & macro definitions
@@ -36,11 +43,29 @@ public partial class ShaderCompiler : BaseCompiler
 
 		shaderSource = preamble.ToString() + shaderSource;
 
-		var shaderData = CompileShader( shaderType, shaderSource );
-		var dataInts = new int[shaderData.count];
-		Marshal.Copy( shaderData.data, dataInts, 0, dataInts.Length );
+		//
+		// Shader source data
+		//
+		var shaderResult = CompileShader( shaderType, shaderSource );
+		var shaderData = shaderResult.ShaderData;
+		shaderCode = new int[shaderData.count];
+		Marshal.Copy( shaderData.data, shaderCode, 0, shaderCode.Length );
 
-		return dataInts;
+		//
+		// Shader reflection info
+		//
+		reflectionInfo = shaderResult.ReflectionData;
+
+		var bindings = new ShaderReflectionBinding[reflectionInfo.Bindings.count];
+		for ( int i = 0; i < reflectionInfo.Bindings.count; i++ )
+		{
+			bindings[i] = Marshal.PtrToStructure<ShaderReflectionBinding>( reflectionInfo.Bindings.data + (i * Marshal.SizeOf<ShaderReflectionBinding>()) );
+		}
+
+		foreach ( var reflectionBinding in bindings )
+		{
+			Log.Info( $"{reflectionBinding.Type} {reflectionBinding.Name} on {reflectionBinding.Set}, {reflectionBinding.Binding}" );
+		}
 	}
 
 	/// <inheritdoc/>
@@ -52,16 +77,27 @@ public partial class ShaderCompiler : BaseCompiler
 		var shaderParser = new ShaderParser( shaderString );
 		var shaderFile = shaderParser.Parse();
 
-		// Debug name is used for error messages and internally by the SPIR-V compiler.
-		var debugName = Path.GetFileNameWithoutExtension( input.SourcePath ) ?? "temp";
-
 		var shaderFormat = new ShaderInfo();
 
 		if ( shaderFile.Vertex != null )
-			shaderFormat.VertexShaderData = CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderType.Vertex, debugName );
+		{
+			CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderType.Vertex, out var reflection, out var data );
+			shaderFormat.Vertex = new()
+			{
+				Data = data,
+				Reflection = reflection
+			};
+		}
 
 		if ( shaderFile.Fragment != null )
-			shaderFormat.FragmentShaderData = CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderType.Fragment, debugName );
+		{
+			CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderType.Fragment, out var reflection, out var data );
+			shaderFormat.Fragment = new()
+			{
+				Data = data,
+				Reflection = reflection
+			};
+		}
 
 		/*
 		if ( shaderFile.Compute != null )
@@ -71,7 +107,7 @@ public partial class ShaderCompiler : BaseCompiler
 		// Wrapper for file.
 		var mochaFile = new MochaFile<ShaderInfo>
 		{
-			MajorVersion = 4,
+			MajorVersion = 5,
 			MinorVersion = 0,
 			Data = shaderFormat,
 			AssetHash = input.DataHash

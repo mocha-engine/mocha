@@ -188,6 +188,7 @@ struct PipelineInfo_t
 	bool renderToSwapchain = false;
 };
 
+// todo: remove me
 struct RenderPushConstants
 {
 	glm::vec4 data = glm::vec4{ 1.0f };
@@ -200,6 +201,15 @@ struct RenderPushConstants
 	float time = 0.0f;
 
 	glm::vec4 vLightInfoWS[4] = {};
+};
+
+// These need to be aligned
+struct ViewConstants
+{
+	glm::mat4 render_matrix = {};		// view/projection
+	glm::vec4 vCameraPosWS = {};		// camera pos
+	glm::vec4 vLightInfoWS[4] = {};		// light data
+	glm::vec4 data = {};				// misc data
 };
 
 struct GPUInfo
