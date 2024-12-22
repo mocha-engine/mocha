@@ -1,6 +1,6 @@
 {
-    "DiffuseTexture": "materials/metal/metal_color.mtex",
-    "NormalTexture": "materials/metal/metal_normal.mtex",
-    "RoughnessTexture": "materials/metal/metal_rough.mtex",
-    "MetalnessTexture": "materials/metal/metal_metal.mtex"
+    "diffuseTexture": "materials/metal/metal_color.mtex",
+    "normalTexture": "materials/metal/metal_normal.mtex",
+    "roughnessTexture": "materials/metal/metal_rough.mtex",
+    "metalnessTexture": "materials/metal/metal_metal.mtex"
 }

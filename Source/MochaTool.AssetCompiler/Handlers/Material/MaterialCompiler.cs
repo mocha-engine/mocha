@@ -20,12 +20,12 @@ public class MaterialCompiler : BaseCompiler
 	/// <inheritdoc/>
 	public override CompileResult Compile( ref CompileInput input )
 	{
-		var materialData = JsonSerializer.Deserialize<MaterialInfo>( input.SourceData.Span );
+		var materialData = JsonSerializer.Deserialize<Dictionary<string, string>>( input.SourceData.Span );
 		// Wrapper for file
-		var mochaFile = new MochaFile<MaterialInfo>()
+		var mochaFile = new MochaFile<Dictionary<string, string>>()
 		{
 			MajorVersion = 4,
-			MinorVersion = 0,
+			MinorVersion = 1,
 			Data = materialData,
 			AssetHash = input.DataHash
 		};

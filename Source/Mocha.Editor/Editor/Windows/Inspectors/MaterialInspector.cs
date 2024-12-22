@@ -69,6 +69,6 @@ public class MaterialInspector : BaseInspector
 		}
 
 		ImGui.SetCursorPosY( windowHeight - windowWidth - 10 );
-		ImGuiX.Image( _material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
+		// ImGuiX.Image( _material.DiffuseTexture, new Vector2( windowWidth, windowWidth ) - new Vector2( 16, 0 ) );
 	}
 }

@@ -21,9 +21,14 @@ public struct ShaderReflectionBinding
 	public string Name { get; set; }
 }
 
-public struct ShaderReflectionInfo
+public struct NativeShaderReflectionInfo
 {
 	public UtilArray Bindings { get; set; }
+}
+
+public struct ShaderReflectionInfo
+{
+	public ShaderReflectionBinding[] Bindings { get; set; }
 }
 
 public struct ShaderStageInfo

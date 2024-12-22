@@ -1,1 +1,1 @@
-{"DiffuseTexture":"textures/dev/floor_basecolor.mtex","NormalTexture":"textures/dev/floor_normal.mtex","AmbientOcclusionTexture":"textures/dev/floor_ambientocclusion.mtex","MetalnessTexture":"textures/dev/floor_metallic.mtex","RoughnessTexture":"textures/dev/floor_roughness.mtex"}
+{"diffuseTexture":"textures/dev/floor_basecolor.mtex","normalTexture":"textures/dev/floor_normal.mtex","ambientOcclusionTexture":"textures/dev/floor_ambientocclusion.mtex","metalnessTexture":"textures/dev/floor_metallic.mtex","roughnessTexture":"textures/dev/floor_roughness.mtex"}

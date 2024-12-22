@@ -21,7 +21,7 @@ public partial class ShaderCompiler : BaseCompiler
 	private struct ShaderCompilerResult
 	{
 		public UtilArray ShaderData;
-		public ShaderReflectionInfo ReflectionData;
+		public NativeShaderReflectionInfo ReflectionData;
 	}
 
 	[DllImport( "MochaTool.ShaderCompilerBindings.dll", CharSet = CharSet.Ansi )]
@@ -54,18 +54,15 @@ public partial class ShaderCompiler : BaseCompiler
 		//
 		// Shader reflection info
 		//
-		reflectionInfo = shaderResult.ReflectionData;
+		reflectionInfo = new();
 
-		var bindings = new ShaderReflectionBinding[reflectionInfo.Bindings.count];
-		for ( int i = 0; i < reflectionInfo.Bindings.count; i++ )
+		var bindings = new ShaderReflectionBinding[shaderResult.ReflectionData.Bindings.count];
+		for ( int i = 0; i < shaderResult.ReflectionData.Bindings.count; i++ )
 		{
-			bindings[i] = Marshal.PtrToStructure<ShaderReflectionBinding>( reflectionInfo.Bindings.data + (i * Marshal.SizeOf<ShaderReflectionBinding>()) );
+			bindings[i] = Marshal.PtrToStructure<ShaderReflectionBinding>( shaderResult.ReflectionData.Bindings.data + (i * Marshal.SizeOf<ShaderReflectionBinding>()) );
 		}
 
-		foreach ( var reflectionBinding in bindings )
-		{
-			Log.Info( $"{reflectionBinding.Type} {reflectionBinding.Name} on {reflectionBinding.Set}, {reflectionBinding.Binding}" );
-		}
+		reflectionInfo.Bindings = bindings;
 	}
 
 	/// <inheritdoc/>

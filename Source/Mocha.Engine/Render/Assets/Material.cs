@@ -3,13 +3,7 @@
 [Icon( FontAwesome.FaceGrinStars ), Title( "Material" )]
 public class Material : Asset
 {
-	public Texture? DiffuseTexture { get; set; } = Texture.MissingTexture;
-	public Texture? NormalTexture { get; set; } = Texture.Normal;
-	public Texture? AmbientOcclusionTexture { get; set; } = Texture.One;
-	public Texture? MetalnessTexture { get; set; } = Texture.Zero;
-	public Texture? RoughnessTexture { get; set; } = Texture.One;
-
-	public static Texture BlueNoiseTexture { get; } = new Texture( "textures/bluenoise.mtex", false );
+	public Dictionary<string, Texture> Textures { get; set; } = new();
 
 	public Glue.Material NativeMaterial { get; private set; }
 
@@ -22,53 +16,47 @@ public class Material : Asset
 	{
 		Path = path;
 
-		MochaFile<MaterialInfo> materialFormat = new();
+		// todo: We should really *not* be doing this but I can't be bothered
+		// to go through and upgrade every single material right now
+		MochaFile<Dictionary<string, string>> textureBindings = new();
 
 		if ( FileSystem.Mounted.Exists( path ) )
 		{
 			var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
-			materialFormat = Serializer.Deserialize<MochaFile<MaterialInfo>>( fileBytes );
+			textureBindings = Serializer.Deserialize<MochaFile<Dictionary<string, string>>>( fileBytes );
 		}
 		else
 		{
 			Log.Warning( $"Material '{path}' does not exist" );
 		}
 
-		if ( !string.IsNullOrEmpty( materialFormat.Data.DiffuseTexture ) )
-			DiffuseTexture = new Texture( materialFormat.Data.DiffuseTexture );
-
-		if ( !string.IsNullOrEmpty( materialFormat.Data.NormalTexture ) )
-			NormalTexture = new Texture( materialFormat.Data.NormalTexture, false );
-
-		if ( !string.IsNullOrEmpty( materialFormat.Data.AmbientOcclusionTexture ) )
-			AmbientOcclusionTexture = new Texture( materialFormat.Data.AmbientOcclusionTexture, false );
-
-		if ( !string.IsNullOrEmpty( materialFormat.Data.MetalnessTexture ) )
-			MetalnessTexture = new Texture( materialFormat.Data.MetalnessTexture, false );
-
-		if ( !string.IsNullOrEmpty( materialFormat.Data.RoughnessTexture ) )
-			RoughnessTexture = new Texture( materialFormat.Data.RoughnessTexture, false );
-
-		var textures = new List<Glue.Texture>()
+		foreach ( var texturePath in textureBindings.Data )
 		{
-			DiffuseTexture.NativeTexture,
-			NormalTexture.NativeTexture,
-			AmbientOcclusionTexture.NativeTexture,
-			MetalnessTexture.NativeTexture,
-			RoughnessTexture.NativeTexture,
-			BlueNoiseTexture.NativeTexture
-		};
+			// todo: How do we determine SRGB here? We should probably just fetch it from the texture itself right?
+			Textures.Add( texturePath.Key, new Texture( texturePath.Value, false ) );
+		}
 
 		{
 			var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
 			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
+
+			var boundTextures = shaderFormat.Data.Fragment.Reflection.Bindings
+				.Where( binding => binding.Type == ShaderReflectionType.Texture )
+				.Select( binding => (
+					binding.Name,
+					Textures.TryGetValue( binding.Name, out var tex ) ? tex : Texture.MissingTexture,
+					binding
+				) )
+				.OrderBy( x => x.binding.Binding )
+				.Select( x => x.Item2.NativeTexture )
+				.ToList();
 
 			NativeMaterial = new(
 				Path,
 				shaderFormat.Data.Vertex.Data.ToInterop(),
 				shaderFormat.Data.Fragment.Data.ToInterop(),
 				Vertex.VertexAttributes.ToInterop(),
-				textures.ToInterop(),
+				boundTextures.ToInterop(),
 				SamplerType.Point,
 				false
 			);
@@ -91,46 +79,6 @@ public class Material : Asset
 
 			NativeMaterial.Reload();
 		} );
-	}
-
-	/// <summary>
-	/// Creates a material.
-	/// </summary>
-	public Material( string shaderPath, VertexAttribute[] vertexAttributes, Texture? diffuseTexture = null,
-		Texture? normalTexture = null, Texture? ambientOcclusionTexture = null, Texture? metalnessTexture = null,
-		Texture? roughnessTexture = null, SamplerType sampler = SamplerType.Point, bool ignoreDepth = false )
-	{
-		var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( shaderPath );
-		var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
-
-		Path = "Procedural Material";
-
-		DiffuseTexture = diffuseTexture ?? Texture.MissingTexture;
-		NormalTexture = normalTexture ?? Texture.Normal;
-		AmbientOcclusionTexture = ambientOcclusionTexture ?? Texture.One;
-		MetalnessTexture = metalnessTexture ?? Texture.Zero;
-		RoughnessTexture = roughnessTexture ?? Texture.One;
-
-		var textures = new List<Glue.Texture>()
-		{
-			DiffuseTexture.NativeTexture,
-			NormalTexture.NativeTexture,
-			AmbientOcclusionTexture.NativeTexture,
-			MetalnessTexture.NativeTexture,
-			RoughnessTexture.NativeTexture
-		};
-
-		NativeMaterial = new(
-			Path,
-			shaderFormat.Data.Vertex.Data.ToInterop(),
-			shaderFormat.Data.Fragment.Data.ToInterop(),
-			vertexAttributes.ToInterop(),
-			textures.ToInterop(),
-			sampler,
-			ignoreDepth
-		);
-
-		// TODO: File watcher here!
 	}
 
 	public static Material FromShader( string shaderPath, VertexAttribute[] vertexAttributes )

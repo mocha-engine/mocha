@@ -114,7 +114,7 @@ Fragment
     [[vk::binding(3, 0)]] Texture2D metalnessTexture;
     [[vk::binding(4, 0)]] Texture2D roughnessTexture;
 
-    [[vk::binding(6, 0)]] SamplerState samplerState;
+    [[vk::binding(5, 0)]] SamplerState samplerState;
 
     float3 fresnelSchlick(float cosTheta, float3 F0)
     {
