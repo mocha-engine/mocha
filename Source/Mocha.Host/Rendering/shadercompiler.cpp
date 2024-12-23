@@ -77,7 +77,7 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 
 	std::vector<ShaderReflectionBinding> reflectionBindings = {};
 	ShaderReflectionInfo shaderReflectionInfo = {};
-	
+
 	{
 		slang::ProgramLayout* layout = program->getLayout( targetIndex );
 		auto globalScope = layout->getGlobalParamsVarLayout();
@@ -116,12 +116,53 @@ bool ShaderCompiler::Compile( const ShaderType shaderType, const char* pShader, 
 				break;
 			}
 
-			reflectionBindings.push_back( ShaderReflectionBinding{
-			    .Set = ( int )set, .Binding = ( int )binding, .Type = mochaReflectionType, .Name = name } );
+			// get attributes
+			auto attributeCount = param->getVariable()->getUserAttributeCount();
+			spdlog::info( "Variable {} has {} attributes", name, attributeCount );
+
+			std::vector<ShaderReflectionAttribute> reflectedAttributes{};
+
+			for ( int attributeIndex = 0; attributeIndex < attributeCount; ++attributeIndex )
+			{
+				auto attribute = param->getVariable()->getUserAttributeByIndex( attributeIndex );
+				auto attributeName = attribute->getName();
+
+				auto attributeArgumentCount = attribute->getArgumentCount();
+
+				ShaderReflectionAttribute reflectedAttribute;
+
+				if ( strcmp( attributeName, "Default" ) == 0 )
+				{
+					// Default attribute
+					reflectedAttribute.Type = SHADER_REFLECTION_ATTRIBUTE_TYPE_DEFAULT;
+					reflectedAttribute.Data = new DefaultAttributeData();
+					attribute->getArgumentValueFloat( 0, &( ( DefaultAttributeData* )reflectedAttribute.Data )->ValueR );
+					attribute->getArgumentValueFloat( 1, &( ( DefaultAttributeData* )reflectedAttribute.Data )->ValueG );
+					attribute->getArgumentValueFloat( 2, &( ( DefaultAttributeData* )reflectedAttribute.Data )->ValueB );
+					attribute->getArgumentValueFloat( 3, &( ( DefaultAttributeData* )reflectedAttribute.Data )->ValueA );
+				}
+				else if ( strcmp( attributeName, "SrgbRead" ) == 0 )
+				{
+					// SRGB read attribute
+					reflectedAttribute.Type = SHADER_REFLECTION_ATTRIBUTE_TYPE_SRGB_READ;
+				}
+				else
+				{
+					spdlog::warn( "Unhandled attribute '{}'", attributeName );
+				}
+
+				reflectedAttributes.emplace_back( reflectedAttribute );
+			}
+
+			reflectionBindings.push_back( ShaderReflectionBinding{ .Set = ( int )set,
+			    .Binding = ( int )binding,
+			    .Type = mochaReflectionType,
+			    .Name = name,
+			    .Attributes = UtilArray::FromVector<ShaderReflectionAttribute>( reflectedAttributes ) } );
 		}
 	}
 
-	outResult.ReflectionData = ShaderReflectionInfo { .Bindings = UtilArray::FromVector( reflectionBindings ) };
+	outResult.ReflectionData = ShaderReflectionInfo{ .Bindings = UtilArray::FromVector( reflectionBindings ) };
 
 	return true;
 }

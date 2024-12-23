@@ -17,16 +17,6 @@ public partial class ShaderCompiler : BaseCompiler
 	/// <inheritdoc/>
 	public override bool SupportsMochaFile => true;
 
-	[StructLayout( LayoutKind.Sequential )]
-	private struct ShaderCompilerResult
-	{
-		public UtilArray ShaderData;
-		public NativeShaderReflectionInfo ReflectionData;
-	}
-
-	[DllImport( "MochaTool.ShaderCompilerBindings.dll", CharSet = CharSet.Ansi )]
-	private static extern ShaderCompilerResult CompileShader( ShaderType shaderType, string shaderSource );
-
 	/// <summary>
 	/// Compiles a shader from GLSL into SPIR-V using Veldrid's libshaderc bindings.
 	/// </summary>
@@ -54,15 +44,7 @@ public partial class ShaderCompiler : BaseCompiler
 		//
 		// Shader reflection info
 		//
-		reflectionInfo = new();
-
-		var bindings = new ShaderReflectionBinding[shaderResult.ReflectionData.Bindings.count];
-		for ( int i = 0; i < shaderResult.ReflectionData.Bindings.count; i++ )
-		{
-			bindings[i] = Marshal.PtrToStructure<ShaderReflectionBinding>( shaderResult.ReflectionData.Bindings.data + (i * Marshal.SizeOf<ShaderReflectionBinding>()) );
-		}
-
-		reflectionInfo.Bindings = bindings;
+		reflectionInfo = shaderResult.ReflectionData.ToManaged();
 	}
 
 	/// <inheritdoc/>
@@ -76,9 +58,13 @@ public partial class ShaderCompiler : BaseCompiler
 
 		var shaderFormat = new ShaderInfo();
 
+		// Prepend attributes.mshdri (horrible hack)
+		var attributeSource = File.ReadAllText( Path.GetDirectoryName( input.SourcePath ) + "\\attributes.mshdri" );
+		var common = (shaderFile.Common ?? "") + "\n\n" + attributeSource;
+
 		if ( shaderFile.Vertex != null )
 		{
-			CompileShader( shaderFile.Common, shaderFile.Vertex, ShaderType.Vertex, out var reflection, out var data );
+			CompileShader( common, shaderFile.Vertex, ShaderType.Vertex, out var reflection, out var data );
 			shaderFormat.Vertex = new()
 			{
 				Data = data,
@@ -88,7 +74,7 @@ public partial class ShaderCompiler : BaseCompiler
 
 		if ( shaderFile.Fragment != null )
 		{
-			CompileShader( shaderFile.Common, shaderFile.Fragment, ShaderType.Fragment, out var reflection, out var data );
+			CompileShader( common, shaderFile.Fragment, ShaderType.Fragment, out var reflection, out var data );
 			shaderFormat.Fragment = new()
 			{
 				Data = data,
@@ -96,15 +82,10 @@ public partial class ShaderCompiler : BaseCompiler
 			};
 		}
 
-		/*
-		if ( shaderFile.Compute != null )
-			shaderFormat.ComputeShaderData = CompileShader( shaderFile.Common, shaderFile.Compute, ShaderStages.Compute, debugName );
-		*/
-
 		// Wrapper for file.
 		var mochaFile = new MochaFile<ShaderInfo>
 		{
-			MajorVersion = 5,
+			MajorVersion = 6,
 			MinorVersion = 0,
 			Data = shaderFormat,
 			AssetHash = input.DataHash

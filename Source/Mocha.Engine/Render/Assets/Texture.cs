@@ -1,4 +1,6 @@
-﻿namespace Mocha;
+﻿using static Mocha.Common.Font;
+
+namespace Mocha;
 
 [Icon( FontAwesome.Image ), Title( "Texture" )]
 public partial class Texture : Asset
@@ -68,6 +70,15 @@ public partial class Texture : Asset
 		var textureFormat = GetRenderTextureFormat( TextureFormat.RGBA, isSrgb );
 		NativeTexture = new( Path, width, height );
 		NativeTexture.SetData( Width, Height, 1, new byte[Width * Height * 4].ToInterop(), (int)textureFormat );
+	}
+
+	internal Texture( float r, float g, float b, float a = 1.0f, bool isSrgb = true )
+	{
+		var textureFormat = GetRenderTextureFormat( TextureFormat.RGBA, isSrgb );
+		var data = new byte[] { (byte)(r * 255.0f), (byte)(g * 255.0f), (byte)(b * 255.0f), (byte)(a * 255.0f) };
+
+		NativeTexture = new( "pixel", 1, 1 );
+		NativeTexture.SetData( 1, 1, 1, data.ToInterop(), (int)textureFormat );
 	}
 
 	public void Copy( uint srcX, uint srcY, uint dstX, uint dstY, uint width, uint height, Texture src )

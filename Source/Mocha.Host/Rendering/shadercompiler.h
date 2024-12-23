@@ -1,13 +1,12 @@
 #pragma once
 
-#include <slang.h>
-#include <slang-com-ptr.h>
-#include <vector>
-
 #include "baserendercontext.h"
 
-using namespace slang;
+#include <slang-com-ptr.h>
+#include <slang.h>
+#include <vector>
 
+using namespace slang;
 
 enum ShaderReflectionType
 {
@@ -18,12 +17,39 @@ enum ShaderReflectionType
 	SHADER_REFLECTION_TYPE_SAMPLER
 };
 
+enum ShaderReflectionAttributeType
+{
+	SHADER_REFLECTION_ATTRIBUTE_TYPE_UNKNOWN,
+
+	// SrgbReadAttribute
+	SHADER_REFLECTION_ATTRIBUTE_TYPE_SRGB_READ,
+
+	// DefaultAttribute
+	SHADER_REFLECTION_ATTRIBUTE_TYPE_DEFAULT
+};
+
+struct DefaultAttributeData
+{
+	float ValueR = 0.0f;
+	float ValueG = 0.0f;
+	float ValueB = 0.0f;
+	float ValueA = 0.0f;
+};
+
+struct ShaderReflectionAttribute
+{
+	ShaderReflectionAttributeType Type = SHADER_REFLECTION_ATTRIBUTE_TYPE_UNKNOWN;
+	void* Data = nullptr;
+};
+
 struct ShaderReflectionBinding
 {
-	int Set;
-	int Binding;
-	ShaderReflectionType Type;
-	const char* Name;
+	int Set = -1;
+	int Binding = -1;
+	ShaderReflectionType Type = SHADER_REFLECTION_TYPE_UNKNOWN;
+	const char* Name = nullptr;
+
+	UtilArray Attributes;
 };
 
 struct ShaderReflectionInfo

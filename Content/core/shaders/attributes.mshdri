@@ -1,0 +1,11 @@
+[__AttributeUsage(_AttributeTargets.Var)]
+struct SrgbReadAttribute {}
+
+[__AttributeUsage(_AttributeTargets.Var)]
+struct DefaultAttribute
+{
+    float valueR;
+    float valueG;
+    float valueB;
+    float valueA;
+}

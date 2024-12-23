@@ -30,25 +30,50 @@ public class Material : Asset
 			Log.Warning( $"Material '{path}' does not exist" );
 		}
 
-		foreach ( var texturePath in textureBindings.Data )
-		{
-			// todo: How do we determine SRGB here? We should probably just fetch it from the texture itself right?
-			Textures.Add( texturePath.Key, new Texture( texturePath.Value, false ) );
-		}
-
 		{
 			var shaderFileBytes = FileSystem.Mounted.ReadAllBytes( "shaders/pbr.mshdr" );
 			var shaderFormat = Serializer.Deserialize<MochaFile<ShaderInfo>>( shaderFileBytes );
 
-			var boundTextures = shaderFormat.Data.Fragment.Reflection.Bindings
+			// resolve bindings
+			var requiredBindings = shaderFormat.Data.Fragment.Reflection.Bindings
 				.Where( binding => binding.Type == ShaderReflectionType.Texture )
-				.Select( binding => (
-					binding.Name,
-					Textures.TryGetValue( binding.Name, out var tex ) ? tex : Texture.MissingTexture,
-					binding
-				) )
-				.OrderBy( x => x.binding.Binding )
-				.Select( x => x.Item2.NativeTexture )
+				.ToList();
+
+			// load textures
+			foreach ( var binding in requiredBindings )
+			{
+				if ( !Textures.ContainsKey( binding.Name ) && textureBindings.Data.ContainsKey( binding.Name ) )
+				{
+					bool isSrgb = binding.Attributes.Any( a => a.Type == ShaderReflectionAttributeType.SrgbRead );
+
+					Textures.Add( binding.Name, new Texture( textureBindings.Data[binding.Name], isSrgb ) );
+				}
+			}
+
+			// create the ordered list of bound textures
+			var boundTextures = requiredBindings
+				.OrderBy( x => x.Binding )
+				.Select( binding =>
+				{
+					if ( Textures.TryGetValue( binding.Name, out var tex ) )
+						return tex;
+
+					// check for default attribute
+					var defaultAttr = binding.Attributes.Where( a => a.Type == ShaderReflectionAttributeType.Default ).Any()
+						? binding.Attributes.First( a => a.Type == ShaderReflectionAttributeType.Default )
+						: default;
+
+					bool isSrgb = binding.Attributes.Any( a => a.Type == ShaderReflectionAttributeType.SrgbRead );
+
+					if ( defaultAttr.Type == ShaderReflectionAttributeType.Default )
+					{
+						var data = defaultAttr.GetData<DefaultAttributeData>();
+						return new Texture( data.ValueR, data.ValueG, data.ValueB, data.ValueA, isSrgb );
+					}
+
+					return Texture.MissingTexture;
+				} )
+				.Select( x => x.NativeTexture )
 				.ToList();
 
 			NativeMaterial = new(
