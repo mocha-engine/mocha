@@ -216,6 +216,12 @@ void SceneMeshPass::RenderMesh( RenderPushConstants constants, Mesh* mesh )
 {
 }
 
+void EditorPass::Execute()
+{
+	Globals::m_hostManager->Render();
+	Globals::m_hostManager->DrawEditor();
+}
+
 void RenderManager::Render()
 {
 	// Server is headless - don't render
@@ -262,13 +268,20 @@ void RenderManager::Render()
 	} );
 
 	//
+	// B. Editor pass
+	//
+	EditorPass editorPass{};
+
+	//
 	// 2. Execute passes
 	//
 	Globals::m_renderContext->BeginRendering();
 	sceneMeshPass.Execute();
-	Globals::m_renderContext->EndRendering();
 
-	Globals::m_hostManager->Render();
+	Globals::m_renderContext->BeginImGui();
+	editorPass.Execute();
+	Globals::m_renderContext->EndImGui();
+	Globals::m_renderContext->EndRendering();
 }
 
 void RenderPass::Execute()

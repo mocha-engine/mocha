@@ -208,7 +208,7 @@ public static class Main
 	{
 		// Render editor.
 		SetServerContext( false );
-		// s_editor.EntryPoint?.FrameUpdate();
+		s_editor.EntryPoint?.FrameUpdate();
 	}
 
 	/// <summary>

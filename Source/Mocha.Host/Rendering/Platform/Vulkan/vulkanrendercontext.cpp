@@ -1047,6 +1047,8 @@ RenderStatus VulkanRenderContext::BeginImGui()
 	ImGui_ImplVulkan_NewFrame();
 	ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 
+	ImGui::NewFrame();
+
 	return RENDER_STATUS_OK;
 }
 

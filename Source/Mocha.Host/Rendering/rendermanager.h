@@ -62,3 +62,9 @@ public:
 	
 	void Render();
 };
+
+class EditorPass : public RenderPass
+{
+public:
+	void Execute() override;
+};
