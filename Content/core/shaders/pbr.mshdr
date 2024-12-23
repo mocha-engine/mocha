@@ -72,12 +72,12 @@ Vertex
         output.vColor = input.vColor;
         output.vTexCoord = input.vTexCoord * float2( -1, 1 );
         output.vNormalWS = input.vNormal;
-
+        
         // Calculate TBN matrix for lighting
-        float3 T = normalize(mul(float4(input.vTangent, 0.0), model_matrix).xyz);
-        float3 B = normalize(mul(float4(input.vBitangent, 0.0), model_matrix).xyz);
-        float3 N = normalize(mul(float4(input.vNormal, 0.0), model_matrix).xyz);
-        float3x3 TBN = transpose(float3x3(T, B, N));
+        float3 T = normalize(mul(model_matrix, float4(input.vTangent, 0.0)).xyz);
+        float3 B = normalize(mul(model_matrix, float4(input.vBitangent, 0.0)).xyz);
+        float3 N = normalize(mul(model_matrix, float4(input.vNormal, 0.0)).xyz);
+        float3x3 TBN = float3x3(T, B, N);
 
         // Transform into tangent space
         for (int i = 0; i < 4; i++)
