@@ -143,13 +143,13 @@ public static class Main
 		{
 			SetServerContext( false );
 
-			// s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
+			s_editor = new ProjectAssembly<IGame>( editorAssemblyInfo );
 			// The editor should never fail to compile.
-			// Debug.Assert( s_editor.EntryPoint is not null );
+			Debug.Assert( s_editor.EntryPoint is not null );
 			s_client = new ProjectAssembly<IGame>( clientAssemblyInfo );
 
 			// Start.
-			// s_editor.EntryPoint?.Startup();
+			s_editor.EntryPoint?.Startup();
 			s_client.EntryPoint?.Startup();
 		}
 	}
