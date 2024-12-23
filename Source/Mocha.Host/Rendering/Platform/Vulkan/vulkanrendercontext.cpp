@@ -43,7 +43,7 @@ void VulkanSwapchain::CreateMainSwapchain( Size2D size )
 
 	vkb::Swapchain vkbSwapchain = swapchainBuilder.set_old_swapchain( m_swapchain )
 	                                  .set_desired_format( { VK_FORMAT_B8G8R8A8_UNORM, VK_COLOR_SPACE_SRGB_NONLINEAR_KHR } )
-	                                  .set_desired_present_mode( VK_PRESENT_MODE_MAILBOX_KHR )
+	                                  .set_desired_present_mode( VK_PRESENT_MODE_IMMEDIATE_KHR )
 	                                  .set_desired_extent( size.x, size.y )
 	                                  .build()
 	                                  .value();
