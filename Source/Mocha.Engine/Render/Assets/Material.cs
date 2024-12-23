@@ -42,11 +42,11 @@ public class Material : Asset
 			// load textures
 			foreach ( var binding in requiredBindings )
 			{
-				if ( !Textures.ContainsKey( binding.Name ) && textureBindings.Data.ContainsKey( binding.Name ) )
+				if ( !Textures.ContainsKey( binding.Name ) && textureBindings.Data.TryGetValue( binding.Name, out string? value ) )
 				{
 					bool isSrgb = binding.Attributes.Any( a => a.Type == ShaderReflectionAttributeType.SrgbRead );
 
-					Textures.Add( binding.Name, new Texture( textureBindings.Data[binding.Name], isSrgb ) );
+					Textures.Add( binding.Name, new Texture( value, isSrgb ) );
 				}
 			}
 
