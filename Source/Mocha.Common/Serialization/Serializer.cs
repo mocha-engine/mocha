@@ -9,14 +9,28 @@ public static class Serializer
 	{
 		var serialized = BinaryConverter.Serialize( obj );
 
-		return Compress( serialized );
+		if ( serialized.Length < 512 )
+		{
+			return serialized;
+		}
+
+		var header = "BILZ"u8.ToArray();
+		return header.Concat( Compress( serialized ) ).ToArray();
 	}
 
 	public static T? Deserialize<T>( byte[] data ) where T : new()
 	{
-		var serialized = Decompress( data );
+		byte[] decompressedData = data;
 
-		return BinaryConverter.Deserialize<T>( serialized );
+		if ( data.Length > 4 )
+		{
+			var header = data[0..4];
+
+			if ( Enumerable.SequenceEqual( header, "BILZ"u8.ToArray() ) )
+				decompressedData = Decompress( data[4..] );
+		}
+
+		return BinaryConverter.Deserialize<T>( decompressedData );
 	}
 
 	public static byte[] Compress( byte[] uncompressedData )
