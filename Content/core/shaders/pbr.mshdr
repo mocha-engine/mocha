@@ -108,11 +108,11 @@ Fragment
 {    
     #define PI              3.14159265359
 
-    [SrgbRead, Default(1.0f, 0.0f, 1.0f, 1.0f)] Texture2D diffuseTexture;
-    [Default(0.5f, 0.5f, 1.0f, 1.0f)] Texture2D normalTexture;
-    [Default(1.0f, 1.0f, 1.0f, 1.0f)] Texture2D ambientOcclusionTexture;
-    [Default(0.0f, 0.0f, 0.0f, 1.0f)] Texture2D metalnessTexture;
-    [Default(1.0f, 1.0f, 1.0f, 1.0f)] Texture2D roughnessTexture;
+    [SrgbRead, Default(1.0f, 0.0f, 1.0f, 1.0f)]     Texture2D diffuseTexture;
+    [Default(0.5f, 0.5f, 1.0f, 1.0f)]               Texture2D normalTexture;
+    [Default(1.0f, 1.0f, 1.0f, 1.0f)]               Texture2D ambientOcclusionTexture;
+    [Default(0.0f, 0.0f, 0.0f, 1.0f)]               Texture2D metalnessTexture;
+    [Default(1.0f, 1.0f, 1.0f, 1.0f)]               Texture2D roughnessTexture;
     SamplerState samplerState;
 
     float3 fresnelSchlick(float cosTheta, float3 F0)
@@ -186,7 +186,7 @@ Fragment
 
     float ambient()
     {
-        return 0.05;
+        return 0.00;
     }
 
     float3 sampleTexture(Texture2D tex, float2 uv)

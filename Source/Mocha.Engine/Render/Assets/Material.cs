@@ -19,7 +19,7 @@ public class Material : Asset
 		// todo: We should really *not* be doing this but I can't be bothered
 		// to go through and upgrade every single material right now
 		MochaFile<Dictionary<string, string>> textureBindings = new();
-
+		
 		if ( FileSystem.Mounted.Exists( path ) )
 		{
 			var fileBytes = FileSystem.Mounted.ReadAllBytes( path );
@@ -82,7 +82,7 @@ public class Material : Asset
 				shaderFormat.Data.Fragment.Data.ToInterop(),
 				Vertex.VertexAttributes.ToInterop(),
 				boundTextures.ToInterop(),
-				SamplerType.Point,
+				SamplerType.Anisotropic,
 				false
 			);
 		}
