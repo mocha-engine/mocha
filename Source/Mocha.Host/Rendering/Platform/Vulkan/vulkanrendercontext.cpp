@@ -1490,7 +1490,7 @@ RenderStatus VulkanRenderContext::EndRendering()
 	//
 	// Render editor
 	//
-	// RenderImGui();
+	RenderImGui();
 
 	//
 	// We want to present the image, so we'll manually transition the layout to

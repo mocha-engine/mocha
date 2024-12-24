@@ -267,12 +267,12 @@ void RenderManager::Render()
 	//
 	// 2. Execute passes
 	//
-	Globals::m_renderContext->BeginRendering();
-	sceneMeshPass.Execute();
-
 	Globals::m_renderContext->BeginImGui();
 	editorPass.Execute();
 	Globals::m_renderContext->EndImGui();
+
+	Globals::m_renderContext->BeginRendering();
+	sceneMeshPass.Execute();
 	Globals::m_renderContext->EndRendering();
 }
 
