@@ -1048,6 +1048,7 @@ RenderStatus VulkanRenderContext::BeginImGui()
 	ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 
 	ImGui::NewFrame();
+	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 
 	return RENDER_STATUS_OK;
 }

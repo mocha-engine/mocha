@@ -208,14 +208,6 @@ void SceneMeshPass::SetConstants( RenderPushConstants constants )
 	m_constants = constants;
 }
 
-void SceneMeshPass::RenderSceneMesh( SceneMesh* mesh )
-{
-}
-
-void SceneMeshPass::RenderMesh( RenderPushConstants constants, Mesh* mesh )
-{
-}
-
 void EditorPass::Execute()
 {
 	Globals::m_hostManager->Render();
