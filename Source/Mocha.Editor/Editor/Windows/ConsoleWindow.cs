@@ -40,14 +40,16 @@ public class ConsoleWindow : EditorWindow
 			_isDirty = false;
 		}
 
-		if ( ImGui.BeginTable( "##console_output_table", 3, ImGuiTableFlags.RowBg ) )
+		if ( ImGui.BeginTable( "##console_output_table", 2, ImGuiTableFlags.RowBg ) )
 		{
-			ImGui.TableSetupColumn( "Time", ImGuiTableColumnFlags.WidthFixed, 64.0f );
-			ImGui.TableSetupColumn( "Logger", ImGuiTableColumnFlags.WidthFixed, 64.0f );
+			ImGui.TableSetupColumn( "Time", ImGuiTableColumnFlags.WidthFixed, 128.0f );
 			ImGui.TableSetupColumn( "Text", ImGuiTableColumnFlags.WidthStretch, 1.0f );
 
 			foreach ( NativeLogger.LogEntry item in Log.GetHistory() )
 			{
+				var level = Enum.Parse<LogLevel>( item.level );
+				var color = LogLevelToColor( level );
+
 				ImGui.TableNextRow();
 				ImGui.TableNextColumn();
 
@@ -59,14 +61,9 @@ public class ConsoleWindow : EditorWindow
 					ImGui.PopStyleColor();
 				}
 
-				ColoredText( item.time, Theme.Green );
+				ColoredText( item.time, color.ToBackground( 0.75f ) );
 				ImGui.TableNextColumn();
 
-				ColoredText( item.logger, Theme.Blue );
-				ImGui.TableNextColumn();
-
-				var level = Enum.Parse<LogLevel>( item.level );
-				var color = LogLevelToColor( level );
 				ColoredText( item.message, color );
 			}
 
@@ -78,7 +75,7 @@ public class ConsoleWindow : EditorWindow
 
 	private void DrawInput()
 	{
-		ImGui.SetNextItemWidth( -68 );
+		ImGui.SetNextItemWidth( -78 );
 		bool pressed = ImGui.InputText( "##console_input", ref s_currentInput, MaxInputLength, ImGuiInputTextFlags.EnterReturnsTrue );
 
 		ImGui.SameLine();
@@ -93,88 +90,12 @@ public class ConsoleWindow : EditorWindow
 		}
 	}
 
-	private void DrawEntityList()
-	{
-		if ( ImGui.BeginTabItem( $"{FontAwesome.Ghost}" ) )
-		{
-			foreach ( var actor in Actor.All )
-			{
-				if ( ImGui.Selectable( actor.Name ) )
-					InspectorWindow.SetSelectedObject( actor );
-			}
-
-			ImGui.EndTabItem();
-		}
-	}
-
-	private void DrawUIList()
-	{
-		if ( ImGui.BeginTabItem( $"{FontAwesome.VectorSquare}" ) )
-		{
-			void ShowNode( LayoutNode node )
-			{
-				if ( node.StyledNode.Node is ElementNode element )
-				{
-					var name = $"{element.Data}##{element.GetHashCode()}";
-
-					if ( ImGui.TreeNodeEx( name, node.Children.Count == 0 ? ImGuiTreeNodeFlags.Leaf : ImGuiTreeNodeFlags.None ) )
-					{
-						foreach ( var child in node.Children.ToArray() )
-						{
-							ShowNode( child );
-						}
-
-						ImGui.TreePop();
-					}
-				}
-				else
-				{
-					if ( ImGui.TreeNodeEx( "[Text Node]", ImGuiTreeNodeFlags.Leaf ) )
-						ImGui.TreePop();
-				}
-			}
-
-			ImGui.EndTabItem();
-		}
-	}
-
-	private void DrawOutliner()
-	{
-		if ( !ImGui.BeginChild( "##console_tabs_outer", new Vector2( -1, -1 ), false, ImGuiWindowFlags.AlwaysUseWindowPadding ) )
-			return;
-
-		if ( ImGui.BeginTabBar( "##console_tabs" ) )
-		{
-			DrawEntityList();
-			DrawUIList();
-
-			ImGui.EndTabBar();
-		}
-
-		ImGui.EndChild();
-	}
-
 	public override void Draw()
 	{
-		if ( ImGuiX.BeginWindow( "Console", ref isVisible ) )
+		if ( ImGui.Begin( "Console", ref isVisible ) )
 		{
-			if ( ImGui.BeginTable( "##console_output", 2, ImGuiTableFlags.Resizable ) )
-			{
-				ImGui.TableSetupColumn( "Entities", ImGuiTableColumnFlags.WidthFixed, 128.0f );
-				ImGui.TableSetupColumn( "Console Output", ImGuiTableColumnFlags.WidthStretch );
-
-				ImGui.TableNextRow();
-				ImGui.TableNextColumn();
-
-				DrawOutliner();
-
-				ImGui.TableNextColumn();
-
-				DrawOutput();
-				DrawInput();
-
-				ImGui.EndTable();
-			}
+			DrawOutput();
+			DrawInput();
 
 			ImGui.End();
 		}

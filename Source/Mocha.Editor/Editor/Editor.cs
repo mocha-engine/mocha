@@ -9,14 +9,14 @@ public class Editor
 	public static List<EditorWindow> EditorWindows = new()
 	{
 		new ConsoleWindow(),
-		new BrowserWindow(),
-		new InspectorWindow(),
-
-		new NetworkingWindow()
+		new InspectorWindow()
 	};
 
 	public static void Draw()
 	{
+		if ( Input.IsMouseCaptured )
+			return;
+
 		DrawMenuBar();
 		DrawStatusBar();
 
@@ -35,7 +35,7 @@ public class Editor
 		if ( ImGui.BeginMainMenuBar() )
 		{
 			ImGui.Dummy( new Vector2( 4, 0 ) );
-			ImGui.Text( "Mocha Engine" );
+			ImGui.Text( $"Mocha" );
 			ImGui.Dummy( new Vector2( 4, 0 ) );
 
 			ImGui.Separator();
@@ -52,14 +52,6 @@ public class Editor
 
 				if ( ImGui.MenuItem( "Performance Overlay" ) )
 					drawPerformanceOverlay = !drawPerformanceOverlay;
-
-				ImGui.EndMenu();
-			}
-
-			if ( ImGui.BeginMenu( "Layout" ) )
-			{
-				if ( ImGui.MenuItem( "Reset to Default" ) )
-					ResetLayout();
 
 				ImGui.EndMenu();
 			}
@@ -84,7 +76,7 @@ public class Editor
 			// Filler
 			var windowWidth = ImGui.GetWindowWidth();
 			var cursorX = ImGui.GetCursorPosX();
-			ImGui.Dummy( new Vector2( windowWidth - cursorX - 150f, 0 ) );
+			ImGui.Dummy( new Vector2( windowWidth - cursorX - 200f, 0 ) );
 
 			ImGui.Separator();
 			ImGui.Dummy( new Vector2( 4, 0 ) );
@@ -102,7 +94,7 @@ public class Editor
 			Vector2 workSize = ImGui.GetMainViewport().WorkSize;
 			Vector2 windowSize = ImGui.GetWindowSize();
 
-			ImGui.SetWindowPos( new Vector2( workPos.X + workSize.X - windowSize.X - 16, workPos.Y + workSize.Y - windowSize.Y - 128 - 16 ) );
+			ImGui.SetWindowPos( new Vector2( workPos.X + workSize.X - windowSize.X - 16, workPos.Y + workSize.Y - windowSize.Y - 16 ) );
 
 			var cursorPos = ImGui.GetCursorPos();
 			void DrawProperty( string name, string value )
@@ -160,10 +152,5 @@ public class Editor
 		}
 
 		ImGui.End();
-	}
-
-	private static void ResetLayout()
-	{
-
 	}
 }

@@ -6,7 +6,6 @@ public class Game : IGame
 	{
 		DebugOverlay.Render();
 		Notifications.Render();
-		ConsoleOverlay.Render();
 		Editor.Draw();
 	}
 
