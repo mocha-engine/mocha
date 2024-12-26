@@ -926,7 +926,7 @@ void VulkanRenderContext::CreateImGui()
 
 	io.Fonts->Build();
 
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
+	// io.ConfigFlags |= ImGuiConfigFlags_DockingEnable | ImGuiConfigFlags_ViewportsEnable;
 	io.ConfigViewportsNoDecoration = false;
 	io.ConfigViewportsNoAutoMerge = true;
 	io.ConfigDockingWithShift = true;
@@ -1048,7 +1048,7 @@ RenderStatus VulkanRenderContext::BeginImGui()
 	ImGui_ImplSDL2_NewFrame( m_window->GetSDLWindow() );
 
 	ImGui::NewFrame();
-	ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
+	// ImGui::DockSpaceOverViewport( nullptr, ImGuiDockNodeFlags_PassthruCentralNode );
 
 	return RENDER_STATUS_OK;
 }

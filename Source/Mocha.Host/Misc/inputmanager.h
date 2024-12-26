@@ -14,6 +14,8 @@ struct InputState
 	Vector2 mousePosition;
 	Vector2 lastMousePosition;
 	Vector2 mouseDelta;
+
+	bool isMouseCaptured;
 };
 
 class InputManager : ISubSystem
@@ -32,4 +34,5 @@ public:
 	GENERATE_BINDINGS bool IsKeyDown( int key );
 	GENERATE_BINDINGS Vector2 GetMousePosition();
 	GENERATE_BINDINGS Vector2 GetMouseDelta();
+	GENERATE_BINDINGS bool IsMouseCaptured();
 };

@@ -27,6 +27,8 @@ public static partial class Input
 	public static bool Crouch => IsKeyDown( InputButton.KeyControl );
 	public static bool Sprint => IsKeyDown( InputButton.KeyShift );
 
+	public static bool IsMouseCaptured => NativeInput.IsMouseCaptured();
+
 	public static void Update()
 	{
 		//
@@ -71,5 +73,7 @@ public static partial class Input
 		// Combine, store in Direction
 		//
 		Direction = new Vector3( forward, right, up );
+		Log.Info( Direction );
+		Log.Info( Rotation );
 	}
 }

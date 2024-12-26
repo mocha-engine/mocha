@@ -63,3 +63,8 @@ Vector2 InputManager::GetMouseDelta()
 
 	return m_inputState.mouseDelta;
 }
+
+bool InputManager::IsMouseCaptured()
+{
+	return m_inputState.isMouseCaptured;
+}

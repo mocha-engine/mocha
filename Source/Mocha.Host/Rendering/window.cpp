@@ -68,6 +68,7 @@ void Window::Update()
 
 	// Clear mouse delta every frame
 	inputState.mouseDelta = { 0, 0 };
+	inputState.isMouseCaptured = m_captureMouse;
 
 	SDL_SetRelativeMouseMode( m_captureMouse ? SDL_TRUE : SDL_FALSE );
 
@@ -155,7 +156,10 @@ void Window::Update()
 			inputState.keys[scanCode] = isDown;
 
 			if ( kbe.keysym.scancode == SDL_SCANCODE_GRAVE && isDown )
+			{
 				m_captureMouse = !m_captureMouse;
+				inputState.isMouseCaptured = m_captureMouse;
+			}
 		}
 		else if ( e.type == SDL_MOUSEMOTION )
 		{
