@@ -36,9 +36,10 @@ setup_x64.cmd
 # OR for 32-bit: setup_x86.cmd
 
 # 2. Build the entire solution (15-45 minutes total)
-# NEVER CANCEL: Use MSBuild with long timeout
+# NEVER CANCEL: Complex dependency resolution and interop generation
 msbuild Mocha.sln /p:Configuration=Debug /p:Platform=x64
 # OR use Visual Studio: Open Source/Mocha.sln and build solution
+# First build takes longer due to vcpkg package installation
 ```
 
 **Build Order Dependencies:**
@@ -77,9 +78,18 @@ dotnet test Mocha.Tests/Mocha.Tests.csproj
 cd Source
 dotnet format
 
+# Check formatting without making changes
+dotnet format --verify-no-changes
+
 # The CI pipeline (.github/workflows/format.yml) will fail if code is not formatted
 # Always run dotnet format before committing changes
 ```
+
+**Formatting Notes:**
+- Uses tabs for indentation (tab_size = 4) as defined in .editorconfig
+- Enforces CRLF line endings on Windows
+- Formatting applies only to .NET projects (C++ projects use .clang-format)
+- Security vulnerabilities in dependencies (SixLabors.ImageSharp) may cause warnings
 
 ## Project Structure
 
@@ -108,6 +118,25 @@ dotnet format
 - **`Mocha`** - Main executable wrapper
 - **`MochaDedicatedServer`** - Server executable
 
+### Sample Projects
+
+#### mocha-minimal Sample
+Located in `Samples/mocha-minimal/`, this is the basic sample project demonstrating engine usage.
+
+**Structure:**
+- `project.json` - Project configuration (name, version, resources, tick rate)
+- `code/` - C# game code (Game.cs, Player.cs, Controllers)
+- `content/` - Game assets
+  - `materials/pbr/` - PBR material definitions and textures (.mmat, .mtex files)
+  - `models/` - 3D models (FBX files and .mmdl material mappings)
+  - `ui/` - SCSS stylesheets for HTML/CSS UI
+
+**Running the Sample:**
+```batch
+cd build
+Mocha.exe -project ..\Samples\mocha-minimal\project.json
+```
+
 ## Common Development Tasks
 
 ### Building Individual Components
@@ -126,7 +155,11 @@ msbuild Mocha.Host/Mocha.Host.vcxproj /p:Configuration=Debug /p:Platform=x64
 ### Asset Compilation
 ```batch
 # Compile assets (after successful build)
+# This compiles content from both sample project and core engine content
 build\MochaTool.AssetCompiler.exe --mountpoints "samples/mocha-minimal/content/" "content/core/" -f
+
+# Or use the provided batch file
+BuildContent.bat
 ```
 
 ### Debugging
@@ -185,9 +218,11 @@ Mocha.exe -project ..\Samples\mocha-minimal\project.json
 ### Build Issues
 - **"Missing Microsoft.Cpp.Default.props"** - Install Visual Studio 2022 with C++ workload
 - **"vcpkg packages not found"** - Run `setup_x64.cmd` first
-- **"Vulkan not found"** - Install Vulkan SDK
+- **"Vulkan not found"** - Install Vulkan SDK and ensure graphics drivers are updated
 - **"InteropGen.exe not found"** - Build order issue; clean and rebuild entire solution
 - **".NET 7.0 not found"** - Install .NET 7.0 SDK (or newer with 7.0 targeting pack)
+- **"Package vulnerabilities"** - Known issues with SixLabors.ImageSharp 3.1.5; warnings can be ignored for development
+- **"Cannot open .vcxproj"** - Linux limitation; C++ projects require Windows and Visual Studio
 
 ### Runtime Issues
 - **"Vulkan initialization failed"** - Update graphics drivers or install Vulkan runtime
