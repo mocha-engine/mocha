@@ -66,6 +66,12 @@ public class BaseGame : IGame
 		}
 
 		DebugOverlay.ScreenText( $"BaseGame.Update assembly {GetType().Assembly.GetHashCode()}" );
+
+		// Call tick logic on all entities
+		TryCallMethodOnEntity( "Update" );
+
+		// Fire tick event
+		Event.Run( Event.TickAttribute.Name );
 	}
 
 	public void Shutdown()

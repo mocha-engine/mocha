@@ -7,6 +7,7 @@ public interface IActor
 
 	void Delete();
 	void Update();
+	void FrameUpdate();
 }
 
 public static class IActorExtensions
