@@ -14,6 +14,7 @@ namespace EngineProperties
 	    "project.current", "Samples\\mocha-minimal\\project.json", CVarFlags::Archive, "Which project should we load?" );
 	BoolCVar Raytracing( "render.raytracing", true, CVarFlags::Archive, "Enable raytracing" );
 	BoolCVar Renderdoc( "render.renderdoc", false, CVarFlags::Archive, "Enable renderdoc" );
+	BoolCVar Bindless( "render.bindless", true, CVarFlags::Archive, "Enable bindless" );
 
 	StringCVar ServerName( "server.name", "Mocha Dedicated Server", CVarFlags::None, "Server name" );
 	StringCVar ServerPassword( "server.password", "", CVarFlags::None, "Server password" );
