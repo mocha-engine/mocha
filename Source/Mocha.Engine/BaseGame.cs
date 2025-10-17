@@ -51,6 +51,8 @@ public class BaseGame : IGame
 	public void FrameUpdate()
 	{
 		TryCallMethodOnEntity( "FrameUpdate" );
+
+		OnFrameUpdate();
 	}
 
 	public void Update()
@@ -65,7 +67,7 @@ public class BaseGame : IGame
 			DebugOverlay.currentLine = 0;
 		}
 
-		DebugOverlay.ScreenText( $"BaseGame.Update assembly {GetType().Assembly.GetHashCode()}" );
+		OnUpdate();
 	}
 
 	public void Shutdown()
@@ -82,7 +84,7 @@ public class BaseGame : IGame
 	/// <summary>
 	/// Called on the server when the game starts up
 	/// </summary>
-	public virtual void OnStartup()
+	protected virtual void OnStartup()
 	{
 
 	}
@@ -90,7 +92,17 @@ public class BaseGame : IGame
 	/// <summary>
 	/// Called on the server when the game shuts down
 	/// </summary>
-	public virtual void OnShutdown()
+	protected virtual void OnShutdown()
+	{
+
+	}
+
+	protected virtual void OnUpdate()
+	{
+
+	}
+
+	protected virtual void OnFrameUpdate()
 	{
 
 	}

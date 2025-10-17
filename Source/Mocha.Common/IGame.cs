@@ -2,17 +2,17 @@
 
 public interface IGame
 {
-	void Startup();
-	void Shutdown();
+	internal void Startup();
+	internal void Shutdown();
 
 	/// <summary>
 	/// Called every frame on the client.
 	/// Note that there is nothing for this on the server, because servers don't render anything.
 	/// </summary>
-	void FrameUpdate();
+	internal void FrameUpdate();
 
 	/// <summary>
 	/// Called every tick on the client and the server.
 	/// </summary>
-	void Update();
+	internal void Update();
 }

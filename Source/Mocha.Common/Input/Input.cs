@@ -73,7 +73,5 @@ public static partial class Input
 		// Combine, store in Direction
 		//
 		Direction = new Vector3( forward, right, up );
-		Log.Info( Direction );
-		Log.Info( Rotation );
 	}
 }

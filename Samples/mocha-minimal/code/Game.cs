@@ -6,7 +6,7 @@ namespace Minimal;
 
 public class Game : BaseGame
 {
-	public override void OnStartup()
+	protected override void OnStartup()
 	{
 		// Spawn a model to walk around in
 		var map = new StaticMeshActor( "models/dev/dev_map.mmdl" );

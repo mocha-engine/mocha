@@ -639,7 +639,7 @@ vkb::Instance VulkanRenderContext::CreateInstanceAndSurface()
 
 	volkLoadInstance( m_instance );
 
-	m_window = std::make_unique<Window>( 1280, 720 );
+	m_window = std::make_unique<Window>( 1600, 900 );
 	m_surface = m_window->CreateSurface( m_instance );
 
 	return vkbInstance;
@@ -914,9 +914,9 @@ void VulkanRenderContext::CreateImGui()
 	//io.FontGlobalScale = 1.0f / 1.25f;
 
 #define ADD_FONT( name, path, size )                   \
-	name = io.Fonts->AddFontFromFileTTF( path, size * 1.25f ); \
+	name = io.Fonts->AddFontFromFileTTF( path, size ); \
 	CreateImGuiIconFont();
-
+	
 	ADD_FONT( m_mainFont, "Content\\core\\fonts\\editor\\Inter-Regular.ttf", 14.0f );
 	ADD_FONT( m_boldFont, "Content\\core\\fonts\\editor\\Inter-Bold.ttf", 14.0f );
 	ADD_FONT( m_subheadingFont, "Content\\core\\fonts\\editor\\Inter-Medium.ttf", 16.0f );
