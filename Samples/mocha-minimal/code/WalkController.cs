@@ -9,11 +9,11 @@ namespace Minimal;
 
 public class WalkController
 {
-	public float Friction => 12.0f;
-	public float GroundAccelerate => 50.0f;
-	public float MaxVelocityGround => 50.0f;
+	public float Friction => 5.0f;
+	public float GroundAccelerate => 30.0f;
+	public float MaxVelocityGround => 5.0f;
 	public float AirAccelerate => 5.0f;
-	public float MaxVelocityAir => 100.0f;
+	public float MaxVelocityAir => 5.0f;
 	public float GroundDistance => 0.1f;
 	public float StepSize => 0.5f;
 	public float MaxAngle => 60.0f;
@@ -66,7 +66,7 @@ public class WalkController
 		{
 			Velocity = MoveAir( wishDir, Velocity );
 
-			Velocity.Z -= 9.8f * Time.Delta;
+			Velocity.Z -= 15.24f * Time.Delta;
 		}
 
 		Player.Velocity = Velocity * 10f;

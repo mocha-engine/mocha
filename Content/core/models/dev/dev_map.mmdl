@@ -1,7 +1,7 @@
 {
 	"Model": "models/dev/dev_map.fbx",
 	"Materials": [
-		"materials/metal/metal.mmat",
+		"materials/planks/planks.mmat",
 		"materials/dev/dev_floor.mmat",
 		"materials/dev/dev_white.mmat",
 		"materials/dev/dev_white.mmat",
