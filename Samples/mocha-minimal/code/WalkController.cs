@@ -7,7 +7,7 @@ namespace Minimal;
  * once it's done
  */
 
-public class WalkController : BaseController
+public class WalkController
 {
 	public float Friction => 12.0f;
 	public float GroundAccelerate => 50.0f;
@@ -19,7 +19,7 @@ public class WalkController : BaseController
 	public float MaxAngle => 60.0f;
 
 	private bool IsGrounded => GroundEntity != null;
-	private Actor GroundEntity;
+	private BaseEntity GroundEntity;
 
 	private Player Player { get; set; }
 
@@ -28,12 +28,15 @@ public class WalkController : BaseController
 	public WalkController( Player player )
 	{
 		Player = player;
-		// Player.IgnoreRigidbodyRotation = true;
+		Player.IgnoreRigidbodyRotation = true;
 
 		Event.Register( this );
+
+		Player.Position = new Vector3( 0, 5, 10 );
 	}
 
-	public override void PredictedUpdate()
+	[Event.Tick]
+	public void PredictedUpdate()
 	{
 		DebugOverlay.ScreenText( $"--------------------------------------------------------------------------------" );
 		DebugOverlay.ScreenText( $"{(Core.IsClient ? "Client" : "Server")}" );
@@ -66,15 +69,10 @@ public class WalkController : BaseController
 			Velocity.Z -= 9.8f * Time.Delta;
 		}
 
-//		Player.Velocity = Velocity * 10f;
+		Player.Velocity = Velocity * 10f;
 		Move();
 
 		DebugOverlay.ScreenText( $"--------------------------------------------------------------------------------" );
-	}
-
-	~WalkController()
-	{
-		Event.Unregister( this );
 	}
 
 	private Vector3 GetWishDir()
@@ -118,7 +116,7 @@ public class WalkController : BaseController
 
 	public Mocha.TraceResult TraceBBox( Vector3 start, Vector3 end )
 	{
-		return Cast.Ray( start, end ).WithHalfExtents( Player.PlayerBounds ).Run();//.Ignore( Player ).Run();
+		return Cast.Ray( start, end ).WithHalfExtents( Player.PlayerBounds ).Ignore( Player ).Run();
 	}
 
 	private void CheckGrounded()
@@ -128,9 +126,9 @@ public class WalkController : BaseController
 		// Grounded only counts if the normal is facing upwards
 		var angle = Vector3.GetAngle( tr.Normal, Vector3.Up );
 
-		//if ( tr.Hit && angle < MaxAngle )
-		//	GroundEntity = tr.Entity;
-		//else
+		if ( tr.Hit && angle < MaxAngle )
+			GroundEntity = tr.Entity;
+		else
 			GroundEntity = null;
 	}
 

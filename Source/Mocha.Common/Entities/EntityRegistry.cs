@@ -2,7 +2,7 @@
 
 namespace Mocha.Common;
 
-public sealed class EntityRegistry : IEnumerable<IActor>
+public sealed class EntityRegistry : IEnumerable<IEntity>
 {
 	private static EntityRegistry? s_instance;
 	public static EntityRegistry Instance
@@ -14,9 +14,9 @@ public sealed class EntityRegistry : IEnumerable<IActor>
 		}
 	}
 
-	private readonly List<IActor> _entities = new();
+	private readonly List<IEntity> _entities = new();
 
-	public void RegisterEntity( IActor entity )
+	public void RegisterEntity( IEntity entity )
 	{
 		// Don't add duplicates
 		if ( _entities.Contains( entity ) )
@@ -25,15 +25,15 @@ public sealed class EntityRegistry : IEnumerable<IActor>
 		_entities.Add( entity );
 	}
 
-	public void UnregisterEntity( IActor entity )
+	public void UnregisterEntity( IEntity entity )
 	{
 		_entities.Remove( entity );
 	}
 
-	public IEnumerator<IActor> GetEnumerator() => _entities.GetEnumerator();
+	public IEnumerator<IEntity> GetEnumerator() => _entities.GetEnumerator();
 	IEnumerator IEnumerable.GetEnumerator() => _entities.GetEnumerator();
 
-	public IActor this[int index]
+	public IEntity this[int index]
 	{
 		get => _entities.ElementAt( index );
 		set => _entities[index] = value;

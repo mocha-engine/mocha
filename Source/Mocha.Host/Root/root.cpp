@@ -26,8 +26,8 @@ void Root::Startup()
 	Globals::m_projectManager = new ProjectManager();
 	Globals::m_projectManager->Startup();
 
-	Globals::m_sceneGraph = new SceneGraph();
-	Globals::m_sceneGraph->Startup();
+	Globals::m_entityManager = new EntityManager();
+	Globals::m_entityManager->Startup();
 
 	Globals::m_physicsManager = new PhysicsManager();
 	Globals::m_physicsManager->Startup();
@@ -56,7 +56,7 @@ void Root::Shutdown()
 	Globals::m_inputManager->Shutdown();
 	Globals::m_renderdocManager->Shutdown();
 	Globals::m_physicsManager->Shutdown();
-	Globals::m_sceneGraph->Shutdown();
+	Globals::m_entityManager->Shutdown();
 	Globals::m_projectManager->Shutdown();
 	Globals::m_cvarManager->Shutdown();
 	Globals::m_logManager->Shutdown();
@@ -71,6 +71,29 @@ const char* Root::GetProjectPath()
 	strcpy_s( cstr, str.length() + 1, str.c_str() );
 
 	return cstr;
+}
+
+uint32_t Root::CreateBaseEntity()
+{
+	auto* entityDictionary = Globals::m_entityManager;
+
+	BaseEntity baseEntity = {};
+	baseEntity.AddFlag( ENTITY_MANAGED );
+	baseEntity.m_type = "BaseEntity";
+
+	return entityDictionary->AddEntity<BaseEntity>( baseEntity );
+}
+
+uint32_t Root::CreateModelEntity()
+{
+	auto* entityDictionary = Globals::m_entityManager;
+
+	ModelEntity modelEntity = {};
+	modelEntity.AddFlag( ENTITY_MANAGED );
+	modelEntity.AddFlag( ENTITY_RENDERABLE );
+	modelEntity.m_type = "ModelEntity";
+
+	return entityDictionary->AddEntity<ModelEntity>( modelEntity );
 }
 
 double HiresTimeInSeconds()
@@ -119,8 +142,8 @@ void Root::Run()
 		while ( accumulator >= logicDelta )
 		{
 			// Assign previous transforms to all entities
-			Globals::m_sceneGraph->ForEach(
-			    [&]( std::shared_ptr<SceneMesh> mesh ) { mesh->m_transformLastFrame = mesh->m_transformCurrentFrame; } );
+			Globals::m_entityManager->ForEach(
+			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformLastFrame = entity->m_transformCurrentFrame; } );
 
 			Globals::m_tickDeltaTime = ( float )logicDelta;
 
@@ -143,8 +166,8 @@ void Root::Run()
 			}
 
 			// Assign current transforms to all entities
-			Globals::m_sceneGraph->ForEach(
-			    [&]( std::shared_ptr<SceneMesh> mesh ) { mesh->m_transformCurrentFrame = mesh->m_transform; } );
+			Globals::m_entityManager->ForEach(
+			    [&]( std::shared_ptr<BaseEntity> entity ) { entity->m_transformCurrentFrame = entity->m_transform; } );
 
 			Globals::m_curTime += logicDelta;
 			accumulator -= logicDelta;
@@ -160,13 +183,13 @@ void Root::Run()
 			const double alpha = accumulator / logicDelta;
 
 			// Assign interpolated transforms to all entities
-			Globals::m_sceneGraph->ForEach( [&]( std::shared_ptr<SceneMesh> mesh ) {
+			Globals::m_entityManager->ForEach( [&]( std::shared_ptr<BaseEntity> entity ) {
 				// If this entity was spawned in just now, don't interpolate
-				if ( mesh->m_spawnTime == Globals::m_curTick )
+				if ( entity->m_spawnTime == Globals::m_curTick )
 					return;
 
-				mesh->m_transform =
-				    Transform::Lerp( mesh->m_transformLastFrame, mesh->m_transformCurrentFrame, ( float )alpha );
+				entity->m_transform =
+				    Transform::Lerp( entity->m_transformLastFrame, entity->m_transformCurrentFrame, ( float )alpha );
 			} );
 
 			Globals::m_renderManager->DrawOverlaysAndEditor();

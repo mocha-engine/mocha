@@ -97,10 +97,10 @@ public class ConsoleWindow : EditorWindow
 	{
 		if ( ImGui.BeginTabItem( $"{FontAwesome.Ghost}" ) )
 		{
-			foreach ( var actor in Actor.All )
+			foreach ( var entity in BaseEntity.All )
 			{
-				if ( ImGui.Selectable( actor.Name ) )
-					InspectorWindow.SetSelectedObject( actor );
+				if ( ImGui.Selectable( entity.Name ) )
+					InspectorWindow.SetSelectedObject( entity );
 			}
 
 			ImGui.EndTabItem();
@@ -133,6 +133,8 @@ public class ConsoleWindow : EditorWindow
 						ImGui.TreePop();
 				}
 			}
+
+			ShowNode( UIManager.Instance.RootPanel );
 
 			ImGui.EndTabItem();
 		}

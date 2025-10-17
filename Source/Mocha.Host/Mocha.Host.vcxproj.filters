@@ -477,6 +477,9 @@
     <ClCompile Include="thirdparty\volk\volk.c">
       <Filter>Thirdparty\Volk</Filter>
     </ClCompile>
+    <ClCompile Include="Entities\modelentity.cpp">
+      <Filter>Entities</Filter>
+    </ClCompile>
     <ClCompile Include="Managed\hostmanager.cpp">
       <Filter>Managed</Filter>
     </ClCompile>
@@ -1346,6 +1349,9 @@
     </ClInclude>
     <ClInclude Include="thirdparty\volk\volk.h">
       <Filter>Thirdparty\Volk</Filter>
+    </ClInclude>
+    <ClInclude Include="Entities\modelentity.h">
+      <Filter>Entities</Filter>
     </ClInclude>
     <ClInclude Include="Entities\baseentity.h">
       <Filter>Entities</Filter>

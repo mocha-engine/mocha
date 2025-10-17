@@ -19,47 +19,4 @@ public struct Transform
 		Rotation = other.Rotation;
 		Scale = other.Scale;
 	}
-
-	public Transform WithPosition( Vector3 position )
-	{
-		var tx = new Transform
-		{
-			Position = position,
-			Rotation = Rotation,
-			Scale = Scale
-		};
-
-		return tx;
-	}
-
-	public Transform WithRotation( Rotation rotation )
-	{
-		var tx = new Transform
-		{
-			Position = Position,
-			Rotation = rotation,
-			Scale = Scale
-		};
-
-		return tx;
-	}
-
-	public Transform WithScale( Vector3 scale )
-	{
-		var tx = new Transform
-		{
-			Position = Position,
-			Rotation = Rotation,
-			Scale = scale
-		};
-
-		return tx;
-	}
-
-	public static Transform Default => new Transform()
-	{
-		Position = Vector3.Zero,
-		Rotation = Rotation.Identity,
-		Scale = Vector3.One
-	};
 }

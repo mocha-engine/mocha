@@ -1,6 +1,5 @@
 #pragma once
 #include <Rendering/rendering.h>
-#include <Rendering/baserendercontext.h>
 #include <Util/util.h>
 
 class Root;

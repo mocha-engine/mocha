@@ -1,4 +1,5 @@
 #pragma once
+#include <Entities/modelentity.h>
 #include <Jolt/Jolt.h>
 #include <Misc/handlemap.h>
 #include <Misc/mathtypes.h>
@@ -261,6 +262,6 @@ public:
 
 	void Update();
 
-	// uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
+	uint32_t AddBody( ModelEntity* entity, PhysicsBody body );
 	GENERATE_BINDINGS TraceResult Trace( TraceInfo traceInfo );
 };

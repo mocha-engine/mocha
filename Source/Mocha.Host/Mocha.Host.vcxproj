@@ -193,6 +193,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Entities\modelentity.cpp" />
     <ClCompile Include="Managed\hostmanager.cpp" />
     <ClCompile Include="Managed\managedcallback.cpp" />
     <ClCompile Include="Misc\cvarmanager.cpp" />
@@ -357,6 +358,7 @@ git rev-parse --abbrev-ref HEAD &gt;&gt; gitdefs.h</Command>
   <ItemGroup>
     <ClInclude Include="Entities\baseentity.h" />
     <ClInclude Include="Entities\entitymanager.h" />
+    <ClInclude Include="Entities\modelentity.h" />
     <ClInclude Include="fontawesome.h" />
     <ClInclude Include="Managed\managedcallbackdispatchinfo.h" />
     <ClInclude Include="Managed\managedcallback.h" />

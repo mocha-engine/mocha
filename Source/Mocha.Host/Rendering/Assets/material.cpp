@@ -54,7 +54,6 @@ void Material::CreateResources()
 	pipelineInfo.shaderInfo.vertexShaderData = m_vertexShaderData;
 	pipelineInfo.shaderInfo.fragmentShaderData = m_fragmentShaderData;
 	pipelineInfo.vertexAttributes = m_vertexAttribInfo;
-	pipelineInfo.ignoreDepth = m_ignoreDepth;
 
 	DescriptorInfo_t descriptorInfo;
 	descriptorInfo.name = m_name + " descriptor";

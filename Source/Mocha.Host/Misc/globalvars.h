@@ -28,7 +28,7 @@ class RenderManager;
 class LogManager;
 class HostManager;
 class RenderdocManager;
-class SceneGraph;
+class EntityManager;
 class PhysicsManager;
 class EditorManager;
 class InputManager;
@@ -48,7 +48,7 @@ namespace Globals
 	extern LogManager* m_logManager;
 	extern HostManager* m_hostManager;
 	extern RenderdocManager* m_renderdocManager;
-	extern SceneGraph* m_sceneGraph;
+	extern EntityManager* m_entityManager;
 	extern PhysicsManager* m_physicsManager;
 	extern EditorManager* m_editorManager;
 	extern InputManager* m_inputManager;

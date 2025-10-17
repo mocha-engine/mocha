@@ -93,12 +93,12 @@ internal static class Upgrader
 
 			// Find new type for entity in new assembly
 			var newType = newAssembly.GetType( entityType.FullName ?? entityType.Name )!;
-			var newEntity = (IActor)FormatterServices.GetUninitializedObject( newType )!;
+			var newEntity = (IEntity)FormatterServices.GetUninitializedObject( newType )!;
 
 			// Have we already upgraded this?
 			if ( UpgradedReferences.TryGetValue( entity.GetHashCode(), out var upgradedValue ) )
 			{
-				newEntity = (IActor)upgradedValue;
+				newEntity = (IEntity)upgradedValue;
 			}
 			else
 			{

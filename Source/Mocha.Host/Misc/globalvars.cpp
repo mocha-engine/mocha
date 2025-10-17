@@ -28,7 +28,7 @@ namespace Globals
 	LogManager* m_logManager;
 	HostManager* m_hostManager;
 	RenderdocManager* m_renderdocManager;
-	SceneGraph* m_sceneGraph;
+	EntityManager* m_entityManager;
 	PhysicsManager* m_physicsManager;
 	EditorManager* m_editorManager;
 	InputManager* m_inputManager;
