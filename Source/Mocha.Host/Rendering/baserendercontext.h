@@ -146,6 +146,8 @@ struct DescriptorBindingInfo_t
 {
 	DescriptorBindingType type = DESCRIPTOR_BINDING_TYPE_IMAGE;
 	ImageTexture* texture = nullptr;
+
+	bool isBindless = false;
 };
 
 struct DescriptorInfo_t

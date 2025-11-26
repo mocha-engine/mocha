@@ -59,6 +59,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="renderdoc.dll">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Runtimes\cimgui.dll">
 			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
 		</None>

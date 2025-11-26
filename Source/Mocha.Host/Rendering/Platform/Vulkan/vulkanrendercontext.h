@@ -377,6 +377,7 @@ private:
 	VkSurfaceKHR m_surface;
 	VkSemaphore m_presentSemaphore, m_renderSemaphore;
 	VkDescriptorPool m_descriptorPool;
+	VkDescriptorPool m_bindlessDescriptorPool;
 
 	std::unique_ptr<Window> m_window;
 	VulkanCommandContext m_mainContext;
@@ -486,6 +487,12 @@ private:
 	/// deleted when the next frame ends instead.
 	/// </summary>
 	VulkanDeletionQueue m_frameDeletionQueue = {};
+
+	//
+	// Bindless
+	//
+	VulkanDescriptor m_bindlessDescriptor;
+	std::deque<VulkanImageTexture> m_bindlessTextureUpdates = {};
 
 protected:
 	// ----------------------------------------
